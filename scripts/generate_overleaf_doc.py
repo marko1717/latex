@@ -97,51 +97,63 @@ LATEX_FOOTER = r"""
 \end{document}
 """
 
-def generate_doc():
-    generators = [
-        ArithmeticFindDifferentGenerator(),
-        ArithmeticMemberDifferenceGenerator(),
-        ArithmeticSumGenerator(),
-        ArithmeticTermPropertiesGenerator(),
-        ArithmeticMiddleTermGenerator(),
-        ArithmeticFormulaSearchGenerator(),
-        ArithmeticWordProblemGenerator(),
-        # Geometric
-        GeometricFindTermGenerator(),
-        GeometricRatioGenerator(),
-        GeometricFormulaGenerator(),
-        GeometricSumGenerator(),
-        GeometricWordProblemGenerator()
-    ]
-    
+def generate_topic_doc(topic_name, generators, output_filename):
     content = ""
     task_counter = 1
     
+    # Header specific to topic? Or generic?
+    # Using generic header with specific title
+    header = LATEX_HEADER.replace("Арифметична та Геометрична прогресії", topic_name)
+    
     for gen in generators:
         content += f"% === {gen.topic} ===\n"
-        
-        # Generator 2 examples per type
-        for _ in range(2):
+        # Generate 10 examples per type for scale? Or keep 2 for now?
+        # User wants 5000 tasks eventually. Let's do 5 per type for now.
+        for _ in range(5):
             task = gen.generate()
             question = task["question"]
             options = task["options"]
             
-            # Format Question
             content += f"\\noindent\\makebox[1.5em][l]{{\\textbf{{{task_counter}.}}}}\\parbox[t]{{\\dimexpr\\textwidth-1.5em}}{{{question} \\nmtyear{{2026}}}}\n\n"
             
-            # Use answerTable
             opts = task["options"]
             content += f"\\answerTable{{{opts[0]}}}{{{opts[1]}}}{{{opts[2]}}}{{{opts[3]}}}{{{opts[4]}}}\n\n"
             content += "\\vspace{0.5cm}\n\n"
             
             task_counter += 1
 
-    full_latex = LATEX_HEADER + content + LATEX_FOOTER
+    full_latex = header + content + LATEX_FOOTER
     
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+    
+    with open(output_filename, "w", encoding="utf-8") as f:
         f.write(full_latex)
     
-    print(f"Generated {task_counter-1} tasks to {OUTPUT_FILE}")
+    print(f"Generated {task_counter-1} tasks to {output_filename}")
+
+def generate_all():
+    # 1. Arithmetic
+    arithmetic_gens = [
+        ArithmeticFindDifferentGenerator(),
+        ArithmeticMemberDifferenceGenerator(),
+        ArithmeticSumGenerator(),
+        ArithmeticTermPropertiesGenerator(),
+        ArithmeticMiddleTermGenerator(),
+        ArithmeticFormulaSearchGenerator(),
+        ArithmeticWordProblemGenerator()
+    ]
+    generate_topic_doc("Арифметична прогресія", arithmetic_gens, "tex/arithmetic_progression.tex")
+    
+    # 2. Geometric
+    geometric_gens = [
+        GeometricFindTermGenerator(),
+        GeometricRatioGenerator(),
+        GeometricFormulaGenerator(),
+        GeometricSumGenerator(),
+        GeometricWordProblemGenerator()
+    ]
+    generate_topic_doc("Геометрична прогресія", geometric_gens, "tex/geometric_progression.tex")
 
 if __name__ == "__main__":
-    generate_doc()
+    generate_all()
