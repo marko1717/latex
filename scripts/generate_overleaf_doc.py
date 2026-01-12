@@ -267,5 +267,15 @@ def generate_all():
     ]
     generate_topic_doc("Тригонометричні вирази та рівняння", trig_gens, "tex/trigonometry.tex")
 
+    # 5. Functions
+    from generators.functions import FunctionShiftGenerator, FunctionDomainGenerator
+    func_gens = [
+        FunctionShiftGenerator(),
+        MatchingTaskGenerator(FunctionShiftGenerator),
+        FunctionDomainGenerator(),
+        MatchingTaskGenerator(FunctionDomainGenerator)
+    ]
+    generate_topic_doc("Функції та їх властивості", func_gens, "tex/functions.tex")
+
 if __name__ == "__main__":
     generate_all()
