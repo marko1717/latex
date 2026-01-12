@@ -155,5 +155,14 @@ def generate_all():
     ]
     generate_topic_doc("Геометрична прогресія", geometric_gens, "tex/geometric_progression.tex")
 
+    # 3. Logarithms
+    from generators.logarithms import LogEquationGenerator, LogInequalityGenerator, LogValueGenerator
+    log_gens = [
+        LogValueGenerator(),
+        LogEquationGenerator(),
+        LogInequalityGenerator()
+    ]
+    generate_topic_doc("Логарифмічні вирази та рівняння", log_gens, "tex/logarithms.tex")
+
 if __name__ == "__main__":
     generate_all()

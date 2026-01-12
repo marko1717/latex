@@ -19,7 +19,16 @@ def parse_latex_file(filepath, topic_name):
     
     # Regex to find definition of tasks
     # We use a custom parser because regex doesn't handle nested braces well
-    task_start_pattern = re.compile(r'(?:\\task\s*\{(\d+)\}\s*\{)|(?:\\noindent\\makebox\[[^\]]*\]\[[^\]]*\]\{\\textbf\{(\d+)\.\}\}\\parbox\[[^\]]*\](?:\{[^}]*\})?\{)')
+    # Regex to find definition of tasks
+    # 1. \task{num}{text}
+    # 2. \noindent\makebox...{\textbf{num.}}\parbox...{text}
+    # 3. \noindent\textbf{num.} text ... (Simple format found in Logarithms/Probability)
+    
+    task_start_pattern = re.compile(
+        r'(?:\\task\s*\{(\d+)\}\s*\{)|' + 
+        r'(?:\\noindent\\makebox\[[^\]]*\]\[[^\]]*\]\{\\textbf\{(\d+)\.\}\}\\parbox\[[^\]]*\](?:\{[^}]*\})?\{)|' +
+        r'(?:\\noindent\s*\\textbf\{(\d+)\.\})'
+    )
     
     current_pos = 0
     while True:
@@ -27,38 +36,90 @@ def parse_latex_file(filepath, topic_name):
         if not match:
             break
             
+        is_simple_format = False
+        
         if match.group(1):
-            task_num = match.group(1)
+             task_num = match.group(1)
+        elif match.group(2):
+             task_num = match.group(2)
         else:
-            task_num = match.group(2)
+             task_num = match.group(3)
+             is_simple_format = True
             
         start_content_idx = match.end()
         
-        # Extract the question text by balancing braces
-        brace_count = 1
-        i = start_content_idx
+        task_text = ""
         task_text_end = -1
         
-        while i < len(content):
-            if content[i] == '{':
-                brace_count += 1
-            elif content[i] == '}':
-                brace_count -= 1
+        if not is_simple_format:
+            # Extract the question text by balancing braces
+            brace_count = 1
+            i = start_content_idx
             
-            if brace_count == 0:
-                task_text_end = i
-                break
-            i += 1
+            while i < len(content):
+                if content[i] == '{':
+                    brace_count += 1
+                elif content[i] == '}':
+                    brace_count -= 1
+                
+                if brace_count == 0:
+                    task_text_end = i
+                    break
+                i += 1
+                
+            if task_text_end == -1:
+                print(f"Error: Could not find closing brace for task {task_num}")
+                current_pos = start_content_idx
+                continue
+                
+            task_text = content[start_content_idx:task_text_end]
+            body_start = task_text_end + 1
             
-        if task_text_end == -1:
-            print(f"Error: Could not find closing brace for task {task_num}")
-            current_pos = start_content_idx
-            continue
+        else:
+            # Simple format: Text is everything from here until \answerTable or \nmtyear or next task
+            # BUT we need to be careful. Ideally we read until we hit \answerTable or next task start.
+            # Usually \nmtyear is at the end of the question.
             
-        task_text = content[start_content_idx:task_text_end]
+            # Let's find end of question heuristic.
+            # Usually ends before \answerTable
+            
+            # Find next task to set a hard limit
+            next_task_debug = task_start_pattern.search(content, start_content_idx)
+            hard_limit = next_task_debug.start() if next_task_debug else len(content)
+            
+            # Find \answerTable within this range
+            # Or \matchTable
+            # Or \vspace
+            
+            # Let's assume question text ends where \answerTable starts, OR at \nmtyear (which is part of q text usually but we strip it later)
+            
+            # Actually, `body_start` is where options definition starts.
+            # In \task{n}{text}... body starts after text.
+            # Here, there is no separation. "Text" is just the start of the body effectively.
+            
+            # Let's treat everything up to next task as "body", and extract question from it.
+            # This simplifies logic: question is part of "full content" which we parse later.
+            
+            # BUT downstream we rely on `task_text` separate from `task_body`.
+            # Let's say task_text is everything before the first \answerTable command?
+            
+            answer_match = re.search(r'\\answerTable', content[start_content_idx:hard_limit])
+            if answer_match:
+                task_text_end = start_content_idx + answer_match.start()
+            else:
+                # Maybe it is a matching task?
+                match_match = re.search(r'\\matchTable', content[start_content_idx:hard_limit])
+                if match_match:
+                     task_text_end = start_content_idx + match_match.start()
+                else:
+                     # Maybe text only?
+                     task_text_end = hard_limit
+            
+            task_text = content[start_content_idx:task_text_end]
+            body_start = task_text_end # The body starts exactly where question ended (e.g. at \answerTable)
+
         
         # Now find the "body" (everything after the question curly brace until the next task or newpage)
-        body_start = task_text_end + 1
         
         # Find next task to determine body end (or end of file)
         next_task_match = task_start_pattern.search(content, body_start)
