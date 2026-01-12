@@ -9,6 +9,13 @@ from generators.arithmetic_progression import (
     ArithmeticFormulaSearchGenerator,
     ArithmeticWordProblemGenerator
 )
+from generators.geometric_progression import (
+    GeometricFindTermGenerator,
+    GeometricRatioGenerator,
+    GeometricFormulaGenerator,
+    GeometricSumGenerator,
+    GeometricWordProblemGenerator
+)
 
 OUTPUT_FILE = "generated_tasks.tex"
 
@@ -80,7 +87,7 @@ LATEX_HEADER = r"""\documentclass[14pt]{extarticle}
 \end{center}
 
 \begin{center}
-{\large Тема: \textbf{Арифметична прогресія}}
+{\large Тема: \textbf{Арифметична та Геометрична прогресії}}
 \end{center}
 
 \vspace{0.5cm}
@@ -98,7 +105,13 @@ def generate_doc():
         ArithmeticTermPropertiesGenerator(),
         ArithmeticMiddleTermGenerator(),
         ArithmeticFormulaSearchGenerator(),
-        ArithmeticWordProblemGenerator()
+        ArithmeticWordProblemGenerator(),
+        # Geometric
+        GeometricFindTermGenerator(),
+        GeometricRatioGenerator(),
+        GeometricFormulaGenerator(),
+        GeometricSumGenerator(),
+        GeometricWordProblemGenerator()
     ]
     
     content = ""
@@ -116,13 +129,7 @@ def generate_doc():
             # Format Question
             content += f"\\noindent\\makebox[1.5em][l]{{\\textbf{{{task_counter}.}}}}\\parbox[t]{{\\dimexpr\\textwidth-1.5em}}{{{question} \\nmtyear{{2026}}}}\n\n"
             
-            # Use answerTable for options
-            # If word problem was short answer, we might want shortAnswer.
-            # But currently all our generators produce options (MCQ format).
-            # If we wanted short answer we would need to check task type.
-            # For now forcing table.
-            
-            # Escape options if needed (they should already be latex safe from generator)
+            # Use answerTable
             opts = task["options"]
             content += f"\\answerTable{{{opts[0]}}}{{{opts[1]}}}{{{opts[2]}}}{{{opts[3]}}}{{{opts[4]}}}\n\n"
             content += "\\vspace{0.5cm}\n\n"

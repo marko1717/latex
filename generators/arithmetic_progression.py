@@ -362,12 +362,40 @@ class ArithmeticWordProblemGenerator(MathTaskGenerator):
             # Usually simple: top row 1, increases by 1.
             
             top_row = 1
-            rows = random.randint(10, 20)
+            rows = random.randint(3, 8) # Keep rows small for drawing
             bottom_row = top_row + (rows - 1)
             # Sum = (top + bottom) * rows / 2
             total = (top_row + bottom_row) * rows // 2
             
-            question = f"На рисунку зображено (уявно) поперечний переріз стосу дерев'яних колод. У нижньому ряду стосу {bottom_row} колод, а у верхньому — {top_row}. Визначте загальну кількість колод у цьому стосі, якщо кожен наступний ряд містить на одну колоду менше, ніж попередній."
+            # Generate TikZ
+            # We can use the user's provided tikz logic but we need to inject the row count
+            tikz_code =  r"""
+            \begin{center}
+            \begin{tikzpicture}[scale=0.5]
+                \newcommand{\woodLog}[3]{
+                    \begin{scope}[shift={(#1,#2)}]
+                        \draw[fill=woodinner, draw=black, thick] (0,0) circle (0.5);
+                        \draw[woodouter!80, thin] (0,0) circle (0.35);
+                        \draw[woodouter!80, thin] (0,0) circle (0.2);
+                        \begin{scope}[rotate=#3]
+                            \fill[woodouter] (0,0) -- (0.4, 0.05) -- (0.5, 0.1) -- (0.5, -0.1) -- (0.4, -0.05) -- cycle;
+                        \end{scope}
+                    \end{scope}
+                }
+                \def\rows{""" + str(rows) + r"""} 
+                \foreach \row in {1,...,\rows} {
+                    \foreach \col in {1,...,\row} {
+                        \pgfmathsetmacro{\x}{(\col-1) - (\row-1)*0.5}
+                        \pgfmathsetmacro{\y}{-(\row-1)*0.866}
+                        \pgfmathsetmacro{\angle}{mod(\col*70 + \row*50, 360)}
+                        \woodLog{\x}{\y}{\angle}
+                    }
+                }
+            \end{tikzpicture}
+            \end{center}
+            """
+            
+            question = f"На рисунку зображено поперечний переріз стосу колод. У нижньому ряду стосу {bottom_row} колод, а у верхньому — {top_row}. Визначте загальну кількість колод.{tikz_code}"
             correct_ans = str(total)
             distractors = [str(total + 10), str(total - 10), str(total + rows), str(total - rows)]
 
