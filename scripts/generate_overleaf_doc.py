@@ -277,5 +277,17 @@ def generate_all():
     ]
     generate_topic_doc("Функції та їх властивості", func_gens, "tex/functions.tex")
 
+    # 6. Symbolic Algebra (New)
+    from generators.algebra import AlgebraSimplificationGenerator, AlgebraFractionGenerator, SymbolicLogGenerator
+    alg_gens = [
+        AlgebraSimplificationGenerator(),
+        MatchingTaskGenerator(AlgebraSimplificationGenerator),
+        AlgebraFractionGenerator(),
+        MatchingTaskGenerator(AlgebraFractionGenerator),
+        SymbolicLogGenerator(),
+        MatchingTaskGenerator(SymbolicLogGenerator)
+    ]
+    generate_topic_doc("Алгебраїчні вирази", alg_gens, "tex/algebra.tex")
+
 if __name__ == "__main__":
     generate_all()
