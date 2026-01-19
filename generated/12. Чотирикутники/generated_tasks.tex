@@ -8,17 +8,17 @@
 \setsansfont{Liberation Sans}
 \setmonofont{Liberation Mono}
 
-\usepackage[a4paper,margin=2cm,bottom=2.5cm,top=2.5cm]{geometry}
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.16}
-\usetikzlibrary{calc,patterns,angles,quotes}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
 \usepackage{xcolor}
 \usepackage{array}
 \usepackage{fancyhdr}
-\usepackage{multicol}
+\usepackage{multirow}
 
 % Кольори
 \definecolor{headerblue}{RGB}{0, 102, 204}
@@ -38,6 +38,73 @@
 
 % === КОМАНДИ ===
 
+% Таблиця для відповідей із дробами (збільшена висота)
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 &
+\rule[-0.9cm]{0pt}{2.0cm}#2 &
+\rule[-0.9cm]{0pt}{2.0cm}#3 &
+\rule[-0.9cm]{0pt}{2.0cm}#4 &
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Таблиця для відповідності
+\newcommand{\answerGrid}{
+    \begingroup
+    \renewcommand{\arraystretch}{1.3}
+    \setlength{\tabcolsep}{7pt}
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+% Макет для завдань на відповідність
+\newcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        \textit{Величина / Початок} \par \vspace{0.2cm}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        \textit{Значення / Закінчення} \par \vspace{0.2cm}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
+% Маленька таблиця відповідей
+\newcommand{\answerTableSmall}[5]{
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 &
+\rule[-0.4cm]{0pt}{0.9cm}#2 &
+\rule[-0.4cm]{0pt}{0.9cm}#3 &
+\rule[-0.4cm]{0pt}{0.9cm}#4 &
+\rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}
+}
+
 % Стандартна таблиця відповідей
 \newcommand{\answerTable}[5]{
 \begin{center}
@@ -51,19 +118,8 @@
 \end{center}
 }
 
-% Маленька таблиця відповідей
-\newcommand{\answerTableSmall}[5]{
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.1cm}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.3cm]{0pt}{0.8cm}#1 & #2 & #3 & #4 & #5 \\
-\hline
-\end{tabular}
-}
-
-% Команда для завдань
-\newcommand{\gentask}[2]{\noindent\makebox[1.5em][l]{\textbf{#1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{#2}}
+% Команда для року
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(#1)}}
 
 \begin{document}
 
@@ -72,7 +128,7 @@
 \end{center}
 
 \begin{center}
-{\large Тема 12: Чотирикутники (паралелограм, прямокутник, ромб, квадрат, трапеція)}
+{\large Тема 12: Чотирикутники}
 \end{center}
 
 \vspace{0.5cm}
@@ -83,80 +139,416 @@
 
 \section*{Блок 1: Паралелограм - основні властивості}
 
-\gentask{1}{У паралелограмі $ABCD$ $\angle A = 70°$. Знайдіть $\angle B$.}
-\answerTable{$110°$}{$70°$}{$90°$}{$140°$}{$180°$}
+% === ЗАВДАННЯ 1 ===
+\noindent\makebox[1.5em][l]{\textbf{1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона $CD$ паралелограма $ABCD$ утворює з прямою $AD$ кут $48°$ (див. рисунок). Знайдіть градусну міру кута $MAB$. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$48°$}{$132°$}{$138°$}{$142°$}{$128°$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=1]
+    \coordinate (M) at (-0.8,0);
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (E) at (3.8,0);
+    \coordinate (B) at (0.7,1.2);
+    \coordinate (C) at (3.7,1.2);
 
-\gentask{2}{У паралелограмі $ABCD$ $\angle A = 55°$. Знайдіть $\angle C$.}
-\answerTable{$55°$}{$125°$}{$35°$}{$145°$}{$180°$}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (M) -- (A);
+    \draw[thick] (D) -- (E);
 
-\vspace{0.4cm}
+    \pic [draw, pic text={$48°$}, angle radius=0.5cm, angle eccentricity=1.9] {angle = E--D--C};
 
-\gentask{3}{У паралелограмі сума двох сусідніх кутів дорівнює:}
-\answerTable{$180°$}{$360°$}{$90°$}{$270°$}{$120°$}
+    \pic [draw, angle radius=0.4cm] {angle = B--A--M};
+    \pic [draw, angle radius=0.5cm, "?" anchor=south east] {angle = B--A--M};
 
-\vspace{0.4cm}
+    \node[below] at (M) {$M$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \fill (M) circle (1.5pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{4}{Сторони паралелограма дорівнюють 8 і 12 см. Знайдіть периметр.}
-\answerTable{40 см}{20 см}{96 см}{80 см}{48 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 2 ===
+\noindent\makebox[1.5em][l]{\textbf{2.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ $\angle A = 70°$ (див. рисунок). Знайдіть градусну міру кута $B$. \nmtyear{gen}}
 
-\gentask{5}{Периметр паралелограма 56 см, одна сторона 18 см. Знайдіть другу сторону.}
-\answerTable{10 см}{18 см}{28 см}{38 см}{20 см}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$70°$}{$110°$}{$90°$}{$140°$}{$35°$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.9]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2);
+    \coordinate (C) at (4.5,2);
+    \coordinate (D) at (3.3,0);
 
-\vspace{0.4cm}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-\gentask{6}{Діагоналі паралелограма перетинаються в точці $O$. $AC = 16$ см. Знайдіть $AO$.}
-\answerTable{8 см}{16 см}{4 см}{32 см}{12 см}
+    \pic [draw, pic text={$70°$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--B};
+    \pic [draw, angle radius=0.4cm, "?" anchor=west] {angle = A--B--C};
 
-\vspace{0.4cm}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{7}{Діагоналі паралелограма перетинаються в точці $O$. $BO = 7$ см. Знайдіть $BD$.}
-\answerTable{14 см}{7 см}{3{,}5 см}{21 см}{28 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 3 ===
+\noindent\makebox[1.5em][l]{\textbf{3.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
 
-\gentask{8}{У паралелограмі один кут у 3 рази більший за інший. Знайдіть менший кут.}
-\answerTable{$45°$}{$135°$}{$60°$}{$30°$}{$90°$}
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагональ паралелограма ділить його на два рівних трикутники. \\
+II. & Діагоналі паралелограма є бісектрисами його кутів. \\
+III. & Сума сусідніх кутів паралелограма дорівнює $180°$. \\
+\end{tabular}
 
-\vspace{0.4cm}
+\answerTable{лише I}{лише I та III}{лише II}{лише II та III}{I, II та III}
 
-\gentask{9}{У паралелограмі один кут на $40°$ більший за інший. Знайдіть більший кут.}
-\answerTable{$110°$}{$70°$}{$100°$}{$120°$}{$140°$}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 4 ===
+\noindent\textbf{4.} \begin{minipage}[t]{0.55\textwidth}
+Діагональ $BD$ паралелограма $ABCD$ перпендикулярна до сторони $AB$ (див. рисунок). $\angle A = 50°$, $BD = 10$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д). \nmtyear{gen}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (1.3,2.2);
+        \coordinate (C) at (5.5,2.2);
+        \coordinate (D) at (4.2,0);
 
-\gentask{10}{Діагональ паралелограма ділить його на:}
-\answerTable{два рівних трикутники}{два подібних трикутники}{чотири трикутники}{нерівні частини}{залежить від форми}
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (D);
 
-\vspace{0.4cm}
+        \coordinate (BA) at ($(B)!0.25cm!(A)$);
+        \coordinate (BD) at ($(B)!0.25cm!(D)$);
+        \draw (BA) -- ($(BA)+(BD)-(B)$) -- (BD);
 
-\gentask{11}{Площа паралелограма 48 см$^2$, основа 8 см. Знайдіть висоту.}
-\answerTable{6 см}{48 см}{384 см}{4 см}{12 см}
+        \pic [draw, pic text={$50°$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--B};
 
-\vspace{0.4cm}
+        \node[below left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
 
-\gentask{12}{Сторона паралелограма 10 см, висота до неї 7 см. Знайдіть площу.}
-\answerTable{70 см$^2$}{35 см$^2$}{17 см$^2$}{140 см$^2$}{100 см$^2$}
+\vspace{0.3cm}
 
-\vspace{0.4cm}
+\matchingLayout{
+    \textbf{1} \quad Сторона $AB$ \\
+    \textbf{2} \quad Сторона $AD$ \\
+    \textbf{3} \quad Діагональ $AC$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & $\approx 6{,}4$ \textit{см} \\
+    \textbf{Б} & $\approx 7{,}7$ \textit{см} \\
+    \textbf{В} & $\approx 13{,}1$ \textit{см} \\
+    \textbf{Г} & $\approx 15{,}6$ \textit{см} \\
+    \textbf{Д} & $20$ \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
 
-\gentask{13}{У паралелограмі протилежні сторони:}
-\answerTable{рівні і паралельні}{рівні, не паралельні}{паралельні, не рівні}{перпендикулярні}{різні}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 5 ===
+\noindent\makebox[1.5em][l]{\textbf{5.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ діагональ $BD$ утворює зі сторонами $AB$ і $AD$ кути $50°$ і $55°$ відповідно (див. рисунок). Знайдіть довжину сторони $BC$, якщо $AB = 3$ \textit{см}. \nmtyear{gen}}
 
-\gentask{14}{Сума кутів паралелограма дорівнює:}
-\answerTable{$360°$}{$180°$}{$540°$}{$720°$}{$270°$}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$3\sqrt{2}$ \textit{см}}{$\approx 3{,}5$ \textit{см}}{$\approx 2{,}8$ \textit{см}}{$\approx 3{,}2$ \textit{см}}{$\approx 2{,}5$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=1.1]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2);
+    \coordinate (C) at (4.5,2);
+    \coordinate (D) at (3.3,0);
 
-\vspace{0.4cm}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (D);
 
-\gentask{15}{Діагоналі паралелограма:}
-\answerTable{діляться навпіл}{рівні}{перпендикулярні}{є бісектрисами}{усі варіанти}
+    \pic [draw, pic text={\small $50°$}, angle radius=0.4cm, angle eccentricity=1.7] {angle = A--B--D};
 
-\vspace{0.5cm}
+    \pic [draw, angle radius=0.4cm] {angle = B--D--A};
+    \pic [draw, angle radius=0.5cm, "\small $55°$" anchor=east] {angle = B--D--A};
+
+    \node[left] at (0.6,1) {\small 3 \textit{см}};
+
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 6 ===
+\noindent\makebox[1.5em][l]{\textbf{6.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ бісектриса кута $A = 50°$ перетинає сторону $BC$ в точці $K$, $BK = 6$ \textit{см}, $KC = 4$ \textit{см} (див. рисунок). Обчисліть периметр паралелограма $ABCD$. \nmtyear{gen}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$32$ \textit{см}}{$40$ \textit{см}}{$36$ \textit{см}}{$44$ \textit{см}}{$38$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.75]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.5,2.6);
+    \coordinate (C) at (5.5,2.6);
+    \coordinate (D) at (4,0);
+    \coordinate (K) at (3.7,2.6);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K);
+
+    \pic [draw, angle radius=0.5cm] {angle = D--A--K};
+    \pic [draw, angle radius=0.65cm] {angle = K--A--B};
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 7 ===
+\noindent\makebox[1.5em][l]{\textbf{7.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ діагоналі $AC$ і $BD$ перетинаються в точці $O$. $AC = 16$ \textit{см}, $BD = 12$ \textit{см}. Знайдіть $AO$. \nmtyear{gen}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$8$ \textit{см}}{$6$ \textit{см}}{$14$ \textit{см}}{$10$ \textit{см}}{$4$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.7]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2.2);
+    \coordinate (C) at (5,2.2);
+    \coordinate (D) at (3.8,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+    \path[name path=AC] (A) -- (C);
+    \path[name path=BD] (B) -- (D);
+    \path [name intersections={of=AC and BD, by=O}];
+
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above right] at (O) {$O$};
+    \fill (O) circle (1.5pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 8 ===
+\noindent\makebox[1.5em][l]{\textbf{8.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $K$. Діагональ $AC$ і відрізок $BK$ перетинаються в точці $O$ (див. рисунок). Визначте довжину сторони $BC$, якщо $AK = 10$ \textit{см}, $OK = 3$ \textit{см}, $OB = 5$ \textit{см}. \nmtyear{gen}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$\frac{50}{3}$ \textit{см}}{$15$ \textit{см}}{$12$ \textit{см}}{$18$ \textit{см}}{$20$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.7]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2.2);
+    \coordinate (C) at (5,2.2);
+    \coordinate (D) at (3.8,0);
+    \coordinate (K) at (2.5,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+    \path[name path=AC] (A) -- (C);
+    \path[name path=BK] (B) -- (K);
+    \path [name intersections={of=AC and BK, by=O}];
+
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (K);
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \node[above right] at (O) {$O$};
+    \fill (O) circle (1.5pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 9 ===
+\noindent\makebox[1.5em][l]{\textbf{9.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ $AB = 8$ \textit{см}, $AD = 14$ \textit{см}. Знайдіть периметр паралелограма. \nmtyear{gen}}
+
+\answerTable{$44$ \textit{см}}{$36$ \textit{см}}{$22$ \textit{см}}{$56$ \textit{см}}{$40$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 10 ===
+\noindent\textbf{10.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ діагональ $BD$ утворює зі сторонами $BC$ і $CD$ кути $62°$ і $70°$ (див. рисунок). Визначте градусну міру кута $ABC$. \nmtyear{gen}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.9]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (4,0);
+        \coordinate (C) at (5.2,2.5);
+        \coordinate (B) at (1.2,2.5);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (D);
+
+        \pic [draw, pic text={$62°$}, angle radius=0.6cm, angle eccentricity=1.7] {angle = D--B--C};
+        \pic [draw, pic text={$70°$}, angle radius=0.6cm, angle eccentricity=1.4] {angle = C--D--B};
+        \pic [draw, angle radius=0.5cm] {angle = C--D--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTable{$132°$}{$110°$}{$118°$}{$48°$}{$62°$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 11 ===
+\noindent\makebox[1.5em][l]{\textbf{11.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Протилежні кути паралелограма рівні. \\
+II. & Діагоналі паралелограма точкою перетину діляться навпіл. \\
+III. & Діагоналі паралелограма перпендикулярні. \\
+\end{tabular}
+
+\answerTable{лише I та II}{лише I}{лише II}{I, II та III}{лише III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 12 ===
+\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+Діагоналі $AC$ і $BD$ паралелограма $ABCD$ перетинаються в точці $O$ (див. рисунок). З точки $O$ на сторону $AD$ опущено перпендикуляр $OK = 10$ \textit{см}, $AK = 18$ \textit{см}, $KD = 12$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{gen}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (4,0);
+        \coordinate (D) at (6.7,0);
+        \coordinate (O) at (4, 2.2);
+
+        \coordinate (C) at ($(O)!-1!(A)$);
+        \coordinate (B) at ($(O)!-1!(D)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        \draw[thick] (O) -- (K);
+
+        \draw (K) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+        \node[below] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textbf{1} \quad Висота паралелограма до $AD$ \\
+    \textbf{2} \quad Проєкція $AB$ на $AD$ \\
+    \textbf{3} \quad $AB$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & 20 \textit{см} \\
+    \textbf{В} & $\sqrt{136}$ \textit{см} \\
+    \textbf{Г} & 26 \textit{см} \\
+    \textbf{Д} & 30 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 13 ===
+\noindent\makebox[1.5em][l]{\textbf{13.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа паралелограма $ABCD$ дорівнює $72$ см$^2$. Сторона $AB = 9$ \textit{см}. Знайдіть висоту, проведену до сторони $AB$. \nmtyear{gen}}
+
+\answerTable{$8$ \textit{см}}{$6$ \textit{см}}{$9$ \textit{см}}{$12$ \textit{см}}{$4$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 14 ===
+\noindent\makebox[1.5em][l]{\textbf{14.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сума кутів паралелограма дорівнює: \nmtyear{gen}}
+
+\answerTable{$360°$}{$180°$}{$540°$}{$270°$}{$720°$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 15 ===
+\noindent\makebox[1.5em][l]{\textbf{15.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі паралелограма $ABCD$ дорівнюють $10$ см і $14$ см. Точка перетину діагоналей ділить кожну з них на відрізки довжиною: \nmtyear{gen}}
+
+\answerTable{$5$ і $7$ \textit{см}}{$10$ і $14$ \textit{см}}{$4$ і $6$ \textit{см}}{$2{,}5$ і $3{,}5$ \textit{см}}{$6$ і $8$ \textit{см}}
+
+\vspace{1cm}
 
 %======================================================================
 % БЛОК 2: Прямокутник (15 завдань)
@@ -164,80 +556,196 @@
 
 \section*{Блок 2: Прямокутник}
 
-\gentask{16}{Сторони прямокутника 5 і 12 см. Знайдіть діагональ.}
-\answerTable{13 см}{17 см}{7 см}{60 см}{$\sqrt{119}$ см}
+% === ЗАВДАННЯ 16 ===
+\noindent\makebox[1.5em][l]{\textbf{16.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторони прямокутника дорівнюють $5$ \textit{см} і $12$ \textit{см}. Знайдіть діагональ прямокутника. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$13$ \textit{см}}{$17$ \textit{см}}{$15$ \textit{см}}{$11$ \textit{см}}{$8{,}5$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.4]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,2.5);
+    \coordinate (C) at (6,2.5);
+    \coordinate (D) at (6,0);
 
-\gentask{17}{Діагональ прямокутника 10 см, одна сторона 6 см. Знайдіть другу сторону.}
-\answerTable{8 см}{4 см}{16 см}{$\sqrt{136}$ см}{14 см}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick, dashed] (A) -- (C);
 
-\vspace{0.4cm}
+    \draw (A) rectangle ++(0.4,0.4);
 
-\gentask{18}{Діагональ прямокутника 15 см, одна сторона 9 см. Знайдіть периметр.}
-\answerTable{42 см}{48 см}{24 см}{30 см}{54 см}
+    \node[left] at (0,1.25) {\small 5};
+    \node[below] at (3,0) {\small 12};
 
-\vspace{0.4cm}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{19}{Периметр прямокутника 34 см, одна сторона 5 см. Знайдіть площу.}
-\answerTable{60 см$^2$}{170 см$^2$}{85 см$^2$}{30 см$^2$}{120 см$^2$}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 17 ===
+\noindent\makebox[1.5em][l]{\textbf{17.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ прямокутника дорівнює $10$ \textit{см}, одна зі сторін --- $6$ \textit{см}. Знайдіть другу сторону. \nmtyear{gen}}
 
-\gentask{20}{Площа прямокутника 84 см$^2$, одна сторона 7 см. Знайдіть периметр.}
-\answerTable{38 см}{24 см}{91 см}{42 см}{48 см}
+\answerTable{$8$ \textit{см}}{$4$ \textit{см}}{$7$ \textit{см}}{$12$ \textit{см}}{$\sqrt{136}$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{21}{Діагоналі прямокутника:}
-\answerTable{рівні}{перпендикулярні}{є бісектрисами}{не діляться навпіл}{різні}
+% === ЗАВДАННЯ 18 ===
+\noindent\makebox[1.5em][l]{\textbf{18.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр прямокутника дорівнює $34$ \textit{см}, одна зі сторін --- $8$ \textit{см}. Знайдіть площу прямокутника. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$72$ см$^2$}{$64$ см$^2$}{$136$ см$^2$}{$81$ см$^2$}{$56$ см$^2$}
 
-\gentask{22}{Кути прямокутника:}
-\answerTable{всі прямі}{два гострих, два тупих}{всі гострі}{всі тупі}{один прямий}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 19 ===
+\noindent\makebox[1.5em][l]{\textbf{19.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа прямокутника дорівнює $48$ см$^2$, одна зі сторін --- $6$ \textit{см}. Знайдіть периметр прямокутника. \nmtyear{gen}}
 
-\gentask{23}{Діагональ прямокутника ділить його на:}
-\answerTable{два рівних прямокутних трикутники}{два рівнобедрених}{чотири трикутники}{нерівні частини}{залежить від сторін}
+\answerTable{$28$ \textit{см}}{$54$ \textit{см}}{$20$ \textit{см}}{$22$ \textit{см}}{$32$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{24}{Діагоналі прямокутника перетинаються в точці $O$. Трикутник $AOB$ є:}
-\answerTable{рівнобедреним}{рівностороннім}{прямокутним}{тупокутним}{гострокутним}
+% === ЗАВДАННЯ 20 ===
+\noindent\makebox[1.5em][l]{\textbf{20.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Прямокутник є паралелограмом. \\
+II. & Діагоналі прямокутника рівні. \\
+III. & Діагоналі прямокутника перпендикулярні. \\
+\end{tabular}
 
-\gentask{25}{Сторони прямокутника 3 і 4 см. Знайдіть радіус описаного кола.}
-\answerTable{2{,}5 см}{5 см}{3{,}5 см}{7 см}{6 см}
+\answerTable{лише I та II}{лише I}{лише II}{I, II та III}{лише I та III}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{26}{Діагональ прямокутника дорівнює діаметру описаного кола. Це твердження:}
-\answerTable{завжди правильне}{завжди неправильне}{іноді правильне}{залежить від сторін}{не має сенсу}
+% === ЗАВДАННЯ 21 ===
+\noindent\makebox[1.5em][l]{\textbf{21.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутнику $ABCD$ діагоналі перетинаються в точці $O$. $\angle AOB = 60°$. Знайдіть $\angle OAB$. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$60°$}{$30°$}{$45°$}{$120°$}{$90°$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.6]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,2);
+    \coordinate (C) at (4,2);
+    \coordinate (D) at (4,0);
+    \coordinate (O) at (2,1);
 
-\gentask{27}{Сторони прямокутника 6 і 8 см. Знайдіть відстань від точки перетину діагоналей до вершини.}
-\answerTable{5 см}{10 см}{7 см}{14 см}{4 см}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
 
-\vspace{0.4cm}
+    \pic [draw, pic text={$60°$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = B--O--A};
+    \pic [draw, angle radius=0.4cm, "?" anchor=south] {angle = O--A--B};
 
-\gentask{28}{Прямокутник із рівними сторонами називається:}
-\answerTable{квадратом}{ромбом}{трапецією}{паралелограмом}{шестикутником}
+    \draw (A) rectangle ++(0.3,0.3);
 
-\vspace{0.4cm}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (O) {$O$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{29}{Площа прямокутника $S = ab$. Якщо $a = 2b$, то $S =$}
-\answerTable{$2b^2$}{$b^2$}{$4b^2$}{$3b^2$}{$2b$}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 22 ===
+\noindent\makebox[1.5em][l]{\textbf{22.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ прямокутника дорівнює $d$. Знайдіть відстань від точки перетину діагоналей до сторони прямокутника, якщо ця відстань дорівнює половині меншої сторони. \nmtyear{gen}}
 
-\gentask{30}{Діагональ прямокутника 20 см, кут між діагоналями 60°. Знайдіть меншу сторону.}
-\answerTable{10 см}{$10\sqrt{3}$ см}{20 см}{5 см}{15 см}
+\answerTable{$\dfrac{d}{2}$}{$d$}{$\dfrac{d}{4}$}{$\dfrac{d\sqrt{2}}{2}$}{$\dfrac{d\sqrt{3}}{2}$}
 
-\vspace{0.5cm}
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 23 ===
+\noindent\makebox[1.5em][l]{\textbf{23.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутнику $ABCD$ $AB = 6$ \textit{см}, $BC = 8$ \textit{см}. Радіус описаного кола дорівнює: \nmtyear{gen}}
+
+\answerTable{$5$ \textit{см}}{$10$ \textit{см}}{$7$ \textit{см}}{$4$ \textit{см}}{$3$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 24 ===
+\noindent\makebox[1.5em][l]{\textbf{24.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторони прямокутника відносяться як $3:4$, а діагональ дорівнює $15$ \textit{см}. Знайдіть площу прямокутника. \nmtyear{gen}}
+
+\answerTable{$108$ см$^2$}{$144$ см$^2$}{$81$ см$^2$}{$180$ см$^2$}{$96$ см$^2$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 25 ===
+\noindent\makebox[1.5em][l]{\textbf{25.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутнику $ABCD$ діагональ $AC$ утворює зі стороною $AB$ кут $30°$. $AC = 12$ \textit{см}. Знайдіть сторону $BC$. \nmtyear{gen}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$6$ \textit{см}}{$6\sqrt{3}$ \textit{см}}{$4\sqrt{3}$ \textit{см}}{$3$ \textit{см}}{$8$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.5]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,3);
+    \coordinate (C) at (5.2,3);
+    \coordinate (D) at (5.2,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+
+    \pic [draw, pic text={$30°$}, angle radius=0.7cm, angle eccentricity=1.5] {angle = D--A--C};
+
+    \draw (A) rectangle ++(0.4,0.4);
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 26-30 ===
+\noindent\makebox[1.5em][l]{\textbf{26.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі прямокутника $ABCD$ перетинаються в точці $O$. $AO = 7$ \textit{см}. Знайдіть діагональ $AC$. \nmtyear{gen}}
+
+\answerTable{$14$ \textit{см}}{$7$ \textit{см}}{$3{,}5$ \textit{см}}{$21$ \textit{см}}{$28$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{27.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторони прямокутника дорівнюють $a$ і $b$. Чому дорівнює сума квадратів діагоналей? \nmtyear{gen}}
+
+\answerTable{$2(a^2+b^2)$}{$a^2+b^2$}{$(a+b)^2$}{$4(a^2+b^2)$}{$2ab$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{28.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр прямокутника дорівнює $40$ \textit{см}, а його площа --- $96$ см$^2$. Знайдіть діагональ прямокутника. \nmtyear{gen}}
+
+\answerTable{$\sqrt{208}$ \textit{см}}{$14$ \textit{см}}{$10$ \textit{см}}{$12$ \textit{см}}{$16$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{29.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутнику одна сторона вдвічі більша за іншу, а діагональ дорівнює $10$ \textit{см}. Знайдіть меншу сторону. \nmtyear{gen}}
+
+\answerTable{$2\sqrt{5}$ \textit{см}}{$4\sqrt{5}$ \textit{см}}{$5$ \textit{см}}{$\sqrt{20}$ \textit{см}}{$4$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{30.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа прямокутника дорівнює $60$ см$^2$. Одна зі сторін більша за іншу на $7$ \textit{см}. Знайдіть меншу сторону. \nmtyear{gen}}
+
+\answerTable{$5$ \textit{см}}{$12$ \textit{см}}{$6$ \textit{см}}{$4$ \textit{см}}{$10$ \textit{см}}
+
+\vspace{1cm}
 
 %======================================================================
 % БЛОК 3: Ромб (15 завдань)
@@ -245,80 +753,171 @@
 
 \section*{Блок 3: Ромб}
 
-\gentask{31}{Периметр ромба 48 см. Знайдіть його сторону.}
-\answerTable{12 см}{24 см}{48 см}{6 см}{16 см}
+% === ЗАВДАННЯ 31 ===
+\noindent\makebox[1.5em][l]{\textbf{31.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі ромба дорівнюють $6$ \textit{см} і $8$ \textit{см}. Знайдіть сторону ромба. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$5$ \textit{см}}{$7$ \textit{см}}{$10$ \textit{см}}{$\sqrt{100}$ \textit{см}}{$4$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.5]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (2,3);
+    \coordinate (C) at (6,0);
+    \coordinate (D) at (4,-3);
+    \coordinate (O) at (3,0);
 
-\gentask{32}{Сторона ромба 9 см. Знайдіть периметр.}
-\answerTable{36 см}{18 см}{81 см}{27 см}{45 см}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
 
-\vspace{0.4cm}
+    \draw (O) ++(-0.3,0) -- ++(0,0.3) -- ++(0.3,0);
 
-\gentask{33}{Діагоналі ромба:}
-\answerTable{перпендикулярні і діляться навпіл}{рівні}{паралельні}{є сторонами}{не перетинаються}
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{34}{Діагоналі ромба 6 і 8 см. Знайдіть сторону.}
-\answerTable{5 см}{7 см}{10 см}{14 см}{$\sqrt{50}$ см}
+% === ЗАВДАННЯ 32 ===
+\noindent\makebox[1.5em][l]{\textbf{32.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона ромба дорівнює $9$ \textit{см}. Знайдіть периметр ромба. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$36$ \textit{см}}{$18$ \textit{см}}{$27$ \textit{см}}{$81$ \textit{см}}{$45$ \textit{см}}
 
-\gentask{35}{Діагоналі ромба 10 і 24 см. Знайдіть площу.}
-\answerTable{120 см$^2$}{240 см$^2$}{60 см$^2$}{34 см$^2$}{170 см$^2$}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 33 ===
+\noindent\makebox[1.5em][l]{\textbf{33.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
 
-\gentask{36}{Площа ромба 54 см$^2$, одна діагональ 9 см. Знайдіть другу діагональ.}
-\answerTable{12 см}{6 см}{27 см}{18 см}{108 см}
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагоналі ромба перпендикулярні. \\
+II. & Діагоналі ромба є бісектрисами його кутів. \\
+III. & Діагоналі ромба рівні. \\
+\end{tabular}
 
-\vspace{0.4cm}
+\answerTable{лише I та II}{лише I}{лише II та III}{I, II та III}{лише III}
 
-\gentask{37}{Діагоналі ромба є:}
-\answerTable{бісектрисами кутів}{медіанами}{висотами}{серединними перпендикулярами}{жодним з цих}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 34 ===
+\noindent\makebox[1.5em][l]{\textbf{34.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі ромба дорівнюють $10$ \textit{см} і $24$ \textit{см}. Знайдіть площу ромба. \nmtyear{gen}}
 
-\gentask{38}{Сторона ромба 13 см, одна діагональ 10 см. Знайдіть другу діагональ.}
-\answerTable{24 см}{12 см}{23 см}{26 см}{$\sqrt{69}$ см}
+\answerTable{$120$ см$^2$}{$240$ см$^2$}{$60$ см$^2$}{$340$ см$^2$}{$34$ см$^2$}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{39}{Один кут ромба $60°$. Знайдіть сусідній кут.}
-\answerTable{$120°$}{$60°$}{$30°$}{$90°$}{$150°$}
+% === ЗАВДАННЯ 35 ===
+\noindent\makebox[1.5em][l]{\textbf{35.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа ромба дорівнює $48$ см$^2$, одна з діагоналей --- $8$ \textit{см}. Знайдіть другу діагональ. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$12$ \textit{см}}{$6$ \textit{см}}{$24$ \textit{см}}{$40$ \textit{см}}{$16$ \textit{см}}
 
-\gentask{40}{Діагональ ромба ділить його на:}
-\answerTable{два рівних трикутники}{чотири рівних трикутники}{два прямокутних}{нерівні частини}{залежить від кута}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 36 ===
+\noindent\makebox[1.5em][l]{\textbf{36.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Один із кутів ромба дорівнює $60°$. Знайдіть інший кут, що не є сусіднім до даного. \nmtyear{gen}}
 
-\gentask{41}{Ромб із прямими кутами називається:}
-\answerTable{квадратом}{прямокутником}{трапецією}{паралелограмом}{правильним}
+\answerTable{$60°$}{$120°$}{$90°$}{$30°$}{$150°$}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{42}{Сторона ромба 10 см, висота 8 см. Знайдіть площу.}
-\answerTable{80 см$^2$}{40 см$^2$}{100 см$^2$}{18 см$^2$}{160 см$^2$}
+% === ЗАВДАННЯ 37 ===
+\noindent\makebox[1.5em][l]{\textbf{37.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона ромба дорівнює $10$ \textit{см}, а один із кутів --- $60°$. Знайдіть меншу діагональ. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$10$ \textit{см}}{$10\sqrt{3}$ \textit{см}}{$20$ \textit{см}}{$5$ \textit{см}}{$5\sqrt{3}$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.6]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.5,2.6);
+    \coordinate (C) at (4.5,2.6);
+    \coordinate (D) at (3,0);
 
-\gentask{43}{Діагоналі ромба 12 і 16 см. Знайдіть периметр.}
-\answerTable{40 см}{56 см}{28 см}{80 см}{100 см}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
 
-\vspace{0.4cm}
+    \pic [draw, pic text={$60°$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--B};
 
-\gentask{44}{У ромбі $ABCD$ $\angle A = 50°$. Знайдіть $\angle ABD$.}
-\answerTable{$65°$}{$25°$}{$50°$}{$130°$}{$115°$}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{45}{Площа ромба $S = \dfrac{d_1 \cdot d_2}{2}$. Якщо $d_1 = d_2 = d$, то $S =$}
-\answerTable{$\dfrac{d^2}{2}$}{$d^2$}{$2d^2$}{$\dfrac{d}{2}$}{$d$}
+% === ЗАВДАННЯ 38 ===
+\noindent\makebox[1.5em][l]{\textbf{38.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр ромба дорівнює $40$ \textit{см}, а одна з діагоналей --- $16$ \textit{см}. Знайдіть другу діагональ. \nmtyear{gen}}
 
-\vspace{0.5cm}
+\answerTable{$12$ \textit{см}}{$24$ \textit{см}}{$8$ \textit{см}}{$6$ \textit{см}}{$20$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 39 ===
+\noindent\makebox[1.5em][l]{\textbf{39.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ ромба дорівнює його стороні. Знайдіть більший кут ромба. \nmtyear{gen}}
+
+\answerTable{$120°$}{$60°$}{$90°$}{$150°$}{$135°$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 40 ===
+\noindent\makebox[1.5em][l]{\textbf{40.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Ромб є паралелограмом. \\
+II. & Діагоналі ромба точкою перетину діляться навпіл. \\
+III. & Усі сторони ромба рівні. \\
+\end{tabular}
+
+\answerTable{I, II та III}{лише I та II}{лише I}{лише II та III}{лише I та III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 41-45 ===
+\noindent\makebox[1.5em][l]{\textbf{41.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона ромба дорівнює $13$ \textit{см}, а одна з діагоналей --- $24$ \textit{см}. Знайдіть другу діагональ. \nmtyear{gen}}
+
+\answerTable{$10$ \textit{см}}{$5$ \textit{см}}{$12$ \textit{см}}{$26$ \textit{см}}{$20$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{42.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа ромба дорівнює $96$ см$^2$. Діагоналі відносяться як $3:4$. Знайдіть меншу діагональ. \nmtyear{gen}}
+
+\answerTable{$12$ \textit{см}}{$16$ \textit{см}}{$8$ \textit{см}}{$6$ \textit{см}}{$24$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{43.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Радіус вписаного в ромб кола дорівнює $4$ \textit{см}, а сторона ромба --- $10$ \textit{см}. Знайдіть площу ромба. \nmtyear{gen}}
+
+\answerTable{$80$ см$^2$}{$40$ см$^2$}{$160$ см$^2$}{$100$ см$^2$}{$64$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{44.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Гострий кут ромба дорівнює $50°$. Знайдіть тупий кут ромба. \nmtyear{gen}}
+
+\answerTable{$130°$}{$140°$}{$50°$}{$100°$}{$80°$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{45.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона ромба $a$, гострий кут $\alpha$. Знайдіть площу ромба. \nmtyear{gen}}
+
+\answerTable{$a^2\sin\alpha$}{$a^2\cos\alpha$}{$a^2\tg\alpha$}{$\dfrac{a^2\sin\alpha}{2}$}{$a^2$}
+
+\vspace{1cm}
 
 %======================================================================
 % БЛОК 4: Квадрат (15 завдань)
@@ -326,161 +925,307 @@
 
 \section*{Блок 4: Квадрат}
 
-\gentask{46}{Сторона квадрата 7 см. Знайдіть периметр.}
-\answerTable{28 см}{49 см}{14 см}{21 см}{35 см}
+% === ЗАВДАННЯ 46 ===
+\noindent\makebox[1.5em][l]{\textbf{46.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона квадрата дорівнює $7$ \textit{см}. Знайдіть периметр квадрата. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$28$ \textit{см}}{$14$ \textit{см}}{$49$ \textit{см}}{$21$ \textit{см}}{$56$ \textit{см}}
 
-\gentask{47}{Периметр квадрата 36 см. Знайдіть сторону.}
-\answerTable{9 см}{18 см}{6 см}{12 см}{36 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 47 ===
+\noindent\makebox[1.5em][l]{\textbf{47.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр квадрата дорівнює $36$ \textit{см}. Знайдіть сторону квадрата. \nmtyear{gen}}
 
-\gentask{48}{Сторона квадрата 5 см. Знайдіть площу.}
-\answerTable{25 см$^2$}{20 см$^2$}{10 см$^2$}{50 см$^2$}{125 см$^2$}
+\answerTable{$9$ \textit{см}}{$18$ \textit{см}}{$6$ \textit{см}}{$12$ \textit{см}}{$4$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{49}{Площа квадрата 64 см$^2$. Знайдіть сторону.}
-\answerTable{8 см}{32 см}{16 см}{4 см}{$\sqrt{64}$ см}
+% === ЗАВДАННЯ 48 ===
+\noindent\makebox[1.5em][l]{\textbf{48.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа квадрата дорівнює $64$ см$^2$. Знайдіть сторону квадрата. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$8$ \textit{см}}{$16$ \textit{см}}{$32$ \textit{см}}{$4$ \textit{см}}{$64$ \textit{см}}
 
-\gentask{50}{Сторона квадрата 6 см. Знайдіть діагональ.}
-\answerTable{$6\sqrt{2}$ см}{12 см}{6 см}{$12\sqrt{2}$ см}{$3\sqrt{2}$ см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 49 ===
+\noindent\makebox[1.5em][l]{\textbf{49.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона квадрата дорівнює $5$ \textit{см}. Знайдіть діагональ квадрата. \nmtyear{gen}}
 
-\gentask{51}{Діагональ квадрата $10\sqrt{2}$ см. Знайдіть сторону.}
-\answerTable{10 см}{$10\sqrt{2}$ см}{20 см}{5 см}{$5\sqrt{2}$ см}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$5\sqrt{2}$ \textit{см}}{$10$ \textit{см}}{$5\sqrt{3}$ \textit{см}}{$2{,}5\sqrt{2}$ \textit{см}}{$25$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.5]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,3);
+    \coordinate (C) at (3,3);
+    \coordinate (D) at (3,0);
 
-\vspace{0.4cm}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick, dashed] (A) -- (C);
 
-\gentask{52}{Діагональ квадрата 14 см. Знайдіть площу.}
-\answerTable{98 см$^2$}{196 см$^2$}{49 см$^2$}{$98\sqrt{2}$ см$^2$}{$49\sqrt{2}$ см$^2$}
+    \draw (A) rectangle ++(0.3,0.3);
 
-\vspace{0.4cm}
+    \node[left] at (0,1.5) {\small 5};
 
-\gentask{53}{Площа квадрата 50 см$^2$. Знайдіть діагональ.}
-\answerTable{10 см}{$5\sqrt{2}$ см}{$10\sqrt{2}$ см}{25 см}{100 см}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{54}{Сторона квадрата $a$. Радіус описаного кола дорівнює:}
-\answerTable{$\dfrac{a\sqrt{2}}{2}$}{$a$}{$\dfrac{a}{2}$}{$a\sqrt{2}$}{$2a$}
+% === ЗАВДАННЯ 50 ===
+\noindent\makebox[1.5em][l]{\textbf{50.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ квадрата дорівнює $8\sqrt{2}$ \textit{см}. Знайдіть сторону квадрата. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$8$ \textit{см}}{$4$ \textit{см}}{$16$ \textit{см}}{$4\sqrt{2}$ \textit{см}}{$8\sqrt{2}$ \textit{см}}
 
-\gentask{55}{Сторона квадрата $a$. Радіус вписаного кола дорівнює:}
-\answerTable{$\dfrac{a}{2}$}{$a$}{$\dfrac{a\sqrt{2}}{2}$}{$a\sqrt{2}$}{$2a$}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 51 ===
+\noindent\makebox[1.5em][l]{\textbf{51.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ квадрата дорівнює $12$ \textit{см}. Знайдіть площу квадрата. \nmtyear{gen}}
 
-\gentask{56}{Діагоналі квадрата:}
-\answerTable{рівні, перпендикулярні, діляться навпіл}{тільки рівні}{тільки перпендикулярні}{різні}{паралельні}
+\answerTable{$72$ см$^2$}{$144$ см$^2$}{$36$ см$^2$}{$24$ см$^2$}{$48$ см$^2$}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{57}{Діагональ квадрата ділить його кут на:}
-\answerTable{два кути по $45°$}{два кути по $90°$}{нерівні частини}{три частини}{залежить від квадрата}
+% === ЗАВДАННЯ 52 ===
+\noindent\makebox[1.5em][l]{\textbf{52.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Квадрат є прямокутником. \\
+II. & Квадрат є ромбом. \\
+III. & Діагоналі квадрата перпендикулярні та рівні. \\
+\end{tabular}
 
-\gentask{58}{Площа квадрата 144 см$^2$. Знайдіть периметр.}
-\answerTable{48 см}{12 см}{24 см}{36 см}{72 см}
+\answerTable{I, II та III}{лише I та II}{лише I}{лише II та III}{лише III}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{59}{Периметр квадрата 20 см. Знайдіть площу.}
-\answerTable{25 см$^2$}{100 см$^2$}{400 см$^2$}{5 см$^2$}{50 см$^2$}
+% === ЗАВДАННЯ 53 ===
+\noindent\makebox[1.5em][l]{\textbf{53.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Радіус вписаного в квадрат кола дорівнює $3$ \textit{см}. Знайдіть сторону квадрата. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$6$ \textit{см}}{$3$ \textit{см}}{$3\sqrt{2}$ \textit{см}}{$6\sqrt{2}$ \textit{см}}{$9$ \textit{см}}
 
-\gentask{60}{Відношення радіусів описаного і вписаного кіл квадрата дорівнює:}
-\answerTable{$\sqrt{2}$}{2}{$\dfrac{1}{\sqrt{2}}$}{1}{$\sqrt{3}$}
+\vspace{0.7cm}
 
-\vspace{0.5cm}
+% === ЗАВДАННЯ 54 ===
+\noindent\makebox[1.5em][l]{\textbf{54.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Радіус описаного навколо квадрата кола дорівнює $5$ \textit{см}. Знайдіть сторону квадрата. \nmtyear{gen}}
+
+\answerTable{$5\sqrt{2}$ \textit{см}}{$10$ \textit{см}}{$5$ \textit{см}}{$2{,}5\sqrt{2}$ \textit{см}}{$10\sqrt{2}$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 55-60 ===
+\noindent\makebox[1.5em][l]{\textbf{55.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа квадрата дорівнює $50$ см$^2$. Знайдіть діагональ квадрата. \nmtyear{gen}}
+
+\answerTable{$10$ \textit{см}}{$5\sqrt{2}$ \textit{см}}{$25$ \textit{см}}{$100$ \textit{см}}{$\sqrt{50}$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{56.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр квадрата дорівнює $24$ \textit{см}. Знайдіть площу квадрата. \nmtyear{gen}}
+
+\answerTable{$36$ см$^2$}{$144$ см$^2$}{$48$ см$^2$}{$72$ см$^2$}{$24$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{57.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона квадрата збільшилася в $3$ рази. У скільки разів збільшилася площа квадрата? \nmtyear{gen}}
+
+\answerTable{у $9$ разів}{у $3$ рази}{у $6$ разів}{у $12$ разів}{у $27$ разів}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{58.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ квадрата збільшилася в $2$ рази. У скільки разів збільшилася площа квадрата? \nmtyear{gen}}
+
+\answerTable{у $4$ рази}{у $2$ рази}{у $8$ разів}{у $\sqrt{2}$ рази}{у $2\sqrt{2}$ рази}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{59.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Відношення діагоналі квадрата до його сторони дорівнює: \nmtyear{gen}}
+
+\answerTable{$\sqrt{2}$}{$2$}{$\sqrt{3}$}{$\dfrac{1}{\sqrt{2}}$}{$1$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{60.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сума діагоналей квадрата дорівнює $20\sqrt{2}$ \textit{см}. Знайдіть сторону квадрата. \nmtyear{gen}}
+
+\answerTable{$10$ \textit{см}}{$20$ \textit{см}}{$5\sqrt{2}$ \textit{см}}{$10\sqrt{2}$ \textit{см}}{$5$ \textit{см}}
+
+\vspace{1cm}
 
 %======================================================================
-% БЛОК 5: Трапеція - основні властивості (15 завдань)
+% БЛОК 5: Трапеція (15 завдань)
 %======================================================================
 
-\section*{Блок 5: Трапеція - основні властивості}
+\section*{Блок 5: Трапеція}
 
-\gentask{61}{Основи трапеції 8 і 14 см. Знайдіть середню лінію.}
-\answerTable{11 см}{22 см}{6 см}{3 см}{112 см}
+% === ЗАВДАННЯ 61 ===
+\noindent\makebox[1.5em][l]{\textbf{61.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Основи трапеції дорівнюють $8$ \textit{см} і $14$ \textit{см}. Знайдіть середню лінію трапеції. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$11$ \textit{см}}{$22$ \textit{см}}{$6$ \textit{см}}{$10$ \textit{см}}{$12$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.5]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1,2);
+    \coordinate (C) at (5,2);
+    \coordinate (D) at (7,0);
 
-\gentask{62}{Середня лінія трапеції 10 см, одна основа 6 см. Знайдіть другу основу.}
-\answerTable{14 см}{4 см}{16 см}{20 см}{8 см}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-\vspace{0.4cm}
+    \coordinate (M) at (0.5,1);
+    \coordinate (N) at (6,1);
+    \draw[thick, dashed] (M) -- (N);
 
-\gentask{63}{Основи трапеції 10 і 18 см, висота 7 см. Знайдіть площу.}
-\answerTable{98 см$^2$}{196 см$^2$}{126 см$^2$}{70 см$^2$}{180 см$^2$}
+    \node[above] at (3,2) {\small 8};
+    \node[below] at (3.5,0) {\small 14};
 
-\vspace{0.4cm}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{64}{Площа трапеції 60 см$^2$, основи 8 і 12 см. Знайдіть висоту.}
-\answerTable{6 см}{5 см}{10 см}{3 см}{12 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 62 ===
+\noindent\makebox[1.5em][l]{\textbf{62.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Середня лінія трапеції дорівнює $15$ \textit{см}, одна з основ --- $10$ \textit{см}. Знайдіть другу основу. \nmtyear{gen}}
 
-\gentask{65}{Площа трапеції 72 см$^2$, висота 8 см. Знайдіть середню лінію.}
-\answerTable{9 см}{18 см}{576 см}{4{,}5 см}{36 см}
+\answerTable{$20$ \textit{см}}{$25$ \textit{см}}{$5$ \textit{см}}{$12{,}5$ \textit{см}}{$30$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{66}{Середня лінія трапеції паралельна:}
-\answerTable{основам}{бічним сторонам}{діагоналям}{висоті}{нічому}
+% === ЗАВДАННЯ 63 ===
+\noindent\makebox[1.5em][l]{\textbf{63.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Основи трапеції дорівнюють $12$ \textit{см} і $18$ \textit{см}, висота --- $7$ \textit{см}. Знайдіть площу трапеції. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$105$ см$^2$}{$210$ см$^2$}{$63$ см$^2$}{$126$ см$^2$}{$84$ см$^2$}
 
-\gentask{67}{Сума кутів при бічній стороні трапеції дорівнює:}
-\answerTable{$180°$}{$90°$}{$360°$}{$270°$}{залежить від трапеції}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 64 ===
+\noindent\makebox[1.5em][l]{\textbf{64.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа трапеції дорівнює $80$ см$^2$, середня лінія --- $10$ \textit{см}. Знайдіть висоту трапеції. \nmtyear{gen}}
 
-\gentask{68}{Бічна сторона трапеції 10 см, кут при основі $30°$. Знайдіть висоту.}
-\answerTable{5 см}{$5\sqrt{3}$ см}{10 см}{$10\sqrt{3}$ см}{$\dfrac{10}{\sqrt{3}}$ см}
+\answerTable{$8$ \textit{см}}{$4$ \textit{см}}{$16$ \textit{см}}{$5$ \textit{см}}{$10$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{69}{У рівнобічній трапеції бічна сторона 13 см, основи 8 і 18 см. Знайдіть висоту.}
-\answerTable{12 см}{5 см}{$\sqrt{119}$ см}{10 см}{13 см}
+% === ЗАВДАННЯ 65 ===
+\noindent\makebox[1.5em][l]{\textbf{65.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У рівнобічній трапеції основи дорівнюють $6$ \textit{см} і $12$ \textit{см}, бічна сторона --- $5$ \textit{см}. Знайдіть висоту трапеції. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$4$ \textit{см}}{$3$ \textit{см}}{$5$ \textit{см}}{$6$ \textit{см}}{$\sqrt{34}$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.45]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.5,2);
+    \coordinate (C) at (4.5,2);
+    \coordinate (D) at (6,0);
 
-\gentask{70}{Діагоналі рівнобічної трапеції:}
-\answerTable{рівні}{перпендикулярні}{паралельні}{є бісектрисами}{різні}
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-\vspace{0.4cm}
+    % Позначки рівності
+    \draw ($(A)!0.5!(B)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+    \draw ($(C)!0.5!(D)$) ++(-0.1,-0.1) -- ++(0.2,0.2);
 
-\gentask{71}{Кути при основі рівнобічної трапеції:}
-\answerTable{рівні}{різні}{один гострий, один тупий}{обидва прямі}{залежить від основи}
+    \node[above] at (3,2) {\small 6};
+    \node[below] at (3,0) {\small 12};
+    \node[left] at (0.75,1) {\small 5};
 
-\vspace{0.4cm}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
 
-\gentask{72}{У прямокутній трапеції один кут прямий. Скільки всього прямих кутів?}
-\answerTable{2}{1}{4}{3}{0}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 66 ===
+\noindent\makebox[1.5em][l]{\textbf{66.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{gen}}
 
-\gentask{73}{Основи трапеції 6 і 10 см. Відрізок, що з'єднує середини діагоналей, дорівнює:}
-\answerTable{2 см}{4 см}{8 см}{16 см}{3 см}
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Трапеція --- чотирикутник, у якого тільки дві сторони паралельні. \\
+II. & Діагоналі рівнобічної трапеції рівні. \\
+III. & Кути при основі рівнобічної трапеції рівні. \\
+\end{tabular}
 
-\vspace{0.4cm}
+\answerTable{I, II та III}{лише I та II}{лише I}{лише II та III}{лише I та III}
 
-\gentask{74}{У трапеції $ABCD$ ($BC \parallel AD$) $\angle A = 70°$. Знайдіть $\angle B$.}
-\answerTable{$110°$}{$70°$}{$180°$}{$90°$}{не можна визначити}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 67 ===
+\noindent\makebox[1.5em][l]{\textbf{67.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У трапеції $ABCD$ ($BC \parallel AD$) $\angle A = 65°$. Знайдіть $\angle B$. \nmtyear{gen}}
 
-\gentask{75}{Діагональ трапеції ділить середню лінію на відрізки 3 і 5 см. Знайдіть основи.}
-\answerTable{6 і 10 см}{3 і 5 см}{8 і 8 см}{4 і 12 см}{5 і 11 см}
+\answerTable{$115°$}{$65°$}{$180°$}{$90°$}{$130°$}
 
-\vspace{0.5cm}
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 68 ===
+\noindent\makebox[1.5em][l]{\textbf{68.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутній трапеції одна з основ дорівнює $8$ \textit{см}, бічна сторона, перпендикулярна до основ --- $6$ \textit{см}, а діагональ --- $10$ \textit{см}. Знайдіть другу основу. \nmtyear{gen}}
+
+\answerTable{$0$ \textit{см} (точка)}{$2$ \textit{см}}{$16$ \textit{см}}{$14$ \textit{см}}{$4$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 69-75 ===
+\noindent\makebox[1.5em][l]{\textbf{69.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Основи трапеції дорівнюють $5$ \textit{см} і $13$ \textit{см}. Знайдіть відрізок, що з'єднує середини діагоналей. \nmtyear{gen}}
+
+\answerTable{$4$ \textit{см}}{$9$ \textit{см}}{$8$ \textit{см}}{$2$ \textit{см}}{$6{,}5$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{70.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі трапеції ділять її на 4 трикутники. Площі трикутників, прилеглих до основ, дорівнюють $4$ см$^2$ і $9$ см$^2$. Знайдіть площу одного з бічних трикутників. \nmtyear{gen}}
+
+\answerTable{$6$ см$^2$}{$5$ см$^2$}{$6{,}5$ см$^2$}{$13$ см$^2$}{$\sqrt{36}$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{71.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У рівнобічній трапеції діагональ перпендикулярна до бічної сторони і дорівнює $8$ \textit{см}. Знайдіть площу трапеції, якщо її більша основа дорівнює $10$ \textit{см}. \nmtyear{gen}}
+
+\answerTable{$48$ см$^2$}{$40$ см$^2$}{$32$ см$^2$}{$64$ см$^2$}{$80$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{72.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Основи трапеції відносяться як $2:5$, середня лінія дорівнює $14$ \textit{см}. Знайдіть меншу основу. \nmtyear{gen}}
+
+\answerTable{$8$ \textit{см}}{$20$ \textit{см}}{$4$ \textit{см}}{$10$ \textit{см}}{$6$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{73.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Бічні сторони трапеції дорівнюють $10$ \textit{см} і $17$ \textit{см}, основи --- $3$ \textit{см} і $24$ \textit{см}. Знайдіть висоту трапеції. \nmtyear{gen}}
+
+\answerTable{$8$ \textit{см}}{$12$ \textit{см}}{$15$ \textit{см}}{$6$ \textit{см}}{$10$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{74.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У рівнобічній трапеції $ABCD$ ($BC \parallel AD$) $\angle A = 70°$. Знайдіть $\angle D$. \nmtyear{gen}}
+
+\answerTable{$70°$}{$110°$}{$140°$}{$35°$}{$90°$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{75.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сума кутів при одній з бічних сторін трапеції дорівнює: \nmtyear{gen}}
+
+\answerTable{$180°$}{$360°$}{$90°$}{$270°$}{$120°$}
+
+\vspace{1cm}
 
 %======================================================================
 % БЛОК 6: Порівняння чотирикутників (12 завдань)
@@ -488,65 +1233,77 @@
 
 \section*{Блок 6: Порівняння чотирикутників}
 
-\gentask{76}{Який чотирикутник має рівні діагоналі і рівні сторони?}
-\answerTable{квадрат}{прямокутник}{ромб}{паралелограм}{трапеція}
+\noindent\makebox[1.5em][l]{\textbf{76.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Яка з фігур є водночас і ромбом, і прямокутником? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{квадрат}{паралелограм}{трапеція}{будь-який ромб}{будь-який прямокутник}
 
-\gentask{77}{Який чотирикутник має перпендикулярні діагоналі, але нерівні сторони?}
-\answerTable{ромб}{квадрат}{прямокутник}{трапеція}{жоден}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+\noindent\makebox[1.5em][l]{\textbf{77.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Кожен квадрат є: \nmtyear{gen}}
 
-\gentask{78}{Прямокутник є окремим випадком:}
-\answerTable{паралелограма}{ромба}{трапеції}{квадрата}{п'ятикутника}
+\answerTable{ромбом}{трапецією}{тільки прямокутником}{тільки паралелограмом}{довільним чотирикутником}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{79}{Ромб є окремим випадком:}
-\answerTable{паралелограма}{прямокутника}{трапеції}{квадрата}{трикутника}
+\noindent\makebox[1.5em][l]{\textbf{78.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі якого чотирикутника НЕ обов'язково рівні? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{ромба}{квадрата}{прямокутника}{рівнобічної трапеції}{усі перераховані мають рівні діагоналі}
 
-\gentask{80}{Квадрат є одночасно:}
-\answerTable{прямокутником і ромбом}{прямокутником і трапецією}{ромбом і трапецією}{тільки прямокутником}{тільки ромбом}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+\noindent\makebox[1.5em][l]{\textbf{79.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі якого чотирикутника завжди перпендикулярні? \nmtyear{gen}}
 
-\gentask{81}{У якого чотирикутника діагоналі рівні, але не перпендикулярні?}
-\answerTable{прямокутника}{ромба}{квадрата}{паралелограма}{усіх}
+\answerTable{ромба}{прямокутника}{трапеції}{паралелограма}{будь-якого чотирикутника}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{82}{У якого чотирикутника діагоналі перпендикулярні, але не рівні?}
-\answerTable{ромба}{прямокутника}{квадрата}{трапеції}{паралелограма}
+\noindent\makebox[1.5em][l]{\textbf{80.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Який чотирикутник має всі сторони рівні, але кути не обов'язково прямі? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{ромб}{квадрат}{прямокутник}{паралелограм}{трапеція}
 
-\gentask{83}{Який чотирикутник може мати тільки одну пару паралельних сторін?}
-\answerTable{трапеція}{паралелограм}{прямокутник}{ромб}{квадрат}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+\noindent\makebox[1.5em][l]{\textbf{81.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Який чотирикутник має всі кути прямі, але сторони не обов'язково рівні? \nmtyear{gen}}
 
-\gentask{84}{Діагоналі якого чотирикутника завжди рівні?}
-\answerTable{прямокутника і квадрата}{тільки квадрата}{ромба і квадрата}{паралелограма}{трапеції}
+\answerTable{прямокутник}{квадрат}{ромб}{паралелограм}{трапеція}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{85}{Діагоналі якого чотирикутника є бісектрисами кутів?}
-\answerTable{ромба і квадрата}{тільки квадрата}{прямокутника}{паралелограма}{трапеції}
+\noindent\makebox[1.5em][l]{\textbf{82.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Чи правильно, що кожен паралелограм є трапецією? \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{ні}{так}{залежить від кутів}{залежить від сторін}{тільки якщо це ромб}
 
-\gentask{86}{У якого чотирикутника всі сторони рівні, а кути~--- ні?}
-\answerTable{ромба}{квадрата}{прямокутника}{паралелограма}{трапеції}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+\noindent\makebox[1.5em][l]{\textbf{83.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У якому чотирикутнику діагоналі є бісектрисами кутів? \nmtyear{gen}}
 
-\gentask{87}{У якого чотирикутника всі кути рівні, а сторони~--- ні?}
-\answerTable{прямокутника}{квадрата}{ромба}{паралелограма}{трапеції}
+\answerTable{ромб}{прямокутник}{трапеція}{довільний паралелограм}{будь-який чотирикутник}
 
-\vspace{0.5cm}
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{84.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Яка з фігур має тільки одну пару паралельних сторін? \nmtyear{gen}}
+
+\answerTable{трапеція}{паралелограм}{ромб}{квадрат}{прямокутник}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{85.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа якого чотирикутника обчислюється як половина добутку діагоналей? \nmtyear{gen}}
+
+\answerTable{ромба}{прямокутника}{трапеції}{паралелограма}{довільного чотирикутника}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{86.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Яка фігура НЕ є паралелограмом? \nmtyear{gen}}
+
+\answerTable{трапеція}{ромб}{квадрат}{прямокутник}{усі перераховані є паралелограмами}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{87.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У якого чотирикутника сума протилежних кутів дорівнює $180°$? \nmtyear{gen}}
+
+\answerTable{вписаного в коло}{описаного навколо кола}{будь-якого паралелограма}{будь-якої трапеції}{квадрата}
+
+\vspace{1cm}
 
 %======================================================================
 % БЛОК 7: Задачі на обчислення (13 завдань)
@@ -554,69 +1311,119 @@
 
 \section*{Блок 7: Задачі на обчислення}
 
-\gentask{88}{Діагоналі паралелограма 10 і 14 см, кут між ними $90°$. Знайдіть площу.}
-\answerTable{70 см$^2$}{140 см$^2$}{35 см$^2$}{24 см$^2$}{48 см$^2$}
+% === ЗАВДАННЯ 88 ===
+\noindent\textbf{88.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ з гострим кутом $\angle A = 30°$ на стороні $AD$ вибрано точку $K$ так, що $AB = AK = KD$ (див. рисунок). Визначте периметр паралелограма $ABCD$, якщо $BK = 8$ \textit{см}. \nmtyear{gen}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (2,0);
+        \coordinate (D) at (4,0);
+        \coordinate (B) at (30:2);
+        \coordinate (C) at ($(D)+(B)-(A)$);
 
-\vspace{0.4cm}
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
 
-\gentask{89}{Сторона ромба 10 см, один кут $60°$. Знайдіть меншу діагональ.}
-\answerTable{10 см}{$10\sqrt{3}$ см}{20 см}{5 см}{$5\sqrt{3}$ см}
+        \draw ($(A)!0.5!(B)$) ++(120:0.1) -- ++(-60:0.2);
+        \draw ($(A)!0.5!(K)$) ++(90:0.1) -- ++(-90:0.2);
+        \draw ($(K)!0.5!(D)$) ++(90:0.1) -- ++(-90:0.2);
 
-\vspace{0.4cm}
+        \pic [draw, pic text={\small $30°$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = K--A--B};
 
-\gentask{90}{Діагональ квадрата 8 см. Знайдіть сторону.}
-\answerTable{$4\sqrt{2}$ см}{4 см}{8 см}{$8\sqrt{2}$ см}{16 см}
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
 
-\vspace{0.4cm}
+\vspace{0.2cm}
+\answerTableTall{$\dfrac{24}{\sin 15°}$ \textit{см}}{$48$ \textit{см}}{$32$ \textit{см}}{$24\sqrt{3}$ \textit{см}}{$\dfrac{48}{\sqrt{3}}$ \textit{см}}
 
-\gentask{91}{У рівнобічній трапеції діагональ перпендикулярна бічній стороні. Бічна сторона 8 см, менша основа 6 см. Знайдіть більшу основу.}
-\answerTable{16 см}{10 см}{14 см}{12 см}{18 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 89 ===
+\noindent\makebox[1.5em][l]{\textbf{89.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагоналі ромба відносяться як $3:4$, а його площа дорівнює $96$ см$^2$. Знайдіть периметр ромба. \nmtyear{gen}}
 
-\gentask{92}{Сторони прямокутника відносяться як 3:4, площа 48 см$^2$. Знайдіть меншу сторону.}
-\answerTable{6 см}{4 см}{8 см}{12 см}{3 см}
+\answerTable{$40$ \textit{см}}{$20$ \textit{см}}{$52$ \textit{см}}{$28$ \textit{см}}{$32$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{93}{Кут паралелограма $60°$, сторони 6 і 10 см. Знайдіть площу.}
-\answerTable{$30\sqrt{3}$ см$^2$}{60 см$^2$}{30 см$^2$}{$60\sqrt{3}$ см$^2$}{120 см$^2$}
+% === ЗАВДАННЯ 90 ===
+\noindent\makebox[1.5em][l]{\textbf{90.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутник вписано коло радіуса $4$ \textit{см}. Знайдіть площу прямокутника. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$64$ см$^2$}{$32$ см$^2$}{$128$ см$^2$}{$16\pi$ см$^2$}{$256$ см$^2$}
 
-\gentask{94}{У ромбі сторона 6 см, один кут $120°$. Знайдіть меншу діагональ.}
-\answerTable{6 см}{$6\sqrt{3}$ см}{12 см}{3 см}{$3\sqrt{3}$ см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 91 ===
+\noindent\makebox[1.5em][l]{\textbf{91.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У рівнобічну трапецію з основами $6$ \textit{см} і $10$ \textit{см} вписано коло. Знайдіть бічну сторону трапеції. \nmtyear{gen}}
 
-\gentask{95}{Основи трапеції 5 і 11 см, бічні сторони 4 і 6 см. Знайдіть периметр.}
-\answerTable{26 см}{22 см}{16 см}{55 см}{10 см}
+\answerTable{$8$ \textit{см}}{$4$ \textit{см}}{$16$ \textit{см}}{$5$ \textit{см}}{$12$ \textit{см}}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{96}{Площа ромба 24 см$^2$, сторона 6 см. Знайдіть висоту.}
-\answerTable{4 см}{8 см}{6 см}{12 см}{2 см}
+% === ЗАВДАННЯ 92 ===
+\noindent\makebox[1.5em][l]{\textbf{92.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Площа квадрата, побудованого на діагоналі даного квадрата, дорівнює $50$ см$^2$. Знайдіть сторону даного квадрата. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$5$ \textit{см}}{$\sqrt{50}$ \textit{см}}{$25$ \textit{см}}{$5\sqrt{2}$ \textit{см}}{$10$ \textit{см}}
 
-\gentask{97}{Діагоналі ромба відносяться як 3:4, площа 24 см$^2$. Знайдіть меншу діагональ.}
-\answerTable{6 см}{8 см}{4 см}{3 см}{12 см}
+\vspace{0.7cm}
 
-\vspace{0.4cm}
+% === ЗАВДАННЯ 93 ===
+\noindent\makebox[1.5em][l]{\textbf{93.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона ромба дорівнює $12$ \textit{см}, а один з кутів --- $30°$. Знайдіть площу ромба. \nmtyear{gen}}
 
-\gentask{98}{Середня лінія трапеції 15 см. Одна основа більша за іншу на 8 см. Знайдіть більшу основу.}
-\answerTable{19 см}{11 см}{15 см}{23 см}{30 см}
+\answerTable{$72$ см$^2$}{$144$ см$^2$}{$36$ см$^2$}{$72\sqrt{3}$ см$^2$}{$36\sqrt{3}$ см$^2$}
 
-\vspace{0.4cm}
+\vspace{0.7cm}
 
-\gentask{99}{Діагоналі прямокутника перетинаються під кутом $60°$, менша сторона 4 см. Знайдіть діагональ.}
-\answerTable{8 см}{$4\sqrt{3}$ см}{$8\sqrt{3}$ см}{4 см}{$\dfrac{8}{\sqrt{3}}$ см}
+% === ЗАВДАННЯ 94-100 ===
+\noindent\makebox[1.5em][l]{\textbf{94.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі діагоналі дорівнюють $10$ \textit{см} і $14$ \textit{см}, а кут між ними --- $90°$. Знайдіть площу паралелограма. \nmtyear{gen}}
 
-\vspace{0.4cm}
+\answerTable{$70$ см$^2$}{$140$ см$^2$}{$35$ см$^2$}{$24$ см$^2$}{$48$ см$^2$}
 
-\gentask{100}{У квадрат вписано коло радіусом 5 см. Знайдіть площу квадрата.}
-\answerTable{100 см$^2$}{25 см$^2$}{$25\pi$ см$^2$}{50 см$^2$}{$100\pi$ см$^2$}
+\vspace{0.7cm}
 
-\vspace{0.5cm}
+\noindent\makebox[1.5em][l]{\textbf{95.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр прямокутника дорівнює $28$ \textit{см}, а різниця сторін --- $4$ \textit{см}. Знайдіть площу прямокутника. \nmtyear{gen}}
+
+\answerTable{$45$ см$^2$}{$49$ см$^2$}{$36$ см$^2$}{$40$ см$^2$}{$48$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{96.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Основи трапеції дорівнюють $8$ \textit{см} і $14$ \textit{см}, а її площа --- $77$ см$^2$. Знайдіть висоту трапеції. \nmtyear{gen}}
+
+\answerTable{$7$ \textit{см}}{$11$ \textit{см}}{$14$ \textit{см}}{$5{,}5$ \textit{см}}{$22$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{97.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У квадрат зі стороною $10$ \textit{см} вписано коло. Знайдіть площу частини квадрата, що знаходиться поза колом. \nmtyear{gen}}
+
+\answerTable{$100-25\pi$ см$^2$}{$100-100\pi$ см$^2$}{$25\pi$ см$^2$}{$100\pi$ см$^2$}{$100-50\pi$ см$^2$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{98.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Діагональ ромба дорівнює $d$, а один з кутів ромба --- $60°$. Знайдіть площу ромба. \nmtyear{gen}}
+
+\answerTable{$\dfrac{d^2\sqrt{3}}{2}$}{$d^2\sqrt{3}$}{$\dfrac{d^2}{2}$}{$d^2$}{$\dfrac{d^2\sqrt{3}}{4}$}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{99.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутній трапеції основи дорівнюють $5$ \textit{см} і $11$ \textit{см}, а більша бічна сторона --- $10$ \textit{см}. Знайдіть меншу бічну сторону (висоту). \nmtyear{gen}}
+
+\answerTable{$8$ \textit{см}}{$6$ \textit{см}}{$\sqrt{136}$ \textit{см}}{$4$ \textit{см}}{$12$ \textit{см}}
+
+\vspace{0.7cm}
+
+\noindent\makebox[1.5em][l]{\textbf{100.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Периметр паралелограма дорівнює $60$ \textit{см}, а одна сторона більша за іншу в $2$ рази. Знайдіть більшу сторону паралелограма. \nmtyear{gen}}
+
+\answerTable{$20$ \textit{см}}{$10$ \textit{см}}{$40$ \textit{см}}{$15$ \textit{см}}{$30$ \textit{см}}
 
 \end{document}
