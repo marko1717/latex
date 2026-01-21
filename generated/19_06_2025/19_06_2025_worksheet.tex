@@ -8,15 +8,15 @@
 \setsansfont{Liberation Sans}
 \setmonofont{Liberation Mono}
 
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2.5cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepackage{hyperref}
 
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
-\usetikzlibrary{3d}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d}
 
 \usepackage{xcolor}
 \usepackage{array}
@@ -26,23 +26,33 @@
 % Кольори
 \definecolor{headerblue}{RGB}{0, 102, 204}
 \definecolor{yearcolor}{RGB}{128, 0, 128}
-\definecolor{solutioncolor}{RGB}{200, 220, 255}
+\definecolor{gridcolor}{RGB}{210, 210, 210}
 
+% === КОЛОНТИТУЛИ ===
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\textcolor{headerblue}{\textbf{@pvtr2525}} | Підготовка до НМТ}
+\fancyhead[R]{Математика 2026}
 \fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
+\setlength{\headheight}{18pt}
 \setlength{\footskip}{25pt}
 
-\widowpenalty=10000
-\clubpenalty=10000
-
 % === КОМАНДИ ===
+\newcommand{\nmtyear}[1]{\hfill \textcolor{yearcolor}{\small #1}}
 
-% Стандартна таблиця відповідей
+\newcommand{\solutionGrid}[1][2cm]{
+
+\vspace{0.2cm}
+\noindent
+\begin{tikzpicture}
+    \draw[step=0.5cm, gridcolor, thin] (0,0) grid (\textwidth-0.1cm, #1);
+    \draw[black, thick] (0,0) rectangle (\textwidth-0.1cm, #1);
+\end{tikzpicture}
+\vspace{0.4cm}
+}
+
 \newcommand{\answerTable}[5]{
 \begin{center}
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
@@ -55,24 +65,18 @@
 \end{center}
 }
 
-% Таблиця для відповідей із дробами
 \newcommand{\answerTableTall}[5]{
 \begin{center}
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
 \hline
 \rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\rule[-0.9cm]{0pt}{2.0cm}#1 &
-\rule[-0.9cm]{0pt}{2.0cm}#2 &
-\rule[-0.9cm]{0pt}{2.0cm}#3 &
-\rule[-0.9cm]{0pt}{2.0cm}#4 &
-\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\rule[-0.9cm]{0pt}{2.0cm}#1 & \rule[-0.9cm]{0pt}{2.0cm}#2 & \rule[-0.9cm]{0pt}{2.0cm}#3 & \rule[-0.9cm]{0pt}{2.0cm}#4 & \rule[-0.9cm]{0pt}{2.0cm}#5 \\
 \hline
 \end{tabular}
 \end{center}
 }
 
-% Таблиця відповідей для відповідностей
 \newcommand{\answerGrid}{
     \begingroup
     \renewcommand{\arraystretch}{1.3}
@@ -86,433 +90,329 @@
     \endgroup
 }
 
-% Макет для завдань на відповідність
 \newcommand{\matchingLayout}[3]{
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
-        #1
-    \end{minipage}%
+    \begin{minipage}[t]{0.40\textwidth} #1 \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
-        #2
-    \end{minipage}%
+    \begin{minipage}[t]{0.28\textwidth} #2 \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}
+    \begin{minipage}[t]{0.30\textwidth} \vspace{0pt} \begin{flushright} #3 \end{flushright} \end{minipage}
 }
 
-% Поле для розв'язку
-\newcommand{\solutionBox}[1][3cm]{
-\vspace{0.3cm}
-\noindent\textbf{Розв'язок:}
-\vspace{0.2cm}
-
-\noindent\fbox{\begin{minipage}[t][#1]{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
-\hfill\vfill
-\end{minipage}}
-\vspace{0.5cm}
-}
-
-% Поле для відповіді (числове завдання)
 \newcommand{\answerBox}{
 \vspace{0.3cm}
 \noindent\textbf{Відповідь:} \framebox[4cm]{\rule{0pt}{0.8cm}}
 \vspace{0.5cm}
 }
 
-% Команда для завдання
 \newcommand{\task}[2]{\noindent\makebox[1.5em][l]{\textbf{#1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{#2}}
 
 \begin{document}
 
 \begin{center}
-{\LARGE\textbf{\color{headerblue}19 червня 2025 року}}
-\end{center}
-
-\begin{center}
+{\LARGE\textbf{\color{headerblue}19 червня 2025 року}} \\
 {\large Робочий аркуш для розв'язання}
 \end{center}
 
-\vspace{0.3cm}
+\hrule \vspace{0.3cm}
+\begin{center} \textit{Завдання 1–15 мають лише один правильний варіант відповіді.} \end{center}
+\hrule \vspace{0.5cm}
 
-\hrule
-\vspace{0.3cm}
-\begin{center}
-\textit{Завдання 1–15 мають по п'ять варіантів відповіді, з яких лише один правильний.\\
-Виберіть правильний варіант відповіді й позначте його.}
-\end{center}
-\vspace{0.3cm}
-\hrule
-
-\vspace{0.5cm}
-
-%======================================================================
-% ЗАВДАННЯ 1
-%======================================================================
 \task{1}{Округліть до сотих число 1,31499.}
-
 \answerTable{1,315}{1,32}{1,314}{1,3}{1,31}
+\solutionGrid[2cm]
 
-\solutionBox[2cm]
-
-%======================================================================
-% ЗАВДАННЯ 2
-%======================================================================
-\task{2}{На рисунку зображено автомобільний номер, що складається з 4 букв і 4 цифр. Одна з цифр номеру замазана брудом і не розпізнається. Комп'ютерна програма для зчитування номерів автоматично підбирає відсутню цифру з десяти можливих значень. Яка ймовірність того, що програма правильно визначить замасковану цифру?}
-
+\begin{minipage}[t]{0.55\textwidth}
+\task{2}{На рисунку зображено автомобільний номер... Яка ймовірність того, що програма правильно визначить замасковану цифру?}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \draw[fill=white, rounded corners=3pt, line width=1pt] (0,0) rectangle (6, 1.3);
+    \fill[headerblue] (0,0) [rounded corners=3pt] -- (0,1.3) -- (0.8,1.3) -- (0.8,0) [rounded corners=3pt] -- cycle;
+    \fill[yellow] (0.1, 0.7) rectangle (0.7, 0.45);
+    \fill[blue!80!cyan] (0.1, 0.95) rectangle (0.7, 0.7);
+    \node[white, font=\bfseries\tiny] at (0.4, 0.25) {UA};
+    \node[font=\bfseries\sffamily\Large, anchor=west] at (0.9, 0.65) {AA 37};
+    \node[font=\bfseries\sffamily\Large, anchor=east] at (5.8, 0.65) {0 CI};
+    \fill[gray!60] (3.6, 0.3) to[out=100, in=200] (3.7, 1.0) to[out=20, in=120] (4, 0.9) to[out=300, in=40] (4.1, 0.4) to[out=180, in=0] (3.6, 0.3);
+\end{tikzpicture}
+\end{center}
+\end{minipage}
 \answerTableTall{$\dfrac{1}{10}$}{$\dfrac{1}{4}$}{$\dfrac{1}{2}$}{$\dfrac{1}{8}$}{$\dfrac{1}{9}$}
+\solutionGrid[2cm]
 
-\solutionBox[2cm]
-
-%======================================================================
-% ЗАВДАННЯ 3
-%======================================================================
-\task{3}{Пряма $l$ перетинає паралельні прямі $m$ і $n$. Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 58^\circ$.}
-
+\task{3}{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 58^\circ$.}
+\begin{minipage}[t]{0.55\textwidth}
+\vspace{0.3cm}
 \answerTable{$116^\circ$}{$32^\circ$}{$24^\circ$}{$29^\circ$}{$19^\circ$}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=1]
+    \coordinate (M1) at (0,-1.5); \coordinate (M2) at (0,1.5);
+    \coordinate (N1) at (1.8,-1.5); \coordinate (N2) at (1.8,1.5);
+    \coordinate (L1) at (-0.5,1.3); \coordinate (L2) at (2.3,-1.3);
+    \coordinate (P) at (0,0.836); \coordinate (Q) at (1.8,-0.836);
+    \coordinate (MDown) at (0,0); \coordinate (LRightP) at (0.9,0);
+    \coordinate (NDown) at (1.8,1.4); \coordinate (LLeftQ) at (0.9,0);
+    \draw[thick] (M1) -- (M2); \draw[thick] (N1) -- (N2); \draw[thick] (L1) -- (L2);
+    \node[left] at (-0.3,1.4) {$l$}; \node[above] at (0,1.5) {$m$}; \node[above] at (1.8,1.5) {$n$};
+    \pic[draw, angle radius=0.4cm] {angle = MDown--P--LRightP}; \node at (0.25,0.1) {$\alpha$};
+    \pic[draw, angle radius=0.4cm] {angle = NDown--Q--LLeftQ}; \node at (1.45,0.08) {$\beta$};
+    \pic[draw, angle radius=0.6cm] {angle = NDown--Q--LLeftQ}; \node at (1.45,0.08) {$\beta$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+\solutionGrid[3cm]
 
-\solutionBox[3cm]
-
-%======================================================================
-% ЗАВДАННЯ 4
-%======================================================================
 \task{4}{Яке з наведених чисел є коренем рівняння $|x^2 - 35| = 10$?}
-
 \answerTable{$-15$}{$45$}{$-5$}{$25$}{$7$}
-
-\solutionBox[3cm]
+\solutionGrid[3cm]
 
 %======================================================================
 % ЗАВДАННЯ 5
 %======================================================================
+\noindent
+\begin{minipage}[t]{0.60\textwidth}
 \task{5}{На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму перетину площин $(BB_1C_1)$ і $(CDD_1)$.}
 
-\answerTable{$DD_1$}{$CC_1$}{$BB_1$}{$BC$}{$AC_1$}
+\vspace{0.3cm}
+\textbf{А} \quad $DD_1$ 
 
-\solutionBox[3cm]
+\vspace{0.2cm}
+\textbf{Б} \quad $CC_1$ 
+
+\vspace{0.2cm}
+\textbf{В} \quad $BB_1$ 
+
+\vspace{0.2cm}
+\textbf{Г} \quad $BC$ 
+
+\vspace{0.2cm}
+\textbf{Д} \quad $AC_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\solutionGrid[3cm]
 
 \newpage
 
-%======================================================================
-% ЗАВДАННЯ 6
-%======================================================================
+\begin{minipage}[t]{0.55\textwidth}
 \task{6}{Графік якої функції зображено на рисунку?}
+\vspace{0.3cm}
+\begin{tabular}{ll}
+    \textbf{А} & $y = -2^x$ \\[0.2cm]
+    \textbf{Б} & $y = \sqrt{-x}$ \\[0.2cm]
+    \textbf{В} & $y = -\sqrt{x}$ \\[0.2cm]
+    \textbf{Г} & $y = \dfrac{1}{x}$ \\[0.2cm]
+    \textbf{Д} & $y = \log_{\frac{1}{3}} x$ \\
+\end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.6]
+        \draw[step=1cm,gray!50,very thin] (-0.5,-2.5) grid (5.5,3.5);
+        \draw[->, >=stealth, thick] (-0.5,0) -- (5.5,0) node[below] {$x$};
+        \draw[->, >=stealth, thick] (0,-2.5) -- (0,3.5) node[left] {$y$};
+        \node[below left] at (0,0) {$0$}; \node[below] at (1,0) {$1$}; \node[left] at (0,1) {$1$};
+        \draw[thick] plot [smooth, domain=0:5.2] (\x, {-sqrt(\x)});
+        \fill (1,-1) circle (2pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+\solutionGrid[3cm]
 
-\answerTableTall{$y = -2^x$}{$y = \sqrt{-x}$}{$y = -\sqrt{x}$}{$y = \dfrac{1}{x}$}{$y = \log_{\frac{1}{3}} x$}
-
-\solutionBox[3cm]
-
-%======================================================================
-% ЗАВДАННЯ 7
-%======================================================================
 \task{7}{Які з наведених тверджень є правильними?
-
 \begin{enumerate}[label=\Roman*., itemsep=0pt]
 \item Існує трапеція, точка перетину діагоналей якої рівновіддалена від її вершин.
 \item Існує трапеція, сума довжин бічних сторін якої дорівнює сумі довжин її основ.
 \item Існує трапеція, середня лінія якої проходить через точку перетину її діагоналей.
 \end{enumerate}}
-
 \answerTable{лише I}{лише II}{лише III}{лише I та II}{лише II та III}
+\solutionGrid[4cm]
 
-\solutionBox[4cm]
-
-%======================================================================
-% ЗАВДАННЯ 8
-%======================================================================
 \task{8}{$\dfrac{9 - y^2}{3 - y} - 3 =$}
-
 \answerTableTall{$y$}{$\dfrac{-y^2 - y}{3 - y}$}{$1 - y$}{$-y$}{$\dfrac{-y^2 - 3y}{3 - y}$}
+\solutionGrid[4cm]
 
-\solutionBox[4cm]
-
-%======================================================================
-% ЗАВДАННЯ 9
-%======================================================================
-\task{9}{Визначте максимальну швидкість (у м/с) фантастичного зорельота, якщо вона становить 0,01 від швидкості світла у вакуумі. Уважайте, що швидкість світла у вакуумі дорівнює $3 \cdot 10^8$ м/с.}
-
-\answerTable{$3 \cdot 10^{10}$}{$3 \cdot 10^4$}{$3 \cdot 0{,}1^8$}{$3 \cdot 10^{0{,}08}$}{$3 \cdot 10^6$}
-
-\solutionBox[3cm]
+\task{9}{Визначте швидкість зорельота, якщо вона становить 0,01 від швидкості світла ($3 \cdot 10^8$ м/с).}
+\answerTable{$3 \cdot 10^{10}$}{$3 \cdot 10^4$}{$3 \cdot 0,1^8$}{$3 \cdot 10^{0,08}$}{$3 \cdot 10^6$}
+\solutionGrid[3cm]
 
 \newpage
 
-%======================================================================
-% ЗАВДАННЯ 10
-%======================================================================
-\task{10}{У прямокутній системі координат у просторі задано точки $A(-6; -3; 6)$ і $B$, що симетричні одна одній відносно початку координат. Визначте довжину (модуль) вектора $\overrightarrow{AB}$.}
+\task{10}{Визначте довжину (модуль) вектора $\overrightarrow{AB}$, де $A(-6; -3; 6)$, а $B$ симетрична їй відносно початку координат.}
+\answerTable{$6\sqrt{3}$}{$3$}{$4,5$}{$18$}{$9$}
+\solutionGrid[4cm]
 
-\answerTable{$6\sqrt{3}$}{$3$}{$4{,}5$}{$18$}{$9$}
-
-\solutionBox[4cm]
-
-%======================================================================
-% ЗАВДАННЯ 11
-%======================================================================
 \task{11}{Якому проміжку належить корінь рівняння $\log_6 x - \log_6 2 = 1$?}
-
 \answerTable{$(-\infty; 0]$}{$(0; 1]$}{$(1; 4]$}{$(4; 10]$}{$(10; +\infty)$}
+\solutionGrid[4cm]
 
-\solutionBox[4cm]
-
+\vspace{0.7cm}
 %======================================================================
-% ЗАВДАННЯ 12
-%======================================================================
-\task{12}{На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$. Визначте довжину відрізка $AK$, якщо периметр прямокутника дорівнює 96 см, $AB : BC = 3 : 5$.}
-
+\task{12}{
+\begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$ (див. рисунок). Визначте довжину відрізка $AK$, якщо периметр прямокутника дорівнює $96$ см, $AB : BC = 3 : 5$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.25]
+    \coordinate (A) at (0,0); \coordinate (B) at (0,10.8);
+    \coordinate (C) at (18,10.8); \coordinate (D) at (18,0);
+    \coordinate (K) at (6.23, 10.8);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; \draw[thick] (A) -- (K);
+    \pic [draw, pic text={\small $30^\circ$}, angle radius=0.9cm, angle eccentricity=1.5] {angle = K--A--B};
+    \node[below left] at (A) {$A$}; \node[above left] at (B) {$B$}; \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$}; \node[above] at (K) {$K$}; \fill (K) circle (8pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+}
 \answerTable{$36\sqrt{3}$ см}{$12$ см}{$18$ см}{$12\sqrt{3}$ см}{$36$ см}
-
-\solutionBox[5cm]
+\solutionGrid[5cm]
 
 \newpage
 
-%======================================================================
-% ЗАВДАННЯ 13
-%======================================================================
-\task{13}{Знайдіть суму чотирьох перших членів геометричної прогресії $(b_n)$, у якої $b_2 = 6$, а знаменник $q = -2$.}
+\task{13}{Знайдіть суму чотирьох перших членів геометричної прогресії $(b_n)$, де $b_2 = 6, q = -2$.}
+\answerTable{$15$}{$-7,5$}{$-9$}{$-45$}{$-15$}
+\solutionGrid[4cm]
 
-\answerTable{$15$}{$-7{,}5$}{$-9$}{$-45$}{$-15$}
+\task{14}{Обчисліть $2\sin^2 x - 2$, якщо $\cos^2 x = 0,4$.}
+\answerTable{$-0,8$}{$-1,2$}{$0,8$}{$-3,2$}{$1,2$}
+\solutionGrid[4cm]
 
-\solutionBox[4cm]
-
-%======================================================================
-% ЗАВДАННЯ 14
-%======================================================================
-\task{14}{Обчисліть $2\sin^2 x - 2$, якщо $\cos^2 x = 0{,}4$.}
-
-\answerTable{$-0{,}8$}{$-1{,}2$}{$0{,}8$}{$-3{,}2$}{$1{,}2$}
-
-\solutionBox[4cm]
-
-%======================================================================
-% ЗАВДАННЯ 15
-%======================================================================
-\task{15}{Обчисліть суму всіх цілих розв'язків системи нерівностей $\begin{cases} 3x - 5 < 2x, \\ 12 - 9x \leqslant 3x. \end{cases}$}
-
+\task{15}{Обчисліть суму всіх цілих розв'язків системи $\begin{cases} 3x - 5 < 2x \\ 12 - 9x \leq 3x \end{cases}$}
 \answerTable{$14$}{$10$}{$9$}{$15$}{$7$}
+\solutionGrid[5cm]
 
-\solutionBox[5cm]
+\newpage
+\hrule \vspace{0.3cm}
+\begin{center} \textit{Завдання 16–18: встановлення відповідності.} \end{center}
+\hrule \vspace{0.5cm}
+
+\begin{minipage}[t]{0.55\textwidth}
+\noindent\textbf{16.} На рисунку ромб $ABCD$... $AC = 32, DO = 6$. Узгодьте відрізок (1–3) та його довжину (А–Д).
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.25]
+        \coordinate (A) at (-10, 0); \coordinate (C) at (10, 0); \coordinate (B) at (0, 12); \coordinate (D) at (0, -12);
+        \coordinate (K) at ($(A)!0.5!(D)$); \coordinate (M) at ($(D)!0.5!(C)$); \coordinate (O) at (0, -6);
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; \draw[thick] (K) -- (M); \draw[thick] (B) -- (D);
+        \node[left] at (A) {$A$}; \node[above] at (B) {$B$}; \node[right] at (C) {$C$}; \node[below] at (D) {$D$};
+        \node[below left] at (K) {$K$}; \node[below right] at (M) {$M$}; \node[above right] at (O) {$O$};
+        \fill (K) circle (8pt); \fill (M) circle (8pt); \fill (O) circle (8pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\matchingLayout{
+    1. $KM$ \\ 2. $BO$ \\ 3. $AB$
+}{
+    А 12 см; Б 16 см; В 18 см; Г 20 см; Д 24 см
+}{
+    \answerGrid
+}
+\solutionGrid[5cm]
 
 \newpage
 
-%======================================================================
-\hrule
-\vspace{0.3cm}
+\noindent\textbf{17.} Узгодьте проміжок (1–3) з властивістю функції (А–Д) (згідно з графіком).
+\begin{minipage}[t]{0.55\textwidth}
+    1. $[-4; -2]$ \\ 2. $[-2; 2]$ \\ 3. $[2; 5]$
+    \vspace{0.3cm}
+    А спадає; Б точка макс.; В перетин $y = -4,5$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        \draw[step=1cm,gray!50,very thin] (-5.5,-7.5) grid (5.5,4.5);
+        \draw[->, thick] (-5.5,0) -- (5.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-7.5) -- (0,4.5) node[left] {$y$};
+        \draw[thick] plot [smooth, tension=0.44] coordinates {(-4, -6) (-2, -3) (0, 1) (2, -3) (5, -1)};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+\solutionGrid[5cm]
+
+\task{18}{Узгодьте початок речення з його закінченням ($n \neq 0$).}
+\matchingLayout{
+    1. $(m+1)^2-1=n$ \\ 2. $\sqrt{2^m}=2^n$ \\ 3. $\log_{2^n} 4^m = 1$
+}{
+    А $n=2m$; Б $n=m^2$; В $n=m^2+2m$
+}{
+    \answerGrid
+}
+\solutionGrid[5cm]
+
+\newpage
+\hrule \vspace{0.3cm}
+\begin{center} \textit{Завдання 19–22: запишіть числову відповідь.} \end{center}
+\hrule \vspace{0.5cm}
+
+\task{19}{Визначте суму всіх цілих $a \in [-8; 5]$, при яких рівняння $\dfrac{5^{4x+2a-6}-1}{\sqrt{x-2}}=0$ має корінь.}
+\solutionGrid[6cm]
+\answerBox
+
+\task{20}{Обчисліть $f(-2) \cdot f'(4)$ для $f(x)=x(5-x)$.}
+\solutionGrid[5cm]
+\answerBox
+
+\task{21}{Скільки було опитаних, якщо «Фантастику» вибрало на 30 осіб більше за «Хоррор»?}
 \begin{center}
-\textit{У завданнях 16–18 до кожного з трьох рядків інформації, позначених цифрами,\\
-доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
+\begin{tikzpicture}[scale=1]
+\filldraw[fill=orange!20] (0,0) -- (0:2) arc (0:144:2) -- cycle;
+\filldraw[fill=green!20] (0,0) -- (270:2) arc (270:324:2) -- cycle;
+\node at (72:1.3) {40\%}; \node at (297:1.3) {Ф};
+\end{tikzpicture}
 \end{center}
-\vspace{0.3cm}
-\hrule
-\vspace{0.5cm}
-
-%======================================================================
-% ЗАВДАННЯ 16
-%======================================================================
-\noindent\textbf{16.} На рисунку зображено ромб $ABCD$. Точки $K$ і $M$ — середини сторін $AD$ і $DC$ відповідно, діагональ $BD$ перетинає відрізок $KM$ у точці $O$. $AC = 32$ см, $DO = 6$ см. Узгодьте відрізок (1–3) та його довжину (А–Д).
-
-\vspace{0.5cm}
-
-\matchingLayout{
-\textit{Відрізок}
-
-\textbf{1} \quad $KM$
-
-\vspace{0.4cm}
-
-\textbf{2} \quad $BO$
-
-\vspace{0.4cm}
-
-\textbf{3} \quad $AB$
-
-\vspace{0.4cm}
-
-}{
-\textit{Довжина відрізка}
-
-\textbf{А} \quad 12 см
-
-\vspace{0.4cm}
-
-\textbf{Б} \quad 16 см
-
-\vspace{0.4cm}
-
-\textbf{В} \quad 18 см
-
-\vspace{0.4cm}
-
-\textbf{Г} \quad 20 см
-
-\vspace{0.4cm}
-
-\textbf{Д} \quad 24 см
-
-\vspace{0.4cm}
-
-}{\answerGrid}
-
-\solutionBox[6cm]
-
-\newpage
-
-%======================================================================
-% ЗАВДАННЯ 17
-%======================================================================
-\noindent\textbf{17.} На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-4; 5]$. Узгодьте проміжок (1–3) з властивістю (А–Д), яку має функція на цьому проміжку.
-
-\vspace{0.5cm}
-
-\matchingLayout{
-\textit{Проміжок}
-
-\textbf{1} \quad $[-4; -2]$
-
-\vspace{0.4cm}
-
-\textbf{2} \quad $[-2; 2]$
-
-\vspace{0.4cm}
-
-\textbf{3} \quad $[2; 5]$
-
-\vspace{0.4cm}
-
-}{
-\textit{Властивість функції}
-
-\textbf{А} \quad функція спадає
-
-\vspace{0.3cm}
-
-\textbf{Б} \quad функція має точку максимуму
-
-\vspace{0.3cm}
-
-\textbf{В} \quad графік функції перетинає пряму $y = -4{,}5$
-
-\vspace{0.3cm}
-
-\textbf{Г} \quad для кожної точки $(x_0; y_0)$, що належить графіку функції, добуток $x_0 \cdot y_0 < 0$
-
-\vspace{0.3cm}
-
-\textbf{Д} \quad функція набуває лише додатних значень
-
-\vspace{0.3cm}
-
-}{\answerGrid}
-
-\solutionBox[6cm]
-
-\newpage
-
-%======================================================================
-% ЗАВДАННЯ 18
-%======================================================================
-\noindent\textbf{18.} Доберіть до кожного початку речення (1–3) його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n \neq 0$.
-
-\vspace{0.5cm}
-
-\matchingLayout{
-\textit{Початок речення}
-
-\textbf{1} \quad Якщо $(m + 1)^2 - 1 = n$, то
-
-\vspace{0.4cm}
-
-\textbf{2} \quad Якщо $\sqrt{2^m} = 2^n$, то
-
-\vspace{0.4cm}
-
-\textbf{3} \quad Якщо $\log_{2^n} 4^m = 1$, то
-
-\vspace{0.4cm}
-
-}{
-\textit{Закінчення речення}
-
-\textbf{А} \quad $n = 2m$.
-
-\vspace{0.4cm}
-
-\textbf{Б} \quad $n = m^2$.
-
-\vspace{0.4cm}
-
-\textbf{В} \quad $n = m^2 + 2m$.
-
-\vspace{0.4cm}
-
-\textbf{Г} \quad $n = \sqrt{m}$.
-
-\vspace{0.4cm}
-
-\textbf{Д} \quad $n = \dfrac{m}{2}$.
-
-\vspace{0.4cm}
-
-}{\answerGrid}
-
-\solutionBox[6cm]
-
-\newpage
-
-%======================================================================
-\hrule
-\vspace{0.3cm}
-\begin{center}
-\textit{Розв'яжіть завдання 19–22. Одержані числові відповіді запишіть у спеціально\\
-відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши\\
-положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
-\end{center}
-\vspace{0.3cm}
-\hrule
-\vspace{0.5cm}
-
-%======================================================================
-% ЗАВДАННЯ 19
-%======================================================================
-\task{19}{Визначте суму всіх цілих значень $a$ з проміжку $[-8; 5]$, за кожного з яких рівняння $\dfrac{5^{4x+2a-6} - 1}{\sqrt{x - 2}} = 0$ має корінь.}
-
-\solutionBox[7cm]
-
+\solutionGrid[6cm]
 \answerBox
 
-%======================================================================
-% ЗАВДАННЯ 20
-%======================================================================
-\task{20}{Задано функцію $f(x) = x(5 - x)$, $f'(x)$ — її похідна. Обчисліть значення виразу $f(-2) \cdot f'(4)$.}
-
-\solutionBox[6cm]
-
-\answerBox
-
-\newpage
-
-%======================================================================
-% ЗАВДАННЯ 21
-%======================================================================
-\task{21}{Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало в 1,5 раза більше осіб, ніж жанр «Хоррор». Скільки всього було опитаних, якщо жанр «Фантастика» вибрало на 30 осіб більше, ніж жанр «Хоррор»?
-
-\textit{Дані діаграми: Комедія — 40\%, Мелодрама — 35\%, Фантастика та Хоррор — решта.}}
-
-\solutionBox[7cm]
-
-\answerBox
-
-%======================================================================
-% ЗАВДАННЯ 22
-%======================================================================
-\task{22}{Конус і правильна трикутна піраміда мають рівні висоти. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи конуса. Обчисліть об'єм (у см$^3$) піраміди, якщо медіана основи піраміди дорівнює 9 см, а твірна конуса — 12 см.}
-
-\solutionBox[8cm]
-
+\task{22}{Обчисліть об'єм піраміди (у см$^3$), якщо її висота як у конуса, медіана основи — 9 см, а твірна конуса — 12 см.}
+\solutionGrid[7cm]
 \answerBox
 
 \end{document}
