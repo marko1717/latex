@@ -1,0 +1,1003 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+
+% Підключаємо бібліотеки для зручних кутів
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% Таблиця для відповідей із дробами (збільшена висота клітинок)
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 &
+\rule[-0.9cm]{0pt}{2.0cm}#2 &
+\rule[-0.9cm]{0pt}{2.0cm}#3 &
+\rule[-0.9cm]{0pt}{2.0cm}#4 &
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Оновлена таблиця відповідей (заголовки зовні)
+\newcommand{\answerGrid}{
+    \begingroup
+    \renewcommand{\arraystretch}{1.3}
+    \setlength{\tabcolsep}{7pt}
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+% Макет для завдань на відповідність
+\newcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        \textit{Величина / Початок} \par \vspace{0.2cm}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        \textit{Значення / Закінчення} \par \vspace{0.2cm}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
+% Стандартна таблиця відповідей (для тестів)
+\newcommand{\answerTableSmall}[5]{
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 &
+\rule[-0.4cm]{0pt}{0.9cm}#2 &
+\rule[-0.4cm]{0pt}{0.9cm}#3 &
+\rule[-0.4cm]{0pt}{0.9cm}#4 &
+\rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}
+}
+
+% Таблиця для вибору одного варіанту
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Команда для року
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Паралелограм}}
+\end{center}
+
+\vspace{0.5cm}
+
+% === ЗАВДАННЯ 1 ===
+\noindent\textbf{1.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ діагональ $BD$ утворює зі сторонами $BC$ і $CD$ кути $48^\circ$ і $72^\circ$ (див. рисунок). Визначте градусну міру кута $ABC$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.9]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (4,0);
+        \coordinate (C) at (5.2,2.5);
+        \coordinate (B) at (1.2,2.5);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (D);
+
+        \pic [draw, pic text={$48^\circ$}, angle radius=0.6cm, angle eccentricity=1.7] {angle = D--B--C};
+        \pic [draw, pic text={$72^\circ$}, angle radius=0.6cm, angle eccentricity=1.4] {angle = C--D--B};
+        \pic [draw, angle radius=0.5cm] {angle = C--D--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTable{$132^\circ$}{$60^\circ$}{$108^\circ$}{$72^\circ$}{$120^\circ$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 2 ===
+\noindent\makebox[1.5em][l]{\textbf{2.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутній системі координат на площині задано паралелограм $ABCD$ (див. рисунок). Обчисліть площу цього паралелограма. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$10{,}5$}{$21$}{$18$}{$3\sqrt{85}$}{$1{,}5\sqrt{85}$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.45]
+    \draw[gray!40, very thin] (-5,-5) grid (5,5);
+    \draw[->] (-5,0) -- (5,0) node[right] {$x$};
+    \draw[->] (0,-5) -- (0,5) node[above] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,0) {$1$};
+    \node[left] at (0,1) {$1$};
+
+    \coordinate (A) at (-3,1);
+    \coordinate (B) at (-3,4);
+    \coordinate (C) at (4,-2);
+    \coordinate (D) at (4,-5);
+
+    \fill[gray!40, opacity=0.5] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 3 ===
+\noindent\makebox[1.5em][l]{\textbf{3.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сторона $CD$ паралелограма $ABCD$ утворює з прямою $AD$ кут $65°$ (див. рисунок). Знайдіть градусну міру кута $MAB$. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$145°$}{$65°$}{$125°$}{$115°$}{$135°$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=1]
+    \coordinate (M) at (-0.8,0);
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (E) at (3.8,0);
+    \coordinate (B) at (0.7,1.3);
+    \coordinate (C) at (3.7,1.3);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (M) -- (A);
+    \draw[thick] (D) -- (E);
+
+    \pic [draw, pic text={$65^\circ$}, angle radius=0.5cm, angle eccentricity=1.9] {angle = E--D--C};
+
+    \pic [draw, angle radius=0.4cm] {angle = B--A--M};
+    \pic [draw, angle radius=0.5cm, "?" anchor=south east] {angle = B--A--M};
+
+    \node[below] at (M) {$M$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \fill (M) circle (1.5pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 4 ===
+\noindent\textbf{4.} \begin{minipage}[t]{0.55\textwidth}
+Діагональ $BD$ паралелограма $ABCD$ перпендикулярна до сторони $AB$ (див. рисунок). $\angle A = 45°$, $BD = 10$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (1.5,2.1);
+        \coordinate (C) at (5.5,2.1);
+        \coordinate (D) at (4,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (D);
+
+        \coordinate (BA) at ($(B)!0.25cm!(A)$);
+        \coordinate (BD) at ($(B)!0.25cm!(D)$);
+        \draw (BA) -- ($(BA)+(BD)-(B)$) -- (BD);
+
+        \pic [draw, angle radius=0.6cm, " $45°$" anchor=south west] {angle = D--A--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textbf{1} \quad Сторона $AB$ \\
+    \textbf{2} \quad Сторона $AD$ \\
+    \textbf{3} \quad Діагональ $AC$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & $5\sqrt{2}$ \textit{см} \\
+    \textbf{Б} & $10\sqrt{2}$ \textit{см} \\
+    \textbf{В} & $5\sqrt{6}$ \textit{см} \\
+    \textbf{Г} & $10$ \textit{см} \\
+    \textbf{Д} & $20$ \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 5 ===
+\noindent\makebox[1.5em][l]{\textbf{5.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ діагональ $BD$ утворює зі сторонами $AB$ і $AD$ кути $50°$ і $55°$ відповідно (див. рисунок). Знайдіть довжину сторони $BC$, якщо $AB = 4$ \textit{см}. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$2\sqrt{5}$ \textit{см}}{$\dfrac{4\sin 55°}{\sin 50°}$ \textit{см}}{$4\sqrt{2}$ \textit{см}}{$\sqrt{10}$ \textit{см}}{$\dfrac{4\sin 50°}{\sin 55°}$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=1.2]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2);
+    \coordinate (C) at (4.5,2);
+    \coordinate (D) at (3.3,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (D);
+
+    \pic [draw, angle radius=0.4cm, "\small $50°$" anchor=north] {angle = A--B--D};
+
+    \pic [draw, angle radius=0.4cm] {angle = B--D--A};
+    \pic [draw, angle radius=0.5cm, "\small $55°$" anchor=east] {angle = B--D--A};
+
+    \node[left] at (0.6,1) {\small 4 \textit{см}};
+
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 6 ===
+\noindent\makebox[1.5em][l]{\textbf{6.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ бісектриса кута $A = 45°$ перетинає сторону $BC$ в точці $K$, $BK = 6$ \textit{см}, $KC = 4$ \textit{см} (див. рисунок). Обчисліть площу паралелограма $ABCD$. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$30\sqrt{2}$ \textit{см}$^2$}{$60$ \textit{см}$^2$}{$36$ \textit{см}$^2$}{$30$ \textit{см}$^2$}{$60\sqrt{2}$ \textit{см}$^2$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.75]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2.1);
+    \coordinate (C) at (5.2,2.1);
+    \coordinate (D) at (4,0);
+    \coordinate (K) at (3.3,2.1);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K);
+
+    \pic [draw, angle radius=0.5cm] {angle = D--A--K};
+    \pic [draw, angle radius=0.65cm] {angle = K--A--B};
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 7 ===
+\noindent\makebox[1.5em][l]{\textbf{7.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагональ паралелограма ділить його на два рівних трикутники. \\
+II. & Діагоналі паралелограма є бісектрисами його кутів. \\
+III. & Більша діагональ паралелограма лежить проти більшого кута. \\
+\end{tabular}
+
+\answerTable{I, II та III}{лише I та III}{лише I та II}{лише II}{лише I}
+
+\vspace{0.5cm}
+
+% === ЗАВДАННЯ 8 ===
+\noindent\makebox[1.5em][l]{\textbf{8.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $K$. Діагональ $AC$ і відрізок $BK$ перетинаються в точці $O$ (див. рисунок). Визначте довжину сторони $BC$, якщо $AK = 15$ \textit{см}, $OK = 3$ \textit{см}, $OB = 5$ \textit{см}. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$12$ \textit{см}}{$18$ \textit{см}}{$9$ \textit{см}}{$20$ \textit{см}}{$25$ \textit{см}}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.7]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.2,2.2);
+    \coordinate (C) at (5,2.2);
+    \coordinate (D) at (3.8,0);
+    \coordinate (K) at (2.5,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+    \path[name path=AC] (A) -- (C);
+    \path[name path=BK] (B) -- (K);
+    \path [name intersections={of=AC and BK, by=O}];
+
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (K);
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \node[above right] at (O) {$O$};
+    \fill (O) circle (1.5pt);
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 9 ===
+\noindent\textbf{9.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ з гострим кутом $\angle A = \alpha$ проведено висоту $BK = 10$ (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $BD = 26$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.2]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (5,0);
+        \coordinate (B) at (5,10);
+
+        \coordinate (D) at (29,0);
+        \coordinate (C) at ($(D)+(B)-(A)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
+        \draw[thick] (B) -- (D);
+
+        \draw (K) ++(-0.8,0) -- ++(0,0.8) -- ++(0.8,0);
+
+        \pic [draw, pic text={\small $\alpha$}, angle radius=0.5cm, angle eccentricity=1.5] {angle = K--A--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$100\tg\alpha+240$}{$\dfrac{50}{\tg\alpha}+120$}{$\dfrac{100}{\tg\alpha}+240$}{$200\cos\alpha+240$}{$50\tg\alpha+120$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 10 ===
+\noindent\makebox[1.5em][l]{\textbf{10.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Будь-який ромб є паралелограмом. \\
+II. & Центр вписаного в будь-який ромб кола лежить на перетині бісектрис його кутів. \\
+III. & Менша діагональ будь-якого ромба ділить його на 2 правильні трикутники. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише II}{лише I}{лише III}{I, II та III}{лише I та II}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 11 ===
+\noindent\textbf{11.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ бісектриса кута $A$ перетинає сторону $BC$ в точці $K$ так, що $BK : KC = 5 : 2$ (див. рисунок). $AK = c$, $\angle KAD = \beta$. Знайдіть периметр цього паралелограма. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (1.5,2.5);
+        \coordinate (K) at (4,2.5);
+        \coordinate (C) at (5.5,2.5);
+        \coordinate (D) at (4,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+
+        \pic [draw, angle radius=0.5cm] {angle = D--A--K};
+        \pic [draw, angle radius=0.6cm] {angle = K--A--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (K) {$K$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+
+        \fill (K) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$\dfrac{5c}{\sin\beta}$}{$\dfrac{7c}{5\cos\beta}$}{$\dfrac{12c}{7\cos\beta}$}{$\dfrac{7c}{12\tg\beta}$}{$\dfrac{14c}{5\cos\beta}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 12 ===
+\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ з гострим кутом $\angle A = 2\gamma$ на стороні $AD$ вибрано точку $K$ так, що $AB = AK = KD$ (див. рисунок). Визначте периметр паралелограма $ABCD$, якщо $BK = m$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.9]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (2,0);
+        \coordinate (D) at (4,0);
+
+        \coordinate (B) at (60:2);
+        \coordinate (C) at ($(D)+(B)-(A)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K) node[midway, right] {$m$};
+
+        \draw ($(A)!0.5!(B)$) ++(150:0.1) -- ++(-30:0.2);
+        \draw ($(A)!0.5!(K)$) ++(90:0.1) -- ++(-90:0.2);
+        \draw ($(K)!0.5!(D)$) ++(90:0.1) -- ++(-90:0.2);
+
+        \pic [draw, pic text={\small $2\gamma$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = K--A--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$\dfrac{3m}{\sin\gamma}$}{$\dfrac{6m}{\sin\gamma}$}{$12m\cos\gamma$}{$6m\sin\gamma$}{$\dfrac{3m}{\cos\gamma}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 13 ===
+\noindent\makebox[1.5em][l]{\textbf{13.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Існує паралелограм, діагональ якого дорівнює сумі його сусідніх сторін. \\
+II. & Існує паралелограм, один із кутів якого втричі більший за інший кут. \\
+III. & Існує паралелограм, діагоналі якого перпендикулярні. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише II та III}{лише I та II}{I, II та III}{лише III}{лише I та III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 14 ===
+\noindent\textbf{14.} \begin{minipage}[t]{0.55\textwidth}
+Діагоналі $AC$ і $BD$ паралелограма $ABCD$ перетинаються в точці $O$ (див. рисунок). З точки $O$ на сторону $AD$ опущено перпендикуляр $OK = 9$ \textit{см}, $AK = 16$ \textit{см}, $KD = 12$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.4]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (4,0);
+        \coordinate (D) at (7,0);
+        \coordinate (O) at (4, 2.25);
+
+        \coordinate (C) at ($(O)!-1!(A)$);
+        \coordinate (B) at ($(O)!-1!(D)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        \draw[thick] (O) -- (K);
+
+        \draw (K) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+        \node[below] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textbf{1} \quad Висота, проведена до $AD$ \\
+    \textbf{2} \quad Проєкція $AB$ на $AD$ \\
+    \textbf{3} \quad $AB$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & 4 \textit{см} \\
+    \textbf{Б} & 15 \textit{см} \\
+    \textbf{В} & 18 \textit{см} \\
+    \textbf{Г} & 20 \textit{см} \\
+    \textbf{Д} & 25 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 15 ===
+\noindent\textbf{15.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ на середині сторони $BC$ вибрано точку $K$ так, що $AK \perp KD$, $KP$ --- висота паралелограма (див. рисунок). $AD = 26$ \textit{см}, $AK = 13$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (1.5,3);
+        \coordinate (C) at (7,3);
+        \coordinate (D) at (5.5,0);
+        \coordinate (K) at (4.25,3);
+        \coordinate (P) at (4.25,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        \draw[thick] (K) -- (D);
+        \draw[thick] (K) -- (P);
+
+        \pic [draw, angle radius=0.3cm] {right angle = A--K--D};
+        \pic [draw, angle radius=0.2cm] {right angle = K--P--D};
+
+        \draw (2.7,3.15) -- (2.7,2.85);
+        \draw (2.9,3.15) -- (2.9,2.85);
+        \draw (5.5,3.15) -- (5.5,2.85);
+        \draw (5.7,3.15) -- (5.7,2.85);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[below] at (P) {$P$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textbf{1} \quad $KC$ \\
+    \textbf{2} \quad $KD$ \\
+    \textbf{3} \quad $KP$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & $5$ \textit{см} \\
+    \textbf{Б} & $12$ \textit{см} \\
+    \textbf{В} & $13$ \textit{см} \\
+    \textbf{Г} & $\sqrt{145}$ \textit{см} \\
+    \textbf{Д} & $\sqrt{194}$ \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 16 ===
+\noindent\textbf{16.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено паралелограм $ABCD$. Які з наведених тверджень є правильними? \nmtyear{2024}
+
+\vspace{0.2cm}
+I. \quad $\angle A = \angle C$. \\
+II. \quad $AB + BC = CD + AD$. \\
+III. \quad $AC = BD$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.7]
+        \draw[thick] (0,0) node[below left]{$A$} -- (1,2) node[above left]{$B$} -- (5,2) node[above right]{$C$} -- (4,0) node[below right]{$D$} -- cycle;
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTable{лише III}{лише I та II}{лише I}{лише II}{I, II та III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 17 ===
+\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $K$ так, що $BK = CD$, $AK : KD = 2 : 3$ (див. рисунок). $BC = 15$, $\angle AKB = \varphi$. Знайдіть площу цього паралелограма. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (1.5,2.5);
+        \coordinate (C) at (6.5,2.5);
+        \coordinate (D) at (5,0);
+        \coordinate (K) at (2,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
+
+        \pic [draw, pic text={$\varphi$}, angle radius=0.4cm, angle eccentricity=1.5] {angle = B--K--A};
+
+        \draw ($(B)!0.5!(K)$) ++(-180:0.1) -- ++(0:0.2);
+        \draw ($(C)!0.5!(D)$) ++(180:0.1) -- ++(0:0.2);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$45\tg\varphi$}{$90\cos\varphi$}{$\dfrac{45}{\tg\varphi}$}{$90\tg\varphi$}{$\dfrac{90}{\tg\varphi}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 18 ===
+\noindent\makebox[1.5em][l]{\textbf{18.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Якщо паралелограми мають рівні сторони, то вони мають рівні периметри. \\
+II. & Якщо паралелограми мають рівні сторони, то вони мають рівну площу. \\
+III. & Якщо прямокутники мають рівні діагоналі, то вони мають рівні сторони. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише I та III}{лише I та II}{лише I}{лише III}{лише II}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 19 ===
+\noindent\textbf{19.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ діагональ $AC$ утворює зі сторонами $AD$ і $CD$ кути $25^\circ$ і $35^\circ$ (див. рисунок). Визначте градусну міру гострого кута паралелограма. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=1]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (3,0);
+
+        \coordinate (C) at ($(D) + (120:1.8)$);
+        \coordinate (B) at ($(A) + (C) - (D)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+
+        \pic [draw, pic text={\small $25^\circ$}, angle radius=0.5cm, angle eccentricity=1.8] {angle = D--A--C};
+
+        \pic [draw, pic text={\small $35^\circ$}, angle radius=0.5cm, angle eccentricity=1.6] {angle = A--C--D};
+        \pic [draw, angle radius=0.3cm] {angle = A--C--D};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$60^\circ$}{$55^\circ$}{$70^\circ$}{$65^\circ$}{$120^\circ$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 20 ===
+\noindent\textbf{20.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ діагоналі перетинаються в точці $O$. Знайдіть довжину сторони $AD$ паралелограма, якщо $AC = 10$ \textit{см}, $BD = 8$ \textit{см}, $\cos \angle AOD = -\frac{1}{5}$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.6]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (5,0);
+        \coordinate (O) at (2.5, 1.2);
+
+        \coordinate (C) at ($(O)!-1!(A)$);
+        \coordinate (B) at ($(O)!-1!(D)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableSmall{$2\sqrt{10}$ \textit{см}}{$6$ \textit{см}}{$\sqrt{37}$ \textit{см}}{$7$ \textit{см}}{$\sqrt{29}$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 21 ===
+\noindent\makebox[1.5em][l]{\textbf{21.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Обчисліть \textit{більшу} сторону паралелограма, якщо його периметр дорівнює $24$ \textit{дм}, а сума трьох сторін паралелограма дорівнює $19$ \textit{дм}. \nmtyear{2025}}
+
+\vspace{0.3cm}
+\answerTable{$6$ \textit{дм}}{$8$ \textit{дм}}{$5$ \textit{дм}}{$9$ \textit{дм}}{$7$ \textit{дм}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 22 ===
+\noindent\makebox[1.5em][l]{\textbf{22.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Існує паралелограм, у якого всі кути прямі. \\
+II. & Існує паралелограм, сума двох протилежних кутів якого дорівнює $240^\circ$. \\
+III. & Існує паралелограм, у якого сума кутів, прилеглих до однієї сторони, дорівнює $200^\circ$. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише I та II}{лише I та III}{лише III}{лише II}{лише I}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 23 ===
+\noindent\textbf{23.} \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ з точки $B$ на сторону $AD$ опущено висоту $BK = 8$ \textit{см}, $AK = 6$ \textit{см}, $KD = 9$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.35]
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (6,0);
+        \coordinate (D) at (15,0);
+        \coordinate (B) at (6,8);
+        \coordinate (C) at (21,8);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
+
+        \draw (K) ++(-0.6,0) -- ++(0,0.6) -- ++(0.6,0);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textbf{1} \quad Середня лінія трапеції $KBCD$ \\
+    \textbf{2} \quad $AB$ \\
+    \textbf{3} \quad Відстань від точки $B$ до сторони $CD$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & $\dfrac{120}{17}$ \textit{см} \\
+    \textbf{Б} & 10 \textit{см} \\
+    \textbf{В} & 12 \textit{см} \\
+    \textbf{Г} & $\sqrt{145}$ \textit{см} \\
+    \textbf{Д} & 15 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 24 ===
+\noindent\textbf{24.} \begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ паралелограма $ABCD$ вибрано точку $M$ так, що $BM = MC$, $\angle CDM = 90^\circ$ (див. рисунок). Знайдіть площу паралелограма $ABCD$, якщо $MD = a$, $\angle A = \theta$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.9]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (4.5,0);
+        \coordinate (B) at (1.5, 2);
+        \coordinate (C) at (6, 2);
+        \coordinate (M) at (3.2, 2);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (D) -- (M) node[midway, below left] {$a$};
+
+        \draw ($(B)!0.5!(M)$) ++(90:0.1) -- ++(-90:0.2);
+        \draw ($(M)!0.5!(C)$) ++(90:0.1) -- ++(-90:0.2);
+
+        \pic [draw, pic text={\small $\theta$}, angle radius=0.4cm, angle eccentricity=1.5] {angle = D--A--B};
+
+        \pic [draw, angle radius=0.25cm] {right angle = M--D--C};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (M) {$M$};
+        \fill (M) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.2cm}
+\answerTableTall{$2a^2\tg\theta$}{$2a^2\sin\theta$}{$\dfrac{4a^2}{\sin 2\theta}$}{$\dfrac{2a^2}{\sin\theta}$}{$\dfrac{2a^2}{\tg\theta}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 25 ===
+\noindent\textbf{25.} \begin{minipage}[t]{0.95\textwidth}
+На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $20$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру (1--3) з її площею (А--Д). \nmtyear{2024}
+\end{minipage}
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,2.5);
+    \coordinate (C) at (2.5,2.5);
+    \coordinate (D) at (3.75,0);
+
+    \coordinate (K_sq) at (3.75,2.5);
+    \coordinate (L_sq) at (6.25,2.5);
+    \coordinate (M_sq) at (6.25,0);
+
+    \coordinate (N_par) at (8,2.5);
+    \coordinate (P) at (11.75,2.5);
+    \coordinate (Q) at (10,0);
+
+    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[violet!20] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
+    \fill[yellow!20] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
+    \draw[thick] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
+
+    \draw[thick] (-1,0) -- (13,0) node[above] {$n$};
+    \draw[thick] (-1,2.5) -- (13,2.5) node[above] {$m$};
+
+    \draw (A) rectangle ++(0.25,0.25);
+
+    \node[below] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above] at (K_sq) {$K$};
+    \node[above] at (L_sq) {$L$};
+    \node[below] at (M_sq) {$M$};
+    \node[above] at (N_par) {$N$};
+    \node[above] at (P) {$P$};
+    \node[below] at (Q) {$Q$};
+
+\end{tikzpicture}
+\end{center}
+
+\matchingLayout{
+    \textbf{1} \quad квадрат $DKLM$ \\
+    \textbf{2} \quad паралелограм $MNPQ$ \\
+    \textbf{3} \quad трапеція $ABCD$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & 25 \\
+    \textbf{Б} & 37,5 \\
+    \textbf{В} & 31,25 \\
+    \textbf{Г} & 50 \\
+    \textbf{Д} & 62,5 \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\end{document}

@@ -1,0 +1,992 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{shapes.symbols, decorations.pathreplacing, shapes.geometric, patterns, calc}
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% 1. ТАБЛИЦЯ ДЛЯ ВИСОКИХ ВІДПОВІДЕЙ (дроби)
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 & 
+\rule[-0.9cm]{0pt}{2.0cm}#2 & 
+\rule[-0.9cm]{0pt}{2.0cm}#3 & 
+\rule[-0.9cm]{0pt}{2.0cm}#4 & 
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% 2. ТАБЛИЦЯ ДЛЯ ЗВИЧАЙНИХ ВІДПОВІДЕЙ
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Поле для вводу відповіді (якщо знадобиться)
+\newcommand{\answerBox}{
+    \noindent
+    \textbf{Відповідь:} \quad
+    \begingroup
+    \setlength{\fboxsep}{8pt}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \textbf{,}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \endgroup
+}
+
+% Рік
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\vspace{1cm}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Ймовірність}}
+\end{center}
+
+% === ЗАВДАННЯ 1 (Літак - ВЕРТИКАЛЬНИЙ МАКЕТ) ===
+\noindent\textbf{1.} Місця в літаку розташовані у 20 рядів, у кожному ряді є по 3 місця, розділені проходом, ліворуч і праворуч від проходу (див. рисунок). Комп’ютерна програма випадковим чином обирає місце для пасажира. Визначте \textbf{ймовірність} того, що пасажиру дістанеться перший або останній ряд. \nmtyear{2024}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.6] % Трохи збільшив масштаб (було 0.5), бо місця більше
+    % --- КРИЛА ТА ХВІСТ ---
+    \draw[fill=gray!20, draw=gray!50] (6, 1.3) -- (4, 4.5) -- (7, 4.5) -- (9, 1.3) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (6, -1.3) -- (4, -4.5) -- (7, -4.5) -- (9, -1.3) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (17, 0.8) -- (19, 3) -- (20, 3) -- (19, 0.2) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (17, -0.8) -- (19, -3) -- (20, -3) -- (19, -0.2) -- cycle;
+
+    % --- ФЮЗЕЛЯЖ ---
+    \draw[fill=white, draw=black!70, thick] 
+        (0,0) to[out=90, in=180] (2, 1.4) 
+        -- (18, 1.4) 
+        to[out=0, in=90] (20.5, 0) 
+        to[out=270, in=0] (18, -1.4) 
+        -- (2, -1.4) 
+        to[out=180, in=270] (0,0) -- cycle;
+
+    % --- КАБІНА ---
+    \draw[fill=gray!80] (0.5, 0.3) -- (1.2, 0.6) -- (1.2, -0.6) -- (0.5, -0.3) -- cycle;
+
+    % --- КРІСЛА ---
+    \foreach \row in {0,...,19} {
+        \pgfmathsetmacro{\xpos}{2.5 + \row*0.8}
+        % Верхні
+        \foreach \seat in {0.2, 0.55, 0.9} {
+             \draw[fill=headerblue, draw=headerblue!50!black, rounded corners=1pt] 
+             (\xpos, \seat) rectangle (\xpos+0.5, \seat+0.3);
+        }
+        % Нижні
+        \foreach \seat in {-0.2, -0.55, -0.9} {
+             \draw[fill=headerblue, draw=headerblue!50!black, rounded corners=1pt] 
+             (\xpos, \seat) rectangle (\xpos+0.5, \seat-0.3);
+        }
+    }
+    
+    % Номери рядів (для наочності)
+    \node[above, font=\tiny, color=gray] at (2.75, 1.3) {1};
+    \node[above, font=\tiny, color=gray] at (17.95, 1.3) {20};
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{2}$}{$\dfrac{1}{4}$}{$\dfrac{1}{10}$}{$\dfrac{1}{20}$}{$\dfrac{1}{5}$}
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 2 (Цифри 125790) ===
+\noindent\textbf{2.} Комп’ютерна програма видаляє у шестицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 125790 буде видалено непарну цифру? \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{6}$}{$\dfrac{2}{3}$}{$\dfrac{5}{6}$}{$\dfrac{1}{2}$}{$\dfrac{1}{3}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 3 (Карусель: 10 машинок, 5 літаків, 4 кораблі) ===
+\noindent\textbf{3.} \begin{minipage}[t]{0.55\textwidth}
+На дитячій каруселі є 19 місць для катання: човни, літаки та машинки (див. рисунок). Микита навмання обирає собі місце на каруселі. Визначте \textbf{ймовірність} того, що він сяде \textbf{не на літак}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.5cm} % Піднімаємо вище
+\begin{center}
+\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
+    % Стилі
+    \tikzset{
+        icon/.style={thick, line join=round, line cap=round}
+    }
+
+    % --- ОБОЛОНКА ТА ОРБІТИ ---
+    \draw[thick] (0,0) circle (4.0cm); % Зовнішній контур
+    \draw[dashed, gray!60] (0,0) circle (3.2cm); % Орбіта 3 (Машинки)
+    \draw[dashed, gray!60] (0,0) circle (2.2cm); % Орбіта 2 (Літаки)
+    \draw[dashed, gray!60] (0,0) circle (1.2cm); % Орбіта 1 (Човни)
+    \fill[headerblue] (0,0) circle (4pt); % Центр
+
+    % --- 1. ЗОВНІШНЄ КОЛО: 10 МАШИНОК ---
+    \foreach \i in {1,...,10} {
+        \pgfmathsetmacro{\ang}{\i * 360/10}
+        \begin{scope}[rotate=\ang, shift={(3.2,0)}]
+            % Машинка (повернута по ходу руху +90 градусів)
+            \begin{scope}[rotate=90]
+                \draw[icon, fill=white] (-0.35,-0.2) rectangle (0.35,0.2);
+                \draw[icon, fill=white] (-0.25,-0.2) circle (0.12);
+                \draw[icon, fill=white] (0.25,-0.2) circle (0.12);
+                \draw[icon] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0); % Вікна
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 2. СЕРЕДНЄ КОЛО: 5 ЛІТАКІВ ---
+    \foreach \i in {1,...,5} {
+        \pgfmathsetmacro{\ang}{\i * 360/5}
+        \begin{scope}[rotate=\ang, shift={(2.2,0)}]
+            % Літак (носом до центру або по колу)
+            \begin{scope}[rotate=90] 
+                \draw[icon, fill=white] (0,-0.35) -- (0,0.4); % Фюзеляж
+                \draw[icon, fill=white] (-0.35,0) -- (0.35,0); % Крила
+                \draw[icon] (-0.15,-0.3) -- (0.15,-0.3); % Хвіст
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 3. ВНУТРІШНЄ КОЛО: 4 ЧОВНИ ---
+    \foreach \i in {1,...,4} {
+        \pgfmathsetmacro{\ang}{\i * 360/4 + 45} % Зсув +45, щоб було гарно
+        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
+            % Човен
+            \begin{scope}[rotate=90]
+                 \draw[icon, fill=white] (-0.3,0) arc (180:360:0.3 and 0.25) -- cycle;
+                 \draw[icon] (0,0) -- (0,0.35); % Щогла
+                 \draw[icon] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; % Вітрило
+            \end{scope}
+        \end{scope}
+    }
+\end{tikzpicture}
+\end{center}
+
+% Легенда під малюнком
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \node[right] at (0,0) {\scriptsize – 4 Човни, 5 Літаків, 10 Машинок};
+\end{tikzpicture}
+\end{center}
+
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{15}{19}$}{$\dfrac{5}{19}$}{$\dfrac{14}{19}$}{$\dfrac{5}{14}$}{$\dfrac{4}{15}$}
+
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 4 (Карусель: 10 човнів, 5 машинок, 4 літаки) ===
+\noindent\textbf{4.} \begin{minipage}[t]{0.55\textwidth}
+На дитячій каруселі є 19 місць для катання: човни, літаки та машинки (див. рисунок). Микита навмання обирає собі місце на каруселі. Визначте \textbf{ймовірність} того, що він сяде \textbf{на машинку}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
+    % Стилі
+    \tikzset{icon/.style={thick, line join=round, line cap=round}}
+
+    % --- ОБОЛОНКА ---
+    \draw[thick] (0,0) circle (4.0cm);
+    \draw[dashed, gray!60] (0,0) circle (3.2cm);
+    \draw[dashed, gray!60] (0,0) circle (2.2cm);
+    \draw[dashed, gray!60] (0,0) circle (1.2cm);
+    \fill[headerblue] (0,0) circle (4pt);
+
+    % --- 1. ЗОВНІШНЄ КОЛО: 10 ЧОВНІВ ---
+    \foreach \i in {1,...,10} {
+        \pgfmathsetmacro{\ang}{\i * 360/10}
+        \begin{scope}[rotate=\ang, shift={(3.2,0)}]
+            \begin{scope}[rotate=90]
+                 \draw[icon, fill=white] (-0.35,0) arc (180:360:0.35 and 0.25) -- cycle;
+                 \draw[icon] (0,0) -- (0,0.35); 
+                 \draw[icon] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; 
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 2. СЕРЕДНЄ КОЛО: 5 МАШИНОК ---
+    \foreach \i in {1,...,5} {
+        \pgfmathsetmacro{\ang}{\i * 360/5}
+        \begin{scope}[rotate=\ang, shift={(2.2,0)}]
+            \begin{scope}[rotate=90]
+                \draw[icon, fill=white] (-0.35,-0.2) rectangle (0.35,0.2);
+                \draw[icon, fill=white] (-0.25,-0.2) circle (0.12);
+                \draw[icon, fill=white] (0.25,-0.2) circle (0.12);
+                \draw[icon] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0);
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 3. ВНУТРІШНЄ КОЛО: 4 ЛІТАКИ ---
+    \foreach \i in {1,...,4} {
+        \pgfmathsetmacro{\ang}{\i * 360/4 + 45}
+        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
+            \begin{scope}[rotate=90] 
+                \draw[icon, fill=white] (0,-0.35) -- (0,0.4); 
+                \draw[icon, fill=white] (-0.35,0) -- (0.35,0);
+                \draw[icon] (-0.15,-0.3) -- (0.15,-0.3);
+            \end{scope}
+        \end{scope}
+    }
+\end{tikzpicture}
+\end{center}
+
+% Легенда під малюнком
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \node[right] at (0,0) {\scriptsize – 4 Літаки, 5 Машинок, 10 Човнів};
+\end{tikzpicture}
+\end{center}
+
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{4}{15}$}{$\dfrac{15}{19}$}{$\dfrac{5}{19}$}{$\dfrac{5}{14}$}{$\dfrac{14}{19}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 5 (Кульки Андрія) ===
+\noindent\textbf{5.} В Андрія є 25 кульок: 7 синіх і по 6 зелених, жовтих та червоних. Щоб визначити першочергову справу у вихідний день, хлопець навмання вибирав одну кульку: якщо вибере синю кульку, буде робити домашнє завдання, а якщо іншого кольору – піде на баскетбол. Визначте \textbf{ймовірність} того, що Андрій піде на баскетбол. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{18}$}{$\dfrac{1}{7}$}{$\dfrac{18}{25}$}{$\dfrac{1}{25}$}{$\dfrac{7}{25}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 6 (Цифри 37281) ===
+\noindent\textbf{6.} Комп’ютерна програма видаляє у п’ятицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 37281 буде видалено цифру 1 або цифру 2? \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{2}{5}$}{$\dfrac{1}{2}$}{$\dfrac{1}{3}$}{$\dfrac{1}{5}$}{$\dfrac{2}{3}$}
+
+
+% === ЗАВДАННЯ 7 (Літак - Біля проходу) ===
+\noindent\textbf{7.} Місця в літаку розташовані у 20 рядів, у кожному ряді є по 3 місця, розділені проходом, ліворуч і праворуч від проходу (див. рисунок). Комп’ютерна програма випадковим чином обирає місце для пасажира. Визначте \textbf{ймовірність} того, що пасажиру дістанеться місце біля проходу. \nmtyear{2024}
+
+\vspace{0.5cm}
+% Використовуємо вже існуючий рисунок літака
+\begin{center}
+\begin{tikzpicture}[scale=0.6]
+    % --- КРИЛА ТА ХВІСТ ---
+    \draw[fill=gray!20, draw=gray!50] (6, 1.3) -- (4, 4.5) -- (7, 4.5) -- (9, 1.3) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (6, -1.3) -- (4, -4.5) -- (7, -4.5) -- (9, -1.3) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (17, 0.8) -- (19, 3) -- (20, 3) -- (19, 0.2) -- cycle;
+    \draw[fill=gray!20, draw=gray!50] (17, -0.8) -- (19, -3) -- (20, -3) -- (19, -0.2) -- cycle;
+
+    % --- ФЮЗЕЛЯЖ ---
+    \draw[fill=white, draw=black!70, thick] 
+        (0,0) to[out=90, in=180] (2, 1.4) 
+        -- (18, 1.4) 
+        to[out=0, in=90] (20.5, 0) 
+        to[out=270, in=0] (18, -1.4) 
+        -- (2, -1.4) 
+        to[out=180, in=270] (0,0) -- cycle;
+
+    % --- КАБІНА ---
+    \draw[fill=gray!80] (0.5, 0.3) -- (1.2, 0.6) -- (1.2, -0.6) -- (0.5, -0.3) -- cycle;
+
+    % --- КРІСЛА ---
+    \foreach \row in {0,...,19} {
+        \pgfmathsetmacro{\xpos}{2.5 + \row*0.8}
+        % Верхні (y: 0.2, 0.55, 0.9) - Місце біля проходу це 0.2
+        \foreach \seat in {0.2, 0.55, 0.9} {
+             \draw[fill=headerblue, draw=headerblue!50!black, rounded corners=1pt] 
+             (\xpos, \seat) rectangle (\xpos+0.5, \seat+0.3);
+        }
+        % Нижні (y: -0.2, -0.55, -0.9) - Місце біля проходу це -0.2
+        \foreach \seat in {-0.2, -0.55, -0.9} {
+             \draw[fill=headerblue, draw=headerblue!50!black, rounded corners=1pt] 
+             (\xpos, \seat) rectangle (\xpos+0.5, \seat-0.3);
+        }
+    }
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{6}$}{$\dfrac{1}{3}$}{$\dfrac{2}{5}$}{$\dfrac{1}{5}$}{$\dfrac{1}{4}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 8 (Лотерея) ===
+\noindent\textbf{8.} Випущено партію з 300 лотерейних білетів. \textbf{Ймовірність} того, що навмання вибраний білет із цієї партії буде виграшним, дорівнює $0{,}2$. Визначте кількість виграшних білетів серед цих 300 білетів. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{294}{60}{6}{150}{240}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 9 (Автобуси - n) ===
+\noindent\textbf{9.} У таксопарку $n$ автобусів, шосту частину яких було обладнано інформаційними табло. Після залучення коштів із міського бюджету інформаційні табло встановили ще на 14 досі не переобладнаних автобусів. Під час проведеної після переобладнання перевірки навмання вибирають один з $n$ автобусів таксопарку. \textbf{Ймовірність} того, що це буде автобус без інформаційного табло, становить $0{,}5$. Обчисліть значення $n$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 10 (Вагон потяга) ===
+\noindent\textbf{10.} 
+Людина купляє першою білет на вагон потяга навмання. У цьому вагоні є 60 доступних місць, причому спереду і позаду нього є столик, кожен з яких охоплює по 4 пасажирських місця (див. рисунок). Визначте \textbf{ймовірність} того, що цій людині дістанеться місце за столиком. \nmtyear{2024}
+
+
+\begin{center}
+\begin{tikzpicture}[scale=0.55]
+    % Контур вагона
+    \draw[thick, rounded corners=15pt] (0, -2.5) rectangle (15, 2.5);
+    \draw[thick] (2.5, -2.5) -- (2.5, -0.5); % Перегородки
+    \draw[thick] (2.5, 2.5) -- (2.5, 0.5);
+    \draw[thick] (12.5, -2.5) -- (12.5, -0.5);
+    \draw[thick] (12.5, 2.5) -- (12.5, 0.5);
+    % Ніс вагона (ліворуч)
+    \draw[thick] (0, -2.5) to[out=180, in=270] (-2, 0) to[out=90, in=180] (0, 2.5);
+
+    % Стиль сидінь
+    \tikzset{
+        seatBlue/.style={circle, draw=black, fill=headerblue!80, minimum size=0.35cm, inner sep=0pt},
+        seatRed/.style={circle, draw=black, fill=red!70, minimum size=0.5cm, inner sep=0pt},
+        tableRect/.style={draw=black, fill=gray!10, rounded corners=2pt}
+    }
+
+    % --- ЛІВА ЧАСТИНА (Столик) ---
+    \node[tableRect, minimum width=0.8cm, minimum height=1.6cm] at (1.2, 0) {};
+    \node[seatRed] at (0.5, 0.5) {}; \node[seatRed] at (1.9, 0.5) {};
+    \node[seatRed] at (0.5, -0.5) {}; \node[seatRed] at (1.9, -0.5) {};
+
+    % --- ПРАВА ЧАСТИНА (Столик) ---
+    \node[tableRect, minimum width=0.8cm, minimum height=1.6cm] at (13.8, 0) {};
+    \node[seatRed] at (13.1, 0.5) {}; \node[seatRed] at (14.5, 0.5) {};
+    \node[seatRed] at (13.1, -0.5) {}; \node[seatRed] at (14.5, -0.5) {};
+
+    % --- ЦЕНТРАЛЬНА ЧАСТИНА (Сині сидіння) ---
+    % 13 стовпчиків по 4 місця (52 місця)
+    % x від 3.0 до 12.0
+    \foreach \col in {0,...,12} {
+        \pgfmathsetmacro{\x}{3.2 + \col*0.7}
+        \node[seatBlue] at (\x, 1.5) {};
+        \node[seatBlue] at (\x, 0.8) {};
+        \node[seatBlue] at (\x, -0.8) {};
+        \node[seatBlue] at (\x, -1.5) {};
+    }
+\end{tikzpicture}
+\end{center}
+
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{30}$}{$\dfrac{1}{10}$}{$\dfrac{4}{15}$}{$\dfrac{2}{15}$}{$\dfrac{1}{60}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 11 (Кінотеатр - Мішки - ВИПРАВЛЕНО ЦЕНТРУВАННЯ) ===
+\noindent\textbf{11.} \begin{minipage}[t]{0.55\textwidth}
+У залі кінотеатру є 39 місць (див. рисунок). Усі VIP-місця зайняті. Михайло навмання обирає собі місце в кінотеатрі. Визначте \textbf{ймовірність} того, що він обере місце з кріслами-мішками. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.0cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+    % Рамка залу
+    \draw[thick] (-0.5, -1) rectangle (9.5, 8.5);
+    \node[font=\bfseries] at (4.5, 7.8) {крісла-мішки};
+    \node[font=\bfseries] at (4.5, -0.5) {VIP-місця};
+
+    % --- КРІСЛА-МІШКИ (Жовті круги) ---
+    % Центр малюнка по X = 4.5
+    % Верхній ряд (4 шт) - центруємо
+    \foreach \i in {0, 1, 2, 3} {
+        % Відступ між центрами 2.0, зміщення щоб центрувати навколо 4.5
+        \draw[fill=yellow!90!orange, draw=black] (1.5 + \i*2.0, 6.5) circle (0.45);
+    }
+    % Нижній ряд (5 шт)
+    \foreach \i in {0, 1, 2, 3, 4} {
+        \draw[fill=yellow!90!orange, draw=black] (0.5 + \i*2.0, 5.2) circle (0.45);
+    }
+
+    % --- ЗВИЧАЙНІ МІСЦЯ (Сірі квадрати) ---
+    % Лівий блок (3х4). X: 0.2, 1.1, 2.0. (Кінець на 2.7)
+    \foreach \x in {0, 1, 2} {
+        \foreach \y in {0, 1, 2, 3} {
+            \draw[fill=gray!20, draw=black] (\x*0.9 + 0.2, \y*0.9 + 0.5) rectangle ++(0.7, 0.7);
+        }
+    }
+    
+    % Правий блок (3х4). Симетрично до лівого. Початок на 6.3.
+    % X: 6.3, 7.2, 8.1
+    \foreach \x in {0, 1, 2} {
+        \foreach \y in {0, 1, 2, 3} {
+            \draw[fill=gray!20, draw=black] (6.3 + \x*0.9, \y*0.9 + 0.5) rectangle ++(0.7, 0.7);
+        }
+    }
+
+    % --- VIP МІСЦЯ (Сині квадрати) ---
+    % Рамка VIP по центру
+    \draw[thick] (3.1, 0.3) rectangle (5.9, 4.2); 
+    
+    % 2 колонки. Центр 4.5.
+    % Ліва колонка: x=3.3 (ширина 1.0, до 4.3)
+    % Права колонка: x=4.7 (ширина 1.0, до 5.7) -> трохи вузько.
+    % Зробимо так: x=3.3 і x=4.7 з шириною 0.9 (трохи менші квадрати щоб влізли) або рамку ширшу.
+    % Збільшимо квадрати VIP до 1.0, координати: 3.3 і 4.7 не влізуть в рамку 5.9.
+    % Коригуємо координати VIP:
+    \foreach \y in {0, 1, 2} {
+        % Лівий стовпчик (x=3.25)
+        \draw[fill=headerblue!80, draw=black] (3.25, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
+        % Правий стовпчик (x=4.75)
+        \draw[fill=headerblue!80, draw=black] (4.75, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
+    }
+
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{10}{13}$}{$\dfrac{3}{8}$}{$\dfrac{3}{10}$}{$\dfrac{7}{10}$}{$\dfrac{3}{11}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 12 (Кінотеатр - VIP - ВИПРАВЛЕНО) ===
+\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+У залі кінотеатру є 39 місць (див. рисунок). Усі місця з кріслами-мішками зайняті. Михайло навмання обирає собі місце в кінотеатрі. Визначте \textbf{ймовірність} того, що він обере VIP-місце. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.0cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+    % Рамка
+    \draw[thick] (-0.5, -1) rectangle (9.5, 8.5);
+    \node[font=\bfseries] at (4.5, 7.8) {крісла-мішки};
+    \node[font=\bfseries] at (4.5, -0.5) {VIP-місця};
+
+    % Мішки
+    \foreach \i in {0, 1, 2, 3} 
+        \draw[fill=yellow!90!orange, draw=black] (1.5 + \i*2.0, 6.5) circle (0.45);
+    \foreach \i in {0, 1, 2, 3, 4} 
+        \draw[fill=yellow!90!orange, draw=black] (0.5 + \i*2.0, 5.2) circle (0.45);
+
+    % Звичайні
+    \foreach \x in {0, 1, 2} 
+        \foreach \y in {0, 1, 2, 3} 
+            \draw[fill=gray!20, draw=black] (\x*0.9 + 0.2, \y*0.9 + 0.5) rectangle ++(0.7, 0.7);
+    \foreach \x in {0, 1, 2} 
+        \foreach \y in {0, 1, 2, 3} 
+            \draw[fill=gray!20, draw=black] (6.3 + \x*0.9, \y*0.9 + 0.5) rectangle ++(0.7, 0.7);
+
+    % VIP
+    \draw[thick] (3.1, 0.3) rectangle (5.9, 4.2);
+    \foreach \y in {0, 1, 2} {
+        \draw[fill=headerblue!80, draw=black] (3.25, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
+        \draw[fill=headerblue!80, draw=black] (4.75, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
+    }
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{5}$}{$\dfrac{1}{6}$}{$\dfrac{2}{13}$}{$\dfrac{2}{5}$}{$\dfrac{1}{4}$}
+
+\newpage
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Ймовірність}}
+\end{center}
+
+% === ЗАВДАННЯ 13 (Карусель - ДМИТРИК) ===
+\noindent\textbf{13.} \begin{minipage}[t]{0.55\textwidth}
+На дитячій каруселі розташовано 19 транспортних засобів: човники, літачки й машинки (див. рисунок). Дмитрик навмання сідає в один із транспортних засобів, \textit{окрім літачків}. Яка \textbf{ймовірність} того, що він сяде в \textit{машинку}? \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Фон (пісок/земля)
+    \fill[yellow!10] (0,0) circle (4.0cm);
+    \fill[cyan!10] (0,0) circle (3.2cm); % Вода/небо для внутрішніх кіл
+    \fill[green!5] (0,0) circle (2.0cm); 
+
+    % Контури
+    \draw[thick, gray!40] (0,0) circle (4.0cm);
+    \draw[thick, gray!40] (0,0) circle (3.2cm);
+    \draw[thick, gray!40] (0,0) circle (2.0cm);
+
+    % Стиль іконок (зафарбовані)
+    \tikzset{icon/.style={thick, line join=round}}
+
+    % --- 1. ЗОВНІШНЄ КОЛО: ЧОВНИ (Коричневі) - 10 шт ---
+    \foreach \i in {1,...,10} {
+        \pgfmathsetmacro{\ang}{\i * 360/10}
+        \begin{scope}[rotate=\ang, shift={(3.5,0)}]
+            \begin{scope}[rotate=90]
+                 \draw[icon, fill=brown!80!black] (-0.35,0) arc (180:360:0.35 and 0.25) -- cycle;
+                 \draw[icon, fill=white] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; 
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 2. СЕРЕДНЄ КОЛО: МАШИНКИ (Сині) - 5 шт ---
+    \foreach \i in {1,...,5} {
+        \pgfmathsetmacro{\ang}{\i * 360/5}
+        \begin{scope}[rotate=\ang, shift={(2.6,0)}]
+            \begin{scope}[rotate=90]
+                \draw[icon, fill=cyan!80!blue] (-0.35,-0.2) rectangle (0.35,0.2);
+                \draw[icon, fill=black] (-0.25,-0.2) circle (0.1); % Колеса
+                \draw[icon, fill=black] (0.25,-0.2) circle (0.1);
+                \draw[icon, fill=cyan!30] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0) -- cycle; % Дах
+            \end{scope}
+        \end{scope}
+    }
+
+    % --- 3. ВНУТРІШНЄ КОЛО: ЛІТАКИ (Зелені) - 4 шт ---
+    \foreach \i in {1,...,4} {
+        \pgfmathsetmacro{\ang}{\i * 360/4 + 45}
+        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
+            \begin{scope}[rotate=90] 
+                \draw[icon, fill=green!60!black] (0,-0.35) -- (0,0.4); % Фюзеляж
+                \draw[icon, fill=green!60!black] (-0.35,0) -- (0.35,0); % Крила
+                \draw[icon, fill=red] (-0.15,-0.3) -- (0.15,-0.3); % Хвіст
+            \end{scope}
+        \end{scope}
+    }
+    
+    % Легенда
+    \node[anchor=west, font=\tiny] at (2.9, 3.5) {\textcolor{brown!80!black}{\rule{8pt}{8pt}} човник};
+    \node[anchor=west, font=\tiny] at (2.9, 3.0) {\textcolor{green!60!black}{\rule{8pt}{8pt}} літачок};
+    \node[anchor=west, font=\tiny] at (2.9, 2.5) {\textcolor{cyan!80!blue}{\rule{8pt}{8pt}} машинка};
+
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{5}$}{$\dfrac{5}{19}$}{$\dfrac{2}{3}$}{$\dfrac{1}{3}$}{$\dfrac{1}{15}$}
+
+\vspace{1.0cm}
+
+
+% === ЗАВДАННЯ 14 (Кав'ярня - Соломія) ===
+\noindent\textbf{14.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено план кав’ярні, у якій 25 місць (див. план). У той час, коли Соломія зайшла в кав’ярню, у ній були вільні всі місця, окрім місць біля барної стійки. Соломія вибирає місце навмання. Яка \textbf{ймовірність} того, що вибране нею місце буде за круглим столиком? \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-1.0cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+    % --- Стилі ---
+    \tikzset{
+        chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
+        rectChair/.style={rectangle, draw=black!50, fill=red!70!black, minimum width=0.4cm, minimum height=0.6cm, rounded corners=2pt},
+        roundTable/.style={circle, draw=brown!80!black, fill=orange!30, minimum size=1.2cm},
+        rectTable/.style={rectangle, draw=brown!80!black, fill=orange!30, minimum width=1.2cm, minimum height=1.6cm},
+        mat/.style={rectangle, fill=orange!60!red, minimum width=0.6cm, minimum height=0.4cm}
+    }
+
+    % --- БАРНА СТІЙКА (Верх) ---
+    \draw[fill=red!60!black, rounded corners=5pt] (-0.5, 5.5) rectangle (9.5, 6.2);
+    \node[font=\footnotesize] at (4.5, 6.6) {Барна стійка};
+    % Стільці біля бару (5 шт)
+    \foreach \x in {0.5, 2.5, 4.5, 6.5, 8.5} {
+        \node[chair] at (\x, 4.8) {};
+        % Спинка
+        \draw[thick, red!40!black] (\x-0.2, 4.9) arc (180:360:0.2);
+    }
+
+    % --- КРУГЛІ СТОЛИ (Середина) - 3 шт ---
+    \foreach \x in {1.5, 4.5, 7.5} {
+        % Стіл
+        \node[roundTable] at (\x, 2.5) {};
+        % Серветки на столі (декор)
+        \fill[orange!60] (\x-0.2, 2.5) rectangle (\x+0.2, 2.9);
+        
+        % Стільці (4 навколо)
+        \node[rectChair, rotate=0] at (\x, 3.4) {}; % Верх
+        \node[rectChair, rotate=180] at (\x, 1.6) {}; % Низ
+        \node[rectChair, rotate=90] at (\x-0.9, 2.5) {}; % Ліво
+        \node[rectChair, rotate=-90] at (\x+0.9, 2.5) {}; % Право
+    }
+
+    % --- ПРЯМОКУТНІ СТОЛИ (Низ) - 2 шт ---
+    \foreach \x in {2.5, 6.5} {
+        % Стіл
+        \node[rectTable] at (\x, -0.5) {};
+        % Серветки
+        \fill[orange!60] (\x-0.3, -0.2) rectangle (\x-0.1, 0.2);
+        \fill[orange!60] (\x+0.1, -0.2) rectangle (\x+0.3, 0.2);
+        
+        % Стільці (по 2 з боків)
+        \node[rectChair, rotate=90] at (\x-0.9, -0.2) {}; 
+        \node[rectChair, rotate=90] at (\x-0.9, -0.9) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.2) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.9) {}; 
+    }
+
+    % --- ВІКНО (Низ) ---
+    \draw[fill=cyan!10, draw=gray] (-0.5, -2.0) rectangle (9.5, -1.7);
+    \draw[fill=gray!20] (3.5, -2.1) rectangle (5.5, -1.6); % Колона
+    \node[font=\footnotesize] at (2.0, -2.4) {Вікно};
+    \node[font=\footnotesize] at (7.0, -2.4) {Вікно};
+
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{5}$}{$\dfrac{4}{25}$}{$\dfrac{12}{25}$}{$\dfrac{3}{5}$}{$\dfrac{1}{12}$}
+
+\vspace{1.0cm}
+
+
+% === ЗАВДАННЯ 15 (Кав'ярня - Матвій) ===
+\noindent\textbf{15.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено план кав’ярні, у якій 25 місць (див. план). У той час, коли Матвій зайшов у кав’ярню, у ній були вільні всі місця, окрім місць за прямокутними столиками. Матвій вибирає місце навмання. Яка \textbf{ймовірність} того, що вибране ним місце буде за барною стійкою? \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.4cm}
+% Той самий малюнок
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+    % --- Стилі ---
+    \tikzset{
+        chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
+        rectChair/.style={rectangle, draw=black!50, fill=red!70!black, minimum width=0.4cm, minimum height=0.6cm, rounded corners=2pt},
+        roundTable/.style={circle, draw=brown!80!black, fill=orange!30, minimum size=1.2cm},
+        rectTable/.style={rectangle, draw=brown!80!black, fill=orange!30, minimum width=1.2cm, minimum height=1.6cm}
+    }
+
+    % Бар
+    \draw[fill=red!60!black, rounded corners=5pt] (-0.5, 5.5) rectangle (9.5, 6.2);
+    \foreach \x in {0.5, 2.5, 4.5, 6.5, 8.5} {
+        \node[chair] at (\x, 4.8) {};
+        \draw[thick, red!40!black] (\x-0.2, 4.9) arc (180:360:0.2);
+    }
+
+    % Круглі
+    \foreach \x in {1.5, 4.5, 7.5} {
+        \node[roundTable] at (\x, 2.5) {};
+        \fill[orange!60] (\x-0.2, 2.5) rectangle (\x+0.2, 2.9);
+        \node[rectChair, rotate=0] at (\x, 3.4) {}; 
+        \node[rectChair, rotate=180] at (\x, 1.6) {}; 
+        \node[rectChair, rotate=90] at (\x-0.9, 2.5) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, 2.5) {}; 
+    }
+
+    % Прямокутні
+    \foreach \x in {2.5, 6.5} {
+        \node[rectTable] at (\x, -0.5) {};
+        \fill[orange!60] (\x-0.3, -0.2) rectangle (\x-0.1, 0.2);
+        \fill[orange!60] (\x+0.1, -0.2) rectangle (\x+0.3, 0.2);
+        \node[rectChair, rotate=90] at (\x-0.9, -0.2) {}; 
+        \node[rectChair, rotate=90] at (\x-0.9, -0.9) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.2) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.9) {}; 
+    }
+
+    % Вікно
+    \draw[fill=cyan!10, draw=gray] (-0.5, -2.0) rectangle (9.5, -1.7);
+    \draw[fill=gray!20] (3.5, -2.1) rectangle (5.5, -1.6);
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{17}$}{$\dfrac{5}{21}$}{$\dfrac{5}{17}$}{$\dfrac{1}{3}$}{$\dfrac{1}{5}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 16 (Тюльпани) ===
+\noindent\textbf{16.} У суміші цибулин тюльпанів рожеві становлять третину всіх тюльпанів, білі – половину, а чорні – решту. Яка \textbf{ймовірність} того, що з навмання взятої цибулини виросте білий або рожевий тюльпан? \nmtyear{2025}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{6}$}{$\dfrac{1}{5}$}{$\dfrac{4}{5}$}{$\dfrac{5}{6}$}{$\dfrac{2}{5}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 17 (Запитання - кислоти) ===
+\noindent\textbf{17.} Учням було запропоновано 20 запитань для підготовки до зрізу знань, серед яких 4 – про властивості кислот. Яка \textbf{ймовірність} того, що навмання витягнутий білет буде містити запитання про властивості кислот? \nmtyear{2025}
+
+\vspace{0.3cm}
+\answerTable{0,2}{0,5}{0,3}{0,25}{0,4}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 18 (Число 125079) ===
+\noindent\textbf{18.} Комп’ютерна програма видаляє у шестицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 125079 буде видалено цифру, більшу за 5? \nmtyear{2025}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{4}$}{$\dfrac{2}{3}$}{$\dfrac{1}{2}$}{$\dfrac{1}{6}$}{$\dfrac{1}{3}$}
+
+% === ЗАВДАННЯ 19 (Номерний знак) ===
+\noindent\textbf{19.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено автомобільний номер, що складається з 4 букв і 4 цифр. Одна з цифр номеру замазана брудом і не розпізнається. Комп’ютерна програма для зчитування номерів автоматично підбирає відсутню цифру з десяти можливих значень. Яка \textbf{ймовірність} того, що програма правильно визначить замасковану цифру? \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Рамка номера
+    \draw[fill=white, rounded corners=3pt, line width=1pt] (0,0) rectangle (6, 1.3);
+    
+    % Синьо-жовта смуга зліва
+    \fill[headerblue] (0,0) [rounded corners=3pt] -- (0,1.3) -- (0.8,1.3) -- (0.8,0) [rounded corners=3pt] -- cycle;
+    \fill[yellow] (0.1, 0.7) rectangle (0.7, 0.45);
+    \fill[blue!80!cyan] (0.1, 0.95) rectangle (0.7, 0.7);
+    \node[white, font=\bfseries\tiny] at (0.4, 0.25) {UA};
+    
+    % Текст номера
+    \node[font=\bfseries\sffamily\Large, anchor=west] at (0.9, 0.65) {AA 37};
+    \node[font=\bfseries\sffamily\Large, anchor=east] at (5.8, 0.65) {0 CI};
+    
+    % Пляма (Бруд)
+    \fill[gray!60] (3.6, 0.3) 
+        to[out=100, in=200] (3.7, 1.0) 
+        to[out=20, in=120] (4.2, 0.9) 
+        to[out=300, in=40] (4.1, 0.4) 
+        to[out=180, in=0] (3.6, 0.3);
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{1}{10}$}{$\dfrac{1}{4}$}{$\dfrac{1}{2}$}{$\dfrac{1}{9}$}{$\dfrac{1}{8}$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 20 (Діаграма - БЕЗ ПІДПИСІВ, З УСІМА ЧИСЛАМИ НА ОСІ) ===
+\noindent\textbf{20.} На діаграмі відображено результати опитування учнів щодо тривалості підготовки до контрольної роботи. Обчисліть \textbf{ймовірність} того, що випадково обраний учень готувався до контрольної роботи \textit{не менш} як 2 години. \nmtyear{2025}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        ybar,
+        width=13cm, height=7cm, % Трохи збільшив розмір
+        symbolic x coords={0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4},
+        xtick=data,
+        ymin=0, ymax=6,
+        ytick={0,1,2,3,4,5,6}, % Явно вказуємо всі тіки, включаючи непарні
+        ylabel={Кількість учнів},
+        xlabel={Час, витрачений на підготовку\\до контрольної роботи, години},
+        x label style={align=center, at={(axis description cs:0.5,-0.25)}},
+        % nodes near coords, % <-- ПРИБРАНО підписи значень над стовпчиками
+        ymajorgrids=true,
+        bar width=0.7cm,
+        axis x line*=bottom,
+        axis y line*=left,
+        fill=cyan!50!blue,
+        draw=none
+    ]
+        \addplot coordinates {(0.5,1) (1,3) (1.5,3) (2,4) (2.5,5) (3,2) (3.5,1) (4,1)};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.3cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === НОВИЙ СТИЛЬ ДЛЯ ЛІТАКІВ (Вертикальний макет, 3+прохід+3) ===
+
+% === ЗАВДАННЯ 21 (Перші 3 ряди - З ЛЕГЕНДОЮ) ===
+\noindent\textbf{21.} У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 крісла обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце в трьох перших рядах, дорівнює $\dfrac{1}{14}$. Знайдіть $n$. \nmtyear{2025}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Стилі
+    \tikzset{
+        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
+        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
+    }
+
+    % Легенда
+    \node[seat, scale=0.6] at (0, 1.8) {}; \node[right, font=\footnotesize] at (0.3, 1.8) {– звичайне місце};
+    \node[target, scale=0.6] at (4.5, 1.8) {}; \node[right, font=\footnotesize] at (4.8, 1.8) {– місце в перших 3-х рядах};
+
+    % Лінія проходу
+    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
+
+    % --- РЯДИ 1, 2, 3 (Всі місця - target) ---
+    \foreach \r/\lbl in {0/1, -1/2, -2/3} {
+        \node[left, font=\footnotesize, gray] at (-0.5, \r) {Ряд \lbl};
+        % Лівий блок
+        \node[target] at (0, \r) {}; \node[target] at (0.8, \r) {}; \node[target] at (1.6, \r) {};
+        % Правий блок
+        \node[target] at (4.0, \r) {}; \node[target] at (4.8, \r) {}; \node[target] at (5.6, \r) {};
+    }
+
+    % --- РОЗРИВ ---
+    \node at (2.8, -3.0) {\Huge $\vdots$};
+
+    % --- РЯД n (Звичайні) ---
+    \node[left, font=\footnotesize, gray] at (-0.5, -4.0) {Ряд $n$};
+    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -4.0) {};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 22 (Прохід 1 або n - З ЛЕГЕНДОЮ) ===
+\noindent\textbf{22.} У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце біля проходу в першому або останньому ряду, дорівнює $\dfrac{1}{45}$. Знайдіть $n$. \nmtyear{2025}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \tikzset{
+        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
+        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
+    }
+
+    % Легенда
+    \node[seat, scale=0.6] at (0, 1.5) {}; \node[right, font=\footnotesize] at (0.3, 1.5) {– звичайне місце};
+    \node[target, scale=0.6] at (4.5, 1.5) {}; \node[right, font=\footnotesize] at (4.8, 1.5) {– місце біля проходу (1 або $n$ ряд)};
+
+    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
+
+    % --- РЯД 1 ---
+    \node[left, font=\footnotesize, gray] at (-0.5, 0) {Ряд 1};
+    % Звичайні
+    \node[seat] at (0, 0) {}; \node[seat] at (0.8, 0) {}; 
+    \node[seat] at (4.8, 0) {}; \node[seat] at (5.6, 0) {};
+    % Target (біля проходу)
+    \node[target] at (1.6, 0) {}; 
+    \node[target] at (4.0, 0) {}; 
+
+    % --- РЯД 2 (Звичайний) ---
+    \node[left, font=\footnotesize, gray] at (-0.5, -1) {Ряд 2};
+    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -1) {};
+
+    % --- РОЗРИВ ---
+    \node at (2.8, -2.0) {\Huge $\vdots$};
+
+    % --- РЯД n ---
+    \node[left, font=\footnotesize, gray] at (-0.5, -3.0) {Ряд $n$};
+    % Звичайні
+    \node[seat] at (0, -3.0) {}; \node[seat] at (0.8, -3.0) {}; 
+    \node[seat] at (4.8, -3.0) {}; \node[seat] at (5.6, -3.0) {};
+    % Target
+    \node[target] at (1.6, -3.0) {}; 
+    \node[target] at (4.0, -3.0) {};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 23 (Прохід 1 ряд - З ЛЕГЕНДОЮ) ===
+\noindent\textbf{23.} У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце в першому ряду біля проходу, дорівнює $\dfrac{1}{102}$. Знайдіть $n$. \nmtyear{2025}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \tikzset{
+        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
+        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
+    }
+
+    % Легенда
+    \node[seat, scale=0.6] at (0, 1.5) {}; \node[right, font=\footnotesize] at (0.3, 1.5) {– звичайне місце};
+    \node[target, scale=0.6] at (4.5, 1.5) {}; \node[right, font=\footnotesize] at (4.8, 1.5) {– місце біля проходу (1 ряд)};
+
+    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
+
+    % --- РЯД 1 ---
+    \node[left, font=\footnotesize, gray] at (-0.5, 0) {Ряд 1};
+    % Звичайні
+    \node[seat] at (0, 0) {}; \node[seat] at (0.8, 0) {}; 
+    \node[seat] at (4.8, 0) {}; \node[seat] at (5.6, 0) {};
+    % Target
+    \node[target] at (1.6, 0) {}; 
+    \node[target] at (4.0, 0) {}; 
+
+    % --- РЯД 2 ---
+    \node[left, font=\footnotesize, gray] at (-0.5, -1) {Ряд 2};
+    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -1) {};
+
+    % --- РОЗРИВ ---
+    \node at (2.8, -2.0) {\Huge $\vdots$};
+
+    % --- РЯД n ---
+    \node[left, font=\footnotesize, gray] at (-0.5, -3.0) {Ряд $n$};
+    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -3.0) {};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\answerBox
+
+\end{document}

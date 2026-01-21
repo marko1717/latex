@@ -1,0 +1,221 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% Підключаємо бібліотеки для зручних кутів
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
+\usetikzlibrary{3d}
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% Таблиця для відповідей із дробами (збільшена висота клітинок)
+% Оновлена таблиця: підпорка додана до КОЖНОЇ клітинки
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+% Тепер rule є перед кожним аргументом (#1..#5)
+\rule[-0.9cm]{0pt}{2.0cm}#1 & 
+\rule[-0.9cm]{0pt}{2.0cm}#2 & 
+\rule[-0.9cm]{0pt}{2.0cm}#3 & 
+\rule[-0.9cm]{0pt}{2.0cm}#4 & 
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Оновлена таблиця відповідей (заголовки зовні)
+\newcommand{\answerGrid}{
+    \begingroup
+    % Збільшуємо висоту рядків для квадратних клітинок
+    \renewcommand{\arraystretch}{1.3} 
+    % Відступ всередині клітинок
+    \setlength{\tabcolsep}{7pt} 
+    \begin{tabular}{r|c|c|c|c|c|}
+         % Перший рядок: порожня клітинка зліва + букви без рамок (multicolumn прибирає |)
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         % Наступні рядки: номер зліва (r) + клітинки з рамками (|c|)
+         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+% Макет для завдань на відповідність
+% #1 - Умови (1-3)
+% #2 - Варіанти (А-Д)
+% #3 - Табличка
+\newcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+       
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt} % Хаки для вирівнювання minipage по верху
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
+% Стандартна таблиця відповідей (для тестів)
+\newcommand{\answerTableSmall}[5]{
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+% Підпорка додана до кожного варіанту для ідеального вирівнювання
+\rule[-0.4cm]{0pt}{0.9cm}#1 & 
+\rule[-0.4cm]{0pt}{0.9cm}#2 & 
+\rule[-0.4cm]{0pt}{0.9cm}#3 & 
+\rule[-0.4cm]{0pt}{0.9cm}#4 & 
+\rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}
+}
+
+% Таблиця для вибору одного варіанту (Task 7)
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Команда для року
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\vspace{1cm}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Показникові нерівності}}
+\end{center}
+
+% === НМТ 2023 ===
+
+% === ЗАВДАННЯ 1 ===
+\noindent\textbf{1.} Яке з наведених чисел є розв'язком нерівності $5^{-x} > 25$? \nmtyear{2023}
+
+\answerTable{$0$}{$1$}{$-1$}{$-3$}{$3$}
+
+% === ЗАВДАННЯ 2 ===
+\noindent\textbf{2.} Розв'яжіть нерівність $\left(\displaystyle\frac{1}{5}\right)^x > \displaystyle\frac{1}{25}$. \nmtyear{2023}
+
+\answerTable{$(-\infty; 2)$}{$(0; 2)$}{$(-\infty; 5)$}{$(5; +\infty)$}{$(2; +\infty)$}
+
+% === ЗАВДАННЯ 3 ===
+\noindent\textbf{3.} Розв'яжіть нерівність $8^x > \displaystyle\frac{1}{64}$. \nmtyear{2023}
+
+\answerTable{$(0; 2)$}{$(-\infty; -2)$}{$(2; +\infty)$}{$(-2; +\infty)$}{$(-\infty; 2)$}
+
+% === НМТ 2024 ===
+
+% === ЗАВДАННЯ 4 ===
+\noindent\textbf{4.} Розв'яжіть нерівність $\left(\displaystyle\frac{1}{3}\right)^{2x-1} \leqslant 27^{-1}$. \nmtyear{2024}
+
+\answerTable{$(-\infty; -1]$}{$[2; +\infty)$}{$(-\infty; 2]$}{$[-1; +\infty)$}{$(-\infty; 4]$}
+
+% === ЗАВДАННЯ 5 ===
+\noindent\textbf{5.} Розв'яжіть систему нерівностей $\begin{cases} 5^x < 25, \\ 2 - x < 8. \end{cases}$ \nmtyear{2024}
+
+\answerTable{$(-6; 2)$}{$(2; 6)$}{$(2; +\infty)$}{$(-6; 5)$}{$(-\infty; -6)$}
+
+% === ЗАВДАННЯ 6 ===
+\noindent\textbf{6.} Розв'яжіть систему нерівностей $\begin{cases} x^2 + 9 \geqslant 0, \\ 2^x > \displaystyle\frac{1}{16}. \end{cases}$ \nmtyear{2024}
+
+\answerTable{$(-4; -3] \cup [3; +\infty)$}{$\varnothing$}{$(-4; +\infty)$}{$[-3; +\infty)$}{$(-4; -3]$}
+
+% === ЗАВДАННЯ 7 ===
+\noindent\textbf{7.} Розв'яжіть нерівність $(0{,}1)^{x+2} < 0{,}1$. \nmtyear{2024}
+
+\answerTable{$(3; +\infty)$}{$(-\infty; 3)$}{$(-2; +\infty)$}{$(-1; +\infty)$}{$(-\infty; -1)$}
+
+% === ЗАВДАННЯ 8 ===
+\noindent\textbf{8.} Розв'яжіть нерівність $5^x \leqslant 1$. \nmtyear{2024}
+
+\answerTableTall{$[0; +\infty)$}{$[1; +\infty)$}{$(-\infty; 0]$}{$(-\infty; 1]$}{$\left(-\infty; \displaystyle\frac{1}{5}\right)$}
+
+% === НМТ 2025 ===
+
+% === ЗАВДАННЯ 9 ===
+\noindent\textbf{9.} Розв'яжіть нерівність $7^x \leqslant \displaystyle\frac{1}{49}$. \nmtyear{2025}
+
+\answerTableTall{$\left[\displaystyle\frac{1}{7}; +\infty\right)$}{$[-2; +\infty)$}{$(-\infty; -2]$}{$\left(-\infty; \displaystyle\frac{1}{243}\right]$}{$\left(-\infty; \displaystyle\frac{1}{2}\right]$}
+
+% === ЗАВДАННЯ 10 ===
+\noindent\textbf{10.} Розв'яжіть нерівність $\left(\displaystyle\frac{1}{4}\right)^{2x-6} > \displaystyle\frac{1}{16}$. \nmtyear{2025}
+
+\answerTable{$(4; +\infty)$}{$(-\infty; 4)$}{$(-\infty; -2)$}{$(-2; +\infty)$}{$(-\infty; 2)$}
+
+% === ЗАВДАННЯ 11 ===
+\noindent\textbf{11.} Розв'яжіть нерівність $3^x \cdot 5^x \leqslant \displaystyle\frac{1}{15}$. \nmtyear{2025}
+
+\answerTableTall{$\left(-\infty; \displaystyle\frac{1}{15}\right]$}{$[-1; +\infty)$}{$[1; +\infty)$}{$(-\infty; -1]$}{$(-\infty; 1]$}
+
+% === ЗАВДАННЯ 12 ===
+\noindent\textbf{12.} Розв'яжіть нерівність $2^{3-x} > \displaystyle\frac{1}{4}$. \nmtyear{2025}
+
+\answerTable{$(-\infty; -1)$}{$(5; +\infty)$}{$(-5; +\infty)$}{$(-\infty; 5)$}{$(-1; +\infty)$}
+
+% === ЗАВДАННЯ 13 ===
+\noindent\textbf{13.} Розв'яжіть нерівність $10^{x-2} > 1$. \nmtyear{2025}
+
+\answerTable{$(-2; +\infty)$}{$(2; +\infty)$}{$(2{,}1; +\infty)$}{$(-\infty; 2)$}{$(3; +\infty)$}
+
+\end{document}

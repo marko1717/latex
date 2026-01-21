@@ -1,0 +1,1983 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+
+% Підключаємо бібліотеки для зручних кутів
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% Таблиця для відповідей із дробами (збільшена висота клітинок)
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 & 
+\rule[-0.9cm]{0pt}{2.0cm}#2 & 
+\rule[-0.9cm]{0pt}{2.0cm}#3 & 
+\rule[-0.9cm]{0pt}{2.0cm}#4 & 
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Таблиця відповідей (заголовки зовні, для відповідностей)
+\newcommand{\answerGrid}{
+    \begingroup
+    \renewcommand{\arraystretch}{1.3} 
+    \setlength{\tabcolsep}{7pt} 
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+% Макет для завдань на відповідність
+\newcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt} 
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
+% Стандартна таблиця відповідей (для тестів)
+\newcommand{\answerTableSmall}[5]{
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & 
+\rule[-0.4cm]{0pt}{0.9cm}#2 & 
+\rule[-0.4cm]{0pt}{0.9cm}#3 & 
+\rule[-0.4cm]{0pt}{0.9cm}#4 & 
+\rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}
+}
+
+% Таблиця для вибору одного варіанту
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Команда для року
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Прямокутники}}
+\end{center}
+
+\vspace{0.5cm}
+
+% === ЗАВДАННЯ 1 (Повтор з минулого файлу) ===
+\noindent\textbf{1.} \begin{minipage}[t]{0.55\textwidth}
+Прямокутник $ABCD$, паралелограм $BKMC$ та трапеція $DCMN$ лежать в одній площині, точки $K$, $C$ та $D$ належать одній прямій (див. рисунок). $AB = 5$ \textit{см}, $AD = 12$ \textit{см}, $BK = 13$ \textit{см}. До кожної величини (1--3) доберіть її значення (А--Д). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.55]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,2);
+        \coordinate (C) at (4.8,2);
+        \coordinate (D) at (4.8,0);
+        \coordinate (K) at (4.8,4.6);
+        \coordinate (M) at (9.6,4.6);
+        \coordinate (N) at (9.6,0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K) -- (M) -- (C);
+        \draw[thick] (D) -- (N) -- (M);
+        
+        \draw (0,0.4) -- (0.4,0.4) -- (0.4,0);
+        
+        \node[left] at (0,1) {\small 5 \textit{см}};
+        \node[below] at (2.4,0) {\small 12 \textit{см}};
+        \node[above left] at (1.6,3.3) {\small 13 \textit{см}};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[below right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[above] at (M) {$M$};
+        \node[below right] at (N) {$N$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Величина} \par \vspace{0.2cm}
+    \textbf{1} \quad діагональ $ABCD$ \\
+    \textbf{2} \quad відстань від $K$ до $AN$ \\
+    \textbf{3} \quad висота трапеції $DCMN$
+}{
+    \textit{Значення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & 13 \textit{см} \\
+    \textbf{Г} & 17 \textit{см} \\
+    \textbf{Д} & 5 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 2 (Бісектриса кута А) ===
+\noindent\makebox[1.5em][l]{\textbf{2.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У прямокутнику $ABCD$ бісектриса кута $A$ перетинає сторону $BC$ в точці $M$, $BM : MC = 4 : 5$ (див. рисунок). Обчисліть площу прямокутника $ABCD$, якщо $BC = 18$ \textit{см}. \nmtyear{2023}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.42\textwidth}
+\answerTableSmall{$144$ \textit{см}$^2$}{$90$ \textit{см}$^2$}{$120$ \textit{см}$^2$}{$72$ \textit{см}$^2$}{$162$ \textit{см}$^2$}
+\end{minipage}
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{flushright}
+\begin{tikzpicture}[scale=0.25]
+    % BC = 18. BM = 4x, MC = 5x => 9x=18 => x=2. BM=8, MC=10.
+    % ABM рівнобедрений (бісектриса прямокутного кута 45 град), тому AB=BM=8.
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,8);
+    \coordinate (M) at (8,8);
+    \coordinate (C) at (18,8);
+    \coordinate (D) at (18,0);
+
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (M);
+
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above] at (M) {$M$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+
+    % Кут
+    \pic [draw, angle radius=0.3cm] {angle = D--A--M};
+    \pic [draw, angle radius=0.45cm] {angle = M--A--B};
+\end{tikzpicture}
+\end{flushright}
+\end{minipage}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 3 (Теорія) ===
+\noindent\makebox[1.5em][l]{\textbf{3.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Периметр прямокутника дорівнює сумі довжин його діагоналей. \\
+II. & Сума квадратів усіх сторін прямокутника дорівнює сумі квадратів його діагоналей. \\
+III. & Діаметр кола, описаного навколо прямокутника, дорівнює діагоналі прямокутника. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише II та III}{лише I та II}{лише I та III}{лише III}{I, II та III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 4 (Середини сторін K і M) ===
+\noindent\textbf{4.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$. Точки $K$ і $M$ --- відповідно середини сторін $AB$ і $BC$, $AB = 12$ \textit{см}, $MC = 8$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.15]
+        % AB=12, BC=16 (MC=8 => BC=16)
+        % A(0,0) - ні, нехай B буде верхній лівий, як зазвичай A внизу.
+        % За рисунком: A внизу зліва. B зверху зліва.
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,12);
+        \coordinate (C) at (16,12);
+        \coordinate (D) at (16,0);
+        
+        \coordinate (K) at (0,6); % Середина AB
+        \coordinate (M) at (8,12); % Середина BC (8, 12)
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K) -- (M) -- (C); % Лінія на рисунку йде від A до K, потім до M, потім C?
+        % На рисунку просто точки. Проведемо лінію AK і MC для візуалізації, як на скріншоті.
+        % На скріншоті відрізки: AK з'єднано з M? Ні.
+        % Просто позначено рівність відрізків.
+        
+        % Позначки рівності
+        \draw (-0.5,3) -- (0.5,3); % AK
+        \draw (-0.5,9) -- (0.5,9); % KB
+        \draw[thick] (A)  -- (C);
+        \draw (4,11.5) -- (4,12.5); \draw (4.2,11.5) -- (4.2,12.5); % BM
+        \draw (12,11.5) -- (12,12.5); \draw (12.2,11.5) -- (12.2,12.5); % MC
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[left] at (K) {$K$};
+        \node[above] at (M) {$M$};
+        
+        \fill (K) circle (10pt);
+        \fill (M) circle (10pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Відрізок} \par \vspace{0.2cm}
+    \textbf{1} \quad $BC$ \\
+    \textbf{2} \quad діаметр кола, описаного навколо прямокутника $ABCD$ \\
+    \textbf{3} \quad відстань від точки $D$ до середини $KM$
+}{
+    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 15 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & 18 \textit{см} \\
+    \textbf{Д} & 20 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 5 (Коло і півколо) ===
+\noindent\textbf{5.} \begin{minipage}[t]{0.6\textwidth}
+У прямокутник $ABCD$ вписано коло із центром в точці $O$, яке дотикається до сторін $AB$, $BC$ і $AD$, та півколо з діаметром $CD$ (див. рисунок). Коло й півколо мають лише одну спільну точку. $AB = 8$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.3]
+        % AB=8. Коло R=4. Центр O(4,4).
+        % BC=12. Півколо на CD. R=4. Центр (12,4).
+        % Дотикаються в точці (8,4).
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,8);
+        \coordinate (C) at (12,8);
+        \coordinate (D) at (12,0);
+        \coordinate (O) at (4,4);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        % Коло
+        \draw[thick] (O) circle (4cm);
+        
+        % Півколо (дуга від C до D зліва)
+        \draw[thick] (C) arc (90:270:4cm);
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node at (O) {$\cdot$};
+        \node[below right] at (O) {$O$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Довжина сторони $BC$ \\
+    \textbf{2} \quad Довжина відрізка $OC$ \\
+    \textbf{3} \quad Відстань від середини відрізка $AO$ до прямої $CD$
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 10 \textit{см}. \\
+    \textbf{Б} & дорівнює 12 \textit{см}. \\
+    \textbf{В} & дорівнює 16 \textit{см}. \\
+    \textbf{Г} & дорівнює $4\sqrt{5}$ \textit{см}. \\
+    \textbf{Д} & дорівнює $4\sqrt{3}$ \textit{см}. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 6 (Два прямокутники, L-форма) ===
+\noindent\textbf{6.} \begin{minipage}[t]{0.55\textwidth}
+Прямокутники $ABCD$ і $DKLM$ є рівними (див. рисунок). $AD = 6$, $DM = 8$. Установіть відповідність між величиною (1--3) та її значенням (А--Д). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.35]
+        % D - спільна вершина (0,0)
+        % ABCD лівий: A(-6,0), B(-6,8), C(0,8), D(0,0). (AD=6, AB=8)
+        % DKLM правий: D(0,0), K(0,6), L(8,6), M(8,0). (DM=8, DK=6)
+        
+        \coordinate (D) at (0,0);
+        \coordinate (A) at (-6,0);
+        \coordinate (B) at (-6,8);
+        \coordinate (C) at (0,8);
+        
+        \coordinate (M) at (8,0);
+        \coordinate (L) at (8,6);
+        \coordinate (K) at (0,6);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (K) -- (L) -- (M) -- (A); % Зовнішній контур
+        \draw[thick] (C) -- (D) -- (K); % Спільна лінія
+        \draw[thick] (D) -- (B); % Діагональ BD
+        \draw[thick] (D) -- (L); % Діагональ DL
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[below] at (M) {$M$};
+        \node[above right] at (L) {$L$};
+        \node[above right] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Величина} \par \vspace{0.2cm}
+    \textbf{1} \quad $\sin \angle MDL$ \\
+    \textbf{2} \quad $\tg \angle ABD$ \\
+    \textbf{3} \quad $\cos \angle BDL$
+}{
+    \textit{Значення величини} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 0,6 \\
+    \textbf{Б} & 0,75 \\
+    \textbf{В} & 0,8 \\
+    \textbf{Г} & 0 \\
+    \textbf{Д} & 1 \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+% === ЗАВДАННЯ 7 ===
+\noindent\textbf{7.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$, периметр якого дорівнює $46$ \textit{см}. Визначте довжину сторони $BC$, якщо $AB + CD = 18$ \textit{см}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        \draw[thick] (0,0) node[below left]{$A$} -- (0,3) node[above left]{$B$} -- (5,3) node[above right]{$C$} -- (5,0) node[below right]{$D$} -- cycle;
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableSmall{$16$ \textit{см}}{$14$ \textit{см}$}{$13$ \textit{см}}{$9$ \textit{см}}{$12$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 8 ===
+\noindent\textbf{8.} \begin{minipage}[t]{0.55\textwidth}
+Діагоналі прямокутника перетинаються під кутом $60^\circ$ (див. рисунок). Обчисліть площу цього прямокутника, якщо менша з його сторін дорівнює $4$ \textit{см}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.6]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (5.2,3); % aspect ratio for 60 deg intersection implies specific ratio, but sketch is fine
+        \coordinate (D) at (5.2,0);
+        \coordinate (O) at (2.6, 1.5);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        
+        % Кут 60 градусів (тут це гострий кут між діагоналями, що спирається на меншу сторону)
+        \pic [draw, pic text={\small $60^\circ$}, angle radius=0.6cm, angle eccentricity=1.4] {angle = B--O--A};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$8\sqrt{3}$ \textit{см}$^2$}{$16\sqrt{3}$ \textit{см}$^2$}{$32$ \textit{см}$^2$}{$8$ \textit{см}$^2$}{$16$ \textit{см}$^2$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 9 ===
+\noindent\textbf{9.} \begin{minipage}[t]{0.55\textwidth}
+Діагоналі прямокутника $ABCD$ перетинаються в точці $O$, $AB = 6$, $\angle AOD = 110^\circ$ (див. рисунок). Знайдіть периметр цього прямокутника. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.6]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3.5);
+        \coordinate (C) at (6,3.5);
+        \coordinate (D) at (6,0);
+        \coordinate (O) at (3, 1.75);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        
+        % Кут 110 (тупий, знизу)
+        \pic [draw, pic text={\small $110^\circ$}, angle radius=0.5cm, angle eccentricity=1.5] {angle = A--O--D};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $6 + 6\tg 55^\circ$ \\[0.3cm]
+\textbf{Б} & $12 + 12\sin 55^\circ$ \\[0.3cm]
+\textbf{В} & $12 + \dfrac{12}{\tg 55^\circ}$ \\[0.5cm]
+\textbf{Г} & $12 + 12\tg 55^\circ$ \\[0.3cm]
+\textbf{Д} & $12 + 12\cos 55^\circ$
+\end{tabular}
+
+\vspace{1cm}
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
+\end{center}
+
+% === ЗАВДАННЯ 10 ===
+\noindent\textbf{10.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$. Точка $K$ лежить на стороні $AD$. Визначте периметр прямокутника, якщо $CK = 15$, $KD = 12$, $\angle ABK = \beta$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        % CD = sqrt(15^2 - 12^2) = 9. AB = 9.
+        % Scale: 1 unit = 2 cm approx.
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,4.5); % AB=9 -> 4.5
+        \coordinate (C) at (8,4.5); % AD -> approx
+        \coordinate (D) at (8,0);
+        
+        \coordinate (K) at (5,0); % Point K on AD
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
+        \draw[thick] (K) -- (C) node[midway, above left] {15};
+        
+        % Angle beta
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.8cm, angle eccentricity=1.3] {angle = A--B--K};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \node[below] at (6.5,0) {12}; % KD label
+        \fill (K) circle (3pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $42 + \dfrac{18}{\tg\beta}$ \\[0.4cm]
+\textbf{Б} & $42 + 18\cos\beta$ \\[0.4cm]
+\textbf{В} & $42 + 18\tg\beta$ \\[0.4cm]
+\textbf{Г} & $42 + \dfrac{18}{\sin\beta}$ \\[0.4cm]
+\textbf{Д} & $42 + 18\sin\beta$
+\end{tabular}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 11 ===
+\noindent\textbf{11.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$. Точка $K$ лежить на стороні $AD$. Визначте довжину сторони $AD$, якщо $BK = d$, $\angle AKB = \alpha$, $\angle KCD = \beta$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (6,3);
+        \coordinate (D) at (6,0);
+        \coordinate (K) at (2.5,0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K) node[midway, above right] {$d$};
+        \draw[thick] (K) -- (C);
+        
+        % Angles
+        \pic [draw, pic text={\small $\alpha$}, angle radius=0.6cm, angle eccentricity=1.7] {angle = B--K--A};
+        \pic [draw, angle radius=0.4cm] {angle = B--K--A};
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.6cm, angle eccentricity=1.6] {angle = K--C--D}; % Wait, drawing shows angle at C inside triangle KCD?
+        % Let's look closely at image 2. Angle is marked at C, between KC and CD? No, angle KCD.
+        % The image shows angle beta at C, specifically angle KCD? 
+        % Actually, usually "Angle KCD" means C is vertex. 
+        % Looking at image: Yes, angle is inside triangle KCD at vertex C.
+        
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (2pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $d(\sin\alpha + \cos\alpha\tg\beta)$ \\[0.4cm]
+\textbf{Б} & $d\left(\sin\alpha + \dfrac{\cos\alpha}{\tg\beta}\right)$ \\[0.4cm]
+\textbf{В} & $d(\cos\alpha + \sin\alpha\sin\beta)$ \\[0.4cm]
+\textbf{Г} & $d\left(\cos\alpha + \dfrac{\sin\alpha}{\tg\beta}\right)$ \\[0.4cm]
+\textbf{Д} & $d(\cos\alpha + \sin\alpha\tg\beta)$
+\end{tabular}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 12 ===
+\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+Діагоналі $BD$ і $AC$ прямокутника $ABCD$ перетинаються в точці $O$, $\angle AOB = \beta$ (див. рисунок). Відстань між серединами відрізків $AO$ і $DO$ дорівнює $d$. Знайдіть площу цього прямокутника. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (6,3);
+        \coordinate (D) at (6,0);
+        \coordinate (O) at (3,1.5);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        
+        % Midpoints
+        \coordinate (M1) at ($(A)!0.5!(O)$);
+        \coordinate (M2) at ($(D)!0.5!(O)$);
+        
+        \draw[thick] (M1) -- (M2) node[midway, below] {$d$};
+        \fill (M1) circle (2pt);
+        \fill (M2) circle (2pt);
+        
+        % Angle beta (AOB)
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.5cm, angle eccentricity=1.5] {angle = B--O--A};
+        
+        % Tick marks for midpoints
+        \draw ($(A)!0.5!(M1)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+        \draw ($(O)!0.5!(M1)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+        \draw ($(D)!0.5!(M2)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+        \draw ($(O)!0.5!(M2)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $2d^2\tg\frac{\beta}{2}$ \\[0.4cm]
+\textbf{Б} & $4d^2\tg\frac{\beta}{2}$ \\[0.4cm]
+\textbf{В} & $4d^2\sin\frac{\beta}{2}$ \\[0.4cm]
+\textbf{Г} & $\dfrac{4d^2}{\tg\frac{\beta}{2}}$ \\[0.4cm]
+\textbf{Д} & $\dfrac{2d^2}{\cos\frac{\beta}{2}}$
+\end{tabular}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 13 ===
+\noindent\textbf{13.} \begin{minipage}[t]{0.55\textwidth}
+У прямокутнику $ABCD$ на стороні $AD$ вибрано точку $K$ так, що $BK = KC = d$, $\angle ABK = \beta$ (див. рисунок). Визначте периметр цього прямокутника. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (6,3);
+        \coordinate (D) at (6,0);
+        \coordinate (K) at (3,0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K) node[midway, above right] {$d$};
+        \draw[thick] (K) -- (C) node[midway, above left] {$d$};
+        
+        % Angle beta
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.6cm, angle eccentricity=1.5] {angle = A--B--K};
+        
+        % Ticks on BK and KC
+        \draw ($(B)!0.5!(K)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
+        \draw ($(K)!0.5!(C)$) ++(-0.1,-0.1) -- ++(0.2,0.2);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $4d(\sin\beta + \cos\beta)$ \\[0.4cm]
+\textbf{Б} & $2d\left(\dfrac{1}{\cos\beta} + \dfrac{2}{\sin\beta}\right)$ \\[0.4cm]
+\textbf{В} & $2d(2\sin\beta + \cos\beta)$ \\[0.4cm]
+\textbf{Г} & $2d\left(\dfrac{2}{\cos\beta} + \dfrac{1}{\sin\beta}\right)$ \\[0.4cm]
+\textbf{Д} & $2d(\sin\beta + 2\cos\beta)$
+\end{tabular}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 14 ===
+\noindent\textbf{14.} \begin{minipage}[t]{0.95\textwidth}
+На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру (1--3) з її площею (А--Д). \nmtyear{2024}
+\end{minipage}
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.6]
+    % Coordinates logic based on numbers:
+    % ABCD: width 4. height h.
+    % DKLM: base KL=2, DM=5.
+    % MQP: leg MQ=6. Angle 45 -> PQ=6. So h=6.
+    
+    \def\h{6}
+    
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (4,0);
+    \coordinate (B) at (0,\h);
+    \coordinate (C) at (4,\h);
+    
+    \coordinate (M) at (9,0); % D(4) + 5 = 9
+    \coordinate (K) at (7,\h); % M(9) is vertical side? No, Trap DKLM usually means D->K->L->M.
+    % Image: D to K is slant. L to M is vertical? 
+    % Let's look at numbers. "2" is between K and L. "5" is between D and M.
+    % Angle at M is not marked 90. But triangle MQP has right angle at Q.
+    % The text says "Rectangular Trapezoid DKLM". In drawing, side LM is vertical.
+    % So L is above M. M is at 9. L is at (9, h).
+    % K is left of L. KL=2. K is at (7, h).
+    % D is at (4,0).
+    \coordinate (L) at (9,\h);
+    
+    \coordinate (Q) at (15,0); % M(9) + 6 = 15.
+    \coordinate (P) at (15,\h); % P is above Q. Triangle MQP, right angle at Q.
+    
+    % Colors
+    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[violet!20] (D) -- (K) -- (L) -- (M) -- cycle;
+    \fill[yellow!20] (M) -- (Q) -- (P) -- cycle;
+    
+    % Lines
+    \draw[thick] (-1,0) -- (16,0) node[above] {$n$};
+    \draw[thick] (-1,\h) -- (16,\h) node[above] {$m$};
+    
+    % Shapes
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (K) -- (L) -- (M); % Base is on line n
+    \draw[thick] (M) -- (P) -- (Q); % Triangle MQP (Q is right angle)
+    
+    % Labels and Values
+    \node[below] at (A) {$A$};
+    \node[below] at (2,0) {4};
+    \node[below] at (D) {$D$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    
+    \node[below] at (6.5,0) {5};
+    \node[below] at (M) {$M$};
+    \node[above] at (K) {$K$};
+    \node[above] at (8, \h) {2};
+    \node[above] at (L) {$L$};
+    
+    \node[below] at (12,0) {6};
+    \node[below] at (Q) {$Q$};
+    \node[above] at (P) {$P$};
+    
+    % Angles
+    \draw (Q) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0); % Right angle at Q
+    \draw (M) ++(0,0.4) -- ++(-0.4,0) -- ++(0,-0.4); % Right angle at M (trap)? No, M is just point. 
+    % Wait, text says DKLM is rectangular trap. Usually one leg is perp. Side LM corresponds to vertical line.
+    
+    % 45 degrees at M in triangle MQP?
+    % Image shows angle 45 at M inside triangle MQP.
+    \pic [draw, pic text={\small $45^\circ$}, angle radius=0.9cm, angle eccentricity=1.6] {angle = Q--M--P};
+
+\end{tikzpicture}
+\end{center}
+
+\matchingLayout{
+    \textit{Величина} \par \vspace{0.2cm}
+    \textbf{1} \quad Прямокутник $ABCD$ \\
+    \textbf{2} \quad Трапеція $DKLM$ \\
+    \textbf{3} \quad Трикутник $MQP$
+}{
+
+    \textit{Значення величини} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 12 \\
+    \textbf{Б} & 18 \\
+    \textbf{В} & 21 \\
+    \textbf{Г} & 24 \\
+    \textbf{Д} & 36 \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+% === ЗАВДАННЯ 40 ===
+\noindent\textbf{15.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника, друге коло з центром у точці $O_2$, довжиною $16\pi$ \textit{см}, дотикається до сторін $AB$, $BC$ та $AD$. $BC = 30$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.12]
+        % Circle 2 length 16pi -> R=8. Diameter 16.
+        % Touches AB, BC, AD -> Height AB = 16.
+        % Width BC = 30.
+        \def\w{30}
+        \def\h{16}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\h);
+        \coordinate (C) at (\w,\h);
+        \coordinate (D) at (\w,0);
+        
+        % Center O2: r=8 from AB, r=8 from AD. (8,8)
+        \coordinate (O2) at (8,8);
+        
+        % Center O1: Midpoint of rect (15,8)
+        \coordinate (O1) at (15,8);
+        
+        % Circumcircle radius: sqrt(15^2+8^2) = 17.
+        
+        % Draw Circumcircle (O1) - Green
+        \draw[thick, green!60!black] (O1) circle (17);
+        
+        % Draw Inscribed-like Circle (O2) - Orange
+        \draw[thick, orange!80!black] (O2) circle (8);
+        
+        % Draw Rectangle
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        % Points
+        \fill (O1) circle (15pt) node[right] {$O_1$};
+        \fill (O2) circle (15pt) node[left] {$O_2$};
+        
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (15, \h) {30 \textit{см}};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Довжина сторони $AB$ дорівнює \\
+    \textbf{2} \quad Довжина радіуса кола, описаного навколо прямокутника $ABCD$ дорівнює \\
+    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 7 \textit{см}. \\
+    \textbf{Б} & 9 \textit{см}. \\
+    \textbf{В} & 12 \textit{см}. \\
+    \textbf{Г} & 16 \textit{см}. \\
+    \textbf{Д} & 17 \textit{см}. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 41 ===
+\noindent\makebox[1.5em][l]{\textbf{16.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагоналі будь-якого прямокутника ділять його кути навпіл. \\
+II. & Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл. \\
+III. & Діагоналі будь-якого прямокутника рівні. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише II та III}{лише III}{I, II та III}{лише I та III}{лише I та II}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 42 ===
+\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+У прямокутнику $ABCD$ вибрано точки $K$ і $L$ так, що $AL = LD$, $LK$ --- бісектриса кута $CLD$ (див. рисунок). Знайдіть площу цього прямокутника, якщо $LK = d$, $\angle KLD = \beta$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=1]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (4,0);
+        \coordinate (L) at (2,0); % Midpoint
+        
+        % LK is bisector. Let's make angle CLD = 60 deg, then KLD = 30.
+        % L = (2,0). D=(4,0). LD = 2.
+        % Triangle KLD is right? No, ABCD is rect, so angle D is 90.
+        % Triangle KLD is right-angled at D? K is on side CD?
+        % Text says "points K and L chosen". Drawing shows K on CD.
+        % So triangle KLD is right-angled at D.
+        % LK meets CD at K.
+        \coordinate (C) at (4, 2.5);
+        \coordinate (B) at (0, 2.5);
+        \coordinate (K) at (4, 1.15); % Approx
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (L) -- (C);
+        \draw[thick] (L) -- (K) node[midway, above ] {$d$};
+        
+        % Angle beta
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.8cm, angle eccentricity=1.3] {angle = D--L--K};
+        
+        % Ticks for AL = LD
+        \draw ($(A)!0.5!(L)$) ++(0,-0.1) -- ++(0,0.2);
+        \draw ($(L)!0.5!(D)$) ++(0,-0.1) -- ++(0,0.2);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (L) {$L$};
+        \node[right] at (K) {$K$};
+        \fill (L) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\noindent
+\begin{tabular}{ll}
+\textbf{А} & $\dfrac{2d^2\cos^2\beta}{\tg 2\beta}$ \\[0.4cm]
+\textbf{Б} & $2d^2\sin^2\beta\tg 2\beta$ \\[0.4cm]
+\textbf{В} & $\dfrac{2d^2\tg 2\beta}{\cos^2\beta}$ \\[0.4cm]
+\textbf{Г} & $\dfrac{2d^2\sin^2\beta}{\tg 2\beta}$ \\[0.4cm]
+\textbf{Д} & $2d^2\cos^2\beta\tg 2\beta$
+\end{tabular}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 43 ===
+\noindent\textbf{18.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ і кругові сектори $BCL$ та $KAD$, що мають одну спільну точку $M$. $N$ --- проєкція точки $M$ на пряму $AB$, $BC = 12$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.25]
+        % Centers are A and C. Radius 12.
+        % AB = 12*sqrt(3) approx 20.8
+        \def\r{12}
+        \def\w{20.78}
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (\w,0);
+        \coordinate (B) at (0,\r); % BC is width? No, BC=12. So height is 12?
+        % Text: BC=12. Drawing shows BC as top side. Usually AB is height, BC width.
+        % If BC=12 is width. Then Rect is 12 wide.
+        % Let's assume standard orientation: AB vertical, BC horizontal.
+        % Then Center C (top right). Radius CB = 12 (height).
+        % Center A (bottom left). Radius AD = 12 (width).
+        % Touch at M. Diagonal AC = 24.
+        % AC^2 = AB^2 + BC^2 => 576 = AB^2 + 144 => AB^2 = 432 => AB = 12sqrt(3).
+        % So Height AB = 20.8, Width BC = 12.
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,20.78);
+        \coordinate (C) at (12,20.78);
+        \coordinate (D) at (12,0);
+        
+        % Fill gray
+        \fill[white!30] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        % Sector KAD (Center A, radius 12?) No, K is on AB.
+        % Drawing shows Sector KAD. K on AB. D is corner.
+        % If center is A, radius is AD = 12.
+        % Arc from D to K.
+        \coordinate (K) at (0, 12);
+        \fill[gray!30] (A) -- (D) arc (0:90:12) -- cycle;
+        \draw[thick] (D) arc (0:90:12);
+        
+        % Sector BCL (Center C, radius 12?) L is on CD.
+        % Drawing shows Sector BCL. B is corner.
+        % If center is C, radius CB = 12.
+        % Arc from B to L.
+        \coordinate (L) at (12, 8.78); % 20.78 - 12
+        \fill[gray!30] (C) -- (B) arc (180:270:12) -- cycle;
+        \draw[thick] (B) arc (180:270:12);
+        
+        % Point M (intersection)
+        \coordinate (M) at (intersection of A--C and 0,12--12,12); % Rough
+        % Exact M is midpoint of AC. (6, 10.39)
+        \coordinate (M) at (6, 10.39);
+        
+        % Projection N on AB. N = (0, 10.39).
+        \coordinate (N) at (0, 10.39);
+        
+        % Lines
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C); % Diagonal
+        \draw[thick] (M) -- (N);
+        
+        % Right angle at N
+        \draw (0, 10.39) rectangle ++(1, -1);
+        
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[left] at (K) {$K$};
+        \node[right] at (L) {$L$};
+        \node[above] at (M) {$M$};
+        \node[left] at (N) {$N$};
+        
+        \fill (M) circle (15pt);
+        \fill (N) circle (15pt);
+        \fill (K) circle (10pt);
+        \fill (L) circle (10pt);
+
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Довжина $AN$ \\
+    \textbf{2} \quad Довжина $AB$ \\
+    \textbf{3} \quad Довжина $AC$
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 24 \textit{см}. \\
+    \textbf{Б} & дорівнює 18 \textit{см}. \\
+    \textbf{В} & дорівнює $8\sqrt{3}$ \textit{см}. \\
+    \textbf{Г} & дорівнює $6\sqrt{3}$ \textit{см}. \\
+    \textbf{Д} & є натуральним числом. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 44 ===
+\noindent\textbf{19.} \begin{minipage}[t]{0.55\textwidth}
+У прямокутнику $ABCD$ на стороні $AD$ вибрано точку $K$ так, що $AK : KD = 1 : 2$, $\angle BCK = \beta$ (див. рисунок). Визначте площу цього прямокутника. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.7]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (6,3);
+        \coordinate (D) at (6,0);
+        
+        % AK:KD = 1:2. AD=6. AK=2, KD=4.
+        \coordinate (K) at (2,0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (C);
+        
+        % Label d on top
+        \node[above] at (3,3) {$d$};
+        
+        % Angle beta at C (BCK)
+        \pic [draw, pic text={\small $\beta$}, angle radius=0.8cm, angle eccentricity=1.3] {angle = B--C--K};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (2pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{2d^2}{3\tg\beta}$}{$\dfrac{2}{3}d^2\cos\beta$}{$\dfrac{2d^2}{3\sin\beta}$}{$\dfrac{2}{3}d^2\sin\beta$}{$\dfrac{2}{3}d^2\tg\beta$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 45 ===
+\noindent\textbf{20.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.3]
+        % Square side 6.
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (6,0);
+        \coordinate (C) at (6,6);
+        \coordinate (B) at (0,6);
+        
+        % Triangle KBC. B=90. K on line AB.
+        % Midline = 10. Trapezoid AKCD.
+        % Bases AK, CD. CD=6. (AK+6)/2=10 -> AK=14.
+        % BK = AK - AB = 14 - 6 = 8.
+        \coordinate (K) at (0,14);
+        
+        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Trapezoid contour
+        \draw[thick] (B) -- (C); % Square top
+        % Right angle B
+        \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
+        
+        \node[left] at (A) {$A$};
+        \node[below right] at (D) {$D$};
+        \node[right] at (C) {$C$};
+        \node[left] at (B) {$B$};
+        \node[left] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Відрізок} \par \vspace{0.2cm}
+    \textbf{1} \quad $BK$ \\
+    \textbf{2} \quad $KC$ \\
+    \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
+}{
+    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & 7 \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 9 \textit{см} \\
+    \textbf{Д} & 10 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{1cm}
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
+\end{center}
+
+% === ЗАВДАННЯ 21 ===
+\noindent\textbf{21.} \begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $AK = 8$ \textit{см}, $\angle BAK = 30^\circ$ (див. рисунок). $AK$ --- бісектриса кута $BAC$. Знайдіть площу цього прямокутника.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.3]
+        % AK = 8. Angle BAK = 30.
+        % AB = 8 * cos(30) = 4*sqrt(3) approx 6.928
+        % BK = 8 * sin(30) = 4.
+        % AK is bisector of BAC => Angle BAC = 60.
+        % Triangle ABC is right (B=90). Angle BAC=60.
+        % BC = AB * tan(60) = 4*sqrt(3) * sqrt(3) = 12.
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0, 6.928);
+        \coordinate (K) at (4, 6.928);
+        \coordinate (C) at (12, 6.928);
+        \coordinate (D) at (12, 0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        \draw[thick] (A) -- (C);
+        
+        % Angle 30
+        \pic [draw, pic text={\small $30^\circ$}, angle radius=0.7cm, angle eccentricity=1.7] {angle = K--A--B};
+        % Double arc for bisector part (KAC) - optional, but helps logic
+       \pic [draw, angle radius=0.5cm] {angle = C--A--K};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (K) {$K$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \fill (K) circle (5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$48\sqrt{3}$ \textit{см}$^2$}{$16\sqrt{3}$ \textit{см}$^2$}{$48$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$16$ \textit{см}$^2$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 22 ===
+\noindent\textbf{22.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$ описано навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення (1--3) із його закінченням (А--Д) так, щоб утворилося правильне твердження.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.1]
+        % Circumcircle Area 625pi -> R=25. Diameter AC=50.
+        % AB=30. BC = sqrt(50^2 - 30^2) = 40.
+        % O2 touches AB, BC, AD -> Diameter = AB = 30. Radius r=15.
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,30);
+        \coordinate (C) at (40,30);
+        \coordinate (D) at (40,0);
+        
+        % O1 center of rect (20, 15)
+        \coordinate (O1) at (20,15);
+        
+        % O2 center of inscribed-like (15, 15)
+        \coordinate (O2) at (15,15);
+        
+        % Draw Green Circumcircle (R=25)
+        \draw[green!60!black] (O1) circle (25);
+        
+        % Draw Orange Circle (R=15)
+        \draw[orange!80!black] (O2) circle (15);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        \fill (O1) circle (15pt) node[above right] {$O_1$};
+        \fill (O2) circle (15pt) node[above left] {$O_2$};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
+    \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
+    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 5 \textit{см}. \\
+    \textbf{Б} & 10 \textit{см}. \\
+    \textbf{В} & 15 \textit{см}. \\
+    \textbf{Г} & 25 \textit{см}. \\
+    \textbf{Д} & 40 \textit{см}. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 23 ===
+\noindent\textbf{23.} \begin{minipage}[t]{0.55\textwidth}
+Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д).
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.15]
+        % Square ABCD perimeter 40 -> side 10.
+        % CM = 26. In rect DCKM, side CD=10. CM is diagonal.
+        % DM = sqrt(26^2 - 10^2) = 24.
+        % Total width AM = 10 + 24 = 34.
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,10);
+        \coordinate (C) at (10,10);
+        \coordinate (D) at (10,0);
+        
+        \coordinate (K) at (34,10);
+        \coordinate (M) at (34,0);
+        
+        \draw[thick] (A) -- (B) -- (K) -- (M) -- cycle;
+        \draw[thick] (D) -- (C); % Separator
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above right] at (K) {$K$};
+        \node[below right] at (M) {$M$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Відрізок} \par \vspace{0.2cm}
+    \textbf{1} \quad Сторона квадрата $ABCD$ \\
+    \textbf{2} \quad $CK$ \\
+    \textbf{3} \quad Відстань між центром квадрата і точкою перетину діагоналей прямокутника $ABKM$
+}{
+    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & 17 \textit{см} \\
+    \textbf{Д} & 24 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+\vspace{0.2cm}
+
+
+% === ЗАВДАННЯ 24 ===
+\noindent\makebox[1.5em][l]{\textbf{24.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними?}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагоналі будь-якого прямокутника є бісектрисами його кутів. \\
+II. & Діагоналі будь-якого прямокутника ділять його на чотири рівні трикутники. \\
+III. & Діагоналі будь-якого прямокутника рівні. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише I та III}{лише II}{лише II та III}{лише I}{лише III}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 25 ===
+\noindent\makebox[1.5em][l]{\textbf{25.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними?}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Діагоналі будь-якого прямокутника ділять його кути навпіл. \\
+II. & Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл. \\
+III. & Діагоналі будь-якого прямокутника рівні. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише I та III}{лише III}{I, II та III}{лише II та III}{лише I та II}
+
+
+% === ЗАВДАННЯ 26 ===
+\noindent\textbf{26.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення (1--3) із його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.1]
+        % R_circ = 25 (Area 625pi). Diam = 50.
+        % AB = 30. BC = sqrt(50^2 - 30^2) = 40.
+        % O2 touches AB, BC, AD. Diameter = AB = 30. Radius r=15.
+        
+        \def\w{40}
+        \def\h{30}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\h);
+        \coordinate (C) at (\w,\h);
+        \coordinate (D) at (\w,0);
+        
+        \coordinate (O1) at (20,15); % Center of rect
+        \coordinate (O2) at (15,15); % Center of inscribed-like circle (r=15)
+        
+        % Circumcircle (Green)
+        \draw[thick, green!60!black] (O1) circle (25cm);
+        
+        % Inscribed-like circle (Orange)
+        \draw[thick, orange!80!black] (O2) circle (15cm);
+        
+        % Rectangle
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        % Points
+        \fill (O1) circle (20pt) node[right] {$O_1$};
+        \fill (O2) circle (20pt) node[left] {$O_2$};
+        
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
+    \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
+    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 5 \textit{см}. \\
+    \textbf{Б} & 10 \textit{см}. \\
+    \textbf{В} & 15 \textit{см}. \\
+    \textbf{Г} & 25 \textit{см}. \\
+    \textbf{Д} & 40 \textit{см}. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 27 ===
+\noindent\textbf{27.} \begin{minipage}[t]{0.55\textwidth}
+Вершини прямокутника $KLMN$ лежать на сторонах ромба $ABCD$. $AK : KB = 1 : 3$. Діагональ $KM = 12$ \textit{см} прямокутника утворює зі стороною $NM$ кут $30^\circ$. Визначте площу ромба $ABCD$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.6]
+        \coordinate (A) at (-2.5, 0);
+        \coordinate (B) at (0, 4);
+        \coordinate (C) at (2.5, 0);
+        \coordinate (D) at (0, -4);
+
+        % Прямокутник KLMN
+        % AK : KB = 1:3 -> K ділить AB у відношенні 1:3 (ближче до A)
+        \coordinate (K) at ($(A)!0.25!(B)$);
+        \coordinate (L) at ($(C)!0.25!(B)$);
+        \coordinate (M) at ($(C)!0.25!(D)$);
+        \coordinate (N) at ($(A)!0.25!(D)$);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (L) -- (M) -- (N) -- cycle;
+        \draw[thick] (K) -- (M);
+
+        % Кут 30 градусів KMN
+        \pic [draw, pic text={\scriptsize $30^\circ$}, angle radius=0.8cm, angle eccentricity=1.4] {angle = K--M--N};
+
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        
+        \node[above left] at (K) {$K$};
+        \node[above right] at (L) {$L$};
+        \node[below right] at (M) {$M$};
+        \node[below left] at (N) {$N$};
+        
+        \fill (K) circle (2pt);
+        \fill (L) circle (2pt);
+        \fill (M) circle (2pt);
+        \fill (N) circle (2pt);
+
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+    
+
+\vspace{0.3cm}
+\answerTableTall{$81\sqrt{3}$ \textit{см}$^2$}{$384$ \textit{см}$^2$}{$96$ \textit{см}$^2$}{$81$ \textit{см}$^2$}{$96\sqrt{3}$ \textit{см}$^2$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 28 ===
+\noindent\textbf{28.} \begin{minipage}[t]{0.95\textwidth}
+На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60^\circ$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LQP$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою (1--3) та її периметром (А--Д). \nmtyear{2025}
+\end{minipage}
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.6]
+    \def\h{8} % AB:BC=4:3 => AB=8
+    
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,\h);
+    \coordinate (C) at (6,\h);
+    \coordinate (D) at (6,0);
+    
+    % Parallelogram DKLM. KL=6. KM diagonal perp n => KM is vertical.
+    % D=(6,0). K is on top. M is on bottom.
+    % To make KM vertical, K and M share x coord.
+    % This diagram shows D-K-L-M. K is top left of para, L top right.
+    % M bottom right. D bottom left.
+    % KM is diagonal? No, usually diagonal is DM or KL.
+    % Text says "diagonal KM perp n". M is on n. K is on m.
+    % In drawing, K is on m, M is on n. So KM is a vertical segment.
+    % Parallelogram vertices are D, K, L, M.
+    % So sides are DK and LM? No, DK and ML? 
+    % Drawing: Left side slant DK. Top side KL. Right side slant LM?
+    % No, KM is vertical. That means triangle KDM is right angled at M?
+    % Yes, drawing shows KM perp n.
+    % So D-M is base. K-L is top.
+    % KL=6. So DM=6. 
+    % D=(6,0). M=(12,0). K=(12,8). L=(18,8).
+    
+    \coordinate (K) at (12,\h);
+    \coordinate (M) at (12,0);
+    \coordinate (L) at (18,\h);
+    
+    % Triangle LQP. L=(18,8). LQ perp n => Q=(18,0).
+    % LP=PQ, angle P=60 => Equilateral.
+    % Side LQ = 8. So all sides 8.
+    % P is to the right.
+    \coordinate (Q) at (18,0);
+    \coordinate (P) at ($(Q) + (-30:8)$); % No, P is approx (18+4sqrt(3), 4).
+    \coordinate (P) at (24.9, 4); 
+    
+    % Colors
+    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[violet!20] (D) -- (K) -- (L) -- (M) -- cycle;
+    \fill[yellow!20] (L) -- (Q) -- (P) -- cycle;
+    
+    % Lines
+    \draw[thick] (-1,0) -- (26,0) node[above] {$n$};
+    \draw[thick] (-1,\h) -- (26,\h) node[above] {$m$};
+    
+    % Shapes
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (K) -- (L) -- (M) -- cycle;
+    \draw[thick] (K) -- (M); % Diagonal KM
+    \draw[thick] (L) -- (Q) -- (P) -- cycle;
+    
+    % Right angles
+    \draw (M) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
+    \draw (Q) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
+    
+    % Angle 60
+    \pic [draw, pic text={\small $60^\circ$}, angle radius=0.6cm, angle eccentricity=1.5] {angle = L--P--Q};
+    
+    % Ticks on triangle
+    \draw ($(L)!0.5!(P)$) ++(120:0.2) -- ++(-60:0.4);
+    \draw ($(Q)!0.5!(P)$) ++(60:0.2) -- ++(-120:0.4);
+
+    % Labels
+    \node[below] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above] at (K) {$K$};
+    \node[above] at (L) {$L$};
+    \node[below] at (M) {$M$};
+    \node[below] at (Q) {$Q$};
+    \node[right] at (P) {$P$};
+\end{tikzpicture}
+\end{center}
+
+\matchingLayout{
+    \textit{Фігура} \par \vspace{0.2cm}
+    \textbf{1} \quad прямокутник $ABCD$ \\
+    \textbf{2} \quad паралелограм $DKLM$ \\
+    \textbf{3} \quad трикутник $LPQ$
+}{
+    \textit{Периметр фігури} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 24 \textit{см} \\
+    \textbf{Б} & 32 \textit{см} \\
+    \textbf{В} & 28 \textit{см} \\
+    \textbf{Г} & 36 \textit{см} \\
+    \textbf{Д} & 14 \textit{см} \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 29 ===
+\noindent\textbf{29.} \begin{minipage}[t]{0.6\textwidth}
+Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.25]
+        % AB=12. K is vertex of isosceles right triangle on AB.
+        % Height of K from AB = AB/2 = 6.
+        % Circle touches AB, BC, AD? No, touches BC, AD, CD (right side).
+        % Drawing: AB is left side. Circle is inside right part.
+        % Center O is at distance R=6 from BC and AD. y=6.
+        % K is on the circle. K is at (6,6).
+        % Circle touches BC, AD. Radius 6.
+        % If K(6,6) is on circle, and O is (12,6), then radius is 6.
+        % So Circle touches side CD? Maybe.
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,12);
+        \coordinate (C) at (18,12); % W=18
+        \coordinate (D) at (18,0);
+        
+        \coordinate (K) at (6,6);
+        \coordinate (O) at (12,6);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (O) circle (6cm);
+        \draw[thick] (A) -- (K) -- (B);
+        
+        % Right angle at K
+        \pic [draw, angle radius=0.3cm] {right angle = B--K--A};
+        
+        % Ticks on AK, BK
+        \draw ($(A)!0.5!(K)$) ++(135:0.4) -- ++(-45:0.8);
+        \draw ($(B)!0.5!(K)$) ++(45:0.4) -- ++(-135:0.8);
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[right] at (K) {$K$};
+        \fill (O) circle (10pt) node[right] {$O$};
+        \fill (K) circle (10pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \textbf{1} \quad Довжина радіуса $OK$ кола дорівнює \\
+    \textbf{2} \quad Довжина відрізка $BK$ дорівнює \\
+    \textbf{3} \quad Відстань від точки $O$ до вершини $A$ дорівнює
+}{
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см}. \\
+    \textbf{Б} & 8 \textit{см}. \\
+    \textbf{В} & $6\sqrt{2}$ \textit{см}. \\
+    \textbf{Г} & $6\sqrt{5}$ \textit{см}. \\
+    \textbf{Д} & 18 \textit{см}. \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 30 ===
+\noindent\textbf{30.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури (1--3) її площу (А--Д). \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.4]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,6);
+        \coordinate (C) at (8,6);
+        \coordinate (D) at (8,0);
+        \coordinate (O) at (4,3);
+        \coordinate (M) at (4,0);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+        \draw[thick] (O) -- (M);
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (O) {$O$};
+        \node[below] at (M) {$M$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Фігура} \par \vspace{0.2cm}
+    \textbf{1} \quad трикутник $ABD$ \\
+    \textbf{2} \quad трикутник $AOD$ \\
+    \textbf{3} \quad п'ятикутник $ABCOM$
+}{
+    \textit{Площа фігури} \par \vspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 12 \textit{см}$^2$ \\
+    \textbf{Б} & 18 \textit{см}$^2$ \\
+    \textbf{В} & 24 \textit{см}$^2$ \\
+    \textbf{Г} & 30 \textit{см}$^2$ \\
+    \textbf{Д} & 36 \textit{см}$^2$ \\
+    \end{tabular}
+}{
+    \answerGrid
+}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 31 ===
+\noindent\makebox[1.5em][l]{\textbf{31.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+
+\vspace{0.2cm}
+\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
+I. & Якщо паралелограми мають рівні сторони, то вони мають рівні периметри. \\
+II. & Якщо паралелограми мають рівні сторони, то вони мають рівну площу. \\
+III. & Якщо прямокутники мають рівні діагоналі, то вони мають рівні сторони. \\
+\end{tabular}
+
+\vspace{0.3cm}
+\answerTable{лише II та III}{лише I}{лише II}{лише III}{лише I та III}
+
+% === ЗАВДАННЯ 32 ===
+\noindent\textbf{32.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$. Точка $K$ --- середина сторони $AD$. Довжина відрізка, що сполучає середини сторони $AB$ й відрізка $KC$, дорівнює $d$. Визначте площу прямокутника $ABCD$, якщо $\angle CKD = 60^\circ$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+   \begin{tikzpicture}[scale=0.8]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,3);
+        \coordinate (C) at (5.2,3);
+        \coordinate (D) at (5.2,0);
+        \coordinate (K) at (2.6,0); % Midpoint AD
+        
+        \coordinate (M1) at (0,1.5); % Midpoint AB
+        \coordinate (M2) at (3.9, 1.5); % Midpoint KC
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (C);
+        \draw[thick] (M1) -- (M2) node[midway, below] {$d$};
+        
+        % --- ПОЗНАЧКИ РІВНОСТІ ---
+        
+        % 1. AM1 = M1B (1 риска)
+        \draw (-0.15, 0.75) -- (0.15, 0.75); % на AM1
+        \draw (-0.15, 2.25) -- (0.15, 2.25); % на M1B
+        
+        % 2. AK = KD (2 риски)
+        % Середина AK (1.3, 0)
+        \draw (1.2, -0.1) -- (1.2, 0.1); \draw (1.4, -0.1) -- (1.4, 0.1);
+        % Середина KD (3.9, 0)
+        \draw (3.8, -0.1) -- (3.8, 0.1); \draw (4.0, -0.1) -- (4.0, 0.1);
+        
+        % 3. KM2 = M2C (3 риски)
+        % Середина KM2
+        \coordinate (midKM2) at ($(K)!0.5!(M2)$);
+        \draw (midKM2) ++(-0.15,0.1) -- ++(0.1,-0.2); 
+        \draw (midKM2) ++(-0.05,0.1) -- ++(0.1,-0.2); 
+        \draw (midKM2) ++(0.05,0.1) -- ++(0.1,-0.2);
+        
+        % Середина M2C
+        \coordinate (midM2C) at ($(M2)!0.5!(C)$);
+        \draw (midM2C) ++(-0.15,0.1) -- ++(0.1,-0.2); 
+        \draw (midM2C) ++(-0.05,0.1) -- ++(0.1,-0.2); 
+        \draw (midM2C) ++(0.05,0.1) -- ++(0.1,-0.2);
+        
+        % Кут 60
+        \pic [draw, pic text={\small $60^\circ$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--K--C};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+       
+        \fill (K) circle (1.5pt);
+        \fill (M1) circle (1.5pt);
+        \fill (M2) circle (1.5pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{9d^2\sqrt{3}}{4}$}{$\dfrac{8d^2\sqrt{3}}{9}$}{$\dfrac{8d^2}{9}$}{$\dfrac{8d^2\sqrt{3}}{27}$}{$\dfrac{4d^2\sqrt{3}}{9}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 33 ===
+\noindent\textbf{33.} \begin{minipage}[t]{0.55\textwidth}
+У прямокутнику $ABCD$ точка $L$ належить стороні $AD$, $AC$ --- діагональ прямокутника, що утворює з більшою його стороною кут $\alpha$ (див. рисунок). $AL = 3$ \textit{см}, $AO = 4$ \textit{см}, $OC = 16$ \textit{см}. Знайдіть $\sin\alpha$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.25]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,15); % Approx height
+        \coordinate (D) at (10,0); % Shorter width to match diagram? 
+        % Diagram shows height > width. Let's make it tall.
+        \coordinate (C) at (10,15);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        
+        \coordinate (L) at (2,0); % L on AD
+        \draw[thick] (B) -- (L);
+        \draw[thick] (A) -- (C);
+        
+        \coordinate (O) at (intersection of B--L and A--C);
+        
+        % Angle alpha at C (with CD)
+        \pic [draw, pic text={\small $\alpha$}, angle radius=1.2cm, angle eccentricity=1.3] {angle = A--C--D};
+        % Image shows angle between AC and vertical side CD.
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (L) {$L$};
+        \node[right] at (O) {$O$};
+        
+        \fill (O) circle (10pt);
+        \fill (L) circle (10pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTableTall{$\dfrac{4}{5}$}{$\dfrac{2}{3}$}{$\dfrac{1}{4}$}{$\dfrac{3}{5}$}{$\dfrac{3}{4}$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 34 ===
+\noindent\textbf{34.} \begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.3]
+        % DK bisector => angle KDC = 45. Triangle KCD is right isosceles.
+        % DK = 12sqrt(2) => CD = 12, KC = 12.
+        % AB = CD = 12.
+        % In triangle ABK: AB=12, angle KAB=30. B=90.
+        % BK = AB * tan(30) = 12 * 1/sqrt(3) = 4sqrt(3).
+        % Area = 0.5 * 12 * 4sqrt(3) = 24sqrt(3).
+        
+        \def\h{12}
+        \def\bk{6.928} % 4sqrt(3)
+        \def\kc{12}
+        \def\w{18.928} % bk + kc
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\h);
+        \coordinate (C) at (\w,\h);
+        \coordinate (D) at (\w,0);
+        
+        \coordinate (K) at (\bk, \h);
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        \draw[thick] (D) -- (K);
+        
+        % Angle 30 at A
+        \pic [draw, pic text={\small $30^\circ$}, angle radius=.8cm, angle eccentricity=1.7] {angle = K--A--B};
+        
+        % Bisector marks at D
+        \pic [draw, double, angle radius=0.8cm] {angle = K--D--A}; % Double arc
+        \pic [draw, double, angle radius=1.0cm] {angle = C--D--K};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$144$ \textit{см}$^2$}{$48\sqrt{3}$ \textit{см}$^2$}{$72\sqrt{3}$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$72$ \textit{см}$^2$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 35 ===
+\noindent\textbf{35.} \begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$ (див. рисунок). Визначте довжину відрізка $AK$, якщо периметр прямокутника дорівнює $96$ \textit{см}, $AB : BC = 3 : 5$. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.25]
+        % AB:BC = 3:5. P = 2(3x+5x) = 16x = 96 => x=6.
+        % AB = 18, BC = 30.
+        % AK in right triangle ABK. AB=18. Angle KAB=30.
+        % AK = AB / cos(30) = 18 / (sqrt(3)/2) = 36/sqrt(3) = 12sqrt(3).
+        
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,10.8); % Scaled 18
+        \coordinate (C) at (18,10.8); % Scaled 30
+        \coordinate (D) at (18,0);
+        \coordinate (K) at (6.23, 10.8); % BK = 18*tan(30) ~ 10.4 (scaled)
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        
+        \pic [draw, pic text={\small $30^\circ$}, angle radius=1.5cm, angle eccentricity=1.3] {angle = K--A--B};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \fill (K) circle (8pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$12\sqrt{3}$ \textit{см}}{$36\sqrt{3}$ \textit{см}}{$12$ \textit{см}}{$36$ \textit{см}$}{$18$ \textit{см}}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 36 ===
+\noindent\textbf{36.} \begin{minipage}[t]{0.55\textwidth}
+На стороні $AD$ прямокутника $ABCD$ вибрано точку $K$ так, що $KC = 6\sqrt{3}$, $\angle BKC = 90^\circ$, $\angle ABK = 30^\circ$ (див. рисунок). Визначте периметр прямокутника. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{-0.5cm}
+    \begin{flushright}
+    \begin{tikzpicture}[scale=0.5]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,4);
+        \coordinate (C) at (9,4);
+        \coordinate (D) at (9,0);
+        
+        % K on AD. ABK=30 => AK = AB*tan(30).
+        % BKC=90.
+        \coordinate (K) at (2.3, 0); % Approx position
+        
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K) -- (C);
+        
+        % Angle 30
+        \pic [draw, pic text={\small $30^\circ$}, angle radius=0.9cm, angle eccentricity=1.4] {angle = A--B--K};
+        
+        % Right angle at K (BKC)
+        \pic [draw, angle radius=0.3cm] {right angle = B--K--C};
+        
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \fill (K) circle (2pt);
+    \end{tikzpicture}
+    \end{flushright}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$36$}{$24\sqrt{3}+6$}{$18$}{$24+6\sqrt{3}$}{$24\sqrt{3}+12$}
+
+\end{document}

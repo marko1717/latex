@@ -1,0 +1,1234 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+% Додано 3d та shadings для малювання свічок
+\usetikzlibrary{shapes.symbols, decorations.pathreplacing, shapes.geometric, patterns, calc, 3d, shadings}
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% 1. ТАБЛИЦЯ ДЛЯ ВИСОКИХ ВІДПОВІДЕЙ (дроби, малюнки)
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 & 
+\rule[-0.9cm]{0pt}{2.0cm}#2 & 
+\rule[-0.9cm]{0pt}{2.0cm}#3 & 
+\rule[-0.9cm]{0pt}{2.0cm}#4 & 
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% 2. ТАБЛИЦЯ ДЛЯ ЗВИЧАЙНИХ ВІДПОВІДЕЙ
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Поле для вводу відповіді
+\newcommand{\answerBox}{
+    \noindent
+    \textbf{Відповідь:} \quad
+    \begingroup
+    \setlength{\fboxsep}{8pt}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \textbf{,}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \endgroup
+}
+
+% Рік
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\vspace{1cm}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Призма}}
+\end{center}
+
+% === ЗАВДАННЯ 1 (Свічки) ===
+\noindent\textbf{1.} На сайт інтернет-магазину надійшло замовлення на придбання свічки у формі \textbf{призми}. Яку із зображених свічок має вибрати для цього замовлення менеджер магазину? \nmtyear{2023}
+
+\vspace{0.2cm}
+\answerTable{
+    % Б: Піраміда
+    \begin{tikzpicture}[scale=0.4]
+        \coordinate (A) at (-1.2,0); \coordinate (B) at (1.2,0);
+        \coordinate (C) at (0.5,-0.8); \coordinate (T) at (0,3.5);
+        \draw[fill=orange!80, draw=gray] (A) -- (B) -- (T) -- cycle;
+        \draw[fill=orange!60, draw=gray] (A) -- (C) -- (T) -- cycle;
+        \draw[fill=orange!40, draw=gray] (B) -- (C) -- (T) -- cycle;
+        \draw[thick, brown] (T) -- (0, 3.9);
+    \end{tikzpicture}
+}{
+    % Г: Призма (Правильна відповідь)
+    \begin{tikzpicture}[scale=0.4]
+        \coordinate (A) at (0,0); \coordinate (B) at (1.5,0);
+        \coordinate (C) at (2.2,0.8); \coordinate (D) at (0.7,0.8);
+        \def\h{3.5}
+        \coordinate (At) at (0,\h); \coordinate (Bt) at (1.5,\h);
+        \coordinate (Ct) at (2.2,\h+0.8); \coordinate (Dt) at (0.7,\h+0.8);
+        \draw[fill=red!70!black, draw=black] (A) -- (B) -- (Bt) -- (At) -- cycle;
+        \draw[fill=red!60, draw=black] (B) -- (C) -- (Ct) -- (Bt) -- cycle;
+        \draw[fill=red!50, draw=black] (At) -- (Bt) -- (Ct) -- (Dt) -- cycle;
+        \coordinate (CenterTop) at (1.1, \h+0.4);
+        \draw[thick, brown] (CenterTop) -- ++(0,0.4);
+    \end{tikzpicture}
+}{
+    % Д: Куля
+    \begin{tikzpicture}[scale=0.4]
+        \shade[ball color=blue!60] (0,1.5) circle (1.5cm);
+        \draw[thick, brown] (0,3) to[out=90,in=270] (0.2,3.5);
+    \end{tikzpicture}
+}{
+    % А: Циліндр
+    \begin{tikzpicture}[scale=0.4]
+        \def\rx{1.2} \def\ry{0.4} \def\h{3.5}
+        \draw[fill=yellow!10, draw=none] (-\rx,0) arc (180:360:\rx cm and \ry cm) -- (\rx,\h) -- (-\rx,\h) -- cycle;
+        \draw[fill=yellow!10, draw=none] (0,\h) ellipse (\rx cm and \ry cm);
+        \draw[gray] (-\rx,0) -- (-\rx,\h); \draw[gray] (\rx,0) -- (\rx,\h);
+        \draw[gray] (0,\h) ellipse (\rx cm and \ry cm);
+        \draw[gray] (-\rx,0) arc (180:360:\rx cm and \ry cm);
+        \draw[thick, brown] (0,\h) -- (0,\h+0.4);
+        \shade[left color=yellow!30!white, right color=yellow!10!white, opacity=0.5] (-\rx,0) rectangle (0,\h);
+    \end{tikzpicture}
+}{
+    % В: Конус
+    \begin{tikzpicture}[scale=0.4]
+        \shade[left color=green!60!black, right color=green!30, middle color=green!50] (-1.2,0) arc (180:360:1.2 and 0.4) -- (0,3.5) -- cycle;
+        \draw[gray] (-1.2,0) arc (180:360:1.2 and 0.4);
+        \draw[gray] (-1.2,0) -- (0,3.5) -- (1.2,0);
+        \draw[thick, brown] (0,3.5) -- (0,3.9);
+    \end{tikzpicture}
+}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 2 (Ромб, діагоналі, кут 30) ===
+\noindent\textbf{2.} Основою прямої призми є ромб з діагоналями 20 та $8\sqrt{3}$. Більша діагональ призми нахилена під кутом $30^\circ$ до її основи. Знайдіть об’єм цієї призми. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 3 (Паралелограм, V/sqrt(3)) ===
+\noindent\textbf{3.} Основою прямої призми є паралелограм зі сторонами 8 і 15 та гострим кутом $60^\circ$. Площа меншого діагонального перерізу призми дорівнює 260. Визначте об’єм $V$ цієї призми. У відповіді запишіть значення $\dfrac{V}{\sqrt{3}}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 4 (Ромб 60, переріз 140sqrt3) ===
+\noindent\textbf{4.} Основою прямої призми є ромб із гострим кутом $60^\circ$. Площа меншого діагонального перерізу призми дорівнює $140\sqrt{3}$. Визначте об’єм призми, якщо її висота дорівнює $7\sqrt{3}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 5 (Формула бічної поверхні) ===
+\noindent\textbf{5.} Укажіть формулу для обчислення площі $S$ бічної поверхні правильної чотирикутної призми, сторона основи якої дорівнює $a$, а висота – $2a$. \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerTable{$S=6a^2$}{$S=8a^3$}{$S=12a^2$}{$S=2a^3$}{$S=8a^2$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 6 (Ромб 60, H=8sqrt3, Sбіч) ===
+\noindent\textbf{6.} Основою прямої призми є ромб із гострим кутом $60^\circ$. Висота призми дорівнює $8\sqrt{3}$, площа її більшого діагонального перерізу – $240\sqrt{3}$. Визначте площу бічної поверхні цієї призми. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 7 (Правильна 4-кутна, квадрат 64) ===
+\noindent\textbf{7.} Діагональним перерізом правильної чотирикутної призми є квадрат площею 64. Знайдіть об’єм цієї призми. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 8 (Паралелограм, площа меншого перерізу) ===
+\noindent\textbf{8.} Основою прямої призми є паралелограм зі сторонами 8 і 15 та гострим кутом $60^\circ$. Висота призми дорівнює 20. Визначте площу меншого діагонального перерізу призми. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 9 (Ромб сторона 20, периметр перерізу 58) ===
+\noindent\textbf{9.} Основою прямої призми є ромб зі стороною 20. Периметр одного з діагональних перерізів призми дорівнює 58. Визначте об’єм цієї призми, якщо її висота дорівнює 5. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 10 (Формула бічної поверхні a, b) ===
+\noindent\textbf{10.} У правильній чотирикутній призмі сторона основи дорівнює $a$, бічне ребро – $b$. Укажіть формулу для обчислення площі $S$ бічної поверхні цієї призми. \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerTable{$S=\frac{1}{3}a^2b$}{$S=2a^2$}{$S=2a^2+4ab$}{$S=4ab$}{$S=a^2b$}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 11 (Ромб 60, H=8sqrt3, Об'єм) ===
+\noindent\textbf{11.} Основою прямої призми є ромб із гострим кутом $60^\circ$. Площа більшого діагонального перерізу призми дорівнює $240\sqrt{3}$. Обчисліть \textbf{об’єм} призми, якщо її висота дорівнює $8\sqrt{3}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+\vspace{0.5cm}
+% === НОВІ ЗАВДАННЯ ===
+
+% === ЗАВДАННЯ 12 (Паралелограм - Знімок 1) ===
+\noindent\textbf{12.} Основою прямої призми є паралелограм зі сторонами 8 і 15 та гострим кутом $60^\circ$. Площа меншого діагонального перерізу призми дорівнює 260. Визначте об’єм $V$ цієї призми. У відповіді запишіть значення $\dfrac{V}{\sqrt{3}}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 13 (Паралелепіпед - Знімок 2) ===
+\noindent\textbf{13.} У прямокутному паралелепіпеді діагональ основи дорівнює 12 і вдвічі більша за одну із сторін його основи. Знайдіть об’єм цього паралелепіпеда, якщо площа діагонального перерізу дорівнює $72\sqrt{3}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 14 (Ромб діагоналі 6 і 6sqrt3 - Знімок 3) ===
+\noindent\textbf{14.} Основою прямої призми є ромб, діагоналі якого дорівнюють 6 і $6\sqrt{3}$. Більша діагональ призми нахилена до площини основи під кутом $30^\circ$. Визначте площу бічної поверхні призми. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 15 (Правильна чотирикутна, формула об'єму - Знімок 4) ===
+\noindent\textbf{15.} Укажіть формулу для обчислення об’єму $V$ правильної чотирикутної призми, сторона основи і висота якої відповідно дорівнюють $a$ і $3a$. \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerTableTall{$V=a^3$}{$V=3a^3$}{$V=9a^3$}{$V=4a^3$}{$V=\dfrac{a^3}{3}$}
+
+\newpage
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Призма (Координати та Властивості)}}
+\end{center}
+
+% === ЗАВДАННЯ 16 (Многогранник 1+4) ===
+\noindent\textbf{16.} Укажіть многогранник, що має одну грань основи та чотири бічні грані. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{чотирикутна піраміда}{чотирикутна призма}{трикутна піраміда}{п'ятикутна призма}{трикутна призма}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 17 (Паралельна пряма - малюнок) ===
+\noindent\textbf{17.} \begin{minipage}[t]{0.6\textwidth}
+На рисунку зображено пряму чотирикутну призму $ABCDA_1B_1C_1D_1$. Укажіть пряму, яка паралельна грані $AA_1D_1D$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\textbf{А} \quad $C_1D$
+
+\textbf{Б} \quad $A_1B$
+
+\textbf{В} \quad $CB_1$
+
+\textbf{Г} \quad $C_1D_1$
+
+\textbf{Д} \quad $BD$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{0cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.7]
+    % Координати
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (B) at (1,1.5); % B ззаду зліва (пунктир)
+    \coordinate (C) at (4,1.5); % C ззаду справа
+
+    \coordinate (A1) at (0,4);
+    \coordinate (D1) at (3,4);
+    \coordinate (B1) at (1,5.5);
+    \coordinate (C1) at (4,5.5);
+
+    % Невидимі лінії
+    \draw[dashed] (A) -- (B);
+    \draw[dashed] (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+
+    % Видимі лінії
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle; % Контур
+    \draw[thick] (A1) -- (B1) -- (C1); % Верх
+    \draw[thick] (D) -- (D1); % Переднє ребро
+    \draw[thick] (A) -- (A1); % Переднє ребро
+    
+    % Підписи
+    \node[left] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+    
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ВИПРАВЛЕННЯ ДЛЯ ЗАВДАННЯ 18/35 (Сторони 5,6,7) ===
+\noindent\textbf{35 (Fix).} Сторони основи прямої трикутної призми дорівнюють 5~см, 6~см, 7~см. Знайдіть висоту цієї призми, якщо площа її бічної поверхні дорівнює 144~\text{см}$^2$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{4 \text{см}}{9 \text{см}}{12 \text{см}}{16 \text{см}}{8 \text{см}}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 19 (Координати - Правильна трикутна 1) ===
+\noindent\textbf{19.} У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, у якій $A(2; -8; 10)$. Усі ребра призми рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(12; -2; 7)$. Обчисліть площу бічної поверхні цієї призми. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 20 (Координати - Правильна трикутна 2 з медіаною) ===
+\noindent\textbf{20.} У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, усі ребра якої рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(2; -8; 7)$, точка $M(6; 2; 4)$ – середина ребра $AC$. Обчисліть площу бічної поверхні призми $ABCA_1B_1C_1$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 21 (Координати - Правильна чотирикутна) ===
+\noindent\textbf{21.} У прямокутній системі координат у просторі задано правильну чотирикутну призму $ABCDA_1B_1C_1D_1$. Діагоналі основи $ABCD$ перетинаються в точці $M$. Висота призми втричі більша за сторону $AB$. Обчисліть об’єм цієї призми, якщо $A(4; \sqrt{10}; 3)$, $M(-2; 0; 1)$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 22 (Координати - Прямокутний трикутник в основі) ===
+\noindent\textbf{22.} У прямокутній системі координат у просторі задано пряму трикутну призму $ABCA_1B_1C_1$, в основі якої лежить прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$). $A(5; 2; 0)$, $B(-7; 7; 0)$, основа $ABC$ призми лежить у площині $xy$. Точка $K(0; 0; 10)$ належить площині $A_1B_1C_1$. Знайдіть об’єм цієї призми. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 23 (Координати - Паралелограм) ===
+\noindent\textbf{23.} У прямокутній системі координат у просторі задано пряму чотирикутну призму $ABCDA_1B_1C_1D_1$, в основі якої лежить паралелограм $ABCD$, $A(5; 2; 0)$, $D(-3; 8; 0)$. Площина $ABC$ лежить у площині $xy$. В основі призми з точки $B$ на сторону $AD$ проведено висоту, довжина якої дорівнює 5. Точка $K(0; 0; 8)$ належить площині $A_1B_1C_1D_1$. Знайдіть об’єм цієї призми. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 24 (Координати - Куб та призма) ===
+\noindent\textbf{24.} У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(-6; 2; 5)$. Точка $M(-1; 3; 4)$ – середина ребра $DD_1$. Знайдіть об’єм призми $ABCA_1B_1C_1$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+\newpage
+
+% === ВИПРАВЛЕННЯ ДЛЯ ЗАВДАННЯ 25 (Шестикутна) ===
+\noindent\textbf{25 (Fix).} Знайдіть площу бічної поверхні правильної шестикутної призми, сторона основи якої дорівнює 5~см, а висота призми – 4~см. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{100 \text{см}$^2$}{60 \text{см}$^2$}{80 \text{см}$^2$}{120 \text{см}$^2$}{50 \text{см}$^2$}
+
+\vspace{1.0cm}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 26 (Куб - Перетин площини ABC) ===
+\noindent\textbf{26.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму, яка перетинає площину $ABC$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\textbf{А} \quad $AB$
+
+\textbf{Б} \quad $AC$
+
+\textbf{В} \quad $B_1D$
+
+\textbf{Г} \quad $B_1C_1$
+
+\textbf{Д} \quad $A_1C_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.5);
+    \coordinate (C) at (3.5,1.5);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,4);
+    \coordinate (C1) at (3.5,4);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[left] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 27 (Куб - Паралельна площині AA1B1B) ===
+\noindent\textbf{27.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму, яка паралельна площині $AA_1B_1B$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\textbf{А} \quad $AD$
+
+\textbf{Б} \quad $AC$
+
+\textbf{В} \quad $C_1D$
+
+\textbf{Г} \quad $B_1D$
+
+\textbf{Д} \quad $A_1C_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.5);
+    \coordinate (C) at (3.5,1.5);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,4);
+    \coordinate (C1) at (3.5,4);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[left] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 28 (Куб - Перетин площин BB1C і CDD1) ===
+\noindent\textbf{28.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму перетину площин $BB_1C$ і $CDD_1$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\textbf{А} \quad $B_1C$
+
+\textbf{Б} \quad $CC_1$
+
+\textbf{В} \quad $B_1C_1$
+
+\textbf{Г} \quad $CD$
+
+\textbf{Д} \quad $DD_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.5);
+    \coordinate (C) at (3.5,1.5);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,4);
+    \coordinate (C1) at (3.5,4);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[left] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ВИПРАВЛЕННЯ ДЛЯ ЗАВДАННЯ 29 (Трикутна 3,4,5 - попереднє) ===
+\noindent\textbf{29 (Fix).} В основі прямої трикутної призми лежить прямокутний трикутник зі сторонами 3~см, 4~см, 5~см. Знайдіть площу \textit{повної} поверхні призми, якщо її висота дорівнює 6~см. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{36 \text{см}$^2$}{96 \text{см}$^2$}{84 \text{см}$^2$}{60 \text{см}$^2$}{72 \text{см}$^2$}
+
+\vspace{1.0cm}
+
+% === ВИПРАВЛЕННЯ ДЛЯ ЗАВДАННЯ 30 (Ромб) ===
+\noindent\textbf{30 (Fix).} Знайдіть площу бічної поверхні прямої призми, в основі якої лежить ромб зі стороною 5~см, а діагональ її бічної грані дорівнює 13~см. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{240 \text{см}$^2$}{120 \text{см}$^2$}{260 \text{см}$^2$}{300 \text{см}$^2$}{130 \text{см}$^2$}
+
+\vspace{1.0cm}
+% === ЗАВДАННЯ 31 (Куб - Координати перетину діагоналей двох граней) ===
+\noindent\textbf{31.} У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Точки $K(3; -8; 5)$ і $M(1; -6; -3)$ є точками перетину діагоналей граней $ABCD$ і $DD_1C_1C$ відповідно. Визначте площу \textit{повної} поверхні цього куба. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 32 (Куб - Координати діагоналей і середини ребра) ===
+\noindent\textbf{32.} У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(6; -6; 4)$, точка $M(-4; 4; 9)$ – середина ребра $CC_1$. Обчисліть площу \textit{повної} поверхні цього куба. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 33 (Куб - Координати вершини і центру бічної грані) ===
+\noindent\textbf{33.} У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$, $A(5; 1; 0)$. Діагоналі грані $CC_1D_1D$ перетинаються в точці $K(-6; -4; 2)$. Знайдіть об’єм цього куба. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+
+% === ЗАВДАННЯ 34 (Паралелепіпед - Площина з CC1) ===
+\noindent\textbf{34.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено прямокутний паралелепіпед $ABCDA_1B_1C_1D_1$. Яка з наведених прямих лежить в одній площині з прямою $CC_1$? \nmtyear{2024}
+
+\vspace{0.3cm}
+\textbf{А} \quad $AB$
+
+\textbf{Б} \quad $DB_1$
+
+\textbf{В} \quad $A_1D_1$
+
+\textbf{Г} \quad $BD$
+
+\textbf{Д} \quad $AA_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Координати вершин
+    \coordinate (A) at (0,0);      % Перед-Ліво-Низ
+    \coordinate (D) at (2.5,0);    % Перед-Право-Низ
+    \coordinate (B) at (1,1.2);    % Зад-Ліво-Низ (прихована)
+    \coordinate (C) at (3.5,1.2);  % Зад-Право-Низ
+    
+    \coordinate (A1) at (0,3);     % Перед-Ліво-Верх
+    \coordinate (D1) at (2.5,3);   % Перед-Право-Верх
+    \coordinate (B1) at (1,4.2);   % Зад-Ліво-Верх
+    \coordinate (C1) at (3.5,4.2); % Зад-Право-Верх
+
+    % Невидимі лінії (від точки B)
+    \draw[dashed] (A) -- (B);
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (B1) -- (B);
+
+    % Видимі лінії основи та граней
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle; % Зовнішній контур
+    \draw[thick] (A1) -- (B1) -- (C1); % Верхня задня грань
+    \draw[thick] (D) -- (D1); % Вертикальне ребро спереду
+    \draw[thick] (A) -- (A1); % Вертикальне ребро зліва
+
+    % Підписи
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    
+    \node[left] at (A1) {$A_1$};
+    \node[below right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ВИПРАВЛЕННЯ ДЛЯ ЗАВДАННЯ 18/35 (Сторони 5,6,7) ===
+\noindent\textbf{35 (Fix).} Сторони основи прямої трикутної призми дорівнюють 5~см, 6~см, 7~см. Знайдіть висоту цієї призми, якщо площа її бічної поверхні дорівнює 144~\text{см}$^2$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{4 \text{см}}{16 \text{см}}{9 \text{см}}{12 \text{см}}{8 \text{см}}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 36 (Куб - Об'єм призми ABCA1B1C1 - дубль/варіант) ===
+\noindent\textbf{36.} У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(-6; 2; 5)$. Точка $M(-1; 3; 4)$ – середина ребра $DD_1$. Знайдіть об’єм призми $ABCA_1B_1C_1$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\newpage
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Призма (Комбінації тіл та Властивості)}}
+\end{center}
+
+% === ЗАВДАННЯ 38 (Конус і призма 1) ===
+\noindent\textbf{38.} Конус і правильна чотирикутна призма мають рівні висоти. Радіус описаного навколо основи призми дорівнює радіусу основи конуса. Визначте об’єм (у \text{см}$^3$) призми, якщо діагональ її основи дорівнює 16~\text{см}, а твірна конуса – 17~\text{см}. \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 39 (Куб - пряма в площині BB1C1) ===
+\noindent\textbf{39.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму, що лежить у площині $BB_1C_1$. \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad $AB$
+
+\textbf{Б} \quad $B_1D_1$
+
+\textbf{В} \quad $A_1C$
+
+\textbf{Г} \quad $AD$
+
+\textbf{Д} \quad $B_1C$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 40 (Сфера і призма) ===
+\noindent\textbf{40.} Задано сферу з площею поверхні $64\pi$~\text{см}$^2$ і правильну трикутну призму. Радіус кола, уписаного в основу призми, дорівнює радіусу сфери, а висота призми дорівнює стороні її основи. Визначте об’єм (у \text{см}$^3$) призми. \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 41 (Теорія - грані призми) ===
+\noindent\textbf{41.} Трикутна призма має \nmtyear{2025}
+
+\vspace{0.3cm}
+\noindent
+\textbf{А} \quad дві основи та три бічні грані
+
+\noindent
+\textbf{Б} \quad три основи та дві бічні грані
+
+\noindent
+\textbf{В} \quad дві основи та чотири бічні грані
+
+\noindent
+\textbf{Г} \quad одну основу та чотири бічні грані
+
+\noindent
+\textbf{Д} \quad одну основу та три бічні грані
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 42 (Призма і циліндр 1) ===
+\noindent\textbf{42.} Пряма чотирикутна призма й циліндр мають рівні висоти. В основі призми лежить ромб з діагоналями 12~\text{см} і 16~\text{см}. Радіус основи циліндра дорівнює стороні ромба. Площа бічної поверхні циліндра дорівнює $400\pi$~\text{см}$^2$. Знайдіть об’єм призми (у \text{см}$^3$). \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 43 (Циліндр і призма 2) ===
+\noindent\textbf{43.} Циліндр і пряма чотирикутна призма мають рівні висоти. Основою призми є ромб зі стороною 10~\text{см}. Радіус вписаного кола в основу призми дорівнює радіусу основи циліндра. Знайдіть об’єм (у \text{см}$^3$) призми, якщо площа основи циліндра дорівнює $9\pi$~\text{см}$^2$, а його твірна – 25~\text{см}. \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 44 (Куб - паралельна AB1) ===
+\noindent\textbf{44.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму, паралельну до прямої $AB_1$. \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad $AD_1$
+
+\textbf{Б} \quad $CD_1$
+
+\textbf{В} \quad $DC_1$
+
+\textbf{Г} \quad $A_1D$
+
+\textbf{Д} \quad $CD$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 45 (Конус і призма 2) ===
+\noindent\textbf{45.} Конус і правильна трикутна призма мають рівні висоти. Радіус кола, описаного навколо основи призми дорівнює радіусу основи конуса. Сторона основи призми дорівнює 12~\text{см}, а твірна конуса дорівнює $5\sqrt{3}$~\text{см}. Знайдіть об’єм (у \text{см}$^3$) цієї призми. \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 46 (Куб - кількість прямих) ===
+\noindent\textbf{46.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Скільки всього є прямих, паралельних прямій $AB$, що містять ребра куба? \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одна
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad більше як три
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 47 (Паралелограм площа бічної) ===
+\noindent\textbf{47.} Основою прямої призми є паралелограм зі сторонами 8 і 15 та гострим кутом $60^\circ$. Знайдіть площу бічної поверхні цієї призми, якщо площа меншого діагонального перерізу призми дорівнює 260. \nmtyear{2025}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 48 (Паралелепіпед в осях - Діагональ) ===
+\noindent\textbf{48.} \begin{minipage}[t]{0.60\textwidth}
+У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат – точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(5; 1; 7)$ є вершиною паралелепіпеда. Визначте довжину діагоналі цього паралелепіпеда. \nmtyear{2025}
+
+\vspace{0.3cm}
+\answerTable{15}{13}{$5\sqrt{3}$}{$\sqrt{26}$}{$10\sqrt{3}$}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{0cm}
+\begin{center}
+\begin{tikzpicture}[x={(-0.4cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}, scale=0.8]
+    % Осі
+    \draw[-latex] (0,0,0) -- (4,0,0) node[left] {$x$};
+    \draw[-latex] (0,0,0) -- (0,3,0) node[right] {$y$};
+    \draw[-latex] (0,0,0) -- (0,0,4) node[left] {$z$};
+    
+    % Координати боксу (масштабовані для вигляду)
+    \coordinate (O) at (0,0,0);
+    \coordinate (K) at (2.5, 2, 3);
+    
+    % Вершини
+    \coordinate (X) at (2.5,0,0);
+    \coordinate (Y) at (0,2,0);
+    \coordinate (Z) at (0,0,3);
+    \coordinate (XY) at (2.5,2,0);
+    \coordinate (XZ) at (2.5,0,3);
+    \coordinate (YZ) at (0,2,3);
+    
+    % Лінії (видимі)
+    \draw (O) -- (X) -- (XY) -- (Y) -- cycle;
+    \draw (O) -- (Z);
+    \draw (X) -- (XZ);
+    \draw (Y) -- (YZ);
+    \draw (Z) -- (XZ) -- (K) -- (YZ) -- cycle;
+    \draw (XY) -- (K);
+    
+    % Підписи
+    \node[anchor=north west] at (O) {$O$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 49 (Куб - прямі паралельні AA1B1B) ===
+\noindent\textbf{49.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Скільки прямих, що містять ребра куба, паралельні площині грані $AA_1B_1B$? \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одна
+
+\textbf{В} \quad лише три
+
+\textbf{Г} \quad лише чотири
+
+\textbf{Д} \quad вісім
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 50 (Куб - перетин BB1C1 і CDD1) ===
+\noindent\textbf{50.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Укажіть пряму перетину площин $(BB_1C_1)$ і $(CDD_1)$. \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad $DD_1$
+
+\textbf{Б} \quad $CC_1$
+
+\textbf{В} \quad $BB_1$
+
+\textbf{Г} \quad $BC$
+
+\textbf{Д} \quad $AC_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 51 (Куб - площини паралельні AB) ===
+\noindent\textbf{51.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Скільки всього є площин, що містять грані куба, паралельних прямій $AB$? \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одна
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad більше як три
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 52 (Паралелепіпед - паралельні площини) ===
+\noindent\textbf{52.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено прямокутний паралелепіпед $ABCDA_1B_1C_1D_1$. Позначте пару паралельних площин. \nmtyear{2025}
+
+\vspace{0.3cm}
+\textbf{А} \quad $ABB_1$ і $A_1D_1D$
+
+\textbf{Б} \quad $A_1D_1D$ і $CBB_1$
+
+\textbf{В} \quad $CDD_1$ і $BB_1C_1$
+
+\textbf{Г} \quad $ABC$ і $A_1D_1D$
+
+\textbf{Д} \quad $A_1B_1C_1$ і $ADD_1$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.5,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (3.5,1.2);
+    \coordinate (A1) at (0,2.5);
+    \coordinate (D1) at (2.5,2.5);
+    \coordinate (B1) at (1,3.7);
+    \coordinate (C1) at (3.5,3.7);
+
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 53 (Паралелепіпед в осях - Вектор) ===
+\noindent\textbf{53.} \begin{minipage}[t]{0.60\textwidth}
+У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат – точкою $O$, а три ребра лежать на координатних осях. Точка $K(12; 15; 16)$ є вершиною паралелепіпеда. Визначте довжину (модуль) вектора $\vec{OK}$. \nmtyear{2025}
+
+\vspace{0.3cm}
+\answerTable{25}{$\sqrt{86}$}{$\sqrt{337}$}{43}{11}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{0cm}
+\begin{center}
+\begin{tikzpicture}[x={(-0.4cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}, scale=0.8]
+    % Осі
+    \draw[-latex] (0,0,0) -- (4,0,0) node[left] {$x$};
+    \draw[-latex] (0,0,0) -- (0,3,0) node[right] {$y$};
+    \draw[-latex] (0,0,0) -- (0,0,4) node[left] {$z$};
+    
+    % Координати боксу
+    \coordinate (O) at (0,0,0);
+    \coordinate (K) at (2.5, 2, 3);
+    
+    % Вершини
+    \coordinate (X) at (2.5,0,0);
+    \coordinate (Y) at (0,2,0);
+    \coordinate (Z) at (0,0,3);
+    \coordinate (XY) at (2.5,2,0);
+    \coordinate (XZ) at (2.5,0,3);
+    \coordinate (YZ) at (0,2,3);
+    
+    % Лінії
+    \draw (O) -- (X) -- (XY) -- (Y) -- cycle;
+    \draw (O) -- (Z);
+    \draw (X) -- (XZ);
+    \draw (Y) -- (YZ);
+    \draw (Z) -- (XZ) -- (K) -- (YZ) -- cycle;
+    \draw (XY) -- (K);
+    \draw[thick, ->] (O) -- (K); % Вектор OK
+    
+    % Підписи
+    \node[anchor=north west] at (O) {$O$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\end{document}

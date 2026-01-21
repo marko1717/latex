@@ -1,0 +1,869 @@
+\documentclass[14pt]{extarticle}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{ukrainian}
+
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween} % Для зафарбовування площ
+
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+
+% Кольори
+\definecolor{headerblue}{RGB}{0, 102, 204}
+\definecolor{yearcolor}{RGB}{128, 0, 128}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{10pt}
+\setlength{\footskip}{25pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+% === КОМАНДИ ===
+
+% 1. ТАБЛИЦЯ ДЛЯ ВИСОКИХ ВІДПОВІДЕЙ (дроби, інтеграли)
+% Висота клітинки збільшена до 2.0 см за допомогою команди \rule
+\newcommand{\answerTableTall}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.9cm]{0pt}{2.0cm}#1 & 
+\rule[-0.9cm]{0pt}{2.0cm}#2 & 
+\rule[-0.9cm]{0pt}{2.0cm}#3 & 
+\rule[-0.9cm]{0pt}{2.0cm}#4 & 
+\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Таблиця для відповідей
+\newcommand{\answerTable}[5]{
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\hline
+\end{tabular}
+\end{center}
+}
+
+% Вертикальний список для відповідей
+\newcommand{\answerListVertical}[5]{
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}
+}
+
+% Поле для вводу відповіді
+\newcommand{\answerBox}{
+    \noindent
+    \textbf{Відповідь:} \quad
+    \begingroup
+    \setlength{\fboxsep}{8pt}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \textbf{,}
+    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \endgroup
+}
+
+% Рік
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+
+\begin{document}
+
+\vspace{1cm}
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Первісна та інтеграл}}
+\end{center}
+
+% === ЗАВДАННЯ 1 ===
+\noindent\textbf{1.} Обчисліть інтеграл $\displaystyle\int\limits_1^{e^3} \dfrac{dx}{6x}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 2 ===
+\noindent\textbf{2.} Функція $F(x) = 4x^3 - 3x^2 + 9$ є первісною для функції $y=f(x)$. Визначте $f(2)$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 3 (ВИПРАВЛЕНО) ===
+\noindent\textbf{3.} \begin{minipage}[t]{0.60\textwidth}
+На рисунку зображено графіки функцій $y = 3\sqrt{x}$ і $y = \dfrac{3}{2}x$. Обчисліть площу фігури, обмеженої графіками цих функцій. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.8cm, y=0.8cm,
+        axis lines=middle,
+        xmin=-0.5, xmax=5.5,
+        ymin=-0.5, ymax=7.5,
+        xlabel={$x$}, ylabel={$y$},
+        grid=both,
+        grid style={line width=.2pt, draw=gray!40},
+        xtick={0,1,2,3,4,5},
+        ytick={0,1,2,3,4,5,6,7},
+        ticklabel style={font=\footnotesize},
+        xticklabels={0,1,,,4,},
+        yticklabels={,1,,,,,6,}, 
+        clip=false
+    ]
+        % 1. Спочатку визначаємо шляхи (name path)
+        \addplot[name path=A, draw=none, domain=0:4.5, samples=100] {3*sqrt(x)};
+        \addplot[name path=B, draw=none, domain=0:4.5] {1.5*x};
+        
+        % 2. Малюємо заливку (важливо: це має бути перед основними лініями, якщо хочете, щоб лінії були зверху)
+        % Використовуємо fill=... для явного кольору
+        \addplot[fill=gray!40, fill opacity=0.5, draw=none] fill between[of=A and B, soft clip={domain=0:4}];
+        
+        % 3. Малюємо самі лінії поверх заливки (щоб вони були чіткими)
+        \addplot[thick, smooth, domain=0:4.5, samples=100] {3*sqrt(x)};
+        \addplot[thick, smooth, domain=0:4.5] {1.5*x};
+        
+        % Підписи
+        \node[right] at (axis cs:0.2, 5.8) {$y=3\sqrt{x}$};
+        \node[right] at (axis cs:1.8, 2.2) {$y=\frac{3}{2}x$};
+        
+        % Пунктирні лінії
+        \draw[dashed] (axis cs:4,0) -- (axis cs:4,6);
+        \draw[dashed] (axis cs:0,6) -- (axis cs:4,6);
+        
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 4 ===
+\noindent\textbf{4.} Функції $F(x) = 4x^3 - 3x^2 + 9$ і $G(x)$ є первісними для функції $f(x)$. Графік функції $G(x)$ проходить через точку $(-1; 0)$. Обчисліть $G(1)$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 5 ===
+\noindent\textbf{5.} Визначте загальний вигляд первісних функції $f(x) = 4x - \dfrac{3}{\cos^2 x}$. \nmtyear{2023}
+
+\answerListVertical
+{$F(x) = 2x^2 - 3\operatorname{tg} x + C$}
+{$F(x) = 4x^2 - 3\operatorname{tg} x + C$}
+{$F(x) = 2x^2 + 3\operatorname{tg} x + C$}
+{$F(x) = x^2 - 3\operatorname{tg} x + C$}
+{$F(x) = 2x^2 - \dfrac{3}{\operatorname{tg} x} + C$}
+
+\vspace{0.5cm}
+
+% === ЗАВДАННЯ 6 ===
+\noindent\textbf{6.} Обчисліть інтеграл $\displaystyle\int\limits_{-2}^{1} (x^2 + 7x) dx$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 7 ===
+\noindent\textbf{7.} Обчисліть інтеграл $\displaystyle\int\limits_{-2}^{1} (x^2 + 4x) dx$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 8 ===
+\noindent\textbf{8.} Укажіть для функції $f(x) = 3x + 1$ первісну, графік якої проходить через точку $M(0; 1)$. \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerListVertical{$F(x)=3x^2+1$}{$F(x)=\dfrac{3}{2}x^2+x+1$}{$F(x)=\dfrac{3}{2}x^2$}{$F(x)=3$}{$F(x)=3x^2+x$}
+
+
+
+
+% === ЗАВДАННЯ 9 ===
+\noindent\textbf{9.} Обчисліть інтеграл $\displaystyle\int\limits_1^{e^5} \dfrac{dx}{2x}$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 10 (ВИПРАВЛЕНО) ===
+\noindent\textbf{10.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі геометричних фігур $A$, $B$ і $C$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $6{,}3$ кв. од., $5{,}4$ кв. од. та $4$ кв. од. відповідно. Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 4) dx$. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.7cm, y=0.5cm,
+        axis lines=middle,
+        xmin=-0.5, xmax=5.5,
+        ymin=-3, ymax=4,
+        xlabel={$x$}, ylabel={$y$},
+        ticks=none,
+        clip=false
+    ]
+        % Спочатку визначаємо шляхи, але не малюємо їх (draw=none)
+        \addplot[name path=F, draw=none, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
+        \path[name path=axis] (axis cs:0,0) -- (axis cs:5,0);
+        
+        % Заливка областей (fill opacity робить їх напівпрозорими, щоб не перекривати осі)
+        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=0.01:2}];
+        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=2:4}];
+        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=4:5}];
+        
+        % Тепер малюємо сам графік поверх заливки
+        \addplot[thick, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
+        
+        % Підписи
+        \node at (axis cs:1,1.5) {$A$};
+        \node at (axis cs:3,-1) {$B$};
+        \node at (axis cs:4.5,0.6) {$C$};
+        \node at (axis cs:3.5, 2.5) {$y=f(x)$};
+        \node[below left] at (axis cs:0,0) {$0$};
+        \node[below] at (axis cs:5,0) {$5$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+% === ЗАВДАННЯ 11 ===
+\noindent\textbf{11.} Відомо, що $\displaystyle\int\limits_1^{5} f(x) dx = 14$. Обчисліть $\displaystyle\int\limits_1^{5} (5 - 3 \cdot f(x)) dx$. \nmtyear{2023}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 12 ===
+\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+Укажіть формулу для обчислення площі $S$ фігури, обмеженої графіками функцій $y=2^x$, $y=2$ і $x=0$ (див. рисунок). \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=1cm, y=1cm,
+        axis lines=middle,
+        xmin=-1.5, xmax=2,
+        ymin=-0.5, ymax=3,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={0,1},
+        ytick={1,2},
+        clip=false
+    ]
+        % Лінії
+        \addplot[thick, smooth, domain=-1.5:1.5] {2^x};
+        \addplot[thick, domain=-1.5:1.5] {2};
+        
+        % Заливка
+        \addplot[name path=line, draw=none, domain=0:1] {2};
+        \addplot[name path=curve, draw=none, domain=0:1] {2^x};
+        \addplot[fill=gray!40] fill between[of=line and curve];
+        
+        % Підписи
+        \node[above] at (axis cs:-1, 2) {$y=2$};
+        \node[right] at (axis cs:1.2, 2.5) {$y=2^x$};
+        \node[below left] at (axis cs:0,0) {$0$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerListVertical
+{$S = \displaystyle\int\limits_0^{1} 2^x dx$}
+{$S = \displaystyle\int\limits_0^{1} (2^x - 2) dx$}
+{$S = \displaystyle\int\limits_1^{2} (2 - 2^x) dx$}
+{$S = \displaystyle\int\limits_0^{1} (2 - 2^x) dx$}
+{$S = \displaystyle\int\limits_1^{2} (2^x - 2) dx$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 13 ===
+\noindent\textbf{13.} Обчисліть інтеграл $\displaystyle\int\limits_0^{2} (f(x) + 6) dx$, якщо $\displaystyle\int\limits_0^{2} f(x) dx = 8$. \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerTable{48}{14}{2}{20}{28}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 14 ===
+\noindent\textbf{14.} \begin{minipage}[t]{0.55\textwidth}
+Графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$, паралельний осі $x$ (див. рисунок). Площа зафарбованої фігури дорівнює 8 кв. од. Обчисліть $\displaystyle\int\limits_{-3}^{3} f(x) dx$. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.7cm, y=0.7cm,
+        axis lines=middle,
+        xmin=-4, xmax=2,
+        ymin=-2, ymax=1.5,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={-3,0},
+        ytick={0},
+        clip=false
+    ]
+        % Пряма f(x)
+        \addplot[thick, domain=-4:2] {-1.3};
+        \node[below] at (axis cs:2, -1.3) {$y=f(x)$};
+        
+        % Заливка (прямокутник)
+        \fill[gray!40] (axis cs:-3,0) rectangle (axis cs:0,-1.3);
+        \draw (axis cs:-3,0) -- (axis cs:-3,-1.3);
+        
+        
+        % Явний підпис -3
+        \node[above] at (axis cs:-3,0) {$-3$};
+        \node[above left] at (axis cs:0,0) {$0$};
+    \end{axis}
+
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 15 ===
+\noindent\textbf{15.} Якщо функція $F(x) = x^3 + 4$ є однією з первісних для функції $f(x)$, тоді $f(x) = $ \nmtyear{2023}
+
+\vspace{0.3cm}
+\answerTable{$3x^2$}{$2x^2$}{$3x$}{$3x^2 + 4$}{$\dfrac{x^4}{4} + C$}
+
+
+% === ЗАГОЛОВОК НМТ 2024 ===
+\newpage
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Первісна та інтеграл}}
+\end{center}
+
+% === ЗАВДАННЯ 16 ===
+\noindent\textbf{16.} Знайдіть загальний вигляд первісних функції $f(x) = \dfrac{12}{x^3} - 4x$. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerListVertical{$F(x)=-\dfrac{36}{x^2}-2x^2+C$}{$F(x)=-\dfrac{6}{x^2}-2x^2+C$}{$F(x)=\dfrac{4}{x^2}-4+C$}{$F(x)=-\dfrac{36}{x^4}-4+C$}{$F(x)=-\dfrac{6}{x^2}-4+C$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 17 ===
+\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. Укажіть правильну подвійну нерівність, якщо $a = \displaystyle\int\limits_{-2}^{0} f(x) dx$, $b = \displaystyle\int\limits_{0}^{2} f(x) dx$, $c = \displaystyle\int\limits_{2}^{4} f(x) dx$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.6cm, y=0.4cm,
+        axis lines=middle,
+        xmin=-3, xmax=5,
+        ymin=-2, ymax=4.5,
+        xlabel={$x$}, ylabel={$y$},
+        grid=both,
+        grid style={line width=.2pt, draw=gray!40},
+        xtick={-2,0,1,2,4},
+        ytick={1},
+        ticklabel style={font=\footnotesize},
+        xticklabels={-2,0,1,2,4},
+        yticklabels={1}, 
+        clip=false
+    ]
+        % Імітація графіка через сплайн
+        \addplot[thick, smooth, tension=0.6] coordinates {
+            (-2.5, -1)
+            (-1.8, 0)
+            (-1, 3.5)
+            (0, 0)
+            (1, 4)
+            (2, 0)
+            (3, 1.2)
+            (4, 0)
+            (4.5, -2)
+        };
+        
+        \node[right] at (axis cs:3, 1.5) {$y=f(x)$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$c < b < a$}{$b < c < a$}{$c < a < b$}{$b < a < c$}{$a < b < c$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 18 ===
+\noindent\textbf{18.} Обчисліть інтеграл $\displaystyle\int\limits_{1}^{4} \dfrac{x^2 - 5^2}{x - 5} dx$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 19 ===
+\noindent\textbf{19.} Обчисліть інтеграл $\displaystyle\int\limits_{3}^{5} \dfrac{x^2 + 2x + 1}{x + 1} dx$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 20 ===
+\noindent\textbf{20.} Обчисліть $f'(-1) + \displaystyle\int\limits_{1}^{2} f(x) dx$, якщо $f(x) = 4x^3 - 3$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 21 ===
+\noindent\textbf{21.} Обчисліть $f'(-5) + \displaystyle\int\limits_{1}^{4} f(x) dx$, якщо $f(x) = -6x + 8$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 22 ===
+\noindent\textbf{22.} Знайдіть площу фігури, обмеженої графіком функції $y = \dfrac{x^3}{3}$, прямою $y = 9$ та віссю $y$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{0.2cm}
+% Ілюстрація до завдання 22 (необов'язкова, але корисна для перевірки)
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.6cm, y=0.3cm,
+        axis lines=middle,
+        xmin=-1, xmax=4,
+        ymin=-1, ymax=10,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={3}, ytick={9},
+        clip=false
+    ]
+        % Графіки
+        \addplot[thick, smooth, domain=0:3.2] {x^3/3};
+        \addplot[thick, domain=-0.5:3.5] {9};
+        
+        % Заливка області
+        \addplot[name path=curve, draw=none, domain=0:3] {x^3/3};
+        \addplot[name path=line, draw=none, domain=0:3] {9};
+        \addplot[fill=gray!40] fill between[of=line and curve];
+        
+        \node[right] at (axis cs:3, 9) {$y=\frac{x^3}{3}$};
+        \node[above left] at (axis cs:1, 9) {$y=9$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+% === ЗАГОЛОВОК НМТ 2024 ===
+\newpage
+
+\begin{center}
+{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
+\end{center}
+
+\begin{center}
+{\large Тема: \textbf{Первісна та інтеграл}}
+\end{center}
+
+% === ЗАВДАННЯ 16 ===
+\noindent\textbf{16.} Знайдіть загальний вигляд первісних функції $f(x) = \dfrac{12}{x^3} - 4x$. \nmtyear{2024}
+
+\answerListVertical
+{$F(x)=-\dfrac{36}{x^2}-2x^2+C$}
+{$F(x)=-\dfrac{6}{x^2}-2x^2+C$}
+{$F(x)=\dfrac{4}{x^2}-4+C$}
+{$F(x)=-\dfrac{36}{x^4}-4+C$}
+{$F(x)=-\dfrac{6}{x^2}-4+C$}
+
+\vspace{0.5cm}
+
+% === ЗАВДАННЯ 17 ===
+\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. Укажіть правильну подвійну нерівність, якщо $a = \displaystyle\int\limits_{-2}^{0} f(x) dx$, $b = \displaystyle\int\limits_{0}^{2} f(x) dx$, $c = \displaystyle\int\limits_{2}^{4} f(x) dx$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.6cm, y=0.4cm,
+        axis lines=middle,
+        xmin=-3, xmax=5,
+        ymin=-2, ymax=4.5,
+        xlabel={$x$}, ylabel={$y$},
+        grid=both,
+        grid style={line width=.1pt, draw=gray!40},
+        xtick={-2,0,1,2,4},
+        ytick={1},
+        ticklabel style={font=\footnotesize},
+        xticklabels={-2,0,1,2,4},
+        yticklabels={1}, 
+        clip=false
+    ]
+        % Імітація графіка через сплайн
+        \addplot[thick, smooth, tension=0.6] coordinates {
+            (-2.5, -1)
+            (-1.8, 0)
+            (-1, 3.5)
+            (0, 0)
+            (1, 4)
+            (2, 0)
+            (3, 1.2)
+            (4, 0)
+            (4.5, -2)
+        };
+        
+        \node[right] at (axis cs:3, 1.5) {$y=f(x)$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.3cm}
+\answerTable{$c < a < b$}{$b < a < c$}{$a < b < c$}{$b < c < a$}{$c < b < a$}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 18 ===
+\noindent\textbf{18.} Обчисліть інтеграл $\displaystyle\int\limits_{1}^{4} \dfrac{x^2 - 5^2}{x - 5} dx$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 19 ===
+\noindent\textbf{19.} Обчисліть інтеграл $\displaystyle\int\limits_{3}^{5} \dfrac{x^2 + 2x + 1}{x + 1} dx$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 20 ===
+\noindent\textbf{20.} Обчисліть $f'(-1) + \displaystyle\int\limits_{1}^{2} f(x) dx$, якщо $f(x) = 4x^3 - 3$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 21 ===
+\noindent\textbf{21.} Обчисліть $f'(-5) + \displaystyle\int\limits_{1}^{4} f(x) dx$, якщо $f(x) = -6x + 8$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 22 ===
+\noindent\textbf{22.} Знайдіть площу фігури, обмеженої графіком функції $y = \dfrac{x^3}{3}$, прямою $y = 9$ та віссю $y$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 23 ===
+\noindent\textbf{23.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $f(x) = \begin{cases} 1, & x \in (-\infty; 0], \\ 2, & x \in (0; +\infty). \end{cases}$
+
+Обчисліть $\displaystyle\int\limits_{-4}^{-1} f(x) dx + 2\displaystyle\int\limits_{1}^{8} f(x) dx$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.5cm, y=0.5cm,
+        axis lines=middle,
+        xmin=-5, xmax=5,
+        ymin=-1, ymax=3.5,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={0}, ytick={1,2},
+        clip=false
+    ]
+        % Лінія y=1
+        \draw[thick] (axis cs:-5,1) -- (axis cs:0,1);
+        \fill (axis cs:0,1) circle (1.5pt); 
+        
+        % Лінія y=2
+        \draw[thick] (axis cs:0,2) -- (axis cs:5,2);
+        \fill[white] (axis cs:0,2) circle (1.5pt);
+        \draw (axis cs:0,2) circle (1.5pt); 
+        
+        \node[below left] at (axis cs:0,0) {$0$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 24 ===
+\noindent\textbf{24.} \begin{minipage}[t]{0.55\textwidth}
+Обчисліть $\displaystyle\int\limits_{0}^{7} f(x) dx$, використавши зображений на рисунку графік лінійної функції $y=f(x)$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.5cm, y=0.3cm,
+        axis lines=middle,
+        xmin=-2, xmax=8.5,
+        ymin=-1, ymax=10,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={0,7}, ytick={3,8},
+        clip=false
+    ]
+        % Графік прямої через (0,3) і (7,8)
+        \addplot[thick, domain=-1.5:8] {(5/7)*x + 3};
+        
+        % Пунктири
+        \draw[dashed] (axis cs:0,8) -- (axis cs:7,8) -- (axis cs:7,0);
+        
+        \node[right] at (axis cs:7.2, 8) {$y=f(x)$};
+        \node[below left] at (axis cs:0,0) {$0$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 25 ===
+\noindent\textbf{25.} Укажіть рисунок, на якому може бути зображений графік первісної для функції $f(x) = -3$. \nmtyear{2024}
+
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\hline
+\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+% Рис А (горизонтальна y=3)
+\begin{tikzpicture}[scale=0.4]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,2) node[left] {$y$};
+    \draw[thick] (-1.8,1) -- (1.8,1);
+    \node[below right] at (0,0) {\small $0$};
+\end{tikzpicture} &
+% Рис Б (пряма k>0)
+\begin{tikzpicture}[scale=0.4]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,2) node[left] {$y$};
+    \draw[thick] (-1,-2) -- (1,2);
+    \node[below right] at (0,0) {\small $0$};
+\end{tikzpicture} &
+% Рис В (пряма k<0)
+\begin{tikzpicture}[scale=0.4]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,2) node[left] {$y$};
+    \draw[thick] (-1,2) -- (1,-2);
+    \node[below right] at (0,0) {\small $0$};
+\end{tikzpicture} &
+% Рис Г (пряма k>0 зміщена)
+\begin{tikzpicture}[scale=0.4]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,2) node[left] {$y$};
+    \draw[thick] (-1.5,-2) -- (1.5,1);
+    \node[below right] at (0,0) {\small $0$};
+\end{tikzpicture} &
+% Рис Д (горизонтальна y=-3)
+\begin{tikzpicture}[scale=0.4]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,2) node[left] {$y$};
+    \draw[thick] (-1.8,-1) -- (1.8,-1);
+    \node[below right] at (0,0) {\small $0$};
+\end{tikzpicture} \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{0.7cm}
+
+% === ЗАВДАННЯ 26 ===
+\noindent\textbf{26.} Визначте для функції $f(x) = \dfrac{15}{x^2} + 7$ первісну $F(x)$, графік якої проходить через точку $(-5; 0)$. У відповідь запишіть значення $F(-2)$. \nmtyear{2024}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 27 ===
+\noindent\textbf{27.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$, фрагментом якої є півколо. Обчисліть $\dfrac{1}{\pi} \displaystyle\int\limits_{-5}^{5} f(x) dx$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.4cm, y=0.4cm,
+        axis lines=middle,
+        xmin=-6, xmax=6,
+        ymin=-1, ymax=6,
+        xlabel={$x$}, ylabel={$y$},
+        xtick={-5,0,5}, ytick={5},
+        clip=false
+    ]
+        % Півколо
+        \addplot[thick, domain=-5:5, samples=100] {sqrt(25-x^2)};
+        
+        \fill (axis cs:-5,0) circle (1.5pt);
+        \fill (axis cs:5,0) circle (1.5pt);
+        
+        \node[right] at (axis cs:2.5, 4.5) {$y=f(x)$};
+        \node[below left] at (axis cs:0,0) {$0$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+
+\vspace{1.0cm}
+
+% === ЗАВДАННЯ 28 ===
+\noindent\textbf{28.} Яка з наведених функцій є первісною для функції $f(x) = e^x + 2$? \nmtyear{2024}
+
+\answerListVertical
+{$F(x)=e^x+2x-3$}
+{$F(x)=e^x+1$}
+{$F(x)=2x$}
+{$F(x)=xe^{x-1}+2x+3$}
+{$F(x)=xe^{x-1}$}
+
+% === ЗАВДАННЯ 29 ===
+\noindent\textbf{29.} \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі фігур $A$ і $B$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $7{,}2$ кв. од. і $6{,}1$ кв. од. відповідно.
+
+Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 6) dx$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\vspace{-0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        x=0.7cm, y=0.6cm,
+        axis lines=middle,
+        xmin=-1, xmax=6,
+        ymin=-1, ymax=4,
+        xlabel={$x$}, ylabel={$y$},
+        ticks=none,
+        clip=false
+    ]
+        % Визначаємо форму графіка (два "пагорби")
+        \addplot[name path=curve, smooth, tension=0.7, draw=none] coordinates {
+            (0,0) (1.2, 3) (2.5, 0) (3.8, 2.5) (5,0)
+        };
+        
+        % Вісь X для заливки
+        \path[name path=axis] (axis cs:0,0) -- (axis cs:5,0);
+        
+        % Заливка (fill opacity=0.3, щоб було схоже на оригінал)
+        \addplot[fill=gray!30] fill between[of=curve and axis];
+        
+        % Малюємо контур графіка
+        \addplot[thick, smooth, tension=0.7] coordinates {
+            (0,0) (1.2, 3) (2.5, 0) (3.8, 2.5) (5,0) -- (5.3, -1)
+        };
+        
+        % Підписи
+        \node at (axis cs:1.2, 1.2) {$A$};
+        \node at (axis cs:3.8, 1) {$B$};
+        \node[below right] at (axis cs:0,0) {$0$};
+        \node[below] at (axis cs:5,0) {$5$};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.5cm}
+\answerBox
+\end{document}
