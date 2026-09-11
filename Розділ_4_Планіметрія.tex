@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,19 +163,20 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 \usepackage{docmute}
 % у зведених документах: розділ = section, тема = subsection, рік = subsubsection
 \setcounter{tocdepth}{3}
 \renewcommand{\chapterTitle}[1]{\clearpage\phantomsection\addcontentsline{toc}{subsection}{#1}\sectionTitle{#1}}
-\renewcommand{\typeTitle}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{\quad #1}%
+\renewcommand{\typeTitle}[1]{\needspace{6\baselineskip}\phantomsection\addcontentsline{toc}{subsubsection}{\quad #1}%
 \par\vspace{0.3cm}\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}%
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\partTitle}[1]{\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \vspace*{0.5cm}\begin{tcolorbox}[colback=titleBg, colframe=mainGreen!60, boxrule=0.8pt, arc=8pt, halign=center, fontupper=\LARGE\bfseries\color{mainGreen}]
 #1

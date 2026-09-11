@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,10 +163,11 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -163,43 +179,33 @@
 \definecolor{candleBlue}{RGB}{65, 105, 225}
 \definecolor{candleCream}{RGB}{253, 245, 230}
 \definecolor{candleGreen}{RGB}{34, 139, 34}
-\newcommand{\answerListVertical}[5]{
-    \vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}
-}
 
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -207,11 +213,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -229,42 +235,43 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 42. Куля. Сфера}
-\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 26 (НМТ 2023~--- 3, 2024~--- 4, 2025~--- 9, 2026~--- 10).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 26 (НМТ \mbox{2023~--- 3}, \mbox{2024~--- 4}, \mbox{2025~--- 9}, \mbox{2026~--- 10}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 % === ЗАВДАННЯ 1 (Свічки) ===
 \noindent\zadnum На сайт інтернет-магазину надійшло замовлення на придбання свічки у формі \textbf{кулі}. Яку із зображених свічок має вибрати для цього замовлення менеджер магазину? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{
     % В - Куля
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \shade[ball color=candleBlue] (1,1) circle (1.2);
         % Гніт
         \draw[gray!30!white, thick] (1,2.1) to[out=90,in=180] (1.5,2.5);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }{
     % Д - Конус
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \shade[left color=candleGreen!80, right color=candleGreen!40] (-1,0) -- (1,0) -- (0,3) -- cycle;
         \fill[candleGreen!80!black] (0,0) ellipse (1 and 0.2);
         % Гніт
         \draw[gray] (0,3) -- (0,3.3);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }{
     % А - Піраміда
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \shade[top color=candleOrange!30, bottom color=candleOrange] (0,0) -- (2,0) -- (1,2.5) -- cycle;
         \draw[thick, candleOrange!80!black] (0,0) -- (2,0) -- (1,2.5) -- cycle;
         \draw[thick, candleOrange!80!black] (2,0) -- (2.5,0.8) -- (1,2.5);
         \draw[thick, candleOrange!50!black] (2.5,0.8) -- (0.5,0.8) -- (0,0) [dashed]; % основа
         % Гніт
         \draw[gray] (1,2.5) -- (1,2.7);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }{
     % Г - Циліндр
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \fill[candleCream!90!gray] (0,0) ellipse (1 and 0.3);
         \fill[candleCream] (0,0) rectangle (2,2.5);
         \fill[candleCream!50] (1,2.5) ellipse (1 and 0.3);
@@ -272,21 +279,24 @@
         \draw[candleCream!80!gray] (2,0) -- (2,2.5);
         % Гніт
         \draw[gray] (1,2.5) -- (1,2.8);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }{
     % Б - Призма (паралелепіпед)
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \fill[candleRed] (0,0) rectangle (1.5, 2.5);
         \fill[candleRed!70] (1.5,0) -- (2.2,0.7) -- (2.2,3.2) -- (1.5,2.5) -- cycle;
         \fill[candleRed!50] (0,2.5) -- (1.5,2.5) -- (2.2,3.2) -- (0.7,3.2) -- cycle;
         % Гніт
         \draw[gray] (1.1, 2.85) -- (1.1, 3.1);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 2 (Теорія - утворення сфери) ===
 \noindent\zadnum Доберіть закінчення речення так, щоб утворилося правильне твердження: «\textbf{Сфера} утворена обертанням... \nmtyear{2023}
 
@@ -297,32 +307,37 @@
 {круга навколо прямої, що не проходить через його центр».}
 {кола навколо його дотичної».}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 3 (Координати) ===
 \noindent\zadnum Сфера з центром у точці $O(-2; -4; 3)$ проходить через точку $A(3; -1; 2)$. Визначте діаметр цієї сфери. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$2\sqrt{51}$}{$2\sqrt{35}$}{$3\sqrt{3}$}{$\sqrt{35}$}{$6\sqrt{3}$}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
+
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 % === ЗАВДАННЯ 4 (Об'єм півкулі, R=9) ===
 \noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
 Обчисліть об'єм півкулі радіуса 9 (див. рисунок). \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$162\pi$}{$486\pi$}{$324\pi$}{$972\pi$}{$243\pi$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.7]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
     % Основа (еліпс)
     \draw[dashed] (3,0) arc (0:180:3 and 0.8);
     \draw[thick] (3,0) arc (0:-180:3 and 0.8);
@@ -334,25 +349,28 @@
     \filldraw (0,0) circle (1.5pt); % центр
     \filldraw (0,3) circle (1.5pt); % вершина
     \filldraw (2.5,-0.5) circle (1.5pt); % точка на основі
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 5 (Хорда AB=10, найменший радіус) ===
 \noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
 Точки $A$ та $B$ лежать на сфері, причому $AB=10$~см (див. рисунок). Укажіть із-поміж наведених \textit{найменше можливе} значення радіуса цієї сфери. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{11~см}{4~см}{6~см}{8~см}{3~см}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.7]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
     % Сфера
     \draw (0,0) circle (1.8);
     % Екватор
@@ -363,51 +381,62 @@
     \coordinate (B) at (1.0, 1.2);
     \filldraw (A) circle (2pt) node[above] {$A$};
     \filldraw (B) circle (2pt) node[above left] {$B$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 6 (Площа сфери, D=18) ===
 \noindent\zadnum Визначте площу сфери, діаметр якої дорівнює 18~см. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$324\pi$~см$^2$}{$658\pi$~см$^2$}{$108\pi$~см$^2$}{$972\pi$~см$^2$}{$54\pi$~см$^2$}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 7 (Точка A всередині, OA=6) ===
 \noindent\zadnum Точка $A$ розташована всередині сфери з центром у точці $O$. Укажіть \textit{найменше можливе} значення діаметра цієї сфери, якщо $OA=6$. \nmtyear{2024}
 
-\vspace{0.3cm}
-\answerTable{13}{11}{15}{18}{7}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$13$}{$11$}{$15$}{$18$}{$7$}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
+
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 % === ЗАВДАННЯ 8 (Сфера і призма) ===
 \noindent\zadnum Задано сферу з площею поверхні $64\pi$~см$^2$ і правильну трикутну призму. Радіус кола, уписаного в основу призми, дорівнює радіусу сфери, а висота призми дорівнює стороні її основи. Визначте об'єм (у см$^3$) призми. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 9 (Дві кулі, радіус меншої) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус меншої кулі? \nmtyear{2025}
 
-\vspace{0.3cm}
-\answerTable{13}{16}{26}{17}{12}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$13$}{$16$}{$26$}{$17$}{$12$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Куля 1
     \draw (0,0) circle (1.2);
     \draw[dashed] (1.2,0) arc (0:180:1.2 and 0.4);
@@ -420,25 +449,28 @@
     \filldraw (3,0) circle (1.5pt) node[right] {$O_2$};
     % Дотик
     \filldraw (1.2,0) circle (1.5pt);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 10 (Сфери внутрішній дотик) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано сфери, що мають внутрішній дотик (див. рисунок). $A(9; -2; 4)$ – точка дотику сфер, $B(1; 7; -8)$ – центр меншої сфери. Яким \textit{найменшим} з-поміж наведених може бути радіус сфери з центром у точці $O$? \nmtyear{2025}
 
-\vspace{0.3cm}
-\answerTable{17}{56}{21}{42}{36}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$17$}{$56$}{$21$}{$42$}{$36$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Велика сфера
     \draw (0,0) circle (2.5);
     \draw[dashed] (2.5,0) arc (0:180:2.5 and 0.7);
@@ -451,25 +483,28 @@
     \filldraw (-1,0) circle (1.5pt) node[above] {$B$};
     % Точка А
     \filldraw (-2.5,0) circle (1.5pt) node[left] {$A$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 11 (Дві кулі, радіус більшої) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус більшої кулі? \nmtyear{2025}
 
-\vspace{0.3cm}
-\answerTable{13}{12}{17}{10}{26}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$13$}{$12$}{$17$}{$10$}{$26$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Куля 1
     \draw (0,0) circle (1.2);
     \draw[dashed] (1.2,0) arc (0:180:1.2 and 0.4);
@@ -482,57 +517,74 @@
     \filldraw (3,0) circle (1.5pt) node[right] {$O_2$};
     % Дотик
     \filldraw (1.2,0) circle (1.5pt);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 12 (Точка належить сфері) ===
 \noindent\zadnum У прямокутній системі координат у просторі задано сферу з центром у початку координат, якій належить точка $A(0; 0; -5)$. Яка з наведених точок також належить цій сфері? \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$(0; 1; 4)$}{$(5; 5; 5)$}{$(0; 0; 5)$}{$(5; 5; 0)$}{$(0; 0; 10)$}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 13 (Сфера і піраміда 4-кутна) ===
 \noindent\zadnum Задано сферу з площею поверхні $648\pi$~см$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об'єм піраміди (у см$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 14 (Точка всередині сфери) ===
 \noindent\zadnum У прямокутній системі координат у просторі задано сферу з центром у точці $O(11; -3; -5)$. Точка $A(-1; 2; -5)$ належить цій сфері. Яка з наведених точок лежить усередині сфери? \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$(11; -3; -19)$}{$(11; -3; 19)$}{$(11; -3; 9)$}{$(11; -3; 6)$}{$(11; -3; 10)$}
 
-\vspace{0.5cm}
-\nmtAnswerBox
+\nopagebreak\vspace{0.5cm}
 
+\par\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
 % === ЗАВДАННЯ 15 (Сфера і конус) ===
 \noindent\zadnum Площа поверхні сфери дорівнює $300\pi$~см$^2$. Радіус основи конуса дорівнює радіусу сфери. Твірна конуса нахилена до площини основи під кутом $30^\circ$. Визначте об'єм (у см$^3$) конуса $V$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 16 (Сфера і піраміда 3-кутна) ===
 \noindent\zadnum Задано сферу з площею поверхні $432\pi$~см$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об'єм (у см$^3$) піраміди. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №10 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \zadtask{У прямокутній системі координат у просторі задано сферу та дві точки $M(-4;\, 5;\, 0)$ і $N(4;\, -3;\, 4)$, які належать цій сфері, причому відстань між ними є \textit{найбільшою} серед усіх можливих відстаней між точками цієї сфери. Знайдіть радіус сфери. \nmtyear{2026}}
 \answerTable{$4$}{$6$}{$8$}{$12$}{$24$}
 % Відповідь: Б
 \ifshowsolutions\solution{Найбільша відстань між точками сфери~--- це діаметр, тож $MN$ є діаметром. $MN=\sqrt{(4-(-4))^2+(-3-5)^2+(4-0)^2}=\sqrt{64+64+16}=\sqrt{144}=12$. Радіус $R=\dfrac{12}{2}=6$. Відповідь: \textbf{Б} ($6$).}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №21 --- основна тема: Конус
 \noindent
 \begin{minipage}[c]{0.62\textwidth}
@@ -541,7 +593,7 @@
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.8, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
     \draw[thick, dashed] (-1.0,0) arc (180:0:1.0 and 0.28);
     \draw[thick] (-1.0,0) arc (180:360:1.0 and 0.28);
     \draw[thick] (-1.0,0) -- (0,2.4) -- (1.0,0);
@@ -551,30 +603,34 @@
         \draw[thick, dashed] (-1.1,0) arc (180:0:1.1 and 0.28);
         \draw[thick] (-1.1,0) arc (180:360:1.1 and 0.28);
     \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \nmtAnswerBox
 % Відповідь: $1{,}5$
 \ifshowsolutions\solution{Конус: $r:l=3:5$, $S_{\text{бік}}=\pi rl=135\pi$. Із $l=\dfrac{5r}{3}$: $\pi r\cdot\dfrac{5r}{3}=135\pi$, тож $r^2=81$, $r=9$, $l=15$, висота $h=\sqrt{l^2-r^2}=\sqrt{225-81}=12$, $V_{\text{кон}}=\dfrac13\pi r^2h=\dfrac13\pi\cdot81\cdot12=324\pi$. Півсфера: $3\pi R^2=243\pi$, $R=9$, $V_{\text{півсф}}=\dfrac23\pi R^3=\dfrac23\pi\cdot729=486\pi$. Відношення $\dfrac{486\pi}{324\pi}=1{,}5$.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №5
 \zadtask{Укажіть просторову фігуру, яка не має основи. \nmtyear{2026}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \par\noindent\textbf{А}\ \ призма
 \par\noindent\textbf{Б}\ \ конус
 \par\noindent\textbf{В}\ \ циліндр
 \par\noindent\textbf{Г}\ \ куля
 \par\noindent\textbf{Д}\ \ піраміда
-\vspace{0.3cm}}
+\nopagebreak\vspace{0.3cm}}
 % Відповідь: Г
 \ifshowsolutions\solution{Призма, конус, циліндр і піраміда мають основу (основи). Куля основи не має. Відповідь: \textbf{Г}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №5
 \noindent
 \begin{minipage}[c]{0.62\textwidth}
 \zadnum Площина $\beta$ дотикається сфери в точці $M$ (див. рисунок). Скільки можна провести площин, кожна з яких перпендикулярна до площини $\beta$ і має зі сферою \textit{лише одну} спільну точку? \nmtyear{2026}
-\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=0.04cm, topsep=0.03cm]
+\nopagebreak\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=2pt, topsep=2pt]
 \item жодної
 \item лише одну
 \item лише дві
@@ -585,7 +641,7 @@
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.85, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]
     \draw[fill=yellow!30!orange!20, draw=black, line join=round]
         (-2.5, -0.5) -- (2.5, -0.5) -- (3.8, 1.2) -- (-1.2, 1.2) -- cycle;
     \node at (3.3, 0.9) {$\beta$};
@@ -597,12 +653,14 @@
     \coordinate (M) at (0.5, 0);
     \fill (M) circle (2pt);
     \node[left] at (0.35, 0.05) {$M$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 % Відповідь: Д
 \ifshowsolutions\solution{Площина має зі сферою лише одну спільну точку тоді й тільки тоді, коли вона дотична до сфери. Через точку дотику $M$ можна провести безліч площин, перпендикулярних до $\beta$, і кожна з них дотикається сфери в $M$. Отже, таких площин безліч. Відповідь: \textbf{Д}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №12 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \noindent
 \begin{minipage}[c]{0.60\textwidth}
@@ -611,7 +669,7 @@
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.7, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
     % Площина
     \draw[fill=yellow!30!orange!20, draw=black] (-2,-1) -- (4,-1) -- (5.5,1.5) -- (-0.5,1.5) -- cycle;
     % Осі
@@ -628,49 +686,60 @@
     \draw[dashed, red!80!black] (M) -- (N);
     \fill (M) circle (2pt) node[left] {$M$};
     \fill (N) circle (2pt) node[left] {$N$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(5; -2; 0)$}{$(-1; 2; 8)$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №5
 \zadtask{Куля утворена обертанням \nmtyear{2026}
-\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=0.1cm]
+\nopagebreak\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
     \item кола навколо його діаметра
     \item круга навколо прямої, що проходить через його центр
     \item кола навколо його хорди
     \item круга навколо прямої, що не проходить через його центр
     \item кола навколо дотичної
 \end{enumerate}
-\vspace{0.1cm}}
+\nopagebreak\vspace{0.1cm}}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №12 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-3;\, 1;\, 5)$, яка дотикається до координатної площини $xy$ у точці $N$. Визначте координати точки $N$. \nmtyear{2026}}
 \answerTable{$(-3; 1; -5)$}{$(-3; 1; 0)$}{$(0; 0; 5)$}{$(-3; 0; 5)$}{$(0; 1; 5)$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №12 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \zadtask{У прямокутній системі координат у просторі задано сферу з центром у точці $(6;\, 2;\, 5)$, яка дотикається до координатної площини $xz$. Визначте діаметр цієї сфери. \nmtyear{2026}}
 \answerTable{$10$}{$4$}{$2$}{$6$}{$12$}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №5
 \zadtask{Сфера утворена обертанням \nmtyear{2026}
-\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=0.1cm]
+\nopagebreak\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
     \item кола навколо його діаметра
     \item кола навколо його хорди, що не є діаметром кола
     \item кола навколо січної, що не проходить через центр кола
     \item круга навколо його хорди, що не є діаметром круга
     \item кола навколо дотичної
 \end{enumerate}
-\vspace{0.1cm}}
+\nopagebreak\vspace{0.1cm}}
 % Відповідь: А
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №12 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-9;\, 12;\, 5)$. Визначте діаметр цієї сфери, якщо вона проходить через початок координат. \nmtyear{2026}}
 \answerTableTall{$30$}{$26$}{$10\sqrt{10}$}{$4\sqrt{21}$}{$5\sqrt{10}$}
 % Відповідь: В
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}

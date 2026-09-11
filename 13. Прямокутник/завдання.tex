@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,10 +163,11 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -160,33 +176,20 @@
 % --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\matchingLayout}[3]{
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
         \vspace{0pt} 
         \begin{flushright}
         #3
         \end{flushright}
     \end{minipage}
-}
-\newcommand{\answerTableSmall}[5]{
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.4cm]{0pt}{0.9cm}#1 & 
-\rule[-0.4cm]{0pt}{0.9cm}#2 & 
-\rule[-0.4cm]{0pt}{0.9cm}#3 & 
-\rule[-0.4cm]{0pt}{0.9cm}#4 & 
-\rule[-0.4cm]{0pt}{0.9cm}#5 \\
-\hline
-\end{tabular}
 }
 
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
@@ -203,26 +206,27 @@
 \definecolor{bar6}{RGB}{120, 180, 50}
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -230,11 +234,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -252,19 +256,20 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 13. Прямокутник}
-\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 49 (НМТ 2023~--- 9, 2024~--- 11, 2025~--- 16, 2026~--- 13).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 48 (НМТ \mbox{2023~--- 9}, \mbox{2024~--- 11}, \mbox{2025~--- 15}, \mbox{2026~--- 13}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 % === ЗАВДАННЯ 1 (Повтор з минулого файлу) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Прямокутник $ABCD$, паралелограм $BKMC$ та трапеція $DCMN$ лежать в одній площині, точки $K$, $C$ та $D$ належать одній прямій (див. рисунок). $AB = 5$ \textit{см}, $AD = 12$ \textit{см}, $BK = 13$ \textit{см}. До кожної величини (1--3) доберіть її значення (А--Д). \nmtyear{2023}
+Прямокутник $ABCD$, паралелограм $BKMC$ та трапеція $DCMN$ лежать в одній площині, точки $K$, $C$ та $D$ належать одній прямій (див. рисунок). $AB = 5$ \textit{см}, $AD = 12$ \textit{см}, $BK = 13$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.55]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.55]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,2);
         \coordinate (C) at (4.8,2);
@@ -290,19 +295,19 @@
         \node[above] at (K) {$K$};
         \node[above] at (M) {$M$};
         \node[below right] at (N) {$N$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Величина} \par \vspace{0.2cm}
+    \textit{Величина} \par\par\vspace{0.2cm}
     \textbf{1} \quad діагональ $ABCD$ \\
     \textbf{2} \quad відстань від $K$ до $AN$ \\
     \textbf{3} \quad висота трапеції $DCMN$
 }{
-    \textit{Значення} \par \vspace{0.2cm}
+    \textit{Значення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 10 \textit{см} \\
     \textbf{Б} & 12 \textit{см} \\
@@ -313,18 +318,21 @@
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 2 (Бісектриса кута А) ===
 \zadtask{У прямокутнику $ABCD$ бісектриса кута $A$ перетинає сторону $BC$ в точці $M$, $BM : MC = 4 : 5$ (див. рисунок). Обчисліть площу прямокутника $ABCD$, якщо $BC = 18$ \textit{см}. \nmtyear{2023}}
 
-\vspace{0.3cm}
-\begin{minipage}{0.42\textwidth}
+\nopagebreak\vspace{0.3cm}
+\begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$162$ \textit{см}$^2$}{$120$ \textit{см}$^2$}{$144$ \textit{см}$^2$}{$90$ \textit{см}$^2$}{$72$ \textit{см}$^2$}
 \end{minipage}
 \hfill
-\begin{minipage}{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}
 \begin{flushright}
-\begin{tikzpicture}[scale=0.25]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.25]
     % BC = 18. BM = 4x, MC = 5x => 9x=18 => x=2. BM=8, MC=10.
     % ABM рівнобедрений (бісектриса прямокутного кута 45 град), тому AB=BM=8.
     \coordinate (A) at (0,0);
@@ -345,32 +353,37 @@
     % Кут
     \pic [draw, angle radius=0.3cm] {angle = D--A--M};
     \pic [draw, angle radius=0.45cm] {angle = M--A--B};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 3 (Теорія) ===
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Периметр прямокутника дорівнює сумі довжин його діагоналей. \\
 II. & Сума квадратів усіх сторін прямокутника дорівнює сумі квадратів його діагоналей. \\
 III. & Діаметр кола, описаного навколо прямокутника, дорівнює діагоналі прямокутника. \\
 \end{tabular}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{I, II та III}{лише I та III}{лише II та III}{лише I та II}{лише III}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 4 (Середини сторін K і M) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$. Точки $K$ і $M$ --- відповідно середини сторін $AB$ і $BC$, $AB = 12$ \textit{см}, $MC = 8$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}
+На рисунку зображено прямокутник $ABCD$. Точки $K$ і $M$ --- відповідно середини сторін $AB$ і $BC$, $AB = 12$ \textit{см}, $MC = 8$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.15]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
         % AB=12, BC=16 (MC=8 => BC=16)
         % A(0,0) - ні, нехай B буде верхній лівий, як зазвичай A внизу.
         % За рисунком: A внизу зліва. B зверху зліва.
@@ -404,19 +417,19 @@ III. & Діаметр кола, описаного навколо прямоку
         
         \fill (K) circle (10pt);
         \fill (M) circle (10pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Відрізок} \par \vspace{0.2cm}
+    \textit{Відрізок} \par\par\vspace{0.2cm}
     \textbf{1} \quad $BC$ \\
     \textbf{2} \quad діаметр кола, описаного навколо прямокутника $ABCD$ \\
     \textbf{3} \quad відстань від точки $D$ до середини $KM$
 }{
-    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 10 \textit{см} \\
     \textbf{Б} & 15 \textit{см} \\
@@ -427,16 +440,19 @@ III. & Діаметр кола, описаного навколо прямоку
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 5 (Коло і півколо) ===
 \noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
-У прямокутник $ABCD$ вписано коло із центром в точці $O$, яке дотикається до сторін $AB$, $BC$ і $AD$, та півколо з діаметром $CD$ (див. рисунок). Коло й півколо мають лише одну спільну точку. $AB = 8$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
+У прямокутник $ABCD$ вписано коло із центром в точці $O$, яке дотикається до сторін $AB$, $BC$ і $AD$, та півколо з діаметром $CD$ (див. рисунок). Коло й півколо мають лише одну спільну точку. $AB = 8$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
         % AB=8. Коло R=4. Центр O(4,4).
         % BC=12. Півколо на CD. R=4. Центр (12,4).
         % Дотикаються в точці (8,4).
@@ -461,19 +477,19 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[below right] at (D) {$D$};
         \node at (O) {$\cdot$};
         \node[below right] at (O) {$O$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
+    \textit{Початок речення} \par\par\vspace{0.2cm}
     \textbf{1} \quad Довжина сторони $BC$ \\
     \textbf{2} \quad Довжина відрізка $OC$ \\
     \textbf{3} \quad Відстань від середини відрізка $AO$ до прямої $CD$
 }{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & дорівнює 10 \textit{см}. \\
     \textbf{Б} & дорівнює 12 \textit{см}. \\
@@ -484,16 +500,19 @@ III. & Діаметр кола, описаного навколо прямоку
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 6 (Два прямокутники, L-форма) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Прямокутники $ABCD$ і $DKLM$ є рівними (див. рисунок). $AD = 6$, $DM = 8$. Установіть відповідність між величиною (1--3) та її значенням (А--Д). \nmtyear{2023}
+Прямокутники $ABCD$ і $DKLM$ є рівними (див. рисунок). $AD = 6$, $DM = 8$. Установіть відповідність між величиною \mbox{(1--3)} та її значенням \mbox{(А--Д)}. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.35]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
         % D - спільна вершина (0,0)
         % ABCD лівий: A(-6,0), B(-6,8), C(0,8), D(0,0). (AD=6, AB=8)
         % DKLM правий: D(0,0), K(0,6), L(8,6), M(8,0). (DM=8, DK=6)
@@ -519,19 +538,19 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[below] at (M) {$M$};
         \node[above right] at (L) {$L$};
         \node[above right] at (K) {$K$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Величина} \par \vspace{0.2cm}
+    \textit{Величина} \par\par\vspace{0.2cm}
     \textbf{1} \quad $\sin \angle MDL$ \\
     \textbf{2} \quad $\tg \angle ABD$ \\
     \textbf{3} \quad $\cos \angle BDL$
 }{
-    \textit{Значення величини} \par \vspace{0.2cm}
+    \textit{Значення величини} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 0,6 \\
     \textbf{Б} & 0,75 \\
@@ -542,31 +561,36 @@ III. & Діаметр кола, описаного навколо прямоку
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено прямокутник $ABCD$, периметр якого дорівнює $46$ \textit{см}. Визначте довжину сторони $BC$, якщо $AB + CD = 18$ \textit{см}. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \draw[thick] (0,0) node[below left]{$A$} -- (0,3) node[above left]{$B$} -- (5,3) node[above right]{$C$} -- (5,0) node[below right]{$D$} -- cycle;
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableSmall{$14$ \textit{см}}{$12$ \textit{см}}{$9$ \textit{см}}{$16$ \textit{см}}{$13$ \textit{см}}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Діагоналі прямокутника перетинаються під кутом $60^\circ$ (див. рисунок). Обчисліть площу цього прямокутника, якщо менша з його сторін дорівнює $4$ \textit{см}. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.6]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (5.2,3); % aspect ratio for 60 deg intersection implies specific ratio, but sketch is fine
@@ -579,21 +603,23 @@ III. & Діаметр кола, описаного навколо прямоку
         
         % Кут 60 градусів (тут це гострий кут між діагоналями, що спирається на меншу сторону)
         \pic [draw, pic text={\small $60^\circ$}, angle radius=0.6cm, angle eccentricity=1.4] {angle = B--O--A};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$8$ \textit{см}$^2$}{$32$ \textit{см}$^2$}{$8\sqrt{3}$ \textit{см}$^2$}{$16\sqrt{3}$ \textit{см}$^2$}{$16$ \textit{см}$^2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Діагоналі прямокутника $ABCD$ перетинаються в точці $O$, $AB = 6$, $\angle AOD = 110^\circ$ (див. рисунок). Знайдіть периметр цього прямокутника. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.6]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3.5);
         \coordinate (C) at (6,3.5);
@@ -612,11 +638,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (O) {$O$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $6 + 6\tg 55^\circ$ \\[0.3cm]
@@ -625,17 +651,20 @@ III. & Діаметр кола, описаного навколо прямоку
 \textbf{Г} & $12 + 12\tg 55^\circ$ \\[0.3cm]
 \textbf{Д} & $12 + 12\cos 55^\circ$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено прямокутник $ABCD$. Точка $K$ лежить на стороні $AD$. Визначте периметр прямокутника, якщо $CK = 15$, $KD = 12$, $\angle ABK = \beta$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         % CD = sqrt(15^2 - 12^2) = 9. AB = 9.
         % Scale: 1 unit = 2 cm approx.
         \coordinate (A) at (0,0);
@@ -659,11 +688,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[below] at (K) {$K$};
         \node[below] at (6.5,0) {12}; % KD label
         \fill (K) circle (3pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $42 + \dfrac{18}{\tg\beta}$ \\[0.4cm]
@@ -672,15 +701,18 @@ III. & Діаметр кола, описаного навколо прямоку
 \textbf{Г} & $42 + \dfrac{18}{\sin\beta}$ \\[0.4cm]
 \textbf{Д} & $42 + 18\sin\beta$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено прямокутник $ABCD$. Точка $K$ лежить на стороні $AD$. Визначте довжину сторони $AD$, якщо $BK = d$, $\angle AKB = \alpha$, $\angle KCD = \beta$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.8]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (6,3);
@@ -707,11 +739,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
         \fill (K) circle (2pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $d(\sin\alpha + \cos\alpha\tg\beta)$ \\[0.4cm]
@@ -720,15 +752,18 @@ III. & Діаметр кола, описаного навколо прямоку
 \textbf{Г} & $d\left(\cos\alpha + \dfrac{\sin\alpha}{\tg\beta}\right)$ \\[0.4cm]
 \textbf{Д} & $d(\cos\alpha + \sin\alpha\tg\beta)$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Діагоналі $BD$ і $AC$ прямокутника $ABCD$ перетинаються в точці $O$, $\angle AOB = \beta$ (див. рисунок). Відстань між серединами відрізків $AO$ і $DO$ дорівнює $d$. Знайдіть площу цього прямокутника. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.8]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (6,3);
@@ -761,11 +796,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (O) {$O$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $2d^2\tg\frac{\beta}{2}$ \\[0.4cm]
@@ -774,15 +809,18 @@ III. & Діаметр кола, описаного навколо прямоку
 \textbf{Г} & $\dfrac{4d^2}{\tg\frac{\beta}{2}}$ \\[0.4cm]
 \textbf{Д} & $\dfrac{2d^2}{\cos\frac{\beta}{2}}$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутнику $ABCD$ на стороні $AD$ вибрано точку $K$ так, що $BK = KC = d$, $\angle ABK = \beta$ (див. рисунок). Визначте периметр цього прямокутника. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.8]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (6,3);
@@ -805,11 +843,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $4d(\sin\beta + \cos\beta)$ \\[0.4cm]
@@ -818,14 +856,17 @@ III. & Діаметр кола, описаного навколо прямоку
 \textbf{Г} & $2d\left(\dfrac{2}{\cos\beta} + \dfrac{1}{\sin\beta}\right)$ \\[0.4cm]
 \textbf{Д} & $2d(\sin\beta + 2\cos\beta)$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру (1--3) з її площею (А--Д). \nmtyear{2024}
+На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}. \nmtyear{2024}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     % Coordinates logic based on numbers:
     % ABCD: width 4. height h.
     % DKLM: base KL=2, DM=5.
@@ -892,17 +933,17 @@ III. & Діаметр кола, описаного навколо прямоку
     % Image shows angle 45 at M inside triangle MQP.
     \pic [draw, pic text={\small $45^\circ$}, angle radius=0.9cm, angle eccentricity=1.6] {angle = Q--M--P};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \matchingLayout{
-    \textit{Величина} \par \vspace{0.2cm}
+    \textit{Величина} \par\par\vspace{0.2cm}
     \textbf{1} \quad Прямокутник $ABCD$ \\
     \textbf{2} \quad Трапеція $DKLM$ \\
     \textbf{3} \quad Трикутник $MQP$
 }{
 
-    \textit{Значення величини} \par \vspace{0.2cm}
+    \textit{Значення величини} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 12 \\
     \textbf{Б} & 18 \\
@@ -913,15 +954,18 @@ III. & Діаметр кола, описаного навколо прямоку
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника, друге коло з центром у точці $O_2$, довжиною $16\pi$ \textit{см}, дотикається до сторін $AB$, $BC$ та $AD$. $BC = 30$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника, друге коло з центром у точці $O_2$, довжиною $16\pi$ \textit{см}, дотикається до сторін $AB$, $BC$ та $AD$. $BC = 30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.12]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
         % Circle 2 length 16pi -> R=8. Diameter 16.
         % Touches AB, BC, AD -> Height AB = 16.
         % Width BC = 30.
@@ -959,19 +1003,19 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (15, \h) {30 \textit{см}};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
+    \textit{Початок речення} \par\par\vspace{0.2cm}
     \textbf{1} \quad Довжина сторони $AB$ дорівнює \\
     \textbf{2} \quad Довжина радіуса кола, описаного навколо прямокутника $ABCD$ дорівнює \\
     \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
 }{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 7 \textit{см}. \\
     \textbf{Б} & 9 \textit{см}. \\
@@ -982,27 +1026,32 @@ III. & Діаметр кола, описаного навколо прямоку
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Діагоналі будь-якого прямокутника ділять його кути навпіл. \\
 II. & Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл. \\
 III. & Діагоналі будь-якого прямокутника рівні. \\
 \end{tabular}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{I, II та III}{лише I та III}{лише I та II}{лише III}{лише II та III}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутнику $ABCD$ вибрано точки $K$ і $L$ так, що $AL = LD$, $LK$ --- бісектриса кута $CLD$ (див. рисунок). Знайдіть площу цього прямокутника, якщо $LK = d$, $\angle KLD = \beta$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=1]
+    \begin{nmtfit}\begin{tikzpicture}[scale=1]
         \coordinate (A) at (0,0);
         \coordinate (D) at (4,0);
         \coordinate (L) at (2,0); % Midpoint
@@ -1036,11 +1085,11 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[below] at (L) {$L$};
         \node[right] at (K) {$K$};
         \fill (L) circle (1.5pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{tabular}{ll}
 \textbf{А} & $\dfrac{2d^2\cos^2\beta}{\tg 2\beta}$ \\[0.4cm]
@@ -1049,15 +1098,18 @@ III. & Діагоналі будь-якого прямокутника рівн�
 \textbf{Г} & $\dfrac{2d^2\sin^2\beta}{\tg 2\beta}$ \\[0.4cm]
 \textbf{Д} & $2d^2\cos^2\beta\tg 2\beta$
 \end{tabular}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ і кругові сектори $BCL$ та $KAD$, що мають одну спільну точку $M$. $N$ --- проєкція точки $M$ на пряму $AB$, $BC = 12$ \textit{см}. До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+На рисунку зображено прямокутник $ABCD$ і кругові сектори $BCL$ та $KAD$, що мають одну спільну точку $M$. $N$ --- проєкція точки $M$ на пряму $AB$, $BC = 12$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.25]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         % Centers are A and C. Radius 12.
         % AB = 12*sqrt(3) approx 20.8
         \def\r{12}
@@ -1129,19 +1181,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \fill (K) circle (10pt);
         \fill (L) circle (10pt);
 
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
+    \textit{Початок речення} \par\par\vspace{0.2cm}
     \textbf{1} \quad Довжина $AN$ \\
     \textbf{2} \quad Довжина $AB$ \\
     \textbf{3} \quad Довжина $AC$
 }{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & дорівнює 24 \textit{см}. \\
     \textbf{Б} & дорівнює 18 \textit{см}. \\
@@ -1152,15 +1204,18 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутнику $ABCD$ на стороні $AD$ вибрано точку $K$ так, що $AK : KD = 1 : 2$, $\angle BCK = \beta$ (див. рисунок). Визначте площу цього прямокутника. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.7]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (6,3);
@@ -1184,21 +1239,23 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
         \fill (K) circle (2pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{2d^2}{3\tg\beta}$}{$\dfrac{2}{3}d^2\sin\beta$}{$\dfrac{2}{3}d^2\cos\beta$}{$\dfrac{2d^2}{3\sin\beta}$}{$\dfrac{2}{3}d^2\tg\beta$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}
+На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
         % Square side 6.
         \coordinate (A) at (0,0);
         \coordinate (D) at (6,0);
@@ -1221,19 +1278,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[right] at (C) {$C$};
         \node[left] at (B) {$B$};
         \node[left] at (K) {$K$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Відрізок} \par \vspace{0.2cm}
+    \textit{Відрізок} \par\par\vspace{0.2cm}
     \textbf{1} \quad $BK$ \\
     \textbf{2} \quad $KC$ \\
     \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
 }{
-    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 6 \textit{см} \\
     \textbf{Б} & 7 \textit{см} \\
@@ -1244,17 +1301,20 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $AK = 8$ \textit{см}, $\angle BAK = 30^\circ$ (див. рисунок). $AK$ --- бісектриса кута $BAC$. Знайдіть площу цього прямокутника. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
         % AK = 8. Angle BAK = 30.
         % AB = 8 * cos(30) = 4*sqrt(3) approx 6.928
         % BK = 8 * sin(30) = 4.
@@ -1283,21 +1343,23 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \fill (K) circle (5pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$48$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$48\sqrt{3}$ \textit{см}$^2$}{$16$ \textit{см}$^2$}{$16\sqrt{3}$ \textit{см}$^2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$ описано навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення (1--3) із його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$ описано навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення \mbox{(1--3)} із його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.1]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.1]
         % Circumcircle Area 625pi -> R=25. Diameter AC=50.
         % AB=30. BC = sqrt(50^2 - 30^2) = 40.
         % O2 touches AB, BC, AD -> Diameter = AB = 30. Radius r=15.
@@ -1328,19 +1390,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
+    \textit{Початок речення} \par\par\vspace{0.2cm}
     \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
     \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
     \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
 }{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 5 \textit{см}. \\
     \textbf{Б} & 10 \textit{см}. \\
@@ -1351,15 +1413,18 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}
+Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.15]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
         % Square ABCD perimeter 40 -> side 10.
         % CM = 26. In rect DCKM, side CD=10. CM is diagonal.
         % DM = sqrt(26^2 - 10^2) = 24.
@@ -1382,19 +1447,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[below] at (D) {$D$};
         \node[above right] at (K) {$K$};
         \node[below right] at (M) {$M$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Відрізок} \par \vspace{0.2cm}
+    \textit{Відрізок} \par\par\vspace{0.2cm}
     \textbf{1} \quad Сторона квадрата $ABCD$ \\
     \textbf{2} \quad $CK$ \\
     \textbf{3} \quad Відстань між центром квадрата і точкою перетину діагоналей прямокутника $ABKM$
 }{
-    \textit{Довжина відрізка} \par \vspace{0.2cm}
+    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 10 \textit{см} \\
     \textbf{Б} & 12 \textit{см} \\
@@ -1405,103 +1470,46 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Діагоналі будь-якого прямокутника є бісектрисами його кутів. \\
 II. & Діагоналі будь-якого прямокутника ділять його на чотири рівні трикутники. \\
 III. & Діагоналі будь-якого прямокутника рівні. \\
 \end{tabular}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{лише III}{лише I}{лише II та III}{лише I та III}{лише II}
+\end{samepage}
 
+\begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Діагоналі будь-якого прямокутника ділять його кути навпіл. \\
 II. & Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл. \\
 III. & Діагоналі будь-якого прямокутника рівні. \\
 \end{tabular}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{лише I та III}{I, II та III}{лише III}{лише II та III}{лише I та II}
+\end{samepage}
 
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення (1--3) із його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
-    \begin{flushright}
-    \begin{tikzpicture}[scale=0.1]
-        % R_circ = 25 (Area 625pi). Diam = 50.
-        % AB = 30. BC = sqrt(50^2 - 30^2) = 40.
-        % O2 touches AB, BC, AD. Diameter = AB = 30. Radius r=15.
-        
-        \def\w{40}
-        \def\h{30}
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,\h);
-        \coordinate (C) at (\w,\h);
-        \coordinate (D) at (\w,0);
-        
-        \coordinate (O1) at (20,15); % Center of rect
-        \coordinate (O2) at (15,15); % Center of inscribed-like circle (r=15)
-        
-        % Circumcircle (Green)
-        \draw[thick, green!60!black] (O1) circle (25cm);
-        
-        % Inscribed-like circle (Orange)
-        \draw[thick, orange!80!black] (O2) circle (15cm);
-        
-        % Rectangle
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        
-        % Points
-        \fill (O1) circle (20pt) node[right] {$O_1$};
-        \fill (O2) circle (20pt) node[left] {$O_2$};
-        
-        % Labels
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}
-    \end{flushright}
-\end{minipage}
-
-\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
-    \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
-    \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
-    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
-}{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 5 \textit{см}. \\
-    \textbf{Б} & 10 \textit{см}. \\
-    \textbf{В} & 15 \textit{см}. \\
-    \textbf{Г} & 25 \textit{см}. \\
-    \textbf{Д} & 40 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Вершини прямокутника $KLMN$ лежать на сторонах ромба $ABCD$. $AK : KB = 1 : 3$. Діагональ $KM = 12$ \textit{см} прямокутника утворює зі стороною $NM$ кут $30^\circ$. Визначте площу ромба $ABCD$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.6]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
         \coordinate (A) at (-2.5, 0);
         \coordinate (B) at (0, 4);
         \coordinate (C) at (2.5, 0);
@@ -1536,20 +1544,22 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \fill (M) circle (2pt);
         \fill (N) circle (2pt);
 
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$96\sqrt{3}$ \textit{см}$^2$}{$384$ \textit{см}$^2$}{$81$ \textit{см}$^2$}{$96$ \textit{см}$^2$}{$81\sqrt{3}$ \textit{см}$^2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60^\circ$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LQP$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою (1--3) та її периметром (А--Д). \nmtyear{2025}
+На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60^\circ$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LQP$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою \mbox{(1--3)} та її периметром \mbox{(А--Д)}. \nmtyear{2025}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     \def\h{8} % AB:BC=4:3 => AB=8
     
     \coordinate (A) at (0,0);
@@ -1622,16 +1632,16 @@ III. & Діагоналі будь-якого прямокутника рівн�
     \node[below] at (M) {$M$};
     \node[below] at (Q) {$Q$};
     \node[right] at (P) {$P$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \matchingLayout{
-    \textit{Фігура} \par \vspace{0.2cm}
+    \textit{Фігура} \par\par\vspace{0.2cm}
     \textbf{1} \quad прямокутник $ABCD$ \\
     \textbf{2} \quad паралелограм $DKLM$ \\
     \textbf{3} \quad трикутник $LPQ$
 }{
-    \textit{Периметр фігури} \par \vspace{0.2cm}
+    \textit{Периметр фігури} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 24 \textit{см} \\
     \textbf{Б} & 32 \textit{см} \\
@@ -1642,15 +1652,18 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
-Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}
+Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.25]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         % AB=12. K is vertex of isosceles right triangle on AB.
         % Height of K from AB = AB/2 = 6.
         % Circle touches AB, BC, AD? No, touches BC, AD, CD (right side).
@@ -1687,19 +1700,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[right] at (K) {$K$};
         \fill (O) circle (10pt) node[right] {$O$};
         \fill (K) circle (10pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Початок речення} \par \vspace{0.2cm}
+    \textit{Початок речення} \par\par\vspace{0.2cm}
     \textbf{1} \quad Довжина радіуса $OK$ кола дорівнює \\
     \textbf{2} \quad Довжина відрізка $BK$ дорівнює \\
     \textbf{3} \quad Відстань від точки $O$ до вершини $A$ дорівнює
 }{
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 6 \textit{см}. \\
     \textbf{Б} & 8 \textit{см}. \\
@@ -1710,15 +1723,18 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури (1--3) її площу (А--Д). \nmtyear{2025}
+На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури \mbox{(1--3)} її площу \mbox{(А--Д)}. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.4]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.4]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,6);
         \coordinate (C) at (8,6);
@@ -1737,19 +1753,19 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[below right] at (D) {$D$};
         \node[above] at (O) {$O$};
         \node[below] at (M) {$M$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
-    \textit{Фігура} \par \vspace{0.2cm}
+    \textit{Фігура} \par\par\vspace{0.2cm}
     \textbf{1} \quad трикутник $ABD$ \\
     \textbf{2} \quad трикутник $AOD$ \\
     \textbf{3} \quad п'ятикутник $ABCOM$
 }{
-    \textit{Площа фігури} \par \vspace{0.2cm}
+    \textit{Площа фігури} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & 12 \textit{см}$^2$ \\
     \textbf{Б} & 18 \textit{см}$^2$ \\
@@ -1760,27 +1776,32 @@ III. & Діагоналі будь-якого прямокутника рівн�
 }{
     \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Якщо паралелограми мають рівні сторони, то вони мають рівні периметри. \\
 II. & Якщо паралелограми мають рівні сторони, то вони мають рівну площу. \\
 III. & Якщо прямокутники мають рівні діагоналі, то вони мають рівні сторони. \\
 \end{tabular}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{лише II}{лише III}{лише II та III}{лише I}{лише I та III}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено прямокутник $ABCD$. Точка $K$ --- середина сторони $AD$. Довжина відрізка, що сполучає середини сторони $AB$ й відрізка $KC$, дорівнює $d$. Визначте площу прямокутника $ABCD$, якщо $\angle CKD = 60^\circ$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-   \begin{tikzpicture}[scale=0.8]
+   \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,3);
         \coordinate (C) at (5.2,3);
@@ -1831,21 +1852,23 @@ III. & Якщо прямокутники мають рівні діагонал�
         \fill (K) circle (1.5pt);
         \fill (M1) circle (1.5pt);
         \fill (M2) circle (1.5pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{8d^2}{9}$}{$\dfrac{8d^2\sqrt{3}}{9}$}{$\dfrac{8d^2\sqrt{3}}{27}$}{$\dfrac{9d^2\sqrt{3}}{4}$}{$\dfrac{4d^2\sqrt{3}}{9}$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутнику $ABCD$ точка $L$ належить стороні $AD$, $AC$ --- діагональ прямокутника, що утворює з більшою його стороною кут $\alpha$ (див. рисунок). $AL = 3$ \textit{см}, $AO = 4$ \textit{см}, $OC = 16$ \textit{см}. Знайдіть $\sin\alpha$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.25]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,15); % Approx height
         \coordinate (D) at (10,0); % Shorter width to match diagram? 
@@ -1873,21 +1896,23 @@ III. & Якщо прямокутники мають рівні діагонал�
         
         \fill (O) circle (10pt);
         \fill (L) circle (10pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{3}{4}$}{$\dfrac{4}{5}$}{$\dfrac{1}{4}$}{$\dfrac{2}{3}$}{$\dfrac{3}{5}$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
         % DK bisector => angle KDC = 45. Triangle KCD is right isosceles.
         % DK = 12sqrt(2) => CD = 12, KC = 12.
         % AB = CD = 12.
@@ -1923,21 +1948,23 @@ III. & Якщо прямокутники мають рівні діагонал�
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (K) {$K$};
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$72$ \textit{см}$^2$}{$48\sqrt{3}$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$72\sqrt{3}$ \textit{см}$^2$}{$144$ \textit{см}$^2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30^\circ$ (див. рисунок). Визначте довжину відрізка $AK$, якщо периметр прямокутника дорівнює $96$ \textit{см}, $AB : BC = 3 : 5$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.25]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         % AB:BC = 3:5. P = 2(3x+5x) = 16x = 96 => x=6.
         % AB = 18, BC = 30.
         % AK in right triangle ABK. AB=18. Angle KAB=30.
@@ -1960,21 +1987,23 @@ III. & Якщо прямокутники мають рівні діагонал�
         \node[below right] at (D) {$D$};
         \node[above] at (K) {$K$};
         \fill (K) circle (8pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$36$ \textit{см}}{$12\sqrt{3}$ \textit{см}}{$18$ \textit{см}}{$36\sqrt{3}$ \textit{см}}{$12$ \textit{см}}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $AD$ прямокутника $ABCD$ вибрано точку $K$ так, що $KC = 6\sqrt{3}$, $\angle BKC = 90^\circ$, $\angle ABK = 30^\circ$ (див. рисунок). Визначте периметр прямокутника. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,4);
         \coordinate (C) at (9,4);
@@ -1999,15 +2028,17 @@ III. & Якщо прямокутники мають рівні діагонал�
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
         \fill (K) circle (2pt);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$24+6\sqrt{3}$}{$18$}{$24\sqrt{3}+6$}{$24\sqrt{3}+12$}{$36$}
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №13 --- також у темі: Квадрат
 \noindent
 \begin{minipage}[c]{0.55\textwidth}
@@ -2016,7 +2047,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.43\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.45, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.45, thick]
     \coordinate (A) at (-3,0);
     \coordinate (B) at (0,3);
     \coordinate (Rt) at (3,0);
@@ -2035,13 +2066,15 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above right] at (D) {$D$};
     \node[below right] at (E) {$E$};
     \node[below] at (G) {$G$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$68$ см$^2$}{$64$ см$^2$}{$72$ см$^2$}{$70$ см$^2$}{$76$ см$^2$}
 % Відповідь: А
 \ifshowsolutions\solution{Площа квадрата $6\cdot 6=36$ см$^2$, площа прямокутника $4\cdot 9=36$ см$^2$. Спільний рівнобедрений трикутник має основу, рівну стороні прямокутника $4$ см, і висоту $2$ см, тож його площа $\dfrac{1}{2}\cdot 4\cdot 2=4$ см$^2$. Площа трафарету $=36+36-4=68$ см$^2$. Відповідь: \textbf{А}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №15 --- основна тема: Коло, круг і їх елементи
 \noindent
 \begin{minipage}[c]{0.51\textwidth}
@@ -2050,7 +2083,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.48\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.18, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.18, thick]
     \draw[dashed, gray] (0,0) rectangle (40,20);
     \node[below left] at (0,0) {$A$};
     \node[above left] at (0,20) {$B$};
@@ -2079,18 +2112,20 @@ III. & Якщо прямокутники мають рівні діагонал�
     \fill[gray] (20,20) circle [radius=0.3];
     \draw[->, >=stealth, gray!90] (0,20) -- (3.5, 16.5) node[right, text=black, font=\scriptsize] {$R=5$};
     \fill[gray] (0,20) circle [radius=0.3];
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \answerTable{$500$}{$50$}{$1000$}{$800$}{$100$}
 % Відповідь: Г
 \ifshowsolutions\solution{Чотири вирізані чверті кола радіусом $5$ разом дають одне коло, а два долучені півкола радіусом $5$ — також одне коло; їх площі взаємно компенсуються. Тому площа фігури дорівнює площі прямокутника $ABCD$ зі сторонами $50$~м і $20$~м: $50\cdot20=1000$ (м$^2$). Відповідь: \textbf{В} ($1000$).}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №18 --- також у темі: Коло, круг і їх елементи
-\zadtask{Прямокутник $ABCD$ і коло з центром $O$ розташовані так, що коло дотикається до середин бічних сторін $AB$ і $CD$ та перетинає сторону $BC$ у точках $K$ і $M$ (див. рисунок). Відомо, що $BK = 3$ см, $BM = 27$ см. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
-\vspace{0.3cm}
+\zadtask{Прямокутник $ABCD$ і коло з центром $O$ розташовані так, що коло дотикається до середин бічних сторін $AB$ і $CD$ та перетинає сторону $BC$ у точках $K$ і $M$ (див. рисунок). Відомо, що $BK = 3$ см, $BM = 27$ см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.2, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.2, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,18);
     \coordinate (C) at (30,18);
@@ -2107,9 +2142,9 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.42\textwidth}
 \textit{Відрізок}\par\vspace{0.2cm}
@@ -2128,12 +2163,14 @@ III. & Якщо прямокутники мають рівні діагонал�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
 % Відповідь: 1~--~Г, 2~--~Б, 3~--~В
 \ifshowsolutions\solution{$KM=BM-BK=27-3=24$ см -- \textbf{Г}. Коло дотикається середин $AB$ і $CD$, тож його радіус дорівнює половині сторони $BC$; за симетрією $BC=BK+KM+BK=30$, отже $r=KO=15$ см -- \textbf{Б}. Відстань від $O$ до $BC$ дорівнює $\sqrt{r^2-(KM/2)^2}=\sqrt{225-144}=9$, тому $AB=2\cdot9=18$ см -- \textbf{В}. Відповідь: \textbf{1--Г, 2--Б, 3--В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №14 --- також у темі: Коло, круг і їх елементи
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
@@ -2142,7 +2179,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.42, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,5);
     \coordinate (Cc) at (8.7,5);
@@ -2161,18 +2198,20 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[below right, font=\scriptsize] at (D) {$D$};
     \pic[draw, angle radius=0.9cm] {angle = O--D--A};
     \node[font=\tiny] at (5.9,0.5) {$30^\circ$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$288$ см$^2$}{$576$ см$^2$}{$216\sqrt{3}$ см$^2$}{$288\sqrt{3}$ см$^2$}{$576\sqrt{3}$ см$^2$}
 % Відповідь: В
 \ifshowsolutions\solution{Радіус $r$ дорівнює відстані від $O$ до $AD$: $r = OD\sin30^\circ = 24\cdot\dfrac12 = 12$ см, а $OK = r = 12$. Сторона $CD$ (висота прямокутника) дорівнює діаметру: $CD = 2r = 24$ см. Відстань між паралельними $OK$ і $CD$ дорівнює $OD\cos30^\circ = 24\cdot\dfrac{\sqrt3}{2} = 12\sqrt3$. $OKCD$~--- прямокутна трапеція: $S = \dfrac{OK + CD}{2}\cdot 12\sqrt3 = \dfrac{12+24}{2}\cdot 12\sqrt3 = 216\sqrt3$ см$^2$. Відповідь: \textbf{В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №18 --- також у темі: Трикутники
-\zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
-\vspace{0.3cm}
+\zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.17, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.17, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,16);
     \coordinate (Cc) at (12,16);
@@ -2189,9 +2228,9 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above, font=\scriptsize] at (Cc) {$C$};
     \node[below, font=\scriptsize] at (D) {$D$};
     \node[below right, font=\scriptsize] at (M) {$M$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.46\textwidth}
 \textit{Початок речення}\par\vspace{0.2cm}
@@ -2210,12 +2249,14 @@ III. & Якщо прямокутники мають рівні діагонал�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}
 % Відповідь: 1~--~Г, 2~--~В, 3~--~А
 \ifshowsolutions\solution{$AM=AD+DM=12+2\cdot12=36$ см~--- \textbf{Г}. Нехай $H$~--- основа висоти рівнобедреного $\triangle DKM$ з вершини $K$; вона ділить $DM$ навпіл, тож $DH=12$, а $AH=AD+DH=24$. Оскільки $K$ лежить на прямій $AC$, прямокутні $\triangle ADC$ і $\triangle AHK$ подібні (спільний кут $A$, прямі кути при $D$ і $H$): $KH=CD\cdot\dfrac{AH}{AD}=16\cdot\dfrac{24}{12}=32$ см~--- \textbf{В}. З тієї самої подібності $AK=2\,AC$, де $AC=\sqrt{12^2+16^2}=20$, тож $CK=AK-AC=40-20=20$ см~--- \textbf{А}. Відповідь: \textbf{1~--~Г, 2~--~В, 3~--~А}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №14 --- також у темі: Трикутники
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
@@ -2224,7 +2265,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.32, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.32, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,15);
     \coordinate (C) at (11,15);
@@ -2243,13 +2284,15 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[right, font=\scriptsize] at (K) {$K$};
     \node[below right, font=\scriptsize] at (D) {$D$};
     \node[font=\tiny] at (1.9,0.5) {$30^\circ$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$36$ см$^2$}{$96$ см$^2$}{$72$ см$^2$}{$72\sqrt{3}$ см$^2$}{$36\sqrt{3}$ см$^2$}
 % Відповідь: Д
 \ifshowsolutions\solution{У прямокутному $\triangle ADK$ ($\angle ADK=90^\circ$): $DK=AK\sin30^\circ=6$, $AD=AK\cos30^\circ=6\sqrt3$. Точки $D,K,C$ лежать на правій стороні, тож $CK=CD-DK=AB-DK=15-6=9$. Кути при $K$: $\angle AKD=60^\circ$, $\angle AKM=90^\circ$, тому $\angle MKC=180^\circ-60^\circ-90^\circ=30^\circ$. У прямокутному $\triangle KCM$ ($\angle C=90^\circ$): $KM=\dfrac{CK}{\cos30^\circ}=\dfrac{9}{\sqrt3/2}=6\sqrt3$. Площа (прямий кут при $K$): $S=\tfrac12\cdot AK\cdot KM=\tfrac12\cdot12\cdot6\sqrt3=36\sqrt3$ см$^2$. Відповідь: \textbf{Д}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №3 --- також у темі: Трикутники
 \noindent
 \begin{minipage}[c]{0.60\textwidth}
@@ -2258,7 +2301,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.3, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.3, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (D) at (10,0);
     \coordinate (C) at (10,7);
@@ -2275,11 +2318,13 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[right] at (10,3.5) {$7$ м};
     \node[above left] at (3.2, 9.4) {$8$ м};
     \node[above right] at (8.2, 9.4) {$6$ м};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$28$~м}{$35$~м}{$48$~м}{$38$~м}{$94$~м}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №14
 \noindent
 \begin{minipage}[c]{0.58\textwidth}
@@ -2288,7 +2333,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.3, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.3, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (D) at (15,0);
     \coordinate (C) at (15,5);
@@ -2307,16 +2352,18 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above left] at (K) {$K$};
     \node[above right] at (M) {$M$};
     \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=1.5, font=\scriptsize] {angle = D--A--M};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$54\sqrt{3}$}{$81\sqrt{3}$}{$108\sqrt{3}$}{$216$}{$162$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №18 --- також у темі: Коло, круг і їх елементи
-\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка (1--3) його довжину (А--Д). \nmtyear{2026}
-\vspace{0.3cm}
+\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.42, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,6);
     \coordinate (C) at (8,6);
@@ -2331,9 +2378,9 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right, xshift=0.1cm] at (D) {$D$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.50\textwidth}
 \textit{Відрізок}\par\vspace{0.15cm}
@@ -2352,10 +2399,12 @@ III. & Якщо прямокутники мають рівні діагонал�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.18\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №3
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
@@ -2364,7 +2413,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.72, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.72, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,2.4);
     \coordinate (C) at (5.2,2.4);
@@ -2376,16 +2425,18 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$2\sqrt{3}$~см}{$4$~см}{$4\sqrt{2}$~см}{$4\sqrt{3}$~см}{$2\sqrt{2}$~см}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №18
-\zadtask{На рисунку точки $K$, $L$, $M$ та $N$~--- середини сторін $AB$, $BC$, $CD$ та $AD$ прямокутника $ABCD$ відповідно. $AB = 12$~см, $BC = 16$~см. Точка $P$~--- середина відрізка $KN$. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
-\vspace{0.3cm}
+\zadtask{На рисунку точки $K$, $L$, $M$ та $N$~--- середини сторін $AB$, $BC$, $CD$ та $AD$ прямокутника $ABCD$ відповідно. $AB = 12$~см, $BC = 16$~см. Точка $P$~--- середина відрізка $KN$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.55, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,12);
     \coordinate (C) at (16,12);
@@ -2409,9 +2460,9 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[right] at (M) {$M$};
     \node[below] at (N) {$N$};
     \node[above left, font=\scriptsize] at (P) {$P$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.52\textwidth}
 \textit{Відрізок}\par\vspace{0.15cm}
@@ -2430,14 +2481,16 @@ III. & Якщо прямокутники мають рівні діагонал�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.18\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
 % Відповідь: 1--Б, 2--А, 3--Г
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №18 --- також у темі: Коло, круг і їх елементи
-\zadtask{На рисунку зображено прямокутник $ABCD$, у який вписано коло з центром у точці $O$, що дотикається до сторін $BC$ й $AD$, та два півкола, побудованих на сторонах $AB$ і $CD$ як на діаметрах, що мають лише одну спільну точку з колом. $BC = 12$~см. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}}
-\vspace{0.3cm}
+\zadtask{На рисунку зображено прямокутник $ABCD$, у який вписано коло з центром у точці $O$, що дотикається до сторін $BC$ й $AD$, та два півкола, побудованих на сторонах $AB$ і $CD$ як на діаметрах, що мають лише одну спільну точку з колом. $BC = 12$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{minipage}[c]{0.52\textwidth}
 \begin{minipage}[t]{0.48\textwidth}
@@ -2455,14 +2508,14 @@ III. & Якщо прямокутники мають рівні діагонал�
 \textbf{Г} \quad $6$~см\\[0.15cm]
 \textbf{Д} \quad $3\sqrt{5}$~см
 \end{minipage}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 
 \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.45\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.55, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,6);
     \coordinate (C) at (12,6);
@@ -2482,10 +2535,12 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 % Відповідь: 1--А; 2--Г; 3--Д
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №14 --- також у темі: Трикутники
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
@@ -2494,7 +2549,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.5, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,4);
     \coordinate (C) at (10,4);
@@ -2509,24 +2564,25 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[above] at (K) {$K$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$12$}{$18$}{$12\sqrt{3}$}{$24$}{$24\sqrt{3}$}
 % Відповідь: Г
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{37.}~А \ {\scriptsize\color{gray}(23.05, №13)}\par
-\noindent\textbf{38.}~Г \ {\scriptsize\color{gray}(30.05, №15)}\par
-\noindent\textbf{39.}~1~--~Г, 2~--~Б, 3~--~В \ {\scriptsize\color{gray}(2.06, №18)}\par
-\noindent\textbf{40.}~В \ {\scriptsize\color{gray}(3.06, №14)}\par
-\noindent\textbf{41.}~1~--~Г, 2~--~В, 3~--~А \ {\scriptsize\color{gray}(3.06, №18)}\par
-\noindent\textbf{42.}~Д \ {\scriptsize\color{gray}(5.06, №14)}\par
-\noindent\textbf{47.}~1--Б, 2--А, 3--Г \ {\scriptsize\color{gray}(15.06, №18)}\par
-\noindent\textbf{48.}~1--А; 2--Г; 3--Д \ {\scriptsize\color{gray}(16.06, №18)}\par
-\noindent\textbf{49.}~Г \ {\scriptsize\color{gray}(19.06, №14)}\par
+\noindent\textbf{36.}~А \ {\scriptsize\color{gray}(23.05, №13)}\par
+\noindent\textbf{37.}~Г \ {\scriptsize\color{gray}(30.05, №15)}\par
+\noindent\textbf{38.}~1~--~Г, 2~--~Б, 3~--~В \ {\scriptsize\color{gray}(2.06, №18)}\par
+\noindent\textbf{39.}~В \ {\scriptsize\color{gray}(3.06, №14)}\par
+\noindent\textbf{40.}~1~--~Г, 2~--~В, 3~--~А \ {\scriptsize\color{gray}(3.06, №18)}\par
+\noindent\textbf{41.}~Д \ {\scriptsize\color{gray}(5.06, №14)}\par
+\noindent\textbf{46.}~1--Б, 2--А, 3--Г \ {\scriptsize\color{gray}(15.06, №18)}\par
+\noindent\textbf{47.}~1--А; 2--Г; 3--Д \ {\scriptsize\color{gray}(16.06, №18)}\par
+\noindent\textbf{48.}~Г \ {\scriptsize\color{gray}(19.06, №14)}\par
 \end{multicols}
 \fi
 

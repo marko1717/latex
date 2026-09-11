@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,10 +163,11 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -165,26 +181,27 @@
 \definecolor{bronze}{RGB}{190, 120, 70}
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -192,11 +209,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -214,17 +231,18 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 36. Теорія ймовірності}
-\noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 29 (НМТ 2024~--- 12, 2025~--- 11, 2026~--- 6).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 29 (НМТ \mbox{2024~--- 12}, \mbox{2025~--- 11}, \mbox{2026~--- 6}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 % === ЗАВДАННЯ 1 (Літак - ВЕРТИКАЛЬНИЙ МАКЕТ) ===
 \noindent\zadnum Місця в літаку розташовані у 20 рядів, у кожному ряді є по 3 місця, розділені проходом, ліворуч і праворуч від проходу (див. рисунок). Комп’ютерна програма випадковим чином обирає місце для пасажира. Визначте \textbf{ймовірність} того, що пасажиру дістанеться перший або останній ряд. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.6] % Трохи збільшив масштаб (було 0.5), бо місця більше
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6] % Трохи збільшив масштаб (було 0.5), бо місця більше
     % --- КРИЛА ТА ХВІСТ ---
     \draw[fill=gray!20, draw=gray!50] (6, 1.3) -- (4, 4.5) -- (7, 4.5) -- (9, 1.3) -- cycle;
     \draw[fill=gray!20, draw=gray!50] (6, -1.3) -- (4, -4.5) -- (7, -4.5) -- (9, -1.3) -- cycle;
@@ -261,27 +279,31 @@
     % Номери рядів (для наочності)
     \node[above, font=\tiny, color=gray] at (2.75, 1.3) {1};
     \node[above, font=\tiny, color=gray] at (17.95, 1.3) {20};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{5}$}{$\dfrac{1}{20}$}{$\dfrac{1}{2}$}{$\dfrac{1}{10}$}{$\dfrac{1}{4}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 2 (Цифри 125790) ===
 \noindent\zadnum Комп’ютерна програма видаляє у шестицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 125790 буде видалено непарну цифру? \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{2}{3}$}{$\dfrac{1}{2}$}{$\dfrac{1}{3}$}{$\dfrac{5}{6}$}{$\dfrac{1}{6}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 3 (Карусель: 10 машинок, 5 літаків, 4 кораблі) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На дитячій каруселі є 19 місць для катання: човни, літаки та машинки (див. рисунок). Микита навмання обирає собі місце на каруселі. Визначте \textbf{ймовірність} того, що він сяде \textbf{не на літак}. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.5cm} % Піднімаємо вище
+\nopagebreak\vspace{-0.3cm} % Піднімаємо вище
 \begin{center}
-\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
     % Стилі
     \tikzset{
         icon/.style={thick, line join=round, line cap=round}
@@ -333,31 +355,33 @@
             \end{scope}
         \end{scope}
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 % Легенда під малюнком
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \node[right] at (0,0) {\scriptsize – 4 Човни, 5 Літаків, 10 Машинок};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{4}{15}$}{$\dfrac{5}{14}$}{$\dfrac{14}{19}$}{$\dfrac{5}{19}$}{$\dfrac{15}{19}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 4 (Карусель: 10 човнів, 5 машинок, 4 літаки) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На дитячій каруселі є 19 місць для катання: човни, літаки та машинки (див. рисунок). Микита навмання обирає собі місце на каруселі. Визначте \textbf{ймовірність} того, що він сяде \textbf{на машинку}. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85] % Збільшений масштаб
     % Стилі
     \tikzset{icon/.style={thick, line join=round, line cap=round}}
 
@@ -404,41 +428,47 @@
             \end{scope}
         \end{scope}
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 % Легенда під малюнком
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \node[right] at (0,0) {\scriptsize – 4 Літаки, 5 Машинок, 10 Човнів};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{4}{15}$}{$\dfrac{15}{19}$}{$\dfrac{5}{19}$}{$\dfrac{14}{19}$}{$\dfrac{5}{14}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 5 (Кульки Андрія) ===
 \noindent\zadnum В Андрія є 25 кульок: 7 синіх і по 6 зелених, жовтих та червоних. Щоб визначити першочергову справу у вихідний день, хлопець навмання вибирав одну кульку: якщо вибере синю кульку, буде робити домашнє завдання, а якщо іншого кольору – піде на баскетбол. Визначте \textbf{ймовірність} того, що Андрій піде на баскетбол. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{18}$}{$\dfrac{18}{25}$}{$\dfrac{1}{25}$}{$\dfrac{1}{7}$}{$\dfrac{7}{25}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 6 (Цифри 37281) ===
 \noindent\zadnum Комп’ютерна програма видаляє у п’ятицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 37281 буде видалено цифру 1 або цифру 2? \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{3}$}{$\dfrac{1}{5}$}{$\dfrac{2}{3}$}{$\dfrac{1}{2}$}{$\dfrac{2}{5}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 7 (Літак - Біля проходу) ===
 \noindent\zadnum Місця в літаку розташовані у 20 рядів, у кожному ряді є по 3 місця, розділені проходом, ліворуч і праворуч від проходу (див. рисунок). Комп’ютерна програма випадковим чином обирає місце для пасажира. Визначте \textbf{ймовірність} того, що пасажиру дістанеться місце біля проходу. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 % Використовуємо вже існуючий рисунок літака
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     % --- КРИЛА ТА ХВІСТ ---
     \draw[fill=gray!20, draw=gray!50] (6, 1.3) -- (4, 4.5) -- (7, 4.5) -- (9, 1.3) -- cycle;
     \draw[fill=gray!20, draw=gray!50] (6, -1.3) -- (4, -4.5) -- (7, -4.5) -- (9, -1.3) -- cycle;
@@ -471,30 +501,36 @@
              (\xpos, \seat) rectangle (\xpos+0.5, \seat-0.3);
         }
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{6}$}{$\dfrac{1}{3}$}{$\dfrac{2}{5}$}{$\dfrac{1}{4}$}{$\dfrac{1}{5}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 8 (Лотерея) ===
 \noindent\zadnum Випущено партію з 300 лотерейних білетів. \textbf{Ймовірність} того, що навмання вибраний білет із цієї партії буде виграшним, дорівнює $0{,}2$. Визначте кількість виграшних білетів серед цих 300 білетів. \nmtyear{2024}
 
-\vspace{0.3cm}
-\answerTable{60}{240}{150}{6}{294}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$60$}{$240$}{$150$}{$6$}{$294$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 9 (Автобуси - n) ===
 \noindent\zadnum У таксопарку $n$ автобусів, шосту частину яких було обладнано інформаційними табло. Після залучення коштів із міського бюджету інформаційні табло встановили ще на 14 досі не переобладнаних автобусів. Під час проведеної після переобладнання перевірки навмання вибирають один з $n$ автобусів таксопарку. \textbf{Ймовірність} того, що це буде автобус без інформаційного табло, становить $0{,}5$. Обчисліть значення $n$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 10 (Вагон потяга) ===
 \noindent\zadnum
 Людина купляє першою білет на вагон потяга навмання. У цьому вагоні є 60 доступних місць, причому спереду і позаду нього є столик, кожен з яких охоплює по 4 пасажирських місця (див. рисунок). Визначте \textbf{ймовірність} того, що цій людині дістанеться місце за столиком. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.55]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.55]
     % Контур вагона
     \draw[thick, rounded corners=15pt] (0, -2.5) rectangle (15, 2.5);
     \draw[thick] (2.5, -2.5) -- (2.5, -0.5); % Перегородки
@@ -531,21 +567,23 @@
         \node[seatBlue] at (\x, -0.8) {};
         \node[seatBlue] at (\x, -1.5) {};
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{60}$}{$\dfrac{1}{10}$}{$\dfrac{1}{30}$}{$\dfrac{2}{15}$}{$\dfrac{4}{15}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 11 (Кінотеатр - Мішки - ВИПРАВЛЕНО ЦЕНТРУВАННЯ) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У залі кінотеатру є 39 місць (див. рисунок). Усі VIP-місця зайняті. Михайло навмання обирає собі місце в кінотеатрі. Визначте \textbf{ймовірність} того, що він обере місце з кріслами-мішками. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Рамка залу
     \draw[thick] (-0.5, -1) rectangle (9.5, 8.5);
     \node[font=\bfseries] at (4.5, 7.8) {крісла-мішки};
@@ -596,22 +634,24 @@
         \draw[fill=headerblue!80, draw=black] (4.75, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
     }
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{3}{8}$}{$\dfrac{10}{13}$}{$\dfrac{7}{10}$}{$\dfrac{3}{10}$}{$\dfrac{3}{11}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 12 (Кінотеатр - VIP - ВИПРАВЛЕНО) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У залі кінотеатру є 39 місць (див. рисунок). Усі місця з кріслами-мішками зайняті. Михайло навмання обирає собі місце в кінотеатрі. Визначте \textbf{ймовірність} того, що він обере VIP-місце. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Рамка
     \draw[thick] (-0.5, -1) rectangle (9.5, 8.5);
     \node[font=\bfseries] at (4.5, 7.8) {крісла-мішки};
@@ -637,24 +677,26 @@
         \draw[fill=headerblue!80, draw=black] (3.25, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
         \draw[fill=headerblue!80, draw=black] (4.75, \y*1.2 + 0.5) rectangle ++(1.0, 1.0);
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{4}$}{$\dfrac{1}{6}$}{$\dfrac{1}{5}$}{$\dfrac{2}{5}$}{$\dfrac{2}{13}$}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 % === ЗАВДАННЯ 13 (Карусель - ДМИТРИК) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На дитячій каруселі розташовано 19 транспортних засобів: човники, літачки й машинки (див. рисунок). Дмитрик навмання сідає в один із транспортних засобів, \textit{окрім літачків}. Яка \textbf{ймовірність} того, що він сяде в \textit{машинку}? \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     % Фон (пісок/земля)
     \fill[yellow!10] (0,0) circle (4.0cm);
     \fill[cyan!10] (0,0) circle (3.2cm); % Вода/небо для внутрішніх кіл
@@ -709,22 +751,24 @@
     \node[anchor=west, font=\tiny] at (2.9, 3.0) {\textcolor{green!60!black}{\rule{8pt}{8pt}} літачок};
     \node[anchor=west, font=\tiny] at (2.9, 2.5) {\textcolor{cyan!80!blue}{\rule{8pt}{8pt}} машинка};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{5}{19}$}{$\dfrac{1}{3}$}{$\dfrac{1}{15}$}{$\dfrac{2}{3}$}{$\dfrac{1}{5}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 14 (Кав'ярня - Соломія) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено план кав’ярні, у якій 25 місць (див. план). У той час, коли Соломія зайшла в кав’ярню, у ній були вільні всі місця, окрім місць біля барної стійки. Соломія вибирає місце навмання. Яка \textbf{ймовірність} того, що вибране нею місце буде за круглим столиком? \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % --- Стилі ---
     \tikzset{
         chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
@@ -779,23 +823,25 @@
     \node[font=\footnotesize] at (2.0, -2.4) {Вікно};
     \node[font=\footnotesize] at (7.0, -2.4) {Вікно};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{12}{25}$}{$\dfrac{1}{12}$}{$\dfrac{3}{5}$}{$\dfrac{4}{25}$}{$\dfrac{1}{5}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 15 (Кав'ярня - Матвій) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено план кав’ярні, у якій 25 місць (див. план). У той час, коли Матвій зайшов у кав’ярню, у ній були вільні всі місця, окрім місць за прямокутними столиками. Матвій вибирає місце навмання. Яка \textbf{ймовірність} того, що вибране ним місце буде за барною стійкою? \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.4cm}
+\nopagebreak\vspace{-0.3cm}
 % Той самий малюнок
 \begin{center}
-\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % --- Стилі ---
     \tikzset{
         chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
@@ -835,40 +881,48 @@
     % Вікно
     \draw[fill=cyan!10, draw=gray] (-0.5, -2.0) rectangle (9.5, -1.7);
     \draw[fill=gray!20] (3.5, -2.1) rectangle (5.5, -1.6);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{5}{17}$}{$\dfrac{1}{5}$}{$\dfrac{1}{17}$}{$\dfrac{5}{21}$}{$\dfrac{1}{3}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 16 (Тюльпани) ===
 \noindent\zadnum У суміші цибулин тюльпанів рожеві становлять третину всіх тюльпанів, білі – половину, а чорні – решту. Яка \textbf{ймовірність} того, що з навмання взятої цибулини виросте білий або рожевий тюльпан? \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{6}$}{$\dfrac{4}{5}$}{$\dfrac{2}{5}$}{$\dfrac{1}{5}$}{$\dfrac{5}{6}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 17 (Запитання - кислоти) ===
 \noindent\zadnum Учням було запропоновано 20 запитань для підготовки до зрізу знань, серед яких 4 – про властивості кислот. Яка \textbf{ймовірність} того, що навмання витягнутий білет буде містити запитання про властивості кислот? \nmtyear{2025}
 
-\vspace{0.3cm}
-\answerTable{0,2}{0,25}{0,4}{0,5}{0,3}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$0,2$}{$0,25$}{$0,4$}{$0,5$}{$0,3$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 18 (Число 125079) ===
 \noindent\zadnum Комп’ютерна програма видаляє у шестицифровому числі одну цифру навмання. Яка \textbf{ймовірність} того, що в числі 125079 буде видалено цифру, більшу за 5? \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{4}$}{$\dfrac{1}{6}$}{$\dfrac{1}{3}$}{$\dfrac{1}{2}$}{$\dfrac{2}{3}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 19 (Номерний знак) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено автомобільний номер, що складається з 4 букв і 4 цифр. Одна з цифр номеру замазана брудом і не розпізнається. Комп’ютерна програма для зчитування номерів автоматично підбирає відсутню цифру з десяти можливих значень. Яка \textbf{ймовірність} того, що програма правильно визначить замасковану цифру? \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     % Рамка номера
     \draw[fill=white, rounded corners=3pt, line width=1pt] (0,0) rectangle (6, 1.3);
     
@@ -888,18 +942,20 @@
         to[out=20, in=120] (4.2, 0.9) 
         to[out=300, in=40] (4.1, 0.4) 
         to[out=180, in=0] (3.6, 0.3);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{4}$}{$\dfrac{1}{9}$}{$\dfrac{1}{8}$}{$\dfrac{1}{10}$}{$\dfrac{1}{2}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 20 (Діаграма - БЕЗ ПІДПИСІВ, З УСІМА ЧИСЛАМИ НА ОСІ) ===
 \noindent\zadnum На діаграмі відображено результати опитування учнів щодо тривалості підготовки до контрольної роботи. Обчисліть \textbf{ймовірність} того, що випадково обраний учень готувався до контрольної роботи \textit{не менш} як 2 години. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         width=13cm, height=7cm, % Трохи збільшив розмір
@@ -920,22 +976,25 @@
     ]
         \addplot coordinates {(0.5,1) (1,3) (1.5,3) (2,4) (2.5,5) (3,2) (3.5,1) (4,1)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
 
-\vspace{1.0cm}
+\nopagebreak\vspace{1.0cm}
 
 % === НОВИЙ СТИЛЬ ДЛЯ ЛІТАКІВ (Вертикальний макет, 3+прохід+3) ===
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 21 (Перші 3 ряди - З ЛЕГЕНДОЮ) ===
 \noindent\zadnum У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 крісла обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце в трьох перших рядах, дорівнює $\dfrac{1}{14}$. Знайдіть $n$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     % Стилі
     \tikzset{
         seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
@@ -965,18 +1024,20 @@
     \node[left, font=\footnotesize, gray] at (-0.5, -4.0) {Ряд $n$};
     \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -4.0) {};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 22 (Прохід 1 або n - З ЛЕГЕНДОЮ) ===
 \noindent\zadnum У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце біля проходу в першому або останньому ряду, дорівнює $\dfrac{1}{45}$. Знайдіть $n$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \tikzset{
         seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
         target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
@@ -1013,18 +1074,20 @@
     \node[target] at (1.6, -3.0) {}; 
     \node[target] at (4.0, -3.0) {};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 23 (Прохід 1 ряд - З ЛЕГЕНДОЮ) ===
 \noindent\zadnum У салоні пасажирського літака $n$ рядів, у кожному з яких розташовано по 6 крісел (по 3 обабіч проходу) (див. рисунок). Реєструючи пасажира, електронна система навмання вибирає для нього посадкове місце. \textbf{Ймовірність} того, що першому зареєстрованому пасажиру дістанеться місце в першому ряду біля проходу, дорівнює $\dfrac{1}{102}$. Знайдіть $n$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \tikzset{
         seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
         target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
@@ -1056,14 +1119,16 @@
     \node[left, font=\footnotesize, gray] at (-0.5, -3.0) {Ряд $n$};
     \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -3.0) {};
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №7
 \noindent
 \begin{minipage}[c]{0.54\textwidth}
@@ -1072,7 +1137,7 @@
 \hfill
 \begin{minipage}[c]{0.44\textwidth}
 \centering
-\begin{tikzpicture}[x=1.2cm, y=0.035cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=1.2cm, y=0.035cm, thick]
     \draw (0,0) -- (0,100);
     \node[rotate=90, font=\small, anchor=south,  yshift=1cm] at (0,50) {Кількість анкетованих осіб};
     \foreach \y in {0,10,...,100} {
@@ -1087,32 +1152,40 @@
     \node[below, font=\small, yshift=-0.1cm] at (1.5,0) {ні};
     \node[below, font=\small, yshift=-0.1cm] at (2.5,0) {байдуже};
     \node[below, font=\small, yshift=-0.7cm] at (1.5,0) {Варіанти відповідей};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTableTall{$\frac{8}{9}$}{$\frac{1}{5}$}{$\frac{3}{20}$}{$\frac{17}{20}$}{$\frac{4}{5}$}
 % Відповідь: Д
 \ifshowsolutions\solution{Відкриття піцерії підтримали (відповідь «так») $80$ зі $100$ осіб. Шукана ймовірність $P=\dfrac{80}{100}=\dfrac{4}{5}$. Відповідь: \textbf{Д}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №5
 \zadtask{У десятому класі за списком $24$ учні. Імовірність того, що вік навмання вибраного учня менший за $15$ років, дорівнює $\dfrac16$. Скільки всього в класі учнів, вік яких менший за $15$ років? \nmtyear{2026}}
 \answerTable{$8$}{$4$}{$20$}{$3$}{$6$}
 % Відповідь: Б
 \ifshowsolutions\solution{Кількість учнів молодших за $15$ років дорівнює добутку ймовірності на загальну кількість: $24\cdot\dfrac16 = 4$. Відповідь: \textbf{Б} ($4$).}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №11
 \zadtask{Комп'ютерна програма видаляє у п'ятицифровому числі одну цифру навмання. Яка ймовірність того, що в числі $37281$ буде видалено цифру $1$ або цифру $2$? \nmtyear{2026}}
 \answerTableTall{$\dfrac{1}{2}$}{$\dfrac{2}{5}$}{$\dfrac{1}{5}$}{$\dfrac{2}{3}$}{$\dfrac{1}{3}$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №11
 \zadtask{На столі лежать $18$ світлин, серед яких $8$ із зображенням природи, $6$ із зображенням людей та $4$ із зображенням будівель. Яка ймовірність того, що навмання вибрана світлина буде із зображенням природи або людини? \nmtyear{2026}}
 \answerTableTall{$\dfrac{2}{9}$}{$\dfrac{4}{9}$}{$\dfrac{5}{9}$}{$\dfrac{7}{9}$}{$\dfrac{11}{18}$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №11
 \zadtask{Від бази відпочинку «Затишна» до навколишніх озер веде кілька стежок. До озера Прозоре веде 2 стежки, до озера Мальовниче — 4 стежки, а до озера Пісочне — 3 стежки. Турист навмання вибирає одну стежку, щоб дійти до одного з озер. Яка ймовірність того, що турист вибере маршрут до озера Мальовниче? \nmtyear{2026}}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.9, transform shape]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, transform shape]
     % --- Макроси для об'єктів ---
     \tikzset{
         tree/.pic={
@@ -1218,11 +1291,13 @@
         \draw[thick, brown!80!black] (0.5, 1.0) -- (1.2, 1.0);
     \end{scope}
 
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \answerTableTall{$\dfrac{4}{5}$}{$\dfrac{4}{9}$}{$\dfrac{1}{9}$}{$\dfrac{2}{9}$}{$\dfrac{1}{3}$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №11 --- також у темі: Статистика
 \noindent
 \begin{minipage}[c]{0.54\textwidth}
@@ -1231,7 +1306,7 @@
 \hfill
 \begin{minipage}[c]{0.44\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.0]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0]
     \def\R{1.9}
     % значення: рок 20, поп 25, джаз 11, диско 14; сума 70
     % кути: рок 20/70*360=102.857; поп 25/70*360=128.571; джаз 11/70=56.571; диско 14/70=72
@@ -1259,11 +1334,12 @@
         \filldraw[fill=cjazz, draw=black!40] (0,-1.1) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-0.95){джаз};
         \filldraw[fill=cdisco, draw=black!40] (0,-1.65) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-1.5){диско};
     \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTableTall{$\dfrac{2}{5}$}{$\dfrac{5}{14}$}{$\dfrac{1}{20}$}{$\dfrac{1}{4}$}{$\dfrac{2}{7}$}
 % Відповідь: Д
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}

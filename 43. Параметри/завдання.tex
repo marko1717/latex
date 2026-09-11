@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,36 +163,38 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -185,11 +202,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -207,45 +224,60 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 43. Параметри}
-\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 71 (НМТ 2023~--- 19, 2024~--- 18, 2025~--- 17, 2026~--- 17).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 71 (НМТ \mbox{2023~--- 19}, \mbox{2024~--- 18}, \mbox{2025~--- 17}, \mbox{2026~--- 17}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 \noindent\zadnum Визначте суму всіх цілих значень параметра $a$, за яких один корінь рівняння $2x^2 - (4a + 9)x + 6a + 9 = 0$ належить проміжку $(-8; 0)$, а другий – проміжку $(1; 5)$. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найбільше} ціле значення $a$, за якого корінь рівняння $3x - 4a = \dfrac{2ax + 3}{5}$ є додатним числом. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum За якого значення $a$ сума коренів рівняння $x^2 + (a - 2)x + 28 - 4a = 0$ на 1 більша від їхнього добутку? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Укажіть \textit{кількість} цілих значень $a$, за яких рівняння $x^2 - (9 - a)x + 20 - 3a - 2a^2 = 0$ має лише додатні корені. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Скільки всього існує цілих значень параметра $a$, за яких графік рівняння $(x - 2)^2 + (y - 2a + 3)^2 = 49$ перетинає вісь $x$ у двох точках? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{додатне} значення параметра $m$, за якого один із коренів рівняння $x^2 - (2m - 2)x + 21 = 0$ на 4 більший від іншого. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum За якого значення параметра $a$ сума квадратів коренів рівняння $x^2 - 8x + 4a - 1 = 0$ дорівнює 38? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найбільше} значення $a$, за якого система
 $$
 \begin{cases}
@@ -255,9 +287,11 @@ x^2 + y^2 = 9
 $$
 має єдиний розв'язок. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найменше} ціле значення $a$, за якого система
 $$
 \begin{cases}
@@ -267,90 +301,120 @@ x^2 + y^2 = a
 $$
 має два розв'язки. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{від'ємне} значення параметра $m$, за якого один із коренів рівняння $x^2 - (2m - 2)x + 21 = 0$ на 4 більший від іншого. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 11 (Різниця коренів 4, m додатне) ===
 \noindent\zadnum Визначте \textit{додатне} значення параметра $m$, за якого один із коренів рівняння $x^2 - (2m - 2)x + 4m - 3 = 0$ на 4 більший від іншого. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 12 (Лінійне рівняння з параметром) ===
 \noindent\zadnum Визначте \textit{найбільше} ціле значення $a$, за якого корінь рівняння $a^2x - a = x(a^2 - a) - 10$ є від'ємним числом. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 13 (Розміщення коренів x1 < 1 < x2) ===
 \noindent\zadnum Визначте \textit{кількість} цілих значень $a$, за яких корені $x_1$ і $x_2$ квадратного рівняння $x^2 - 4ax + 4a^2 - 25 = 0$ задовольняють умову $x_1 < 1 < x_2$. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 14 (Різниця коренів 2) ===
 \noindent\zadnum Визначте значення $m$, за якого один із коренів рівняння $x^2 - 9x + m = 0$ на 2 більший від іншого. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 15 (Лише від'ємні корені) ===
 \noindent\zadnum Укажіть \textit{найменше} ціле значення $a$, за якого рівняння $x^2 + (9 - a)x + 20 - 3a - 2a^2 = 0$ має лише від'ємні корені. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 16 (Корені більші за 1) ===
 \noindent\zadnum За якого \textit{найбільшого} цілого значення $a$ обидва корені квадратного рівняння $x^2 + (2a - 15)x + 26 - 4a = 0$ більші за 1? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 17 (Корені на проміжку [-5; 8]) ===
 \noindent\zadnum Визначте \textit{кількість} цілих значень параметра $a$, за яких корені рівняння $2x^2 - (4a - 3)x - 6a = 0$ належать проміжку $[-5; 8]$. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 18 (Різниця коренів 6, m додатне) ===
 \noindent\zadnum Визначте \textit{додатне} значення параметра $m$, за якого один із коренів рівняння $x^2 - (2m - 4)x + 16 = 0$ на 6 більший від іншого. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 19 (Протилежні корені) ===
 \noindent\zadnum Визначте значення $a$, за якого корені рівняння $x^2 + (a - 1)^2x + 6(a - 1)x + a + 2 = 0$ є протилежними числами. Якщо таких значень кілька, то у відповіді запишіть їхню \textit{суму}. \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 \noindent\zadnum Визначте кількість усіх \textit{від'ємних} цілих значень $a$, за кожного з яких рівняння $(\sqrt{4x - 2a - 4} - 3) \cdot (\lg^2 x + 1) = 0$ має корінь. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте кількість усіх цілих значень $a$ з проміжку $[-11; 11]$, за кожного з яких рівняння $\sqrt{2x - a + 4} \cdot (\log_2 x - 2) = 0$ має два різних корені. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть кількість усіх цілих значень $a$ з проміжку $[-5; 10]$, за кожного з яких рівняння $(\sqrt{2x - a + 4} - 1) \cdot |x - 2| = 0$ має два різних корені. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть усі значення $a$, за яких рівняння $\dfrac{x^2 - ax + 4}{x - 5} = 0$ має лише один корінь. Якщо таких значень кілька, то запишіть у відповіді їхній \textit{добуток}. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найменше} ціле значення $a$, за якого розв'язок $(x_0; y_0)$ системи рівнянь
 $$
 \begin{cases}
@@ -364,14 +428,18 @@ y_0 > 5.
 \end{cases}
 $$ \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте кількість усіх цілих значень $a$ з проміжку $(-3; 8)$, за кожного з яких рівняння $\dfrac{\sqrt{x + 2a} - \sqrt{8 - 2x}}{x} = 0$ має корені. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum За якого \textit{найбільшого цілого від'ємного} значення $a$ для розв'язку $(x_0; y_0)$ системи рівнянь
 $$
 \begin{cases}
@@ -381,14 +449,18 @@ $$
 $$
 справджується нерівність $(x_0 - 1) \cdot 2^{y_0} < 0$? \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{суму} всіх цілих значень параметра $a$, за яких усі корені рівняння $4^x - 15 \cdot 2^x - 4a^2 + 30a = 0$ є додатними. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{кількість} усіх цілих значень $a$, за кожного з яких система рівнянь
 $$
 \begin{cases}
@@ -398,24 +470,32 @@ $$
 $$
 має принаймні один розв'язок. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння $\lg(2ax + 5 - a) = \lg(4x)$ не має коренів. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть кількість усіх цілих значень $a$ з проміжку $(-7; 7)$, за кожного з яких рівняння $(3^{a - 2x} - 3^{2 - 4x}) \cdot (3 + \sqrt{3x - 5}) = 0$ має корені. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{кількість} усіх цілих значень $a$ з проміжку $(-4; 10)$, за кожного з яких рівняння $\log_2^2 x + a\log_2 x + 4a - 16 = 0$ має два різних корені, з яких один менший за $0{,}1$, а другий --- більший за $0{,}5$. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найменше} ціле значення $a$, за якого розв'язок $(x_0; y_0)$ системи рівнянь
 $$
 \begin{cases}
@@ -429,24 +509,32 @@ y_0 < 1.
 \end{cases}
 $$ \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найбільше} значення параметра $a$, за якого не має коренів рівняння $3^x + (4a^2 + 10a) \cdot 3^{-x} = 4a + 5$. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{суму} всіх цілих значень $a$ з проміжку $[-9; 4]$, за кожного з яких рівняння $\dfrac{3^{x - 4a} - 3^{3x + 10}}{\log_3 x} = 0$ має корінь. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найменше} ціле значення параметра $a$, за якого рівняння $(2a - 1) \cdot 25^x - (4a + 8) \cdot 5^x + 20 = 0$ має два різних корені, з яких один додатний, а другий --- від'ємний. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum За якого значення $a$ для розв'язку $(x_0; y_0)$ системи рівнянь
 $$
 \begin{cases}
@@ -456,16 +544,20 @@ $$
 $$
 справджується рівність $x_0 = 1 + \log_2 y_0$? \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найменше} ціле значення параметра $a$, за якого рівняння $(\sqrt{4x + 8} + 9) \cdot (\log_3(2x - a) - 3) = 0$ має корінь. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найбільше} значення $a$, за якого система рівнянь
 $$
 \begin{cases}
@@ -475,34 +567,46 @@ $$
 $$
 має хоча б один розв'язок. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найбільше} значення $a$, за якого має корені рівняння $\dfrac{3^{2a-5x+2} - \sqrt{27}}{\sqrt{x} + \sqrt{3-x}} = 0$. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{найбільше} ціле значення $a$, за якого коло, задане рівнянням $(x + 7 - 2a)^2 + (y - 3)^2 = 64$, перетинає вісь ординат у двох точках. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть усі значення $a$, за кожного з яких рівняння $\dfrac{x^2 - 4x + 3}{3x - a} = \dfrac{42 + 3x - x^2}{3x - a}$ має один корінь. Якщо таке значення $a$ одне, запишіть його у відповіді. Якщо таких значень $a$ кілька, то у відповіді запишіть їхню \textit{суму}. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть значення $a$, за якого сума коренів рівняння $10x - 2a - 7\sqrt{5x - a + 3} = 0$ дорівнює $1{,}5$. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння $\dfrac{2^{4x+2a-15} - 2\sqrt{2}}{\sqrt{2 - x}} = 0$ має додатний корінь. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть усі значення $a$, за яких система рівнянь
 $$
 \begin{cases}
@@ -512,24 +616,32 @@ $$
 $$
 не має розв'язків. Якщо таких значень кілька, то у відповідь запишіть їх \textit{добуток}. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте кількість цілих значень $a$, що належать проміжку $[-9; 9]$, за кожного з яких корінь рівняння $ax - 5 = a + 2x$ є \textit{додатним}. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найменше} ціле значення $a$, за якого коло $(x - 11 - 3a)^2 + (y + 2)^2 = 49$ двічі перетинає вісь ординат. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте значення $a$, за якого сума коренів рівняння $4x - \sqrt{4x + a} + a = 0$ дорівнює 10. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких для розв'язку $(x_0; y_0)$ системи
 $$
 \begin{cases}
@@ -539,23 +651,29 @@ $$
 $$
 справджуються нерівності $x_0 > 0$, $y_0 > 0$. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{суму} всіх цілих значень $a$ з проміжку $[-8; 5]$, за кожного з яких рівняння $\dfrac{5^{4x+2a-6} - 1}{\sqrt{x - 2}} = 0$ має корінь. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть \textit{найменше} ціле значення $a$, за якого рівняння
 $$
 (4^{x+1} + 15 \cdot 2^x - 4)(3 + \lg^2(3a - 17x)) = 0
 $$
 має корінь. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{кількість} усіх цілих значень $a$, за кожного з яких система рівнянь
 $$
 \begin{cases}
@@ -565,9 +683,11 @@ $$
 $$
 має принаймні один розв'язок. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте значення $a$, за якого система рівнянь
 $$
 \begin{cases}
@@ -577,9 +697,11 @@ x^2 - 2x + y^2 + 8y = 47
 $$
 має \textit{єдиний} розв'язок. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте значення $a$, за якого система рівнянь
 $$
 \begin{cases}
@@ -589,9 +711,11 @@ $$
 $$
 має \textit{єдиний} розв'язок. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких система рівнянь
 $$
 \begin{cases}
@@ -601,17 +725,21 @@ $$
 $$
 має принаймні один розв'язок. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №22
 \zadtask{Знайдіть найбільше значення $a$, за якого рівняння $\dfrac{\sqrt{x^2 - 10x} - \sqrt{36 - 5x}}{x - 2\log_2 a} = 0$ не має коренів. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $0{,}25$
 \ifshowsolutions\solution{Чисельник нуль при $\sqrt{x^2-10x}=\sqrt{36-5x}$. ОДЗ: $x^2-10x\ge 0$ і $36-5x\ge 0$, тобто $x\le 0$ (бо $x\le 7{,}2$). Піднесемо до квадрата: $x^2-10x=36-5x \Rightarrow x^2-5x-36=0$; $D=25+144=169$, корені $x=\dfrac{5\pm 13}{2}=9$ або $-4$. В ОДЗ лише $x=-4$. Щоб рівняння не мало коренів, цей корінь має обнуляти знаменник: $-4=2\log_2 a$, тобто $\log_2 a=-2$, $a=0{,}25$. Відповідь: \textbf{0,25}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №22
 \zadtask{Знайдіть \textit{кількість} усіх цілих значень $a$, за кожного з яких рівняння
 $$9^x - (a+6) \cdot 3^x + 12a - 2a^2 = 0$$
@@ -619,7 +747,9 @@ $$9^x - (a+6) \cdot 3^x + 12a - 2a^2 = 0$$
 \nmtAnswerBox}
 % Відповідь: $4$
 \ifshowsolutions\solution{Заміна $t=3^x>0$: $t^2-(a+6)t+(12a-2a^2)=0$. За теоремою Вієта корені $t_1=2a$, $t_2=6-a$ ($t_1t_2=2a(6-a)=12a-2a^2$, $t_1+t_2=a+6$). Для двох різних коренів $x$ потрібні два різні додатні $t$: $2a>0$, $6-a>0$, $2a\neq6-a$, тобто $a\in(0;6)$, $a\neq2$. Цілі: $1,3,4,5$. Відповідь: $4$.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №22
 \zadtask{Знайдіть \textit{суму} всіх цілих значень параметра $a$ з проміжку $(0;\,7)$, за кожного з яких рівняння
 $$\dfrac{x^2 + (a-3)x - a + 2}{2x - 3a + 6} = 0$$
@@ -627,7 +757,9 @@ $$\dfrac{x^2 + (a-3)x - a + 2}{2x - 3a + 6} = 0$$
 \nmtAnswerBox
 % Відповідь: $18$
 \ifshowsolutions\solution{Чисельник: $x^2+(a-3)x-(a-2)=0$. За теоремою Вієта корені мають суму $3-a$ і добуток $2-a$; підбором (Вієта) це $x_1=1$ і $x_2=2-a$. Для двох різних коренів потрібно $x_1\ne x_2$, тобто $a\ne 1$, і жоден корінь не має обертати знаменник $2x-3a+6$ на нуль; знаменник занулюється коренем $x_2$ при $a=2$. Цілі $a\in(0;7)$: $1,2,3,4,5,6$; вилучаємо $a=1$ і $a=2$. Сума $3+4+5+6=18$. Відповідь: \textbf{$18$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №22
 \zadtask{Визначте \textit{найменше} значення $a$, за якого рівняння
 $$\dfrac{7^{\,3x - 2x^2} - \dfrac{1}{49}}{\sqrt{2x + 5a} - 4} = 0$$
@@ -636,7 +768,9 @@ $$\dfrac{7^{\,3x - 2x^2} - \dfrac{1}{49}}{\sqrt{2x + 5a} - 4} = 0$$
 }
 % Відповідь: $0{,}2$
 \ifshowsolutions\solution{Чисельник $=0$: $7^{3x-2x^2}=7^{-2}$, тобто $3x-2x^2=-2$, або $2x^2-3x-2=0$. За теоремою Вієта корені $x_1=2$, $x_2=-\dfrac{1}{2}$ (бо $x_1+x_2=\dfrac{3}{2}$, $x_1x_2=-1$). Щоб обидва корені були допустимі, потрібно $2x+5a\geqslant0$ у меншому корені $x=-\dfrac{1}{2}$: $-1+5a\geqslant0$, звідки $a\geqslant0{,}2$. Найменше $a=0{,}2$.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №22
 \zadtask{Визначте \textit{суму} всіх значень $a$, за кожного з яких рівняння
 $$\frac{|4x + 5a - 3| - 3}{(x+2)(x^2 + 9)} = 0$$
@@ -644,7 +778,9 @@ $$\frac{|4x + 5a - 3| - 3}{(x+2)(x^2 + 9)} = 0$$
 \nmtAnswerBox
 % Відповідь: $4{,}4$
 \ifshowsolutions\solution{Оскільки $x^2+9>0$, ОДЗ: $x\ne-2$. Рівняння $|4x+5a-3| = 3$ дає $4x+5a-3 = \pm3$, тобто два корені $x_1 = \dfrac{6-5a}{4}$ і $x_2 = \dfrac{-5a}{4}$ ($x_1\ne x_2$). Єдиний корінь буде, коли один із них дорівнює $-2$: $x_1=-2 \Rightarrow a=2{,}8$; $x_2=-2 \Rightarrow a=1{,}6$. Сума: $2{,}8+1{,}6 = 4{,}4$. Відповідь: \textbf{$4{,}4$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №22
 \zadtask{Визначте \textit{найменше} ціле значення параметра $a$, за якого рівняння
 \[ \frac{x + a + \sqrt{x+a} - 12}{2 + \lg^2(2x - a^2)} = 0 \]
@@ -652,7 +788,9 @@ $$\frac{|4x + 5a - 3| - 3}{(x+2)(x^2 + 9)} = 0$$
 \nmtAnswerBox}
 % Відповідь: $-5$
 \ifshowsolutions\solution{Знаменник завжди додатний, тож потрібен нуль чисельника. Нехай $t=\sqrt{x+a}\geqslant0$: $t^2+t-12=0$. За теоремою Вієта $t_1=3$, $t_2=-4$ ($t_1+t_2=-1$, $t_1t_2=-12$); підходить $t=3$, отже $x+a=9$, $x=9-a$. Має існувати $\lg(2x-a^2)$, тобто $2x-a^2>0$: $18-2a-a^2>0$, або $a^2+2a-18<0$. Корені (через дискримінант $D=4+72=76$): $a=-1\pm\sqrt{19}$, тож $-1-\sqrt{19}<a<-1+\sqrt{19}$, тобто приблизно $-5{,}36<a<3{,}36$. Найменше ціле $a=-5$. Відповідь: \textbf{$-5$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №22
 \zadtask{Знайдіть усі значення параметра $a$, за яких рівняння
 $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
@@ -660,11 +798,15 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 \nmtAnswerBox
 % Відповідь: $a\in(-39;\,-13)$
 \ifshowsolutions\solution{Чисельник $=0$: $\log_9(2x-4a+3)=2\Rightarrow 2x-4a+3=81\Rightarrow x=2a+39$. Знаменник вимагає $a^2-x^2>0$, тобто $-|a|<x<|a|$, що можливо лише при $a<0$. Умова $|2a+39|<-a$ дає систему $a<2a+39<-a$, звідки $-39<a$ і $a<-13$. Відповідь: \textbf{$a\in(-39;\,-13)$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №22
 \zadtask{Визначте суму всіх цілих значень $a$, за кожного з яких рівняння $$\frac{9 \cos x - 2a - 5}{\sqrt{\pi^2 - 4x^2}} = 0$$ має хоча б один корінь. \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №22
 \zadtask{Визначте кількість усіх цілих значень $a$, за кожного з яких рівняння
 \[
@@ -672,7 +814,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 \]
 має два різні корені. \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №22
 \zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння
 \[
@@ -680,7 +824,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 \]
 має два різні корені. \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №22
 \zadtask{За якого \textit{найбільшого} значення $a$ рівняння
 \[
@@ -688,7 +834,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 \]
 має єдиний корінь? \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №22
 \zadtask{Визначте \textit{суму} всіх цілих значень $a$, що належать відрізку $[-4;\, 8]$, за кожного з яких рівняння
 \[
@@ -696,7 +844,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 \]
 має два різні корені. \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №22
 \zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких добуток різних коренів рівняння
 \[
@@ -705,7 +855,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 є більшим за $-40$. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $24$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №22
 \zadtask{Знайдіть суму всіх цілих значень $a$, за кожного з яких корінь рівняння
 \[
@@ -714,7 +866,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 є цілим числом. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $28$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №22
 \zadtask{Знайдіть \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння
 \[
@@ -723,7 +877,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 має два різні корені. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $45$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №22
 \zadtask{За якого \textit{найменшого} значення $a$ рівняння
 \[
@@ -732,7 +888,9 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 не має коренів? \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $9{,}5$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №22
 \zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння
 \[
@@ -741,6 +899,7 @@ $$\dfrac{\log_9(2x - 4a + 3) - 2}{\sqrt{a^2 - x^2}} = 0$$
 має принаймні один корінь. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $-27$
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}

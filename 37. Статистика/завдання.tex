@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,28 +163,16 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
-% --- макроси, перенесені зі старого файлу теми ---
-\newcommand{\answerListVertical}[5]{
-    \vspace{0.2cm}
-    \begin{itemize}[itemsep=0.2cm, leftmargin=0.5cm, labelsep=0.3cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}
-}
-
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -190,26 +193,27 @@
 }
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -217,11 +221,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -239,19 +243,20 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 37. Статистика}
-\noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 76 (НМТ 2023~--- 14, 2024~--- 22, 2025~--- 19, 2026~--- 21).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 75 (НМТ \mbox{2023~--- 14}, \mbox{2024~--- 22}, \mbox{2025~--- 18}, \mbox{2026~--- 21}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 % === ЗАВДАННЯ 1 (Кругова діаграма - Zoom) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Zoom... \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     % Сектори
     % Zoom (Половина, світлий) - права частина
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
@@ -266,7 +271,7 @@
         \node[fill=gray!60, label=right:Google Meet, draw=black!50] {}; \\
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
@@ -276,16 +281,19 @@
 {становить третину від загальної кількості».}
 {менше ніж кількість занять у Google Meet».}
 {належить проміжку [550; 700]».}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 2 (Кругова діаграма - Google Meet) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Google meet... \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -295,7 +303,7 @@
         \node[fill=gray!60, label=right:Google Meet, draw=black!50] {}; \\
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
@@ -305,16 +313,19 @@
 {менше ніж кількість занять у Teams».}
 {становить половину від загальної кількості».}
 {удвічі менше від кількості занять у Zoom».}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 3 (Кругова діаграма - Teams число) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Teams. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -324,18 +335,20 @@
         \node[fill=gray!60, label=right:Google Meet, draw=black!50] {}; \\
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
-\answerTable{450}{600}{300}{500}{150}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$450$}{$600$}{$300$}{$500$}{$150$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 4 (Графік - Опади) ===
 \noindent\zadnum На графіку відображено зміну кількості опадів (у \textit{мм}) протягом року в регіоні України. За графіком визначте місяці, у яких кількість опадів \textit{перевищувала} 60 \textit{мм}. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=6cm,
         xlabel={Місяці},
@@ -353,17 +366,19 @@
             (1,35) (2,38) (3,40) (4,45) (5,102) (6,70) (7,65) (8,40) (9,20) (10,5) (11,10) (12,58)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{4; 5; 6; 7}{5; 8}{5; 6; 7; 8}{5; 6; 7}{6; 7}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 5 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало більше 35, але менше 43 глядачів. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -389,17 +404,19 @@
         \addplot[fill=green!50] coordinates {(4,20)};
         \addplot[fill=violet!60] coordinates {(5,45)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{зелена}{блакитна}{фіолетова}{жовта}{біла}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 6 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте всі зали кінотеатру, у яких глядачів було більше, ніж у жовтій. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -423,7 +440,7 @@
         \addplot[fill=green!50] coordinates {(4,20)};
         \addplot[fill=violet!60] coordinates {(5,45)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \answerListVertical
@@ -432,12 +449,15 @@
 {біла, блакитна, фіолетова}
 {зелена}
 {біла, блакитна}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 7 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте суму глядачів, які відвідали білу і зелену зали кінотеатру. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -461,17 +481,19 @@
         \addplot[fill=green!50] coordinates {(4,20)};
         \addplot[fill=violet!60] coordinates {(5,45)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{65}{75}{90}{70}{80}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$65$}{$75$}{$90$}{$70$}{$80$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 8 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало найбільше глядачів. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -495,17 +517,19 @@
         \addplot[fill=green!50] coordinates {(4,20)};
         \addplot[fill=violet!60] coordinates {(5,45)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{жовта}{фіолетова}{зелена}{біла}{блакитна}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 9 (Графік - Смартфон) ===
 \noindent\zadnum Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 20 хв після початку заряджання. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=7cm,
         xlabel={$x$ (час заряджання, хв)},
@@ -531,30 +555,32 @@
             (0,20) (20,30) (40,50) (60,60) (80,80) (100,90) (120,100)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{30\%}{100\%}{80\%}{20\%}{40\%}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 10 (Діаграми - Столи і Стільці) ===
 \noindent\zadnum Для облаштування кафе було придбано столи і стільці у співвідношенні 1 : 3 відповідно. Укажіть діаграму, на якій правильно відображено розподіл придбаних столів і стільців. \nmtyear{2023}
 
 % Легенда
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \fill[gray!20, draw=black] (0,0.4) rectangle (1,0.8);
     \node[right] at (1,0.6) {-- кількість виготовлених стільців};
     \fill[gray!90, draw=black] (0,0) rectangle (1,0.4);
     \node[right] at (1,0.2) {-- кількість виготовлених столів};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 % Команда для малювання міні-діаграми (кут темного сектора)
 \newcommand{\miniPie}[1]{
-    \begin{tikzpicture}[scale=0.5, baseline=-0.5ex]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5, baseline=-0.5ex]
         % Світлий сектор (стільці) - повне коло
         \draw[fill=gray!20] (0,0) circle (1.5cm);
         % Темний сектор (столи) - кут #1
@@ -564,7 +590,7 @@
         % Радіуси
         \draw (0,0) -- (90:1.5cm);
         \draw (0,0) -- ({90+#1}:1.5cm);
-    \end{tikzpicture}
+    \end{tikzpicture}\end{nmtfit}
 }
 
 % Таблиця з графічними варіантами
@@ -586,12 +612,15 @@
 \hline
 \end{tabular}
 \end{center}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 11 (Гістограма - Зелена зала інтервал) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте, якому відрізку належить кількість глядачів у зеленій залі. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -616,17 +645,19 @@
         \addplot[fill=green!50] coordinates {(4,20)};
         \addplot[fill=violet!60] coordinates {(5,45)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{[25; 30)}{[35; 40)}{[15; 25)}{[10; 15)}{[30; 35)}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 12 (Музика) ===
 \noindent\zadnum Серед 100 учнів музичного класу провели опитування: яка музика їм подобається найбільше. Результати опитування подано у вигляді діаграми, зображеної на рисунку. За діаграмою визначте різницю між кількістю учнів, що обрали поп-музику, та кількістю учнів, що обрали класичну музику. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -655,17 +686,19 @@
         \addplot coordinates {(4,15)};
         \addplot coordinates {(5,20)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{10}{15}{25}{5}{20}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$10$}{$15$}{$25$}{$5$}{$20$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 13 (Транспорт - графік) ===
 \noindent\zadnum На рисунку відображено інформацію про результати опитування пасажирів транспортної мережі деякого міста щодо визначення якості пасажирських перевезень (у балах за шкалою 1–10). Визначте кількість опитуваних, які поставили оцінку, вищу за 8 балів. \nmtyear{2023}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=12cm, height=7cm,
         xlabel={Оцінка в балах},
@@ -682,21 +715,23 @@
             (4,75) (5,100) (6,100) (7,200) (8,175) (9,75) (10,25)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{100}{275}{475}{19}{200}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$100$}{$275$}{$475$}{$19$}{$200$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 3 (Кругова діаграма - Teams число) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Zoom. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-1.0cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -706,22 +741,24 @@
         \node[fill=gray!60, label=right:Google Meet, draw=black!50] {}; \\
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
-\answerTable{1000}{500}{600}{450}{300}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$1000$}{$500$}{$600$}{$450$}{$300$}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 % === ЗАВДАННЯ 15 (Горіхи - Таблиця) ===
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Олена планує придбати горіхи в кіоску. Їй потрібно придбати 500~г фундука, 300~г кеш’ю та 200~г волоських горіхів. Користуючись даними в таблиці, знайдіть середню вартість (у \textit{грн}) за 100~г придбаних Оленою горіхів. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
@@ -733,14 +770,16 @@
 \end{center}
 \end{minipage}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 16 (Кінотеатр - Відвідуваність - ВИПРАВЛЕНО ПІДПИСИ + СІТКА 10) ===
 \noindent\zadnum На діаграмі наведено відвідуваність сеансу одного фільму в кінотеатрі протягом 6 робочих днів. На скільки \textit{відсотків} кількість глядачів на найбільше відвідуваному сеансі перевищує середню кількість глядачів за ці 6 днів? \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -777,17 +816,19 @@
         \addplot coordinates {(5,210)};
         \addplot coordinates {(6,180)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 17 (Смартфони - ВИПРАВЛЕНО ПІДПИСИ + СІТКА 10) ===
 \noindent\zadnum На діаграмі наведено інформацію про продаж смартфонів протягом п’яти місяців. На скільки \textit{відсотків} середня кількість проданих смартфонів перевищує кількість проданих смартфонів у квітні? \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -824,21 +865,23 @@
         \addplot coordinates {(4,200)};
         \addplot coordinates {(5,350)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 18 (Пил - Графік) ===
-\noindent\zadnum На рисунку відображено зміну густини ($мкг/м^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{зменшувалася}. \nmtyear{2024}
+\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{зменшувалася}. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=5cm,
         xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $мкг/м^3$},
+        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
         y label style={align=center, font=\footnotesize, at={(axis description cs:-0.08,0.5)}},
         xmin=0, xmax=25,
         ymin=0, ymax=40,
@@ -854,17 +897,19 @@
             (0,15) (4,10) (10,20) (15,30) (24,15)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{[14; 16]}{[2; 6]}{[20; 24]}{[12; 14]}{[8; 12]}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 19 (Оцінки клієнтів - Горизонтальна діаграма) ===
 \noindent\zadnum На діаграмі відображено результати опитування 1000 клієнтів, які ставили оцінки від 1 до 5. Середня оцінка склала 4{,}2 бали. За відгуками тих відвідувачів, які оцінили роботу від 1 до 4 включно, середня оцінка 2{,}5 бали. Скільки людей поставили оцінку «5»? \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         xbar, % Горизонтальна діаграма
         width=12cm, height=6cm,
@@ -881,41 +926,51 @@
         % Дані візуально
         \addplot coordinates {(30,1) (50,2) (100,3) (180,4) (550,5)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 20 (Ручки Сергія) ===
 \noindent\zadnum Сергій купив 4 чорні, 6 червоних і $n$ синіх ручок по 27 \textit{грн}, 15 \textit{грн} і 10 \textit{грн} кожна. Середня ціна однієї купленої ручки виявилася меншою за 13 \textit{грн}. Укажіть \textit{найменше можливе значення $n$}. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 21 (Дерева компанії) ===
 \noindent\zadnum Компанія виділила кошти на закупівлю 70 дерев: 50 каштанів по 1600 \textit{грн} кожний і 20 ялинок. Середня ціна одного дерева складає 1500 \textit{грн}. Знайдіть вартість однієї ялинки (у \textit{грн}). \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 22 (Оцінки Михайла) ===
 \noindent\zadnum Михайло отримав з математики в першому семестрі такі оцінки: «8», «7», «9», «9». Яку \textit{найменшу} кількість оцінок «10» протягом цього семестру треба отримати Михайлові з математики, щоб середнє арифметичне всіх отриманих у першому семестрі оцінок із цього предмета було більше за 9{,}5? Уважайте, що інших оцінок із математики, окрім «10», Михайло не отримуватиме. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 23 (Джем) ===
 \noindent\zadnum Компанія замовила 10 наборів по 2 банки та 10 наборів по 3 банки джему в кожному. Середня ціна однієї банки джему з усіх наборів дорівнює 72 \textit{грн}. Середня ціна банки з джемом із набору з двох банок дорівнює 75 \textit{грн}. Визначте середню ціну з набору по 3 банки джему. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 24 (Соціальні мережі - Гістограма) ===
 \noindent\zadnum Було проведено опитування серед учнів 5 класу про те, скільки приблизно годин на день кожен з них витрачає на соціальні мережі. Відповіді учнів відображено на діаграмі (див. рисунок). Психолог зазначив, що рекомендована кількість часу на користування соціальними мережами дорівнює 2 \textit{години}. На скільки відсотків середня кількість годин користування учнями соціальними мережами перевищує рекомендовану? \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -940,17 +995,19 @@
         \addplot coordinates {(4,5)};
         \addplot coordinates {(5,1)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 25 (Готель - Горизонтальна діаграма - ТЕСТ) ===
 \noindent\zadnum На діаграмі відображено кількість користувачів, які ставили свої відгуки у вигляді оцінок від 1 до 10 за послуги в деякому готелі. Визначте кількість користувачів, які поставили оцінку 5 та вище. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         xbar,
         width=12cm, height=6cm,
@@ -971,16 +1028,18 @@
         % Значення: 20, 30, 60, 90, 40
         \addplot coordinates {(20,1-2) (30,3-4) (60,5-6) (90,7-8) (40,9-10)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{190}{130}{110}{60}{210}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$190$}{$130$}{$110$}{$60$}{$210$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 26 (Дорога до школи - Таблиця) ===
-\noindent\zadnum Учень з понеділка до п’ятниці записував час (у \textit{хвилинах}), який він витрачав на дорогу до школи та зі школи (див. таблицю).
+\noindent\zadnum Учень з понеділка до п’ятниці записував час (у \textit{хвилинах}), який він витрачав на дорогу до школи та зі школи (див. таблицю). \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -989,22 +1048,24 @@
 зі школи & 28 & 22 & $x$ & 25 & 31 \\ \hline
 \end{tabular}
 \end{center}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
-\noindent Відомо, що в середньому за всі 5 днів дорога зі школи займала на 6 \textit{хвилин} більше, ніж до школи. Знайдіть $x$. \nmtyear{2024}
+\noindent Відомо, що в середньому за всі 5 днів дорога зі школи займала на 6 \textit{хвилин} більше, ніж до школи. Знайдіть $x$.
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 27 (Риболовля - Кругова діаграма) ===
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 Хлопчик рибалив і зловив різні риби. Результати його риболовлі зображені на круговій діаграмі. Користуючись діаграмою, визначте кількість зловлених лящів. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     % Сектор КАРАСІ (Зелений, 90 градусів, 25%)
     \draw[fill=green!40] (0,0) -- (0:2.5) arc (0:90:2.5) -- cycle;
     % Позначка прямого кута
@@ -1032,10 +1093,10 @@
     
     % Контур кола
     \draw (0,0) circle (2.5);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 
 % Легенда
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{tabular}{ll}
 \tikz\draw[fill=green!40] (0,0) rectangle (0.3,0.3); карасі & \tikz\draw[fill=yellow!50] (0,0) rectangle (0.3,0.3); коропи \\
 \tikz\draw[fill=cyan!30] (0,0) rectangle (0.3,0.3); лящі & \tikz\draw[fill=red!40] (0,0) rectangle (0.3,0.3); товстолоби \\
@@ -1044,26 +1105,32 @@
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
-\answerTable{10}{7}{8}{5}{6}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$10$}{$7$}{$8$}{$5$}{$6$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 28 (Табір) ===
 \noindent\zadnum У дитячому таборі відпочивають 10 дівчат і 5 хлопців. Відомо, що середній зріст дівчат складає 142{,}3 \textit{см}, а середній зріст хлопців – 138{,}4 \textit{см}. Знайдіть середній зріст (у \textit{см}) усіх дітей у таборі. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 29 (Дрони) ===
 \noindent\zadnum На підприємстві, що займається виробництвом дронів, є 7 українських і 3 іноземні філіали. Відомо, що середня кількість дронів, вироблених в одній українській філії, складає 26 одиниць, а середня кількість дронів, вироблених в одній іноземній філії, складає 46 одиниць. Визначте середню кількість дронів, вироблених в одній філії компанії. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 30 (Цифри пі - Лінійний графік) ===
 \noindent\zadnum Хлопчик вирішив порахувати 200 цифр після коми числа $\pi$ і подав це у вигляді графіка (див. рисунок). Визначте, яка цифра зустрічалася найчастіше за інші. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=7cm,
         xlabel={Цифра},
@@ -1082,29 +1149,35 @@
             (0,19) (1,20) (2,24) (3,19) (4,22) (5,20) (6,16) (7,12) (8,25) (9,23)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{4}{2}{8}{9}{7}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$4$}{$2$}{$8$}{$9$}{$7$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 31 (Назар - Зарплата) ===
 \noindent\zadnum У будні дні щоденна плата Назара за роботу в кав’ярні становить 300 \textit{грн}, а в суботу й неділю – на 200 \textit{грн} більше. Скільки в середньому за день заробляє Назар (у \textit{грн}), якщо він виходить на роботу в четвер і працює 10 днів безперервно? \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 32 (Кавуни) ===
 \noindent\zadnum Партія складалася з 9 кавунів середньою масою 12 \textit{кг}. До цієї партії додали один херсонський кавун масою 23 \textit{кг}. Визначте середню масу (у \textit{кг}) в партії з 10 кавунів. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 33 (Стрічки - Подвійна діаграма) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між кількостями зелених і жовтих стрічок для маскувальних сіток \textit{влітку}. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         width=14cm, height=8cm,
@@ -1129,17 +1202,19 @@
 
         \legend{Влітку, Восени}
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{15}{20}{25}{30}{35}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$15$}{$20$}{$25$}{$30$}{$35$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 34 (Музей - ЧИСЛОВІ КООРДИНАТИ + КРОК 50) ===
 \noindent\zadnum На діаграмі відображено кількість відвідувачів музею протягом 6 днів (з вівторка по неділю). Знайдіть \textit{різницю} між середнім значенням кількості відвідувачів у вихідні дні та середнім значенням кількості відвідувачів у будні дні. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1175,17 +1250,19 @@
         \addplot coordinates {(5,600)};
         \addplot coordinates {(6,700)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 35 (Контрольна робота - ЧИСЛОВІ + СПЕЦ. ПІДПИСИ ОСІ Y) ===
 \noindent\zadnum На діаграмі відображено інформацію щодо результатів контрольної роботи учнів 11-го класу. Користуючись діаграмою, визначте кількість учнів, які отримали оцінки від 7 до 12 включно. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1217,21 +1294,23 @@
         \addplot coordinates {(4, 10)}; % 7-9 балів: 10 учнів
         \addplot coordinates {(5, 4)};  % 10-12 балів: 4 учні
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{14}{6}{22}{19}{21}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$14$}{$6$}{$22$}{$19$}{$21$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 36 (Пил - Збільшення) ===
-\noindent\zadnum На рисунку відображено зміну густини ($мкг/м^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{збільшувалася}. \nmtyear{2024}
+\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{збільшувалася}. \nmtyear{2024}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=5cm,
         xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $мкг/м^3$},
+        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
         y label style={align=center, font=\footnotesize, at={(axis description cs:-0.08,0.5)}},
         xmin=0, xmax=25,
         ymin=0, ymax=40,
@@ -1247,19 +1326,21 @@
             (0,15) (4,10) (10,20) (15,30) (24,15)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{[20; 24]}{[2; 6]}{[12; 16]}{[8; 10]}{[16; 20]}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 % === ЗАВДАННЯ 37 (Працівники - Вік) ===
 \noindent\zadnum На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте, у скільки разів кількість працівників віком від 20 до 29 років перевищує кількість працівників, яким 60 і більше років. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1286,17 +1367,19 @@
         \addplot coordinates {(4,16)};
         \addplot coordinates {(5,4)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{9}{18}{10}{6}{32}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$9$}{$18$}{$10$}{$6$}{$32$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 38 (Стрічки - У скільки разів) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте, у скільки разів кількість зелених перевищує кількість коричневих маскувальних сіток \textit{влітку}. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         width=14cm, height=8cm,
@@ -1321,17 +1404,19 @@
 
         \legend{Влітку, Восени}
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{2{,}5}{20}{10}{1{,}5}{30}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 39 (Стрічки - Різниця) ===
 \noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між зеленими стрічками влітку та восени. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         width=14cm, height=8cm,
@@ -1355,17 +1440,19 @@
 
         \legend{Влітку, Восени}
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{30}{15}{20}{35}{25}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$30$}{$15$}{$20$}{$35$}{$25$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 40 (М'яч - Висота) ===
 \noindent\zadnum На рисунку зображено графік залежності висоти $h$ (у метрах) м’яча, кинутого в повітря, від часу $t$ (у секундах), що минув від початку запуску. Визначте проміжок часу, протягом якого м’яч знаходився на висоті \textbf{не менше} 3 м. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=10cm, height=7cm,
         xlabel={$t$, с},
@@ -1386,17 +1473,19 @@
             (0,0) (1,3) (2,5) (3,6) (4,5) (5,3) (6,2) (8,0)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{6~с}{4~с}{2~с}{5~с}{3~с}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 41 (Температура) ===
 \noindent\zadnum На графіку відображено зміну температури повітря (у $^\circ$C) протягом доби у деякому місті. За графіком визначте сумарну кількість годин, протягом яких температура повітря \textbf{не перевищувала} 10 $^\circ$C. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=6cm,
         xlabel={Час, години},
@@ -1419,29 +1508,35 @@
             (18,12) (19,12) (20,11) (21,11) (22,10) (23,9) (24,7)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{16}{14}{11}{10}{9}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$16$}{$14$}{$11$}{$10$}{$9$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 42 (Дерева - Вартість) ===
 \noindent\zadnum Компанія виділила кошти на закупівлю 80 дерев: 60 каштанів по 1500 \textit{грн} кожний і 20 ялинок. Вартість кожної ялинки на 40\% менша за вартість кожного каштану. Знайдіть середню вартість одного дерева (у \textit{грн}). \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 43 (Пластуни - Зріст) ===
 \noindent\zadnum Для учнів 6 класу в школі створили гурток пластунів. Гурток відвідують 10 дівчаток і $n$ хлопчиків. Середній зріст дівчинки – 142{,}5 \textit{см}, а хлопчика – 141 \textit{см}. Визначте $n$, якщо середній зріст дитини, яка відвідує гурток, дорівнює 141{,}5 \textit{см}. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 44 (Заряд - 80 хв) ===
 \noindent\zadnum Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 1 \textit{год} 20 \textit{хв} після початку заряджання. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=7cm,
         xlabel={Час заряджання, \textit{хв}},
@@ -1459,17 +1554,19 @@
             (0,20) (10,25) (20,35) (30,40) (40,45) (50,55) (60,60) (70,65) (80,70) (90,80) (100,85) (110,95) (120,100)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{50\%}{60\%}{80\%}{70\%}{90\%}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 45 (Кінофільми - Кругова діаграма) ===
 \noindent\zadnum Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало на 45 осіб більше, ніж жанр «Хоррор». Визначте загальну кількість студентів, які взяли участь в опитуванні. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.9]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
     % Сектор Комедія (42.5%) - Помаранчевий
     % 42.5% * 3.6 = 153 градуси. Почнемо з 0.
     \draw[fill=orange!80] (0,0) -- (0:3) arc (0:153:3) -- cycle;
@@ -1492,16 +1589,18 @@
 
     % Контур
     \draw (0,0) circle (3);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 46 (Вода в офісі - Таблиця) ===
 \noindent\zadnum В офіс замовляють питну воду, розфасовану в пляшки, що містять 5, 6, 10 і 20 літрів. У таблиці наведено дані про кількість спожитих пляшок води протягом робочого тижня (5 днів). Дві клітинки таблиці порожні. У середньому в офісі споживали 79,2 \textit{л} води щодня. Скільки пляшок води місткістю 10 \textit{л} спожито, якщо їх було втричі більше, ніж пляшок місткістю 6 \textit{л}? \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
@@ -1512,15 +1611,17 @@
 20 & 6 \\ \hline
 \end{tabular}
 \end{center}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 47 (Полігон частот) ===
 \noindent\zadnum На рисунку зображено полігон частот певного ряду даних, на якому по горизонталі відмічено елементи цього ряду, а по вертикалі – їхні частоти. Визначте середнє значення цього ряду даних. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=12cm, height=7cm,
         xlabel={Елементи ряду даних},
@@ -1539,17 +1640,19 @@
             (6,3) (12,7) (18,1) (24,3) (30,3) (36,5)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 48 (Підготовка до контрольної - Гістограма) ===
 \noindent\zadnum На діаграмі відображено результати опитування учнів щодо тривалості підготовки до контрольної роботи. Визначте кількість учнів, які готувалися до контрольної роботи \textbf{не менш} як 2 години. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1579,17 +1682,19 @@
         \addplot coordinates {(7,1)};
         \addplot coordinates {(8,1)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{20}{16}{13}{11}{9}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$20$}{$16$}{$13$}{$11$}{$9$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 49 (Зарплата - Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
 \noindent\zadnum На діаграмі відображено нараховану фірмою загальну суму заробітної плати усім своїм працівникам за перший квартал року. Яку частину від загальної суми заробітної плати за весь квартал становить заробітна плата цієї фірми за січень? \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1614,18 +1719,20 @@
         \addplot coordinates {(2,400)};
         \addplot coordinates {(3,500)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 % Таблиця з виправленими дробами (додано $)
 \answerTableTall{$\dfrac{3}{13}$}{$\dfrac{1}{3}$}{$\dfrac{1}{300}$}{$\dfrac{1}{4}$}{$\dfrac{1}{12}$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 50 (Температура Мода - Гістограма) ===
 \noindent\zadnum На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Середнє значення цього ряду збігається з його модою. Знайдіть середньоденну температуру повітря ($^\circ$C) в неділю. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1655,17 +1762,19 @@
         % Нд - знак питання
         \node at (axis cs:7, 21) {\Huge ?};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 51 (Температура Розмах - Гістограма) ===
 \noindent\zadnum На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Визначте, на скільки \textit{відсотків} середнє значення цього ряду даних перевищує його розмах. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
         bar shift=0pt,
@@ -1693,21 +1802,23 @@
         \addplot coordinates {(6,23)};
         \addplot coordinates {(7,25)};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 52 (Пил > 25 - Графік) ===
-\noindent\zadnum На рисунку відображено зміну густини ($мкг/м^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Упродовж скількох годин густина такого пилу в повітрі \textit{перевищувала} допустимий середньодобовий рівень, що становить 25 $мкг/м^3$? \nmtyear{2025}
+\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Упродовж скількох годин густина такого пилу в повітрі \textit{перевищувала} допустимий середньодобовий рівень, що становить 25 $\text{мкг}/\text{м}^3$? \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=14cm, height=6cm,
         xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $мкг/м^3$},
+        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
         y label style={align=center, font=\small},
         xmin=0, xmax=25,
         ymin=0, ymax=40,
@@ -1725,22 +1836,24 @@
         % Лінія рівня 25 (для наочності, необов'язково)
         % \draw[red, dashed] (axis cs:0,25) -- (axis cs:24,25);
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
-\answerTable{3}{12}{5}{6}{18}
+\nopagebreak\vspace{0.3cm}
+\answerTable{$3$}{$12$}{$5$}{$6$}{$18$}
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 53 (Лід - Середнє та різниця - КРОК 0.1 + ЗБІЛЬШЕНО) ===
-\noindent\zadnum На рисунку зірочками позначено річні мінімуми площі (млн $км^2$, округлені до десятих) поверхні арктичного льоду, що спостерігали в період із 2010 до 2014 р. Визначте середнє значення (млн $км^2$) річного мінімуму площі поверхні льоду за вказаний період. Обчисліть різницю (млн $км^2$) середнього значення і найближчого до нього значення річного мінімуму площі поверхні льоду. У відповіді запишіть \textit{модуль} цієї різниці. \nmtyear{2025}
+\noindent\zadnum На рисунку зірочками позначено річні мінімуми площі (млн $\text{км}^2$, округлені до десятих) поверхні арктичного льоду, що спостерігали в період із 2010 до 2014 р. Визначте середнє значення (млн $\text{км}^2$) річного мінімуму площі поверхні льоду за вказаний період. Обчисліть різницю (млн $\text{км}^2$) середнього значення і найближчого до нього значення річного мінімуму площі поверхні льоду. У відповіді запишіть \textit{модуль} цієї різниці. \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         width=13cm, height=9cm, % Збільшені розміри
         xlabel={роки},
         ylabel style={align=center, font=\small},
-        ylabel={Площа поверхні льоду,\\млн $км^2$},
+        ylabel={Площа поверхні льоду,\\млн $\text{км}^2$},
         xmin=2009.5, xmax=2014.5,
         ymin=3, ymax=5.5,
         xtick={2010, 2011, 2012, 2013, 2014},
@@ -1765,17 +1878,19 @@
             (2014, 5.2)
         };
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % === ЗАВДАННЯ 54 (Кінофільми - Варіант 2 - Система рівнянь) ===
 \noindent\zadnum Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало в 1,5 раза більше осіб, ніж жанр «Хоррор». Скільки всього було опитаних, якщо жанр «Фантастика» вибрало на 30 осіб більше, ніж жанр «Хоррор»? \nmtyear{2025}
 
 \begin{center}
-\begin{tikzpicture}[scale=0.9]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
     % Комедія 40% (Помаранчевий) -> 144 град
     \draw[fill=orange!80] (0,0) -- (0:3) arc (0:144:3) -- cycle;
     \node at (72:1.8) [align=center] {Комедія\\40\%};
@@ -1795,61 +1910,16 @@
     \node[rotate=0] at (333:2.0) [font=\footnotesize] {Фантастика};
 
     \draw (0,0) circle (3);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \nmtAnswerBox
-
-% === ЗАВДАННЯ 17 (Смартфони - ВИПРАВЛЕНО ПІДПИСИ + СІТКА 10) ===
-\noindent\zadnum На діаграмі наведено інформацію про продаж смартфонів протягом п’яти місяців. На скільки \textit{відсотків} середня кількість проданих смартфонів перевищує кількість проданих смартфонів у квітні? \nmtyear{2025}
-
-\begin{center}
-\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=16cm, height=12cm, % Високий графік
-        enlarge x limits=0.12,
-        % --- ЧИСЛОВІ КООРДИНАТИ + ТЕКСТОВІ ПІДПИСИ ---
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={Січень, Лютий, Березень, Квітень, Травень},
-        ymin=0, ymax=400,
-        % Основні поділки кожні 50
-        ytick={0, 50, 100, 150, 200, 250, 300, 350, 400},
-        % 4 проміжні лінії (10, 20, 30, 40) -> крок 10
-        minor y tick num=4,
-        ylabel={Кількість проданих\\смартфонів},
-        xlabel={Місяць},
-        y label style={align=center, at={(axis description cs:-0.05,0.5)}},
-        x label style={at={(axis description cs:0.5,-0.05)},anchor=north},
-        % Налаштування сітки
-        grid=major,
-        ymajorgrids=true,
-        yminorgrids=true, % Вмикаємо густу сітку
-        major grid style={line width=0.4pt, draw=gray!50},
-        minor grid style={line width=0.2pt, draw=gray!20},
-        bar width=0.9cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!40,
-        draw=none
-    ]
-        % Використовуємо числа: 1=Січень, 2=Лютий...
-        \addplot coordinates {(1,250)};
-        \addplot coordinates {(2,150)};
-        \addplot coordinates {(3,300)};
-        \addplot coordinates {(4,200)};
-        \addplot coordinates {(5,350)};
-    \end{axis}
-\end{tikzpicture}
-\end{center}
-
-\vspace{0.3cm}
-\nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №14
 \noindent
 \begin{minipage}[c]{0.42\textwidth}
@@ -1858,7 +1928,7 @@
 \hfill
 \begin{minipage}[c]{0.55\textwidth}
 \centering
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \begin{axis}[
     width=9cm, height=6cm,
     xmode=log, log basis x=10,
@@ -1882,13 +1952,15 @@
         (20,40) (100,30) (200,20) (300,12) (500,16) (1000,20) (2000,25) (5000,40)
     };
 \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$1000$}{$5000$}{$200$}{$300$}{$2000$}
 % Відповідь: Г
 \ifshowsolutions\solution{Обчислимо різницю рівнів за кожної частоти: при $300$~Гц вона дорівнює $60-12=48$~дБ, що більше за різниці при інших частотах (напр., $200$: $42$; $1000$: $42$). Найбільша різниця~--- за $300$~Гц. Відповідь: \textbf{Г}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №4
 \noindent
 \begin{minipage}[c]{0.60\textwidth}
@@ -1897,7 +1969,7 @@
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.2, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.2, thick]
     \def\R{1.7}
     \filldraw[fill=mainGreen!40, draw=white] (0,0) -- (90:\R) arc (90:-90:\R) -- cycle;
     \node at (0:0.9) {\scriptsize $50\,\%$};
@@ -1916,18 +1988,20 @@
     \filldraw[fill=gray!20, draw=white] (0,0) -- (-160.2:\R) arc (-160.2:-270:\R) -- cycle;
     \node at (145:1.0) {\scriptsize $?\,\%$};
     \node[left] at (145:\R+0.05) {\scriptsize Канада};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$25\,\%$}{$28{,}5\,\%$}{$30{,}5\,\%$}{$33\,\%$}{$35\,\%$}
 % Відповідь: В
 \ifshowsolutions\solution{Сума всіх відсотків дорівнює $100\,\%$. Канада: $100-(50+11{,}2+4{,}8+3{,}5)=100-69{,}5=30{,}5\,\%$. Відповідь: \textbf{В} ($30{,}5\,\%$).}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №6
 \zadtask{На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте різницю між кількістю працівників віком від $20$ до $29$ років та кількістю працівників, яким від $40$ до $49$ років. \nmtyear{2026}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.9, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick]
     \draw[->, gray!60] (0,0) -- (0,4.8) node[above, font=\scriptsize, text=black] {Кількість};
     \draw[->, gray!60] (0,0) -- (7.4,0) node[right, font=\scriptsize, text=black] {Вік};
     \foreach \v in {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44} {
@@ -1947,13 +2021,15 @@
         \filldraw[fill=cyan!60, draw=white] ({0.6+\i*1.3},0) rectangle ({1.4+\i*1.3},\h);
         \node[below, font=\scriptsize] at ({1.0+\i*1.3},-0.05) {\lab};
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \par\vspace{0.2cm}}
 \answerTable{$6$}{$10$}{$12$}{$16$}{$20$}
 % Відповідь: В
 \ifshowsolutions\solution{За діаграмою у віці $20$--$29$ років -- $36$ працівників, у віці $40$--$49$ -- $24$. Різниця $36-24=12$. Відповідь: \textbf{В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
@@ -1962,7 +2038,7 @@
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
     \foreach \y in {-60,-40,-20,0,20,40,60,80,100} {
         \draw[gray!60, thin] (0,\y) -- (7,\y);
         \node[left, font=\small] at (0,\y) {\y};
@@ -1980,19 +2056,21 @@
     \foreach \x/\y in {0/0, 1/-60, 2/-40, 3/0, 4/20, 5/80, 6/60} {
         \filldraw[black] (\x,\y) circle (2pt);
     }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$4305$ кг}{$4295$ кг}{$4235$ кг}{$4275$ кг}{$4215$ кг}
 % Відповідь: Б
 \ifshowsolutions\solution{Маса в грудні $4{,}235$ т $= 4235$ кг. За діаграмою зміна маси у червні порівняно з груднем дорівнює $+60$ кг. Отже маса в червні: $4235 + 60 = 4295$ кг. Відповідь: \textbf{Б}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №2
 \noindent
 \begin{minipage}[t]{0.52\textwidth}
-\vspace{0pt}
+\nopagebreak\vspace{0pt}
 \zadnum На діаграмі відображено інформацію про ціну пакета цукерок «Чудасія», «Каштанчики», «Шокос», «Смакс» і «Няммі» в деякому магазині. Якщо в Катрусі є лише $200$~грн, то із зазначених цукерок вона може придбати \nmtyear{2026}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \par\noindent\textbf{А}\ \ лише «Каштанчики» або «Шокос»
 \par\noindent\textbf{Б}\ \ лише «Чудасія»
 \par\noindent\textbf{В}\ \ лише «Чудасія», «Смакс» або «Няммі»
@@ -2001,9 +2079,9 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
-\vspace{0pt}
+\nopagebreak\vspace{0pt}
 \centering
-\begin{tikzpicture}[scale=0.85, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]
     \draw[gray!60] (0,0) -- (6.5,0);
     \draw[gray!60] (0,0) -- (0,4.0);
     \node[rotate=90, font=\small] at (-1.2, 2.0) {Ціна (грн за пакет)};
@@ -2021,11 +2099,13 @@
     \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (3.4, -0.1) {«Шокос»};
     \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (4.6, -0.1) {«Смакс»};
     \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (5.8, -0.1) {«Няммі»};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 % Відповідь: В
 \ifshowsolutions\solution{За діаграмою ціни: «Чудасія» $175$, «Каштанчики» $250$, «Шокос» $325$, «Смакс» $190$, «Няммі» $200$~грн. На $200$~грн вистачає лише на ті, що коштують не більше $200$: «Чудасія», «Смакс» або «Няммі». Відповідь: \textbf{В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.54\textwidth}
@@ -2034,7 +2114,7 @@
 \hfill
 \begin{minipage}[c]{0.44\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.42, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick]
     \draw[->, gray!60] (0,0) -- (0,9) node[above, font=\scriptsize] {};
     \draw[->, gray!60] (0,0) -- (7.5,0) node[right, font=\scriptsize, text=black] {бали};
     \foreach \v/\yy in {25/1,50/2,75/3,100/4,125/5,150/6,175/7,200/8,225/9} {
@@ -2047,13 +2127,15 @@
         \filldraw[fill=white, draw=mainGreen, thick] (\xx,\yy) circle (3.5pt);
     }
     \foreach \xx/\lab in {1/4,2/5,3/6,4/7,5/8,6/9,7/10} {\node[below,font=\tiny] at (\xx,0){\lab};}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$19$}{$100$}{$200$}{$275$}{$475$}
 % Відповідь: Б
 \ifshowsolutions\solution{Оцінка вища за $8$ балів~--- це $9$ і $10$ балів. За графіком їх поставили $75$ і $25$ опитаних. Разом $75+25=100$. Відповідь: \textbf{Б}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.48\textwidth}
@@ -2062,7 +2144,7 @@
 \hfill
 \begin{minipage}[c]{0.50\textwidth}
 \centering
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \begin{axis}[
     width=8.5cm, height=5.5cm,
     xmin=0, xmax=21,
@@ -2081,11 +2163,13 @@
     (0,0) (2,1) (4,2) (6,3) (8,6) (10,12) (12,15) (14,16) (16,17) (18,17.5) (20,18)
 };
 \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$[0; 4]$}{$[4; 8]$}{$[8; 10]$}{$[12; 16]$}{$[18; 20]$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.42\textwidth}
@@ -2094,7 +2178,7 @@
 \hfill
 \begin{minipage}[c]{0.56\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.9, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
     \draw[->, gray!80] (0,0) -- (0,5.2) node[above, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.5cm, text=gray!80!black, font=\scriptsize] {Кількість автомобілів};
     \draw[->, gray!80] (0,0) -- (7.5,0) node[below, text=gray!80!black, font=\scriptsize, xshift=-3.5cm, yshift=-0.5cm] {Швидкість автомобіля, км/год};
 
@@ -2115,11 +2199,13 @@
     \node[below, font=\scriptsize] at (3.65,0) {81--100};
     \node[below, font=\scriptsize] at (5.05,0) {101--120};
     \node[below, font=\scriptsize] at (6.45,0) {понад 120};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$48$}{$49$}{$50$}{$45$}{$52$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.42\textwidth}
@@ -2128,7 +2214,7 @@
 \hfill
 \begin{minipage}[c]{0.56\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.9, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
     \draw[->, gray!80] (0,0) -- (0,5.2) node[above, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.5cm, text=gray!80!black, font=\scriptsize] {Кількість учнів};
     \draw[->, gray!80] (0,0) -- (7.5,0) node[below, text=gray!80!black, font=\scriptsize, xshift=-3.5cm, yshift=-0.6cm] {Жанри музики};
 
@@ -2149,11 +2235,13 @@
     \node[below, font=\scriptsize] at (3.65,0) {Рок};
     \node[below, font=\scriptsize] at (5.05,0) {Попмузика};
     \node[below, font=\scriptsize] at (6.45,0) {Інші};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$5$}{$10$}{$15$}{$20$}{$40$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №20
 \zadtask{У таблиці наведено дані крокоміра про кількість (у тис.) кроків Олени за тиждень. \nmtyear{2026}
 \par\vspace{0.25cm}
@@ -2167,10 +2255,12 @@
 \hline
 \end{tabular}
 \end{center}
-\vspace{0.25cm}
+\nopagebreak\vspace{0.25cm}
 Наступного тижня вона планує збільшити середню кількість кроків за день на $20\,\%$ порівняно із середньою кількістю кроків, зафіксованих цього тижня. Скільки в середньому (у тис.) кроків за день протягом наступного тижня має робити Олена?}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.46\textwidth}
@@ -2179,7 +2269,7 @@
 \hfill
 \begin{minipage}[c]{0.52\textwidth}
 \centering
-\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
     \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
     \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
     \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
@@ -2194,11 +2284,13 @@
     \fill (0,2) circle (2.5pt);
     \fill (16,6) circle (2.5pt);
     \fill (24,3) circle (2.5pt);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$4$}{$6$}{$8$}{$10$}{$24$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.46\textwidth}
@@ -2207,7 +2299,7 @@
 \hfill
 \begin{minipage}[c]{0.52\textwidth}
 \centering
-\begin{tikzpicture}[x=0.55cm, y=0.11cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.55cm, y=0.11cm, thick]
     \draw[step=1, gray!30, very thin] (0,0) grid (8,40);
     \draw[->] (0,0) -- (8.8,0) node[right, font=\scriptsize] {$t$, год};
     \draw[->] (0,0) -- (0,46) node[above, font=\scriptsize] {$V$, м$^3$};
@@ -2215,11 +2307,13 @@
     \foreach \xx in {1,2,3,4,5,6,7,8} {\node[below, font=\scriptsize] at (\xx,0) {\xx};}
     \node[below left, font=\scriptsize] at (0,0) {0};
     \draw[mainGreen, very thick] (0,40) -- (8,0);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$7$~м$^3$}{$10$~м$^3$}{$15$~м$^3$}{$20$~м$^3$}{$35$~м$^3$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.44\textwidth}
@@ -2228,7 +2322,7 @@
 \hfill
 \begin{minipage}[c]{0.54\textwidth}
 \centering
-\begin{tikzpicture}[x=0.92cm, y=0.28cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.92cm, y=0.28cm, thick]
     % осі та горизонтальна сітка з позначками 0,2,...,14
     \draw[->] (0,0) -- (0,15.2) node[above, font=\scriptsize] {Кількість медалей};
     \draw[->] (0,0) -- (5.6,0) node[below right, font=\scriptsize] {Рік};
@@ -2253,12 +2347,14 @@
     \node[right, font=\tiny] at (4.0,12.55) {срібло};
     \filldraw[fill=bronze, draw=black!60] (3.7,11.0) rectangle ++(0.3,0.7);
     \node[right, font=\tiny] at (4.0,11.35) {бронза};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$2008$}{$2012$}{$2016$}{$2020$}{$2024$}
 % Відповідь: А
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №11 --- основна тема: Теорія ймовірності
 \noindent
 \begin{minipage}[c]{0.54\textwidth}
@@ -2267,7 +2363,7 @@
 \hfill
 \begin{minipage}[c]{0.44\textwidth}
 \centering
-\begin{tikzpicture}[scale=1.0]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0]
     \def\R{1.9}
     % значення: рок 20, поп 25, джаз 11, диско 14; сума 70
     % кути: рок 20/70*360=102.857; поп 25/70*360=128.571; джаз 11/70=56.571; диско 14/70=72
@@ -2295,15 +2391,17 @@
         \filldraw[fill=cjazz, draw=black!40] (0,-1.1) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-0.95){джаз};
         \filldraw[fill=cdisco, draw=black!40] (0,-1.65) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-1.5){диско};
     \end{scope}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTableTall{$\dfrac{2}{5}$}{$\dfrac{5}{14}$}{$\dfrac{1}{20}$}{$\dfrac{1}{4}$}{$\dfrac{2}{7}$}
 % Відповідь: Д
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №20
 \zadtask{У грушевому саду ростуть $200$ груш п'яти різних сортів. У таблиці наведено інформацію про назви сортів груш і частку (у~\%) дерев цих сортів від загальної кількості груш у саду. \nmtyear{2026}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 \noindent\begin{center}
 \renewcommand{\arraystretch}{1.3}
@@ -2315,12 +2413,14 @@
 \hline
 \end{tabular}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 У таблиці $n$~--- невідоме число. За всі груші сорту Лісова Красуня, реалізовані на оптовому ринку торік, виручили $52\,000$~грн. Цього року запланували за всі груші сорту Лісова Красуня вторгувати на $10\,\%$ більше гривень, ніж торік. Скільки гривень у середньому планують виручити за груші з одного дерева цього сорту?}
 \nmtAnswerBox
 % Відповідь: $1430$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.42\textwidth}
@@ -2329,7 +2429,7 @@
 \hfill
 \begin{minipage}[c]{0.56\textwidth}
 \centering
-\begin{tikzpicture}[scale=0.9, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
     % Сітка та осі
     \draw[gray!30, thin] (0,0) grid[xstep=1.2, ystep=0.6] (7.2, 6.0);
     \draw[->, thick] (0,0) -- (0, 6.5);
@@ -2356,12 +2456,14 @@
     \node[below, font=\scriptsize] at (4.2,0) {п'ятниця};
     \node[below, font=\scriptsize] at (5.4,0) {субота};
     \node[below, font=\scriptsize] at (6.6,0) {неділя};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{середа}{четвер}{п'ятниця}{субота}{неділя}
 % Відповідь: В
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.46\textwidth}
@@ -2370,7 +2472,7 @@
 \hfill
 \begin{minipage}[c]{0.52\textwidth}
 \centering
-\begin{tikzpicture}[x=0.9cm, y=0.32cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.9cm, y=0.32cm, thick]
     \draw[->] (0,0) -- (0,11) node[above, font=\scriptsize, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.4cm] {Частка відвідувачів, \%};
     \draw[->] (0,0) -- (5.6,0);
     \foreach \y in {1,2,3,4,5,6,7,8,9,10} {
@@ -2393,12 +2495,14 @@
     \node[below, font=\tiny] at (2.8,0) {Березень};
     \node[below, font=\tiny] at (3.8,0) {Квітень};
     \node[below, font=\tiny] at (4.8,0) {Травень};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.5cm}
 \answerTable{січень}{лютий}{березень}{квітень}{травень}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.44\textwidth}
@@ -2407,7 +2511,7 @@
 \hfill
 \begin{minipage}[c]{0.54\textwidth}
 \centering
-\begin{tikzpicture}[x=0.72cm, y=0.55cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.72cm, y=0.55cm, thick]
     \draw[->] (0,0) -- (0,5.4) node[above, font=\scriptsize, rotate=90, anchor=south, xshift=-2.0cm, yshift=0.4cm] {Кількість відвідувачів};
     \draw[->] (0,0) -- (6.6,0);
     \foreach \y in {1,2,3,4,5} {
@@ -2433,15 +2537,17 @@
     \node[below, font=\tiny, rotate=35, anchor=east] at (3.75,-0.05) {14:00--16:00};
     \node[below, font=\tiny, rotate=35, anchor=east] at (4.75,-0.05) {16:00--18:00};
     \node[below, font=\tiny, rotate=35, anchor=east] at (5.75,-0.05) {18:00--20:00};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.7cm}
 \answerTable{8:00--12:00}{10:00--14:00}{12:00--16:00}{14:00--18:00}{16:00--20:00}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №11
 \zadtask{Учителька запропонувала $24$ учням обрати один із п'яти напрямків для шкільної екскурсії. Кожен учень проголосував лише за один напрямок, написавши його назву на окремій картці. Результати голосування представлено в таблиці. \nmtyear{2026}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 \noindent\begin{center}
 \renewcommand{\arraystretch}{1.25}
@@ -2461,15 +2567,17 @@
 \hline
 \end{tabular}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 Згодом виявилося, що турагентство відмінило екскурсію «Полтавські галушки», тому картки з голосами за цей напрямок вилучили. Учителька навмання витягає одну картку з-поміж тих, що залишилися. Яка ймовірність того, що на ній записано напрямок «Мальовничий Край»?}
 \answerTableTall{$\dfrac{1}{4}$}{$\dfrac{3}{10}$}{$\dfrac{1}{6}$}{$\dfrac{3}{4}$}{$\dfrac{1}{3}$}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №20
 \zadtask{У таблиці наведено часткові дані маркетингового аналізу про частоту купівлі (у~\%) чоловічих сорочок різних розмірів протягом місяця. \nmtyear{2026}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 \noindent\begin{center}
 \renewcommand{\arraystretch}{1.3}
@@ -2481,12 +2589,14 @@
 \hline
 \end{tabular}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 У таблиці $x$~--- невідоме число. Усього за цей період було придбано $300$ сорочок. Скільки всього сорочок розміру S було куплено в магазині протягом цього місяця?}
 \nmtAnswerBox
 % Відповідь: $18$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №2
 \noindent
 \begin{minipage}[c]{0.46\textwidth}
@@ -2495,7 +2605,7 @@
 \hfill
 \begin{minipage}[c]{0.52\textwidth}
 \centering
-\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
     \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
     \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
     \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
@@ -2511,30 +2621,31 @@
     \fill (0,2) circle (2.5pt);
     \fill (16,6) circle (2.5pt);
     \fill (24,2) circle (2.5pt);
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\vspace{0.2cm}
 \answerTable{$4$}{$6$}{$8$}{$12$}{$14$}
 % Відповідь: Д
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{56.}~Г \ {\scriptsize\color{gray}(23.05, №14)}\par
-\noindent\textbf{57.}~В \ {\scriptsize\color{gray}(30.05, №4)}\par
-\noindent\textbf{58.}~В \ {\scriptsize\color{gray}(2.06, №6)}\par
-\noindent\textbf{59.}~Б \ {\scriptsize\color{gray}(3.06, №2)}\par
-\noindent\textbf{60.}~В \ {\scriptsize\color{gray}(4.06, №2)}\par
-\noindent\textbf{61.}~Б \ {\scriptsize\color{gray}(5.06, №2)}\par
-\noindent\textbf{68.}~А \ {\scriptsize\color{gray}(15.06, №2)}\par
-\noindent\textbf{69.}~Д \ {\scriptsize\color{gray}(15.06, №11)}\par
-\noindent\textbf{70.}~$1430$ \ {\scriptsize\color{gray}(15.06, №20)}\par
-\noindent\textbf{71.}~В \ {\scriptsize\color{gray}(16.06, №2)}\par
-\noindent\textbf{72.}~Б \ {\scriptsize\color{gray}(17.06, №2)}\par
-\noindent\textbf{73.}~Б \ {\scriptsize\color{gray}(18.06, №2)}\par
-\noindent\textbf{74.}~Б \ {\scriptsize\color{gray}(18.06, №11)}\par
-\noindent\textbf{75.}~$18$ \ {\scriptsize\color{gray}(18.06, №20)}\par
-\noindent\textbf{76.}~Д \ {\scriptsize\color{gray}(19.06, №2)}\par
+\noindent\textbf{55.}~Г \ {\scriptsize\color{gray}(23.05, №14)}\par
+\noindent\textbf{56.}~В \ {\scriptsize\color{gray}(30.05, №4)}\par
+\noindent\textbf{57.}~В \ {\scriptsize\color{gray}(2.06, №6)}\par
+\noindent\textbf{58.}~Б \ {\scriptsize\color{gray}(3.06, №2)}\par
+\noindent\textbf{59.}~В \ {\scriptsize\color{gray}(4.06, №2)}\par
+\noindent\textbf{60.}~Б \ {\scriptsize\color{gray}(5.06, №2)}\par
+\noindent\textbf{67.}~А \ {\scriptsize\color{gray}(15.06, №2)}\par
+\noindent\textbf{68.}~Д \ {\scriptsize\color{gray}(15.06, №11)}\par
+\noindent\textbf{69.}~$1430$ \ {\scriptsize\color{gray}(15.06, №20)}\par
+\noindent\textbf{70.}~В \ {\scriptsize\color{gray}(16.06, №2)}\par
+\noindent\textbf{71.}~Б \ {\scriptsize\color{gray}(17.06, №2)}\par
+\noindent\textbf{72.}~Б \ {\scriptsize\color{gray}(18.06, №2)}\par
+\noindent\textbf{73.}~Б \ {\scriptsize\color{gray}(18.06, №11)}\par
+\noindent\textbf{74.}~$18$ \ {\scriptsize\color{gray}(18.06, №20)}\par
+\noindent\textbf{75.}~Д \ {\scriptsize\color{gray}(19.06, №2)}\par
 \end{multicols}
 \fi
 

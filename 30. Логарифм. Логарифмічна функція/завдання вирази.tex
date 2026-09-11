@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,10 +163,11 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -160,15 +176,15 @@
 % --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\matchingLayout}[3]{
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -177,26 +193,27 @@
 }
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -204,11 +221,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -226,12 +243,13 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 30a. Логарифмічні вирази}
-\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 75 (НМТ 2023~--- 20, 2024~--- 27, 2025~--- 19, 2026~--- 9).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 74 (НМТ \mbox{2023~--- 19}, \mbox{2024~--- 27}, \mbox{2025~--- 19}, \mbox{2026~--- 9}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
-\noindent\zadnum До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq 8$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq 8$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -240,7 +258,7 @@
 
 \textbf{2} \quad $2^{3a}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{\sqrt[3]{2}} 2^a$}$
+\textbf{3} \quad $\log_{\sqrt[3]{2}} 2^a$
 }{
 \textit{Тотожно рівний вираз}
 
@@ -256,21 +274,26 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum $\colorbox{yellow!30}{$\log_3 \dfrac{1}{27}$} = $ \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum $\log_3 \dfrac{1}{27} = $ \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \answerTableTall{$\displaystyle\frac{1}{3}$}{$3$}{$-\displaystyle\frac{1}{3}$}{$-3$}{$\displaystyle\frac{1}{9}$}
+\end{samepage}
 
-\noindent\zadnum До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a > 0$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a > 0$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
 
 \textbf{1} \quad $\sqrt{4a}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$2^{\log_4 a}$}$
+\textbf{2} \quad $2^{\log_4 a}$
 
 \textbf{3} \quad $\left(\displaystyle\frac{2}{a}\right)^{-1}$
 }{
@@ -288,31 +311,38 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Обчисліть $\colorbox{yellow!30}{$\log_8 16$}$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Обчисліть $\log_8 16$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \answerTableTall{$12$}{$2$}{$\displaystyle\frac{1}{2}$}{$8$}{$\displaystyle\frac{4}{3}$}
+\end{samepage}
 
-\noindent\zadnum Обчисліть $\colorbox{yellow!30}{$0{,}25^{\log_{0,5} 4}$}$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$0{,}5$}{$0{,}25$}{$16$}{$2$}{$4$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та точкою (А--Д) на координатній прямій (див. рисунок), координатою якою є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якою є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
     \node[above] at (\x,0.1) {\small $\x$};
 }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -321,7 +351,7 @@
 
 \textbf{2} \quad $a^0$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_2 a$}$
+\textbf{3} \quad $\log_2 a$
 }{
 \textit{Точка}
 
@@ -337,9 +367,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Початок речення}
@@ -348,7 +381,7 @@
 
 \textbf{2} \quad Якщо $(m + n)^2 - m^2 - n^2 = a$, то
 
-\textbf{3} \quad Якщо $\colorbox{yellow!30}{$\log_3 27^{mn} = a$}$, то
+\textbf{3} \quad Якщо $\log_3 27^{mn} = a$, то
 }{
 \textit{Закінчення речення}
 
@@ -364,9 +397,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Початок речення}
@@ -391,9 +427,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу, якщо $e \approx 2{,}7$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $e \approx 2{,}7$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -418,9 +457,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -445,14 +487,17 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Початок речення}
 
-\textbf{1} \quad Якщо $\colorbox{yellow!30}{$n^{\log_n m} = a$}$, то
+\textbf{1} \quad Якщо $n^{\log_n m} = a$, то
 
 \textbf{2} \quad Якщо $\displaystyle\frac{mn^2 - nm^2}{n - m} = a$, то
 
@@ -472,36 +517,40 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $\lg 4 + \lg 0{,}025 = $ \nmtyear{2023}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$\lg 4{,}025$}{$0{,}1$}{$10$}{$-2$}{$-1$}
+\end{samepage}
 
-\noindent\zadnum Обчисліть $\colorbox{yellow!30}{$\log_8 16$}$. \nmtyear{2023}
-\vspace{0.3cm}
-
-\answerTableTall{$12$}{$8$}{$2$}{$\displaystyle\frac{1}{2}$}{$\displaystyle\frac{4}{3}$}
-
-\noindent\zadnum Обчисліть $\colorbox{yellow!30}{$0{,}25^{\log_{0,5} 4}$}$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$0{,}25$}{$0{,}5$}{$16$}{$4$}{$2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $\lg 25 + \lg 40 = $ \nmtyear{2023}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$4$}{$\lg 65$}{$1$}{$2$}{$3$}
+\end{samepage}
 
-\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Початок речення}
 
 \textbf{1} \quad Якщо $\displaystyle\frac{n}{a} = 3$, то
 
-\textbf{2} \quad Якщо $\colorbox{yellow!30}{$1 + \log_3 n = \log_3 a$}$, то
+\textbf{2} \quad Якщо $1 + \log_3 n = \log_3 a$, то
 
 \textbf{3} \quad Якщо $3^n \cdot 3 = 3^a$, то
 }{
@@ -519,9 +568,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між твердженням \mbox{(1--3)} та функцією \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Твердження}
@@ -546,9 +598,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -557,7 +612,7 @@
 
 \textbf{2} \quad $\sin \pi$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_\pi \dfrac{1}{\pi}$}$
+\textbf{3} \quad $\log_\pi \dfrac{1}{\pi}$
 }{
 \textit{Проміжок}
 
@@ -573,14 +628,19 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Обчисліть $\colorbox{yellow!30}{$100^{\lg 3}$}$. \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Обчисліть $100^{\lg 3}$. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$1000000$}{$6$}{$\sqrt{3}$}{$9$}{$3$}
+\end{samepage}
 
-\noindent\zadnum До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д). \nmtyear{2023}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2023}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -589,7 +649,7 @@
 
 \textbf{2} \quad $\displaystyle\frac{2\sqrt{5} - 10}{\sqrt{5}}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{\sqrt{5}} 5$}$
+\textbf{3} \quad $\log_{\sqrt{5}} 5$
 }{
 \textit{Тотожно рівний вираз}
 
@@ -607,11 +667,14 @@
 }
 
 % === НМТ 2024 ===
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -620,7 +683,7 @@
 
 \textbf{2} \quad $\sqrt{3} - 1$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{\frac{1}{3}} \sqrt{3}$}$
+\textbf{3} \quad $\log_{\frac{1}{3}} \sqrt{3}$
 }{
 \textit{Проміжок}
 
@@ -636,14 +699,17 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) і множиною (А--Д), якому належить значення цього виразу, якщо $a = 5$. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і множиною \mbox{(А--Д)}, якому належить значення цього виразу, якщо $a = 5$. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\log_{0,2} a$}$
+\textbf{1} \quad $\log_{0,2} a$
 
 \textbf{2} \quad $2^{-a}$
 
@@ -663,9 +729,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д). \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -674,7 +743,7 @@
 
 \textbf{2} \quad $|3 - \sqrt{10}|$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_5 125$}$
+\textbf{3} \quad $\log_5 125$
 }{
 \textit{Тотожно рівний вираз}
 
@@ -690,14 +759,19 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $|\lg 5 - \lg 9| = $ \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTableTall{$-\lg 45$}{$\lg \displaystyle\frac{5}{9}$}{$-\lg 4$}{$\lg \displaystyle\frac{9}{5}$}{$\lg 4$}
+\end{samepage}
 
-\noindent\zadnum До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq \sqrt{2}$. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq \sqrt{2}$. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{
 \textit{Вираз}
@@ -706,7 +780,7 @@
 
 \textbf{2} \quad $\displaystyle\frac{a^2 - 2}{a - \sqrt{2}}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_b b^a + 3$}$
+\textbf{3} \quad $\log_b b^a + 3$
 }{
 \textit{Тотожно рівний вираз}
 
@@ -722,24 +796,32 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum $|1 - \colorbox{yellow!30}{$\lg 1000$}| = $ \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum $|1 - \lg 1000| = $ \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
-\answerTable{$4$}{$-2$}{$-\colorbox{yellow!30}{$\lg 999$}$}{$2$}{$\colorbox{yellow!30}{$\lg 999$}$}
+\answerTable{$4$}{$-2$}{$-\lg 999$}{$2$}{$\lg 999$}
 
 % === НМТ 2024 ===
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Скільки всього цілих чисел містить проміжок $[-1; \log_4 16]$? \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$6$}{$5$}{$2$}{$3$}{$4$}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-1/L, 0/M, 1/N} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
@@ -747,14 +829,14 @@
 }
 \node[below] at (-2,0) {\small $K$};
 \node[below] at (2,0) {\small $P$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\log_{\sqrt{2}} \cos 360°$}$
+\textbf{1} \quad $\log_{\sqrt{2}} \cos 360°$
 
 \textbf{2} \quad $\displaystyle\frac{1}{\sqrt{2} - 1}$
 
@@ -774,21 +856,24 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
     \node[above] at (\x,0.1) {\small $\x$};
 }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -796,7 +881,7 @@
 
 \textbf{2} \quad $\mathrm{tg}\,\displaystyle\frac{5\pi}{4}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_\pi \dfrac{1}{\pi^2}$}$
+\textbf{3} \quad $\log_\pi \dfrac{1}{\pi^2}$
 }{
 \textit{Точка}
 
@@ -812,14 +897,19 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть $\log_2 \displaystyle\frac{16}{a}$, якщо $\log_2 a = 0{,}5$. \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$4{,}5$}{$3{,}5$}{$5$}{$8$}{$16$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -827,7 +917,7 @@
 
 \textbf{2} \quad $2\pi - 5$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_3 \pi - \log_3 (3\pi)$}$
+\textbf{3} \quad $\log_3 \pi - \log_3 (3\pi)$
 }{
 \textit{Проміжок}
 
@@ -843,20 +933,25 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть значення виразу $5{,}6^{\log_{5,6} 12}$. \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$12$}{$6{,}4$}{$5{,}6$}{$67{,}2$}{$17{,}6$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та значенням (А--Д) цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $\displaystyle\frac{3^{-5}}{3^{-6}}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_2 0{,}1 + \log_2 320$}$
+\textbf{2} \quad $\log_2 0{,}1 + \log_2 320$
 
 \textbf{3} \quad $4\cos^2 30° - 4\sin^2 30°$
 }{
@@ -874,14 +969,19 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Укажіть проміжок, якому належить значення виразу $\log_{0,2} 125$. \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$[3; 25)$}{$[0; 3)$}{$(-\infty; -3)$}{$[25; +\infty)$}{$[-3; 0)$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -889,7 +989,7 @@
 
 \textbf{2} \quad $1 - \sqrt{2}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\left(\dfrac{1}{3}\right)^{\log_3 \sqrt{2}}$}$
+\textbf{3} \quad $\left(\dfrac{1}{3}\right)^{\log_3 \sqrt{2}}$
 }{
 \textit{Проміжок}
 
@@ -905,13 +1005,16 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\log_\pi 1$}$
+\textbf{1} \quad $\log_\pi 1$
 
 \textbf{2} \quad $\sin \left(-\displaystyle\frac{\pi}{6}\right)$
 
@@ -931,12 +1034,15 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та точкою (А--Д) на координатній прямій (див. рисунок), координатою якою є значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якою є значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-1/L, 0/M, 1/N} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
@@ -944,10 +1050,10 @@
 }
 \node[below] at (-2,0) {\small $K$};
 \node[below] at (2,0) {\small $P$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -955,7 +1061,7 @@
 
 \textbf{2} \quad $\displaystyle\frac{\pi^2 - 4}{\pi - 2} - \pi$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_3 \pi^0$}$
+\textbf{3} \quad $\log_3 \pi^0$
 }{
 \textit{Точка}
 
@@ -971,9 +1077,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -981,7 +1090,7 @@
 
 \textbf{2} \quad $|\sqrt{2} - 2|$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{\sqrt{2}} 0{,}5$}$
+\textbf{3} \quad $\log_{\sqrt{2}} 0{,}5$
 }{
 \textit{Проміжок}
 
@@ -997,14 +1106,19 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть $2\log_6 3 + \log_6 4$. \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$2$}{$\log_6 13$}{$4$}{$2\log_6 7$}{$2\log_6 12$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1012,7 +1126,7 @@
 
 \textbf{2} \quad $1 - \pi$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\left(\dfrac{1}{2}\right)^{\log_2 \pi}$}$
+\textbf{3} \quad $\left(\dfrac{1}{2}\right)^{\log_2 \pi}$
 }{
 \textit{Проміжок}
 
@@ -1028,15 +1142,18 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $\cos 2\pi$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_\pi \dfrac{1}{\pi}$}$
+\textbf{2} \quad $\log_\pi \dfrac{1}{\pi}$
 
 \textbf{3} \quad $\pi^2 - 9$
 }{
@@ -1054,9 +1171,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним, якщо $e \approx 2{,}7$. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним, якщо $e \approx 2{,}7$. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1064,7 +1184,7 @@
 
 \textbf{2} \quad $(e - 1)(e + 1)$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\ln \left(\sqrt{e} \cdot e^{\frac{1}{2}}\right)$}$
+\textbf{3} \quad $\ln \left(\sqrt{e} \cdot e^{\frac{1}{2}}\right)$
 }{
 \textit{Твердження про значення виразу}
 
@@ -1080,19 +1200,18 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\vspace{0.8cm}
-
-\noindent Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі.
-
-\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі. Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $\varphi \cdot \displaystyle\frac{\sqrt{5} - 1}{2}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_5 (2\varphi - \sqrt{5})$}$
+\textbf{2} \quad $\log_5 (2\varphi - \sqrt{5})$
 
 \textbf{3} \quad $\varphi - 2$
 }{
@@ -1110,20 +1229,25 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $\log_a 3a - \log_a 3 = $ \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$1$}{$\log_a 9$}{$3$}{$0$}{$\log_a (3a - 3)$}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $(\sqrt{2} + 5)(\sqrt{2} - 5)$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$2\log_2 \sqrt{8}$}$
+\textbf{2} \quad $2\log_2 \sqrt{8}$
 
 \textbf{3} \quad $|1 - \sqrt{2}|$
 }{
@@ -1141,9 +1265,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3) та значенням (А--Д) цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1151,7 +1278,7 @@
 
 \textbf{2} \quad $\displaystyle\frac{x - 1}{\sqrt{5}}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\lg x^0$}$
+\textbf{3} \quad $\lg x^0$
 }{
 \textit{Значення виразу}
 
@@ -1167,41 +1294,49 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Укажіть проміжок, якому належить число $\log_{\frac{1}{2}} 8$. \nmtyear{2024}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$(5; +\infty)$}{$(1; 5]$}{$(-\infty; -5]$}{$(-5; 0]$}{$(0; 1]$}
 
 % === НМТ 2025 ===
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть значення виразу $\log_5 (5ab)$, якщо $\log_5 (ab) = 0{,}7$. \nmtyear{2025}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$0{,}7$}{$5{,}7$}{$1{,}7$}{$5^{1{,}7}$}{$3{,}5$}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) й точку (А--Д) на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
     \node[above] at (\x,0.1) {\small $\x$};
 }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $2e \cdot \displaystyle\frac{1}{e}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\ln 1$}$
+\textbf{2} \quad $\ln 1$
 
 \textbf{3} \quad $(e - 1)(e + 1) - e^2$
 }{
@@ -1219,15 +1354,18 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $\displaystyle\frac{3}{3^{-3}}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_3 \sqrt[3]{2}$}$
+\textbf{2} \quad $\log_3 \sqrt[3]{2}$
 
 \textbf{3} \quad $2(\cos 30° - 0{,}5)(\cos 30° + 0{,}5)$
 }{
@@ -1245,19 +1383,26 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $|\log_{0,2} 25 - 1| = $ \nmtyear{2025}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$-3$}{$3$}{$-\log_{0,2} 24$}{$4$}{$\log_{0,2} 24$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $\log_5 5^{10} = $ \nmtyear{2025}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$1$}{$10$}{$5$}{$50$}{$2$}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) із значенням $m$ (А--Д), за якого значення цього виразу дорівнює 1. \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює 1. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1265,7 +1410,7 @@
 
 \textbf{2} \quad $4^6 : 4^{-m}$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{16} 2 + \log_{16} m$}$
+\textbf{3} \quad $\log_{16} 2 + \log_{16} m$
 }{
 \textit{Значення $m$}
 
@@ -1281,12 +1426,15 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) й точку (А--Д) на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-1.5,0) -- (1.5,0);
 \foreach \x/\label in {-1/L, 0/M, 1/N} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
@@ -1294,16 +1442,16 @@
 }
 \node[below] at (-1.3,0) {\small $K$};
 \node[below] at (1.3,0) {\small $P$};
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $e \cdot \displaystyle\frac{1}{2e}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\ln 2e - \ln 2$}$
+\textbf{2} \quad $\ln 2e - \ln 2$
 
 \textbf{3} \quad $|1 - e| - e$
 }{
@@ -1321,25 +1469,24 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\vspace{0.8cm}
-
-\noindent Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз (1--3) й точку (А--Д) на координатній прямій (див. рисунок), координатою якої є значення виразу.
-
-\noindent\zadnum \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.5,0) -- (2.5,0);
 \foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
     \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
     \node[above] at (\x,0.1) {\small $\x$};
 }
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1347,7 +1494,7 @@
 
 \textbf{2} \quad $(1 - \sqrt{5}) \cdot \varphi$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_5 (2\varphi - \sqrt{5})$}$
+\textbf{3} \quad $\log_5 (2\varphi - \sqrt{5})$
 }{
 \textit{Точка}
 
@@ -1363,18 +1510,23 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2025}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$16$}{$2$}{$0{,}25$}{$0{,}5$}{$4$}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) і твердження про його значення (А--Д), яке є правильним для цього виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\ln \dfrac{1}{e}$}$
+\textbf{1} \quad $\ln \dfrac{1}{e}$
 
 \textbf{2} \quad $e + 1$
 
@@ -1394,18 +1546,23 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum $|\lg 50 - 2| = $ \nmtyear{2025}
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \answerTable{$\lg 48$}{$\lg 5$}{$\lg 2$}{$\lg 0{,}5$}{$\lg 25$}
+\end{samepage}
 
-\noindent\zadnum Доберіть до числового виразу (1--3) його значення (А--Д). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\log_3 27$}$
+\textbf{1} \quad $\log_3 27$
 
 \textbf{2} \quad $\mathrm{tg}\,\displaystyle\frac{2\pi}{3}$
 
@@ -1425,15 +1582,18 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Узгодьте вираз (1--3) і твердження про його значення (А--Д), яке є правильним для цього виразу. \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $(3\pi - 1)^0$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_\pi \dfrac{1}{\pi^3}$}$
+\textbf{2} \quad $\log_\pi \dfrac{1}{\pi^3}$
 
 \textbf{3} \quad $\mathrm{tg}\,\displaystyle\frac{\pi}{3}$
 }{
@@ -1451,9 +1611,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Установіть відповідність між виразом (1--3), де $\pi$ -- відома математична константа, та проміжком (А--Д), якому належить його значення. \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)}, де $\pi$ -- відома математична константа, та проміжком \mbox{(А--Д)}, якому належить його значення. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1461,7 +1624,7 @@
 
 \textbf{2} \quad $\pi - 4$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$4^{\log_4 \pi}$}$
+\textbf{3} \quad $4^{\log_4 \pi}$
 }{
 \textit{Проміжок}
 
@@ -1477,13 +1640,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\vspace{0.8cm}
-
-\noindent Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз (1--3) та проміжок (А--Д), якому належить значення цього виразу.
-
-\noindent\zadnum \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} та проміжок \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1491,7 +1653,7 @@
 
 \textbf{2} \quad $(\sqrt{5} - 1) \varphi$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$\log_{\frac{1}{5}} (2\varphi - 1)$}$
+\textbf{3} \quad $\log_{\frac{1}{5}} (2\varphi - 1)$
 }{
 \textit{Проміжок}
 
@@ -1507,19 +1669,18 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\vspace{0.8cm}
-
-\noindent Число $\delta = \sqrt{2} + 1$ називають срібним перетином. Узгодьте вираз (1--3) та твердження про його значення (А--Д), яке є правильним для цього виразу.
-
-\noindent\zadnum \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Число $\delta = \sqrt{2} + 1$ називають срібним перетином. Узгодьте вираз \mbox{(1--3)} та твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
 \textbf{1} \quad $\displaystyle\frac{1}{\delta}$
 
-\textbf{2} \quad $\colorbox{yellow!30}{$\log_2 (\delta - 1)$}$
+\textbf{2} \quad $\log_2 (\delta - 1)$
 
 \textbf{3} \quad $\sqrt{2} - \delta$
 }{
@@ -1537,13 +1698,16 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Доберіть до числового виразу (1--3) його значення (А--Д). \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
-\textbf{1} \quad $\colorbox{yellow!30}{$\lg 100$}$
+\textbf{1} \quad $\lg 100$
 
 \textbf{2} \quad $\sin \displaystyle\frac{3\pi}{2}$
 
@@ -1563,9 +1727,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m > 0$. \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m > 0$. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Початок речення}
 
@@ -1573,7 +1740,7 @@
 
 \textbf{2} \quad Якщо $\sqrt{2m^2} = n$, то
 
-\textbf{3} \quad Якщо $\colorbox{yellow!30}{$4^{\log_2 m} = n$}$, то
+\textbf{3} \quad Якщо $4^{\log_2 m} = n$, то
 }{
 \textit{Закінчення речення}
 
@@ -1589,9 +1756,12 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum Доберіть до виразу (1--3) його значення (А--Д), якщо $a = \sqrt{2}$. \nmtyear{2025}
-\vspace{0.3cm}
+\begin{samepage}
+\noindent\zadnum Доберіть до виразу \mbox{(1--3)} його значення \mbox{(А--Д)}, якщо $a = \sqrt{2}$. \nmtyear{2025}
+\nopagebreak\vspace{0.3cm}
 
 \matchingLayout{\textit{Вираз}
 
@@ -1599,7 +1769,7 @@
 
 \textbf{2} \quad $(a - 3)(a + 3)$
 
-\textbf{3} \quad $\colorbox{yellow!30}{$81^{\log_3 a}$}$
+\textbf{3} \quad $81^{\log_3 a}$
 }{
 \textit{Значення виразу}
 
@@ -1615,19 +1785,24 @@
 }{
 \matchingGrid
 }
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №9
 \zadtask{Обчисліть $\log_{0{,}5} 8$. \nmtyear{2026}}
 \answerTableTall{$-2$}{$-4$}{$-3$}{$\dfrac{16}{3}$}{$3$}
 % Відповідь: В
 \ifshowsolutions\solution{Оскільки $0{,}5=2^{-1}$, а $8=2^3$, то $\log_{0{,}5}8=\dfrac{\log_2 8}{\log_2 0{,}5}=\dfrac{3}{-1}=-3$. Відповідь: \textbf{В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №18 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\zadtask{Установіть відповідність між виразом (1--3) і його значенням (А--Д), якщо $a = \dfrac{3}{8}$. \nmtyear{2026}
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і його значенням \mbox{(А--Д)}, якщо $a = \dfrac{3}{8}$. \nmtyear{2026}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
 \textit{Вираз}\par\vspace{0.15cm}
@@ -1646,17 +1821,19 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}
 }
 % Відповідь: 1~--~В, 2~--~Б, 3~--~Д
 \ifshowsolutions\solution{$a=\dfrac38$. \textbf{1}: $\sqrt[3]{\dfrac{a}{3}}=\sqrt[3]{\dfrac18}=\dfrac12$ (В). \textbf{2}: $\log_2\!\left(a\cdot\dfrac{16}{3}\right)=\log_2 2=1$ (Б). \textbf{3}: $\sin\!\left(4\pi\cdot\dfrac38\right)=\sin\dfrac{3\pi}{2}=-1$ (Д). Відповідь: \textbf{1~--~В, 2~--~Б, 3~--~Д}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\zadtask{Узгодьте вираз (1--3) із його значенням (А--Д), якщо $a = 4$. \nmtyear{2026}
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}, якщо $a = 4$. \nmtyear{2026}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
 \textit{Вираз}\par\vspace{0.2cm}
@@ -1675,17 +1852,19 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}
 }
 % Відповідь: 1~--~Г, 2~--~А, 3~--~В
 \ifshowsolutions\solution{При $a=4$: \textbf{1)} $\dfrac{2a^2-12a}{a^2-36}=\dfrac{2a(a-6)}{(a-6)(a+6)}=\dfrac{2a}{a+6}=\dfrac{8}{10}=0{,}8$ (Г); \textbf{2)} $0{,}04^{\log_5 4}=(5^{-2})^{\log_5 4}=4^{-2}=\dfrac{1}{16}$ (А); \textbf{3)} $a^0-a^{3/2}=1-8=-7$ (В). Відповідь: \textbf{1\,--\,Г, 2\,--\,А, 3\,--\,В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\zadtask{Узгодьте вираз (1--3) із проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2026}
+\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.4\textwidth}
 \textit{Вираз}\par\vspace{0.2cm}
@@ -1704,17 +1883,19 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}
 }
 % Відповідь: 1~--~А, 2~--~Г, 3~--~В
 \ifshowsolutions\solution{$\dfrac{7}{5}-\dfrac{5}{3}=\dfrac{21-25}{15}=-\dfrac{4}{15}\in[-1;0)$ -- \textbf{А}; $\sqrt{3}\cdot\sqrt{5}=\sqrt{15}\approx3{,}87\in[2;4)$ -- \textbf{Г}; $\log_4 8=\dfrac{3}{2}=1{,}5\in[1;2)$ -- \textbf{В}. Відповідь: \textbf{1--А, 2--Г, 3--В}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\zadtask{Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2026}
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2026}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.4\textwidth}
 \textit{Вираз}\par\vspace{0.2cm}
@@ -1733,15 +1914,17 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
 % Відповідь: 1~--~В, 2~--~Г, 3~--~Б
 \ifshowsolutions\solution{$1$: $|-6+\cos4\pi|=|-6+1|=5$ (В); $2$: $\sqrt{2}\cdot\sqrt{18}=\sqrt{36}=6$ (Г); $3$: $\log_{1/2}32=\log_{1/2}2^5=-5$ (Б). Відповідь: \textbf{1~--~В, 2~--~Г, 3~--~Б}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №16 --- також у темі: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\zadtask{Узгодьте вираз (1--3) із проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2026}
-\vspace{0.3cm}
+\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
 \textit{Вираз}\par\vspace{0.15cm}
@@ -1760,36 +1943,43 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №6
 \zadtask{Обчисліть $\log_4 2 + \log_4 32$. \nmtyear{2026}}
 \answerTable{$\log_4 34$}{$3$}{$2$}{$4$}{$16$}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №15 --- основна тема: Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів
 \zadtask{Знайдіть найменший цілий розв'язок нерівності $(\log_3 1 - 2)(3x - 6) \leqslant -6$. \nmtyear{2026}}
 \answerTable{$5$}{$4$}{$3$}{$2$}{$1$}
 % Відповідь: Б
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №13
 \zadtask{$\log_2 8 - \log_{\frac{1}{5}} 25 = $ \nmtyear{2026}}
 \answerTable{$-2$}{$2$}{$1$}{$-1$}{$5$}
 % Відповідь: Д
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{67.}~В \ {\scriptsize\color{gray}(23.05, №9)}\par
-\noindent\textbf{68.}~1~--~В, 2~--~Б, 3~--~Д \ {\scriptsize\color{gray}(30.05, №18)}\par
-\noindent\textbf{69.}~1~--~Г, 2~--~А, 3~--~В \ {\scriptsize\color{gray}(1.06, №16)}\par
-\noindent\textbf{70.}~1~--~А, 2~--~Г, 3~--~В \ {\scriptsize\color{gray}(2.06, №16)}\par
-\noindent\textbf{71.}~1~--~В, 2~--~Г, 3~--~Б \ {\scriptsize\color{gray}(5.06, №16)}\par
-\noindent\textbf{73.}~Б \ {\scriptsize\color{gray}(15.06, №6)}\par
-\noindent\textbf{74.}~Б \ {\scriptsize\color{gray}(17.06, №15)}\par
-\noindent\textbf{75.}~Д \ {\scriptsize\color{gray}(18.06, №13)}\par
+\noindent\textbf{66.}~В \ {\scriptsize\color{gray}(23.05, №9)}\par
+\noindent\textbf{67.}~1~--~В, 2~--~Б, 3~--~Д \ {\scriptsize\color{gray}(30.05, №18)}\par
+\noindent\textbf{68.}~1~--~Г, 2~--~А, 3~--~В \ {\scriptsize\color{gray}(1.06, №16)}\par
+\noindent\textbf{69.}~1~--~А, 2~--~Г, 3~--~В \ {\scriptsize\color{gray}(2.06, №16)}\par
+\noindent\textbf{70.}~1~--~В, 2~--~Г, 3~--~Б \ {\scriptsize\color{gray}(5.06, №16)}\par
+\noindent\textbf{72.}~Б \ {\scriptsize\color{gray}(15.06, №6)}\par
+\noindent\textbf{73.}~Б \ {\scriptsize\color{gray}(17.06, №15)}\par
+\noindent\textbf{74.}~Д \ {\scriptsize\color{gray}(18.06, №13)}\par
 \end{multicols}
 \fi
 

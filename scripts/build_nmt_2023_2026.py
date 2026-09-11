@@ -13,7 +13,7 @@
 
 Запуск:  python3 scripts/build_nmt_2023_2026.py
 """
-import re, os, sys, json, glob, collections
+import re, os, sys, json, glob, collections, difflib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARCH = os.path.join(ROOT, "archive", "старий_формат")
@@ -117,15 +117,19 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -134,6 +138,9 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -146,10 +153,13 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -159,9 +169,9 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -189,7 +199,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -199,7 +209,11 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -223,7 +237,8 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -242,10 +257,11 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
@@ -262,26 +278,27 @@ RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\answerBox\b", r"\\nmtAnswerBox"),
            (r"\\shortAnswer\b", r"\\nmtAnswerBox")]
 COMPAT = r"""% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -289,11 +306,11 @@ COMPAT = r"""% --- сумісність зі старою базою (діє, я
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -311,7 +328,9 @@ COMPAT = r"""% --- сумісність зі старою базою (діє, я
     \vspace{0.2cm}}
 
 """
-DROPPED = {"answerTableBig","matchTable","answerGrid","answerGridSmall","answerBox","shortAnswer"}
+DROPPED = {"answerTableBig","matchTable","answerGrid","answerGridSmall","answerBox","shortAnswer","answerTableSmall","answerListVertical","trigStyle"}
+# ширини колонок старого макета відповідностей: умови / варіанти / сітка (варіанти бувають p{7cm})
+ML_WIDTHS = [("{0.40\\textwidth}", "{0.36\\textwidth}"), ("{0.28\\textwidth}", "{0.43\\textwidth}"), ("{0.30\\textwidth}", "{0.19\\textwidth}")]
 KNOWN_PKGS = {"fontspec","polyglossia","geometry","amsmath","amssymb","enumitem","tikz","pgfplots","xcolor","array","fancyhdr",
               "multirow","multicol","diagbox","graphicx","babel","mathastext","colortbl","tcolorbox","hyperref","draftwatermark"}
 GLOBAL_TIKZLIBS = {"calc","patterns","angles","quotes","intersections","babel","3d","shapes.symbols","shapes.geometric",
@@ -472,6 +491,17 @@ def chunk_start_line(body, pos):
         if prev.startswith("%") or prev.rstrip("%").strip() == "\\noindent" or prev.startswith("\\begin{minipage}") or prev.startswith("\\noindent\\begin{minipage}"):
             ls = pls; continue
         break
+    # вступний абзац "\\noindent Текст..." безпосередньо перед номером завдання (через порожній рядок) належить завданню
+    k = ls - 1
+    while k >= 0 and body[body.rfind("\n", 0, k)+1:k].strip() == "":
+        k = body.rfind("\n", 0, k) - 1
+        if k < 0: break
+    if k >= 0:
+        pls = body.rfind("\n", 0, k) + 1; prev = body[pls:k+1].strip()
+        if re.match(r"\\noindent\s+[^\\%\s]", prev) and not START_RE.search(prev) and "\\begin{" not in prev:
+            ppe = pls - 1; ppls = body.rfind("\n", 0, ppe) + 1 if ppe > 0 else 0
+            pprev = body[ppls:ppe].strip() if ppe > 0 else ""
+            if pprev == "" or pprev.startswith("%"): ls = pls
     return ls
 
 def split_old(body, warn):
@@ -492,6 +522,9 @@ def split_old(body, warn):
 
 def convert_start(chunk):
     """перший старт завдання у chunk -> \\zadtask{ / \\zadnum"""
+    # вступне речення перед номером -> після номера
+    chunk = re.sub(r"^((?:[ \t]*%[^\n]*\n)*)[ \t]*\\noindent[ \t]+([^\n]*?)[ \t]*\n\s*\n[ \t]*\\noindent[ \t]*(\\textbf\{\d+(?:\s*\(Fix\))?\.\})[ \t]*(?:\\ )*[ \t]*",
+                   lambda m: m.group(1) + "\\noindent" + m.group(3) + " " + m.group(2) + " ", chunk, count=1)
     m = START_RE.search(chunk)
     if not m: raise ValueError("no task start in chunk")
     if m.group("A") or m.group("B"):
@@ -503,6 +536,20 @@ def convert_start(chunk):
     if re.search(r"\\noindent\s*$", before):
         before = re.sub(r"\\noindent\s*$", "\\\\noindent", before)
     return before + "\\zadnum " + after
+
+def strip_colorbox(t):
+    """\\colorbox{yellow!30}{...} -> ... (збалансовані дужки)"""
+    key = "\\colorbox{yellow!30}{"
+    while True:
+        i = t.find(key)
+        if i < 0: return t
+        j = balanced(t, i + len(key) - 1)
+        inner = t[i+len(key):j]
+        # $\\colorbox{...}{$X$}$ -- бокс усередині математики з власною математикою: лишаємо лише X
+        ls = t.rfind("\n", 0, i) + 1
+        in_math = len(re.findall(r"(?<!\\)\$", t[ls:i])) % 2 == 1
+        if in_math and inner.startswith("$") and inner.endswith("$"): inner = inner[1:-1]
+        t = t[:i] + inner + t[j+1:]
 
 def clean_chunk(chunk):
     for a, b in RENAMES: chunk = re.sub(a, b, chunk)
@@ -520,6 +567,34 @@ def clean_chunk(chunk):
     while lines and lines[0].strip() == "": lines.pop(0)
     t = "\n".join(lines)
     t = re.sub(r"\n{3,}", "\n\n", t)
+    # \vspace одразу після рядка з текстом = у горизонтальному режимі; завершуємо абзац, щоб наступний блок (minipage) не приклеївся до рядка умови
+    t = re.sub(r"(?m)^(?!\s*$)(?![ \t]*(?:\\begin|\\end|\\vspace|\\par|%|\\hfill|\\noindent|\\centering|\\answer|\\matching|\\nmtAnswerBox|\\zadtask|\\zadnum|\\item|\\hline|\\cline|\\multicolumn|\\textbf\{[А-Д1-3]\}|.*(?:\\\\|&|\\par)\s*$))(.*\S)[ \t]*\n([ \t]*(?:\\vspace\*?\{|\\noindent|\\begin\{(?:minipage|center)\}))", r"\1\\par\n\2", t)
+    # \begin{minipage} одразу після речення в тому ж рядку -- завершити абзац (але не після \hfill)
+    t = re.sub(r"([.?!:;)])[ \t]+(\\begin\{minipage\})", r"\1\\par\2", t)
+    # залишкові жовті маркери редагування у старих файлах (з урахуванням вкладених дужок)
+    t = strip_colorbox(t)
+    # нерозривні діапазони; вужча колонка варіантів p{7cm}; усі minipage без параметра -- [t]
+    t = re.sub(r"\((1--3|А--Д)\)", r"\\mbox{(\1)}", t)
+    t = t.replace("p{7cm}", "p{6.2cm}")
+    t = re.sub(r"\\begin\{minipage\}\{", r"\\begin{minipage}[t]{", t)
+    # \vspace посеред рядка після тексту -- завершити абзац
+    t = re.sub(r"([^\s{\\%])[ \t]+(\\vspace\*?\{)", r"\1\\par\2", t)
+    # знаки нерівності у стилі НМТ
+    t = re.sub(r"\\(leq|le)(?![a-zA-Z])", r"\\leqslant", t); t = re.sub(r"\\(geq|ge)(?![a-zA-Z])", r"\\geqslant", t)
+    # завеликі від'ємні відступи старого макета піднімають рисунок на попереднє завдання
+    t = re.sub(r"\\vspace\*?\{-(\d+(?:\.\d+)?)cm\}", lambda m: "\\vspace{-0.3cm}" if float(m.group(1)) > 0.3 else m.group(0), t)
+    # однакові інтервали у списках варіантів
+    t = re.sub(r"itemsep=0\.\d+cm", "itemsep=2pt", t); t = re.sub(r"topsep=0\.\d+cm", "topsep=2pt", t)
+    # підписи осей pgfplots не наїжджають на підписи поділок
+    t = t.replace("axis description cs:0.5,-0.05", "axis description cs:0.5,-0.15")
+    # поле «Відповідь» під тестовим завданням (є таблиця/список А--Д) зайве
+    if re.search(r"\\answerTable(Tall|Small)?\{", t) or (re.search(r"\\textbf\{А\}", t) and re.search(r"\\textbf\{Д\}", t)) or "label=\\textbf{\\Alph*}" in t:
+        t = re.sub(r"(?m)^[ \t]*\\nmtAnswerBox[ \t]*\n?", "", t)
+    # не розривати сторінку між умовою та наступним блоком (таблиця, рисунок, колонки відповідності)
+    t = re.sub(r"(?m)^([ \t]*)(\\vspace\*?\{)", r"\1\\nopagebreak\2", t)
+    # автостискання tikz-рисунків, ширших за колонку
+    t = re.sub(r"\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", t)
+    t = re.sub(r"\\end\{tikzpicture\}", r"\\end{tikzpicture}\\end{nmtfit}", t)
     # помилки старих файлів: зайвий $ після одиниць вимірювання у клітинці таблиці
     t = re.sub(r"(\\textit\{[^{}]*\})\$(\s*\})", r"\1\2", t)
     # незбалансований \end{minipage} у старому файлі -- прибрати зайві
@@ -528,7 +603,7 @@ def clean_chunk(chunk):
         k = t.rfind("\\end{minipage}"); t = t[:k] + t[k+len("\\end{minipage}"):]; ne -= 1
     return t
 
-BOUNDARY_RE = re.compile(r"\n[ \t]*(\n|\\vspace|\\begin\{|\\par\b|\\nmtAnswerBox|\\answer|\\matching|\\hfill|\\centering|\\end\{minipage\}|\\noindent|\\newline|\\item|\\hspace|\\tikz|\\includegraphics|\\renewcommand)|\\\\(\[[^\]]*\])?")
+BOUNDARY_RE = re.compile(r"\n[ \t]*(\n|\\nopagebreak|\\vspace|\\begin\{|\\nmtAnswerBox|\\answer|\\matching|\\hfill|\\centering|\\end\{minipage\}|\\noindent|\\newline|\\item|\\hspace|\\tikz|\\includegraphics|\\renewcommand)|\\par\b")
 MASK_RE = re.compile(r"\$(?:\\.|[^$\\])*\$|\\\[.*?\\\]|\\begin\{(cases|tabular|array|aligned|align\*?|matrix|pmatrix|bmatrix|tikzpicture|axis|itemize|enumerate)\}.*?\\end\{\1\}", re.S)
 
 def find_boundary(region):
@@ -538,7 +613,7 @@ def find_boundary(region):
         return m.start()
     return len(region)
 
-PREFIX_RE = re.compile(r"\s*(\\begin\{minipage\}(\[[^\]]*\])?\{[^{}]*\}|\\begin\{center\}|\\vspace\*?\{[^}]*\}|\\noindent|\\centering|%[^\n]*\n)")
+PREFIX_RE = re.compile(r"\s*(\\begin\{minipage\}(\[[^\]]*\])?\{[^{}]*\}|\\begin\{center\}|(?:\\nopagebreak)?\\vspace\*?\{[^}]*\}|\\noindent|\\centering|%[^\n]*\n)")
 
 def insert_year(chunk, year):
     """вставити \\nmtyear{year} наприкінці умови (перший абзац після \\zadtask{ або \\zadnum)"""
@@ -560,6 +635,62 @@ def insert_year(chunk, year):
     if seg.endswith("%"): seg = seg[:-1].rstrip()
     ins = i + len(seg)
     return chunk[:ins] + " \\nmtyear{%s}" % year + chunk[ins:]
+
+def math_segments(t):
+    """[(start,end)] сегментів математики: $$..$$, $..$, \\[..\\], \\(..\\) (з урахуванням \\$)"""
+    segs = []; i = 0; n = len(t)
+    while i < n:
+        c = t[i]
+        if c == "%":   # коментар до кінця рядка
+            e = t.find("\n", i); i = n if e < 0 else e+1; continue
+        if c == "\\":
+            if t.startswith("\\[", i):
+                e = t.find("\\]", i+2); e = n if e < 0 else e+2; segs.append((i, e)); i = e; continue
+            if t.startswith("\\(", i):
+                e = t.find("\\)", i+2); e = n if e < 0 else e+2; segs.append((i, e)); i = e; continue
+            i += 2; continue
+        if c == "$":
+            if t.startswith("$$", i):
+                e = t.find("$$", i+2); e = n if e < 0 else e+2; segs.append((i, e)); i = e; continue
+            j = i+1
+            while j < n and not (t[j] == "$" and t[j-1] != "\\"): j += 1
+            e = min(j+1, n); segs.append((i, e)); i = e; continue
+        i += 1
+    return segs
+
+def fix_cyr_math(t):
+    """кирилиця всередині математики (одиниці: м^2, км, мкг/м^3) -> \\text{...}, бо в математичному шрифті її немає"""
+    def fix_seg(seg):
+        masked = []
+        def mask(m): masked.append(m.group(0)); return "\x01%d\x01" % (len(masked)-1)
+        inner = re.sub(r"\\(?:text|textit|textbf|textrm|mbox|mathrm|operatorname|mathit)\{[^{}]*\}", mask, seg)
+        inner = re.sub(r"[А-ЯІЇЄҐа-яіїєґ][А-ЯІЇЄҐа-яіїєґ'’]*", lambda m: "\\text{" + m.group(0) + "}", inner)
+        return re.sub(r"\x01(\d+)\x01", lambda m: masked[int(m.group(1))], inner)
+    out = []; last = 0
+    for a, b in math_segments(t):
+        seg = t[a:b]
+        # лише короткий рядковий матем-режим (одиниці вимірювання); довгі/багаторядкові сегменти -- ознака зайвого $ у джерелі
+        if seg.startswith("$$") or "\n" in seg or len(seg) > 80: continue
+        out.append(t[last:a]); out.append(fix_seg(seg)); last = b
+    out.append(t[last:])
+    return "".join(out)
+
+def fix_figures_tables(t):
+    """підпис y=f(x)/y=g(x) на кривій -> білий фон; дроби -> висока таблиця; голі числа в таблиці -> математика; сирі '|' у словах; поля відповіді з \\framebox"""
+    def node_fix(m):
+        opts = m.group(1) or ""
+        if "fill=" in opts: return m.group(0)
+        opts = opts[1:-1] if opts else ""
+        opts = ("fill=white, inner sep=1.5pt" + (", " + opts if opts else ""))
+        return "\\node[" + opts + "]" + m.group(2) + m.group(3)
+    t = re.sub(r"\\node(\[[^\]]*\])?(\s*at\s*\([^)]*\))?(\s*\{\$y\s*=\s*[fg]\(x\)\$\})", node_fix, t)
+    t = re.sub(r"(?m)^([ \t]*)\\answerTable\{(?=.*\\d?frac)", r"\1\\answerTableTall{", t)
+    def num_args(m):
+        return "\\answerTable" + (m.group(1) or "") + "".join("{$%s$}" % a if re.fullmatch(r"-?\d+(?:[.,]\d+)?", a) else "{%s}" % a for a in m.group(2)[1:-1].split("}{"))
+    t = re.sub(r"\\answerTable(Tall|Small)?(\{[^{}\n]*\}\{[^{}\n]*\}\{[^{}\n]*\}\{[^{}\n]*\}\{[^{}\n]*\})", num_args, t)
+    t = re.sub(r"([а-яіїєА-ЯІЇЄ])\|([а-яіїє])", r"\1\2", t)
+    t = re.sub(r"(?m)^[ \t]*(?:\\noindent)?\\hspace\{1cm\}Відповідь:\s*(?:\\framebox\(18,18\)\{\}\s*|\{,\}\s*)+$", r"\\nmtAnswerBox", t)
+    return t
 
 def count_starts(chunk):
     return len(re.findall(r"\\zadtask\{|\\zadnum\b", chunk))
@@ -584,6 +715,8 @@ def prep_2026(t):
     c = re.sub(r"\s*\\nmtyear\{\d{4}\}", "", c)
     c = clean_chunk(c)
     c = insert_year(c, "2026")
+    c = fix_cyr_math(c)
+    c = fix_figures_tables(c)
     if count_starts(c) != 1: raise SystemExit(f"2026 {t['id']}: {count_starts(c)} стартів завдання")
     return c
 
@@ -632,9 +765,17 @@ def build_unit(key, by2026, log):
     for it in items:
         c = convert_start(it["chunk"])
         c = clean_chunk(c)
+        if it["tagged"] and re.search(r"\\end\{(enumerate|tabular|itemize)\}[\s\S]*?\\nmtyear\{", c) and not re.search(r"\\nmtyear\{\d{4}\}[\s\S]*?\\(begin\{(enumerate|tabular|itemize|minipage|center)\}|matchingLayout)", c):
+            # мітка року стоїть після переліку тверджень -- переносимо в кінець запитання
+            c = re.sub(r"[ \t]*\\hfill[ \t]*\\nmtyear\{\d{4}\}|[ \t]*\\nmtyear\{\d{4}\}", "", c)
+            c = insert_year(c, it["year"])
         if not it["tagged"]:
             c = insert_year(c, it["year"])
         c = restore(c, store)
+        c = fix_cyr_math(c)
+        c = fix_figures_tables(c)
+        c = re.sub(r"(?<!\\begin\{nmtfit\})\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", c)
+        c = re.sub(r"\\end\{tikzpicture\}(?!\\end\{nmtfit\})", r"\\end{tikzpicture}\\end{nmtfit}", c)
         # відомі помилкові рядки старих файлів (некоректний синтаксис TikZ; далі координата задана вручну)
         c = re.sub(r"^[ \t]*\\coordinate \(C\) at \(intersection of O--B and O circle 1\.5cm\);[^\n]*\n", "", c, flags=re.M)
         if count_starts(c) != 1:
@@ -646,6 +787,12 @@ def build_unit(key, by2026, log):
         sig = re.sub(r"%[^\n]*", "", it["out"]); sig = re.sub(r"\s+", "", sig)
         if sig in seen:
             warn(f"завдання {it['num']}: точний дублікат уже наявного завдання пропущено"); continue
+        plain_sig = re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", "", it["out"], flags=re.S)
+        plain_sig = re.sub(r"[^А-Яа-яІіЇїЄєҐґ0-9A-Za-z]", "", re.sub(r"%[^\n]*", "", plain_sig))
+        dup = next((u for u in uniq if abs(len(u["_plain"]) - len(plain_sig)) <= 3 and len(plain_sig) > 60 and difflib.SequenceMatcher(None, u["_plain"], plain_sig).ratio() >= 0.985), None)
+        if dup:
+            warn(f"завдання {it['num']}: майже дублікат завдання {dup['num']} (збіг {difflib.SequenceMatcher(None, dup['_plain'], plain_sig).ratio():.3f}) пропущено"); continue
+        it["_plain"] = plain_sig
         seen.add(sig); uniq.append(it)
     items = uniq
     # групування за роками (стабільно)
@@ -663,7 +810,9 @@ def build_unit(key, by2026, log):
             gl += 1
             s = it["out"]
             if it["inferred"]: s = "% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)\n" + s
-            parts.append(s + "\n")
+            last = s.rstrip().split("\n")[-1]
+            if not re.search(r"answerTable|nmtAnswerBox|matchingGrid", last): s += "\n\\par\\vspace{0.25cm}"
+            parts.append("\\begin{samepage}\n" + s + "\n\\end{samepage}\n")
     # 2026
     t26 = by2026.get(key, [])
     ans_lines = []
@@ -682,9 +831,9 @@ def build_unit(key, by2026, log):
                 ans_lines.append((gl, t["answer"], t["session"], t["n"]))
             if t.get("solution"):
                 s += "\\ifshowsolutions\\solution{" + t["solution"].strip() + "}\\fi\n"
-            parts.append(s)
+            parts.append("\\begin{samepage}\n" + s + "\\end{samepage}\n")
     total = sum(counts.values())
-    stat = ", ".join(f"{y}~--- {c}" for y, c in counts.items())
+    stat = ", ".join("\\mbox{%s~--- %s}" % (y, c) for y, c in counts.items())
     header = f"База завдань НМТ 2023--2026 \\textendash{{}} Тема {key}"
     out = [PREAMBLE.replace("@@HEADER@@", header)]
     out.append("\n\\begin{document}\n\\begingroup\\setcounter{zad}{0}\n")
@@ -692,6 +841,9 @@ def build_unit(key, by2026, log):
         out.append("% --- макроси, перенесені зі старого файлу теми ---\n")
         for c in carried:
             for a, b in RENAMES: c = re.sub(a, b, c)
+            if c.startswith("\\newcommand{\\matchingLayout"):
+                for a, b in ML_WIDTHS: c = c.replace(a, b)
+                c = re.sub(r"(\\begin\{minipage\}\[t\]\{[^}]*\})", r"\1\\vspace{0pt}\\raggedright", c)
             out.append(c + "\n")
         for c in pre_defs: out.append(c + "\n")
         out.append("\n")
@@ -732,9 +884,9 @@ MASTER_EXTRA = r"""\usepackage{docmute}
 % у зведених документах: розділ = section, тема = subsection, рік = subsubsection
 \setcounter{tocdepth}{3}
 \renewcommand{\chapterTitle}[1]{\clearpage\phantomsection\addcontentsline{toc}{subsection}{#1}\sectionTitle{#1}}
-\renewcommand{\typeTitle}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{\quad #1}%
+\renewcommand{\typeTitle}[1]{\needspace{6\baselineskip}\phantomsection\addcontentsline{toc}{subsubsection}{\quad #1}%
 \par\vspace{0.3cm}\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}%
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\partTitle}[1]{\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \vspace*{0.5cm}\begin{tcolorbox}[colback=titleBg, colframe=mainGreen!60, boxrule=0.8pt, arc=8pt, halign=center, fontupper=\LARGE\bfseries\color{mainGreen}]
 #1

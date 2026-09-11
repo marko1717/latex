@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,53 +163,42 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
-% --- макроси, перенесені зі старого файлу теми ---
-\newcommand{\answerListVertical}[5]{
-    \vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}
-}
-
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -202,11 +206,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -224,18 +228,19 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 33. Похідна}
-\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 43 (НМТ 2023~--- 11, 2024~--- 12, 2025~--- 10, 2026~--- 10).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 43 (НМТ \mbox{2023~--- 11}, \mbox{2024~--- 12}, \mbox{2025~--- 10}, \mbox{2026~--- 10}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На рисунку зображено графік квадратичної функції. Укажіть точку локального екстремуму цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         % Жорстка фіксація розміру клітинки: 1 од = 0.7 см
         x=0.7cm, y=0.7cm,
@@ -266,28 +271,36 @@
         \node[below] at (axis cs:1,0) {1};
         \node[left] at (axis cs:0,1) {1};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$x_0=0$}{$x_0=-1$}{$x_0=4$}{$x_0=1$}{$x_0=3$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Тіло рухається прямолінійно за законом $x(t) = t^2 + t + 3$, де $x(t)$ — координата точки (у \textit{метрах}), $t$ — час (у \textit{секундах}). Визначте момент часу $t$ (у \textit{секундах}), у який швидкість точки дорівнюватиме $9$ \textit{м/с}. \nmtyear{2023}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть кутовий коефіцієнт дотичної, проведеної до графіка функції $f(x) = 20 - 3x - x^2$ у точці з абсцисою $x_0 = -6$. \nmtyear{2023}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = 6\sqrt{x} - \dfrac{16}{x} + \ln 2$. Обчисліть $f'(4)$. \nmtyear{2023}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = \dfrac{x^2 - 5}{3x}$. \nmtyear{2023}
 
 \answerListVertical
@@ -296,20 +309,25 @@
 {$f'(x)=\dfrac{x^2+5}{9x^2}$}
 {$f'(x)=\dfrac{x^2+5}{3x^2}$}
 {$f'(x)=\dfrac{2x}{9}$}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть значення похідної функції $y = -2x^3 + \dfrac{10}{x} - 14$ у точці $x_0 = 2$. \nmtyear{2023}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального максимуму цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         % Жорстка фіксація: 1 клітинка = 0.5 см (щоб влізло 10 клітинок по ширині)
         x=0.5cm, y=0.5cm,
@@ -344,15 +362,17 @@
         
         % Додаткові підписи, якщо треба
         \node[below left] at (axis cs:0,0) {0};
-        \node[right] at (axis cs:1, 3.5) {$y=f(x)$};
+        \node[fill=white, inner sep=1.5pt, right] at (axis cs:1, 3.5) {$y=f(x)$};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$-2; 1$}{$6$}{$-2$}{$5$}{$7$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 3x^2 + \dfrac{2}{x^2} + 4$. \nmtyear{2023}
 
 \answerListVertical
@@ -361,25 +381,32 @@
 {$f'(x)=6x+\dfrac{2}{x^3}$}
 {$f'(x)=6x-\dfrac{4}{x^3}$}
 {$f'(x)=x^3-\dfrac{1}{x}+4x$}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть значення похідної функції $f(x) = x(4-x)$ у точці $x_0 = 5$. \nmtyear{2023}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Матеріальна точка рухається прямолінійно за законом $x(t) = 6t^2$, де $x(t)$ — координата точки (у \textit{метрах}), $t$ — час (у \textit{секундах}). За якою формулою визначається швидкість $v(t)$ руху цієї матеріальної точки в будь-який момент часу $t$? \nmtyear{2023}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$v(t)=6t^3$}{$v(t)=3t$}{$v(t)=2t^3$}{$v(t)=6t$}{$v(t)=12t$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального \textbf{міні}муму цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         % Жорстка фіксація масштабу (як у завданні 7)
         x=0.5cm, y=0.5cm,
@@ -413,52 +440,67 @@
         \addplot[only marks, mark=*] coordinates {(-5,-3) (5, 6)};
         
         % Підпис функції
-        \node[right] at (axis cs:1.5, 4) {$y=f(x)$};
+        \node[fill=white, inner sep=1.5pt, right] at (axis cs:1.5, 4) {$y=f(x)$};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$1$}{$-2; 2$}{$-3$}{$2$}{$4$}
 
 % ... (преамбула з попереднього коду залишається без змін) ...
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = x + \dfrac{1}{x^2}$. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerListVertical{$f'(x)=1+\dfrac{1}{2x}$}{$f'(x)=x-\dfrac{2}{x^2}$}{$f'(x)=1+\dfrac{2}{x^2}$}{$f'(x)=\dfrac{x^2}{2}-\dfrac{1}{x}$}{$f'(x)=1-\dfrac{2}{x^3}$}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = \begin{cases} \dfrac{9}{x^2}, & \text{якщо } x < -1, \\ -5x^3 - 4x, & \text{якщо } x \geqslant -1. \end{cases}$ \quad Обчисліть $f(-2) + f'(2)$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть $f'(-5) + \displaystyle\int\limits_1^4 f(x)dx$, якщо $f(x) = -6x + 8$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 6\sqrt{x} - 8$. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerListVertical{$f'(x)=4\sqrt{x^3}-8x$}{$f'(x)=3\sqrt{x}-8$}{$f'(x)=\dfrac{3}{\sqrt{x}}$}{$f'(x)=3\sqrt{x}$}{$f'(x)=\dfrac{3}{\sqrt{x}}-8x$}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Матеріальна точка рухається прямолінійно за законом $x(t) = 1{,}2t + 0{,}2t^2$, де $x(t)$ — координата точки (у \textit{метрах}), $t$ — час (у \textit{секундах}). Знайдіть швидкість цієї точки в момент часу $t = 2{,}75$ с. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$3{,}875$ м/с}{$1{,}75$ м/с}{$4{,}4$ м/с}{$3{,}85$ м/с}{$2{,}3$ м/с}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Скільки всього точок екстремуму має ця функція на проміжку $[-5; 5]$? \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         % Фіксований масштаб: 1 клітинка = 0.5 см
         x=0.5cm, y=0.5cm,
@@ -491,51 +533,61 @@
         \addplot[only marks, mark=*] coordinates {(-5,-1.5) (5, 5)};
         
         % Підпис функції
-        \node[right] at (axis cs:1.5, 4.5) {$y=f(x)$};
+        \node[fill=white, inner sep=1.5pt, right] at (axis cs:1.5, 4.5) {$y=f(x)$};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$5$}{$4$}{$3$}{$1$}{$2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = \dfrac{x^2 - 5}{3x + 1}$ у точці з абсцисою $x_0 = 3$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Обчисліть значення похідної функції $f(x) = (7x+5)(3\cos x - 1)$ у точці $x_0 = 0$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = 81\sqrt{x} - \dfrac{81}{x} + \ln 5$. Обчисліть $f'(9)$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = \begin{cases} 30, & \text{якщо } x < -2, \\ 2x^4 + x, & \text{якщо } x \geqslant -2. \end{cases}$ \quad Обчисліть $f(-3) - f'(2)$. \nmtyear{2024}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
-\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\begin{samepage}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par \vspace{0.3cm}
+    \textit{Початок речення} \par\par\vspace{0.3cm}
     \textbf{1} \quad Нуль функції належить проміжку \\[0.4cm]
     \textbf{2} \quad Точка максимуму функції належить проміжку \\[0.4cm]
     \textbf{3} \quad Абсциса точки перетину графіка функції з графіком функції $y = \log_{\frac{1}{3}} x$ належить проміжку
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (5.5,4.5);
         \draw[->, >=stealth, thick] (-4.5,0) -- (5.5,0) node[below] {$x$};
         \draw[->, >=stealth, thick] (0,-3.5) -- (0,4.5) node[left] {$y$};
@@ -550,16 +602,16 @@
         
         \fill (-4,-3) circle (3pt);
         \fill (5,2) circle (3pt);
-        \node[right] at (2.5, 4) {$y=f(x)$};
-    \end{tikzpicture}
+        \node[fill=white, inner sep=1.5pt, right] at (2.5, 4) {$y=f(x)$};
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & $(-4; -2]$. \\
     \textbf{Б} & $(-2; 0]$. \\
@@ -570,7 +622,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \vspace{0.5cm}
+    \nopagebreak\vspace{0.5cm}
     \begin{flushright}
     \begingroup
     \setlength{\tabcolsep}{4pt}
@@ -585,23 +637,26 @@
     \endgroup
     \end{flushright}
 \end{minipage}
+\par\vspace{0.25cm}
+\end{samepage}
 
-\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\begin{samepage}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par \vspace{0.3cm}
+    \textit{Початок речення} \par\par\vspace{0.3cm}
     \textbf{1} \quad Найменше значення функції $y=f(x)$ \\[0.4cm]
     \textbf{2} \quad Точка екстремуму функції $y=f(x)-5$ \\[0.4cm]
     \textbf{3} \quad Нуль функції $y=f(x+2)$
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \vspace{-0.5cm}
+    \nopagebreak\vspace{-0.3cm}
     \begin{flushright}
-    \begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (4.5,3.5);
         \draw[->, >=stealth, thick] (-4.5,0) -- (4.5,0) node[below] {$x$};
         \draw[->, >=stealth, thick] (0,-3.5) -- (0,3.5) node[left] {$y$};
@@ -617,16 +672,16 @@
         \fill (-4,-3) circle (3pt);
         \fill (4,1) circle (3pt);
         
-        \node[left] at (-1, 1) {$y=f(x)$};
-    \end{tikzpicture}
+        \node[fill=white, inner sep=1.5pt, left] at (-1, 1) {$y=f(x)$};
+    \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\vspace{0.2cm}
     \begin{tabular}{ll}
     \textbf{А} & дорівнює $-3$. \\
     \textbf{Б} & дорівнює $-2$. \\
@@ -637,7 +692,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \vspace{0.5cm}
+    \nopagebreak\vspace{0.5cm}
     \begin{flushright}
     \begingroup
     \setlength{\tabcolsep}{4pt}
@@ -654,42 +709,56 @@
 \end{minipage}
 
 % ... (попередній код)
+\par\vspace{0.25cm}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 2 + \dfrac{3}{x}$. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerListVertical{$f'(x)=-\dfrac{3}{x^2}$}{$f'(x)=3$}{$f'(x)=3\ln|x|$}{$f'(x)=2x+3\ln|x|$}{$f'(x)=\dfrac{3}{x^2}$}
+\par\vspace{0.25cm}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = \begin{cases} 10, & \text{якщо } x < -2, \\ 4x^2 + 3x, & \text{якщо } x \geqslant -2. \end{cases}$ \quad Обчисліть $f(-4) - f'(2)$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Дотична, проведена до графіка функції $y=f(x)$ у точці з абсцисою $x_0=3$, є паралельною до прямої $y=1{,}5x + 5$. Знайдіть значення похідної функції $g(x) = \dfrac{18}{x} - f(x)$ у точці з абсцисою $x_0=3$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Графіком функції $y=f(x)$ є парабола з вершиною в початку координат. Обчисліть $f(2{,}5)$, якщо $f'(1) = -4$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Дотична, проведена до графіка функції $f(x) = -15 + 8x - x^2$ у точці з абсцисою $x_0$, паралельна до прямої $y=x$. Знайдіть $x_0$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть абсцису $x_0$ точки, у якій дотична до графіка функції, паралельна до осі $x$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\vspace{-0.5cm}
+\nopagebreak\vspace{-0.3cm}
 \begin{center}
-\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         x=0.5cm, y=0.5cm,
         axis lines=middle,
@@ -717,64 +786,82 @@
         };
         
         \addplot[only marks, mark=*] coordinates {(-5,-1.5) (5, 5.5)};
-        \node[right] at (axis cs:1.5, 4.5) {$y=f(x)$};
+        \node[fill=white, inner sep=1.5pt, right] at (axis cs:1.5, 4.5) {$y=f(x)$};
     \end{axis}
-\end{tikzpicture}
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$-3$}{$7$}{$1$}{$3$}{$-1$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Похідна лінійної функції $y=f(x)$ дорівнює $-5$. Нуль функції $y=f(x)$ дорівнює $1{,}5$. Обчисліть значення $f(-2)$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Похідна лінійної функції $y=f(x)$ дорівнює $8$, графік функції $y=f(x)$ перетинає вісь $y$ у точці з ординатою $-4$. Обчисліть значення $f(-1{,}2)$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 6x - 2\cos x$ в точці з абсцисою $x_0 = \dfrac{\pi}{2}$. \nmtyear{2025}
 
-\vspace{0.3cm}
+\nopagebreak\vspace{0.3cm}
 \answerTable{$3\pi + 2$}{$4$}{$8$}{$6$}{$3\pi - 2$}
+\end{samepage}
 
+\begin{samepage}
 \noindent\zadnum Задано функцію $f(x) = x(5-x)$, $f'(x)$ — її похідна. Обчисліть значення виразу $f(-2) \cdot f'(4)$. \nmtyear{2025}
 
-\vspace{0.5cm}
+\nopagebreak\vspace{0.5cm}
 \nmtAnswerBox
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №19
 \zadtask{Знайдіть \textit{значення $x_0$}, при якому функція $y = 2x^4 - 9x^2 + 5$ набуває \textit{найменшого} значення на проміжку $[-1;\, 5]$. \nmtyear{2026}
 \nmtAnswerBox}
 % Відповідь: $1{,}5$
 \ifshowsolutions\solution{$y'=8x^3-18x=2x(4x^2-9)$; на $[-1;5]$ критичні точки $x=0$ і $x=1{,}5$. Значення: $y(-1)=-2$, $y(0)=5$, $y(1{,}5)=-5{,}125$, $y(5)$ велике. Найменше — при $x_0=1{,}5$. Відповідь: $1{,}5$.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №19
 \zadtask{Визначте критичні точки функції $f(x) = 4x^3 - 21x^2 - 90x + 19$. У відповідь запишіть ту з них, яка є \textit{точкою мінімуму}. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $5$
 \ifshowsolutions\solution{$f'(x) = 12x^2 - 42x - 90 = 6(2x^2 - 7x - 15)$. Корені рівняння $2x^2-7x-15=0$ через дискримінант: $D = 49 + 120 = 169$, $\sqrt{D}=13$, $x = \dfrac{7\pm13}{4}$, тобто $x_1 = 5$, $x_2 = -1{,}5$. Похідна змінює знак з $-$ на $+$ у точці $x=5$, тож це точка мінімуму. Відповідь: \textbf{$5$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №20
 \zadtask{Знайдіть значення похідної функції $f(x) = \dfrac{\sqrt{x}}{3x - 2}$ у точці $x_0 = 4$. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $-0{,}035$
 \ifshowsolutions\solution{За правилом частки $f'(x)=\dfrac{\frac{1}{2\sqrt x}(3x-2)-\sqrt x\cdot3}{(3x-2)^2}$. При $x_0=4$: $\sqrt4=2$, $3\cdot4-2=10$; чисельник $=\frac{1}{4}\cdot10-2\cdot3=-3{,}5$, знаменник $=100$. Отже $f'(4)=-0{,}035$. Відповідь: \textbf{$-0{,}035$}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №10
 \zadtask{Визначте всі критичні точки функції $f(x) = \dfrac{x^3}{3} - 2x^2 + 3x + 1$. \nmtyear{2026}}
 \answerTable{$-3; -1$}{$1; 3$}{$3$}{$-3; 1$}{$1$}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №17 --- також у темі: Функція та її властивості
-\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку (1--3) речення доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2026}
-\vspace{0.3cm}
+\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку \mbox{(1--3)} речення доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}
+\nopagebreak\vspace{0.3cm}
 \begin{center}
-\begin{tikzpicture}[scale=0.55, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick]
     \draw[step=1cm, gray!40, thin] (-3,-4) grid (5,6);
     \draw[->] (-3.5,0) -- (5.5,0) node[right] {$x$};
     \draw[->] (0,-4.5) -- (0,6.5) node[above] {$y$};
@@ -788,10 +875,10 @@
     \draw[magenta!80!black, thick, smooth] plot coordinates {(-2,-3) (-1.3,0.3) (-0.6,1.7) (0,2) (0.7,1.5) (1.4,1.1) (2,1) (2.7,1.6) (3.3,3) (4,5)};
     \fill (-2,-3) circle (3pt);
     \fill (4,5) circle (3pt);
-    \node[right, font=\small] at (1.7,3.6) {$y=f(x)$};
-\end{tikzpicture}
+    \node[fill=white, inner sep=1.5pt, right, font=\small] at (1.7,3.6) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-\vspace{0.2cm}
+\nopagebreak\vspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.50\textwidth}
 \textit{Початок речення}\par\vspace{0.15cm}
@@ -810,33 +897,44 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.18\textwidth}
-\vspace{0.4cm}
+\nopagebreak\vspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №19
 \zadtask{Дотична, проведена до графіка функції $y = 2x^2 - 5x - 11$ в точці з абсцисою $x_0$, нахилена до додатного напряму осі $x$ під кутом $45^\circ$. Визначте $y(x_0)$. \nmtyear{2026}}
 \nmtAnswerBox
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №19
 \zadtask{Визначте найбільше значення функції $y = 8\sqrt{x} - x + 4$, якщо $x \in [0;\, 36]$. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $20$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №19
 \zadtask{Знайдіть різницю між найбільшим і найменшим значеннями функції $f(x) = x^3 - 3x^2 + 20$ на відрізку $[1;\, 5]$. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $54$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №19
 \zadtask{Квадратичну функцію задано формулою $f(x) = ax^2 + bx + c$ з вершиною в точці $(0;\, -6)$. Визначте значення похідної цієї функції в точці $x_0 = -3$, якщо $f(2) = 10$. \nmtyear{2026}}
 \nmtAnswerBox
 % Відповідь: $-24$
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №13
 \zadtask{Визначте похідну функції $y = (2x + 1)\sqrt{x}$. \nmtyear{2026}}
 \answerTableTall{$\dfrac{3}{2\sqrt{x}}$}{$\dfrac{6x + 1}{2\sqrt{x}}$}{$\dfrac{4x + 1}{2\sqrt{x}}$}{$\dfrac{2}{\sqrt{x}}$}{$\dfrac{1}{\sqrt{x}}$}
 % Відповідь: Б
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}

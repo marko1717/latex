@@ -23,15 +23,19 @@
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox}
+\usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Заборона розриву інлайн-формул
-\binoppenalty=10000
-\relpenalty=10000
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
 
 \definecolor{mainGreen}{RGB}{34, 120, 64}
 \definecolor{yearOrange}{RGB}{220, 100, 30}
@@ -40,6 +44,9 @@
 \definecolor{instrBg}{RGB}{255, 240, 220}
 \definecolor{instrBorder}{RGB}{220, 150, 80}
 \definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,10 +59,13 @@
 \fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
 \newcommand{\answerTable}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
@@ -65,9 +75,9 @@
 \par\vspace{0.25cm}
 }
 \newcommand{\answerTableTall}[5]{%
-\par\vspace{0.15cm}
-\noindent
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
@@ -95,7 +105,7 @@
 \newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
 % --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
 \newcommand{\nmtAnswerBox}{%
-\par\vspace{0.2cm}\noindent
+\par\nopagebreak\vspace{0.2cm}\noindent
 Відповідь:\ \
 \begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
@@ -105,7 +115,11 @@
 \par\vspace{0.3cm}
 }
 % --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
 \newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
     \begingroup
     \renewcommand{\arraystretch}{1.15}
     \setlength{\tabcolsep}{4pt}
@@ -129,7 +143,8 @@
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -148,36 +163,38 @@
 \clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
 \sectionTitle{#1}}
 \newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
 \phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}}
+\end{tabular}\endgroup}
 \providecommand{\matchingLayout}[3]{%
     \noindent
-    \begin{minipage}[t]{0.40\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.28\textwidth}
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.30\textwidth}
+    \begin{minipage}[t]{0.19\textwidth}
         \vspace{0pt}
         \begin{flushright}
         #3
@@ -185,11 +202,11 @@
     \end{minipage}}
 \providecommand{\matchingLayoutBottom}[2]{%
     \noindent
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #1
     \end{minipage}%
     \hfill
-    \begin{minipage}[t]{0.48\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
         #2
     \end{minipage}
     \vspace{0.5cm}
@@ -207,82 +224,108 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 23. Ірраціональні рівняння та нерівності}
-\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 13 (НМТ 2023~--- 2, 2024~--- 7, 2025~--- 1, 2026~--- 3).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 13 (НМТ \mbox{2023~--- 2}, \mbox{2024~--- 7}, \mbox{2025~--- 1}, \mbox{2026~--- 3}).}\par\vspace{0.2cm}
 
 \typeTitle{НМТ 2023}
 
+\begin{samepage}
 % Завдання 1
 \zadtask{Розв'яжіть рівняння $3\sqrt{x} = 12$. \nmtyear{2023}}
 
 \answerTable{$4$}{$8$}{$2$}{$16$}{$-2;\, 2$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 2
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \sqrt{2x} = \sqrt{6}, \\ x - 4y = 7. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $y_0 =$ \nmtyear{2023}}
 
 \answerTable{$1{,}25$}{$-2{,}5$}{$-1$}{$3$}{$-6$}
+\end{samepage}
 
 \typeTitle{НМТ 2024}
 
+\begin{samepage}
 % Завдання 3
 \zadtask{Розв'яжіть рівняння $\dfrac{9}{\sqrt{5x - 2}} = \sqrt{5x - 2}$. \nmtyear{2024}}
 
 \answerTableTall{$81$}{$1$}{$1{,}4$}{$16{,}6$}{$2{,}2$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 4
 \zadtask{Укажіть проміжок, якому належить корінь рівняння $\sqrt[3]{3x} = -4$. \nmtyear{2024}}
 
 \answerTable{$(-\infty; -20]$}{$(0; 10]$}{$(-10; 0]$}{$(-20; -10]$}{$(10; +\infty)$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 5
 \zadtask{Укажіть проміжок, якому належить корінь рівняння $\sqrt{7 - 2x} = 3$. \nmtyear{2024}}
 
 \answerTable{$(1; 8]$}{$(-1; 1]$}{$(-\infty; -8]$}{$(8; +\infty)$}{$(-8; -1]$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 6
 \zadtask{Розв'яжіть рівняння $\sqrt{5x + 10} = 4$. \nmtyear{2024}}
 
 \answerTable{$-1{,}2$}{$1$}{$1{,}2$}{$-0{,}6$}{$2$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 7
 \zadtask{Розв'яжіть рівняння $\sqrt{x - 2} = 4$. \nmtyear{2024}}
 
 \answerTable{$10$}{$14$}{$18$}{$6$}{$4$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 8
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \sqrt{y} - \dfrac{6}{x} = 6, \\[0.3em] \sqrt{y} + \dfrac{4}{x} = 1. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 
 \answerTableTall{$9$}{$7$}{$-2$}{$2$}{$83$}
+\end{samepage}
 
+\begin{samepage}
 % Завдання 9
 \zadtask{Укажіть проміжок, якому належить корінь рівняння $\sqrt{x - 2} = 4$. \nmtyear{2024}}
 
 \answerTable{$[4; 8)$}{$[0; 4)$}{$[20; +\infty)$}{$[16; 20)$}{$[8; 16)$}
+\end{samepage}
 
 \typeTitle{НМТ 2025}
 
+\begin{samepage}
 % Завдання 10
 \zadtask{Якому проміжку належить корінь рівняння $\sqrt{48 - 12x} = 12$? \nmtyear{2025}}
 
 \answerTable{$(16; +\infty)$}{$(0; 8]$}{$(-16; 0]$}{$(8; 16]$}{$(-\infty; -16]$}
+\end{samepage}
 
 \typeTitle{НМТ 2026}
 
+\begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №14
 \zadtask{Розв'яжіть рівняння $\sqrt{12 - 2x} = 6$. \nmtyear{2026}}
 \answerTable{$-12$}{$-3$}{$3$}{$12$}{$24$}
 % Відповідь: А
 \ifshowsolutions\solution{Піднесемо до квадрата: $12-2x=36\Rightarrow -2x=24\Rightarrow x=-12$. Перевірка: $\sqrt{12-2\cdot(-12)}=\sqrt{36}=6$. Відповідь: \textbf{А} ($-12$).}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №14
 \zadtask{Розв'яжіть рівняння $\sqrt{\dfrac{25+2x}{9}} = \dfrac{1}{3}$. \nmtyear{2026}}
 \answerTable{$-12$}{$-11$}{$-8$}{$0$}{$12$}
 % Відповідь: А
 \ifshowsolutions\solution{Піднесемо до квадрата: $\dfrac{25+2x}{9}=\dfrac{1}{9}$, звідки $25+2x=1$, $2x=-24$, $x=-12$. Відповідь: \textbf{А}.}\fi
+\end{samepage}
 
+\begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №15
 \zadtask{Якому проміжку належить \textit{більший} корінь рівняння $\sqrt{\dfrac{2x^2 + 7x + 10}{2}} = 4$? \nmtyear{2026}}
 \answerTable{$(-\infty; -4)$}{$[-4; -1)$}{$[-1; 1)$}{$[1; 4)$}{$[4; +\infty)$}
 % Відповідь: Г
+\end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
