@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -213,7 +218,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -224,17 +229,38 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 28b. Показникова функція і показникові вирази}
-\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 31 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 8}, \mbox{2025~--- 7}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 31 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 8}, \mbox{2025~--- 7}); \mbox{тестових~--- 2}; \mbox{на відповідність~--- 29}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
-\noindent\zadnum До кожного виразу (1–3) доберіть тотожно рівний йому вираз (А–Д), якщо $a \neq 8$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Графік функції $y = 3^x$ паралельно перенесли на 2 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
+\answerTableTall{$y = 3^{x-2}$}{$y = 3^x - 2$}{$y = 3^{x+2}$}{$y = 3^x + 2$}{$y = \displaystyle\frac{3^x}{2}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Спростіть вираз $5^{1+x} \cdot 5^{1-x}$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$25^{1-x^2}$}{$5$}{$25$}{$5^{1-x^2}$}{$10$}
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+\noindent\zadnum До кожного виразу (1–3) доберіть тотожно рівний йому вираз (А–Д), якщо $a \neq 8$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Вираз} \par\par\vspace{0.2cm}
+    \textit{Вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $\displaystyle\frac{64 - a^2}{8 - a}$ \\[0.5cm]
     \textbf{2} & $2^{3a}$ \\[0.4cm]
@@ -243,27 +269,30 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Тотожно рівний вираз} \par\par\vspace{0.2cm}
+    \textit{Тотожно рівний вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & $8^a$ \\[0.2cm]
     \textbf{Б} & $8 + a$ \\[0.2cm]
     \textbf{В} & $8a$ \\[0.2cm]
     \textbf{Г} & $8 - a$ \\[0.2cm]
-    \textbf{Д} & $\displaystyle\frac{a}{8}$ \\
+    \textbf{Д} & $\displaystyle\frac{a}{8}$ \\[0.35cm]
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між виразом (1–3) і проміжком (А–Д), якому належить значення цього виразу. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між виразом (1–3) і проміжком (А–Д), якому належить значення цього виразу. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Вираз} \par\par\vspace{0.2cm}
+    \textit{Вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $\cos \displaystyle\frac{\pi}{2}$ \\[0.5cm]
     \textbf{2} & $|\pi - 5|$ \\[0.4cm]
@@ -272,7 +301,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Проміжок} \par\par\vspace{0.2cm}
+    \textit{Проміжок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & $(-\infty; 0]$ \\[0.2cm]
     \textbf{Б} & $(0; 2)$ \\[0.2cm]
@@ -281,18 +310,21 @@
     \textbf{Д} & $[8; +\infty)$ \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Якщо $n \sin m\pi = a$, то \\[0.4cm]
     \textbf{2} & Якщо $\displaystyle\frac{2^m}{2^n} = 2^a$, то \\[0.6cm]
@@ -301,27 +333,30 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6cm}@{}}
     \textbf{А} & $a = mn$. \\[0.2cm]
     \textbf{Б} & $a = 0$. \\[0.2cm]
     \textbf{В} & $a = m - n$. \\[0.2cm]
     \textbf{Г} & $a = n$. \\[0.2cm]
-    \textbf{Д} & $a = \displaystyle\frac{m}{n}$. \\
+    \textbf{Д} & $a = \displaystyle\frac{m}{n}$. \\[0.35cm]
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та її найменшим значенням (А–Д) на відрізку $[0; 4]$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її найменшим значенням (А–Д) на відрізку $[0; 4]$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = x^2 - 2x + 5$ \\[0.4cm]
     \textbf{2} & $y = -0{,}5x + 5$ \\[0.4cm]
@@ -330,7 +365,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Найменше значення на $[0; 4]$} \par\par\vspace{0.2cm}
+    \textit{Найменше значення на $[0; 4]$} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & $1$ \\[0.2cm]
     \textbf{Б} & $2$ \\[0.2cm]
@@ -339,18 +374,21 @@
     \textbf{Д} & $5$ \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Якщо $3^m \cdot 9^n = 3^a$, то \\[0.4cm]
     \textbf{2} & Якщо $(m + n)^2 - m^2 - n^2 = a$, то \\[0.4cm]
@@ -359,7 +397,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6cm}@{}}
     \textbf{А} & $a = 0$. \\[0.2cm]
     \textbf{Б} & $a = 27^{mn}$. \\[0.2cm]
@@ -368,9 +406,11 @@
     \textbf{Д} & $a = m + 2n$. \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -379,17 +419,17 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
         % Сітка та осі
-        
+
         \draw[->, >=stealth, thick] (-3,0) -- (3,0) node[below] {$x$};
         \draw[->, >=stealth, thick] (0,-3) -- (0,3) node[left] {$y$};
-        
+
         % Коло
         \draw[thick] (0,0) circle (2cm);
-        
+
         % Підписи
         \node[below left] at (0,0) {$0$};
         \node[above right] at (1.4, 1.4) {$x^2+y^2=4$};
@@ -397,18 +437,20 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{5cm}@{}}
     \textbf{1} & $y=x+4$ \\[0.3cm]
     \textbf{2} & $y=x^2-2$ \\[0.3cm]
     \textbf{3} & $y=4^x$ \\
     \end{tabular}
 
-    \nopagebreak\vspace{0.5cm}
+    \nopagebreak\nbvspace{0.5cm}
 
     \begingroup
     \setlength{\tabcolsep}{4pt}
@@ -424,7 +466,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Кількість спільних точок} \par\par\vspace{0.2cm}
+    \textit{Кількість спільних точок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{7.5cm}@{}}
     \textbf{А} & жодної \\[0.3cm]
     \textbf{Б} & лише одна \\[0.3cm]
@@ -433,16 +475,17 @@
     \textbf{Д} & більше за три \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = -x$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = -x$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = -\sqrt{x}$ \\[0.4cm]
     \textbf{2} & $y = \left(\displaystyle\frac{1}{2}\right)^x$ \\[0.6cm]
@@ -451,7 +494,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Кількість спільних точок} \par\par\vspace{0.2cm}
+    \textit{Кількість спільних точок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & жодної \\[0.2cm]
     \textbf{Б} & одна \\[0.2cm]
@@ -460,18 +503,21 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та її найбільшим значенням (А–Д) на відрізку $[-1; 3]$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її найбільшим значенням (А–Д) на відрізку $[-1; 3]$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = x^2 - 2x$ \\[0.4cm]
     \textbf{2} & $y = -x$ \\[0.4cm]
@@ -480,7 +526,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Найбільше значення на $[-1; 3]$} \par\par\vspace{0.2cm}
+    \textit{Найбільше значення на $[-1; 3]$} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & $1$ \\[0.2cm]
     \textbf{Б} & $2$ \\[0.2cm]
@@ -489,27 +535,30 @@
     \textbf{Д} & $5$ \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = x + 3$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = x + 3$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = x$ \\[0.4cm]
     \textbf{2} & $y = 2^{-x}$ \\[0.4cm]
-    \textbf{3} & $y = \displaystyle\frac{1}{x}$ \\
+    \textbf{3} & $y = \displaystyle\frac{1}{x}$ \\[0.35cm]
     \end{tabular}
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Кількість спільних точок} \par\par\vspace{0.2cm}
+    \textit{Кількість спільних точок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & жодної \\[0.2cm]
     \textbf{Б} & одна \\[0.2cm]
@@ -518,18 +567,21 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = x^2 - 1$ \\[0.4cm]
     \textbf{2} & $y = 3^x$ \\[0.4cm]
@@ -538,7 +590,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Властивість} \par\par\vspace{0.2cm}
+    \textit{Властивість} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & проходить через початок координат \\[0.2cm]
     \textbf{Б} & не містить точок з від'ємною ординатою \\[0.2cm]
@@ -547,18 +599,21 @@
     \textbf{Д} & графік знаходиться лише в I чверті \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Якщо $\displaystyle\frac{n}{a} = 3$, то \\[0.5cm]
     \textbf{2} & Якщо $1 + \log_3 n = \log_3 a$, то \\[0.4cm]
@@ -567,27 +622,30 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6cm}@{}}
     \textbf{А} & $a = 3n$. \\[0.2cm]
     \textbf{Б} & $a = n + 1$. \\[0.2cm]
     \textbf{В} & $a = n + 3$. \\[0.2cm]
     \textbf{Г} & $a = \displaystyle\frac{3}{n}$. \\[0.4cm]
-    \textbf{Д} & $a = \displaystyle\frac{n}{3}$. \\
+    \textbf{Д} & $a = \displaystyle\frac{n}{3}$. \\[0.35cm]
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А–Д), для якої це твердження є правильним. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А–Д), для якої це твердження є правильним. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Твердження} \par\par\vspace{0.2cm}
+    \textit{Твердження} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{8cm}@{}}
     \textbf{1} & областю визначення функції є проміжок $[-1; +\infty)$ \\[0.2cm]
     \textbf{2} & графік функції проходить через точку $(0; 1)$ \\[0.2cm]
@@ -596,7 +654,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{5cm}@{}}
     \textbf{А} & $y = -\cos x$ \\[0.2cm]
     \textbf{Б} & $y = 4^x$ \\[0.2cm]
@@ -605,18 +663,21 @@
     \textbf{Д} & $y = x$ \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = (x + 2)^2$ \\[0.4cm]
     \textbf{2} & $y = 2\sqrt{x}$ \\[0.4cm]
@@ -625,7 +686,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Властивість} \par\par\vspace{0.2cm}
+    \textit{Властивість} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & є зростаючою на $(-\infty; +\infty)$ \\[0.2cm]
     \textbf{Б} & графік має одну спільну точку із графіком $y = x - 2$ \\[0.2cm]
@@ -634,27 +695,30 @@
     \textbf{Д} & є спадною на проміжку $(-\infty; 2]$ \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між виразом (1–3) і множиною (А–Д), якій належить значення цього виразу, якщо $a = 5$. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між виразом (1–3) і множиною (А–Д), якій належить значення цього виразу, якщо $a = 5$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Вираз} \par\par\vspace{0.2cm}
+    \textit{Вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $\log_{0{,}2} a$ \\[0.4cm]
     \textbf{2} & $2^{-a}$ \\[0.4cm]
-    \textbf{3} & $\displaystyle\frac{10}{a}$ \\
+    \textbf{3} & $\displaystyle\frac{10}{a}$ \\[0.35cm]
     \end{tabular}
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Множина} \par\par\vspace{0.2cm}
+    \textit{Множина} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & ірраціональних додатних чисел \\[0.2cm]
     \textbf{Б} & натуральних чисел \\[0.2cm]
@@ -663,18 +727,21 @@
     \textbf{Д} & ірраціональних від'ємних чисел \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Функція $y = \sqrt{x + 1}$ \\[0.4cm]
     \textbf{2} & Функція $y = 4 - x^2$ \\[0.4cm]
@@ -683,7 +750,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & має точку локального максимуму. \\[0.2cm]
     \textbf{Б} & має точку локального мінімуму. \\[0.2cm]
@@ -692,18 +759,21 @@
     \textbf{Д} & набуває лише додатних значень. \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю її графіка (А–Д). \nmtyear{2023}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю її графіка (А–Д). \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = \cos x$ \\[0.4cm]
     \textbf{2} & $y = -\displaystyle\frac{2}{x}$ \\[0.6cm]
@@ -712,7 +782,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Властивість графіка} \par\par\vspace{0.2cm}
+    \textit{Властивість графіка} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & проходить через точку $(1; 0)$ \\[0.2cm]
     \textbf{Б} & не перетинає вісь $y$ \\[0.2cm]
@@ -721,32 +791,33 @@
     \textbf{Д} & розміщений лише в I та IV чвертях \\
     \end{tabular}
 \end{minipage}
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \matchingGrid
+\par\penalty-20
 \end{samepage}
 
-\typeTitle{НМТ 2024}
-
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А–Д), для якої це твердження є правильним. \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А–Д), для якої це твердження є правильним. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Твердження} \par\par\vspace{0.2cm}
+    \textit{Твердження} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{8cm}@{}}
     \textbf{1} & функція має 2 нулі \\[0.2cm]
     \textbf{2} & на відрізку $[-1; 3]$ функція набуває від'ємних значень \\[0.2cm]
     \textbf{3} & найменше значення функції на відрізку $[-1; 3]$ дорівнює $0{,}5$ \\
     \end{tabular}
 
-    \nopagebreak\vspace{0.3cm}
+    \nopagebreak\nbvspace{0.3cm}
     \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & $y = x^2 - 4$ \\[0.3cm]
     \textbf{Б} & $y = \displaystyle\frac{1}{x - 4}$ \\[0.5cm]
@@ -755,28 +826,29 @@
     \textbf{Д} & $y = \sqrt{x + 1}$ \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А–Д). \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.22\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = 4 - x^2$ \\[0.4cm]
     \textbf{2} & $y = -x^3$ \\[0.4cm]
     \textbf{3} & $y = 4^x$ \\
     \end{tabular}
 
-    \nopagebreak\vspace{0.3cm}
+    \nopagebreak\nbvspace{0.3cm}
     \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.75\textwidth}
-    \textit{Властивість} \par\par\vspace{0.2cm}
+    \textit{Властивість} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{10cm}@{}}
     \textbf{А} & є зростаючою на всій області визначення \\[0.2cm]
     \textbf{Б} & набуває від'ємного значення при $x = -2$ \\[0.2cm]
@@ -785,25 +857,26 @@
     \textbf{Д} & графік функції розташований лише в I та IV координатній чверті \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між виразом (1–3) та проміжком (А–Д), якому належить значення цього виразу. \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між виразом (1–3) та проміжком (А–Д), якому належить значення цього виразу. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.30\textwidth}
-    \textit{Вираз} \par\par\vspace{0.2cm}
+    \textit{Вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $\mathrm{tg}\, \displaystyle\frac{\pi}{3}$ \\[0.5cm]
     \textbf{2} & $1 - \pi$ \\[0.4cm]
-    \textbf{3} & $\left(\displaystyle\frac{1}{2}\right)^{\log_2 \pi}$ \\
+    \textbf{3} & $\left(\displaystyle\frac{1}{2}\right)^{\log_2 \pi}$ \\[0.35cm]
     \end{tabular}
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-    \textit{Проміжок} \par\par\vspace{0.2cm}
+    \textit{Проміжок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & $[-5; -2)$ \\[0.2cm]
     \textbf{Б} & $[-2; 0)$ \\[0.2cm]
@@ -817,16 +890,17 @@
     \raggedleft
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю її графіка (А–Д). \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю її графіка (А–Д). \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.25\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = \sqrt{x + 4}$ \\[0.4cm]
     \textbf{2} & $y = \displaystyle\frac{4}{x}$ \\[0.5cm]
@@ -835,7 +909,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Властивість графіка функції} \par\par\vspace{0.2cm}
+    \textit{Властивість графіка функції} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.5cm}@{}}
     \textbf{А} & розташований лише в першій чверті \\[0.2cm]
     \textbf{Б} & має спільну точку з віссю $x$ \\[0.2cm]
@@ -849,28 +923,29 @@
     \raggedleft
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Доберіть до початку речення (1–3) його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Доберіть до початку речення (1–3) його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.60\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{9cm}@{}}
     \textbf{1} & Графік функції $y = x$ не має жодної спільної точки з \\[0.2cm]
     \textbf{2} & Графік функції $y = 3^x$ має лише одну спільну точку з \\[0.2cm]
     \textbf{3} & Графік рівняння $(x + 3)^2 + y^2 = 4$ має дві спільні точки з \\
     \end{tabular}
 
-    \nopagebreak\vspace{0.3cm}
+    \nopagebreak\nbvspace{0.3cm}
     \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & віссю $x$. \\[0.2cm]
     \textbf{Б} & віссю $y$. \\[0.2cm]
@@ -879,28 +954,29 @@
     \textbf{Д} & прямою $y = -2$. \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.40\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Графік функції $y = 2x$ \\[0.4cm]
     \textbf{2} & Графік функції $y = \log_2 x$ \\[0.4cm]
     \textbf{3} & Графік функції $y = 2^x$ \\
     \end{tabular}
 
-    \nopagebreak\vspace{0.3cm}
+    \nopagebreak\nbvspace{0.3cm}
     \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{7.5cm}@{}}
     \textbf{А} & симетричний відносно осі абсцис. \\[0.2cm]
     \textbf{Б} & симетричний відносно осі ординат. \\[0.2cm]
@@ -909,18 +985,20 @@
     \textbf{Д} & не перетинає вісь ординат. \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
 \noindent\zadnum На кожному з рисунків \mbox{(1--3)} зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок \mbox{(1--3)} з твердженням \mbox{(А--Д)} щодо функції $y=f(x)$, графік якої зображено на цьому рисунку. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 % Блок рисунків
 \noindent
-\begin{minipage}[t]{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 1 \\
     \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
@@ -932,7 +1010,7 @@
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-        
+
         % Дуга (схожа на півокружність або параболу вниз)
         \draw[thick] plot [smooth, tension=1.5] coordinates {(-3, -1) (0, -4) (3, -1)};
         \node[right] at (2, -2.5) {\small $y=f(x)$};
@@ -941,7 +1019,7 @@
     \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 2 \\
     \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
@@ -953,7 +1031,7 @@
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-        
+
         % "Горб"
         \draw[thick] plot [smooth, tension=0.6] coordinates {(-3, -2) (-1, 3) (1, 0) (3, -1.5)};
         \node[right] at (1, 2) {\small $y=f(x)$};
@@ -962,7 +1040,7 @@
     \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.32\textwidth}
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 3 \\
     \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
@@ -974,7 +1052,7 @@
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-        
+
         % Спадна функція
         \draw[thick] plot [smooth, tension=0.6] coordinates {(-2.5, 3.5) (-1, 2) (0, 0) (1, -1) (3, -3)};
         \node[left] at (-2, 2) {\small $y=f(x)$};
@@ -982,18 +1060,20 @@
     \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.20\textwidth}
-    \textit{Рисунок} \par\par\vspace{0.2cm}
+    \textit{Рисунок} \par\par\nbvspace{0.2cm}
     \textbf{1} \quad Рис. 1 \\[0.3cm]
     \textbf{2} \quad Рис. 2 \\[0.3cm]
     \textbf{3} \quad Рис. 3
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Твердження} \par\par\vspace{0.2cm}
+    \textit{Твердження} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
     \textbf{А} & графік функції $f$ є фрагментом кола $x^2 + (y-1)^2 = 9$ \\[0.2cm]
     \textbf{Б} & графік функції $f$ є фрагментом кола $x^2 + (y+1)^2 = 9$ \\[0.2cm]
@@ -1004,21 +1084,23 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.25\textwidth}
-    \nopagebreak\vspace{0.5cm}
+    \nopagebreak\nbvspace{0.5cm}
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
 \noindent\zadnum Установіть відповідність між твердженням \mbox{(1--3)} та прямою, зображеною на рисунку \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.60\textwidth}
-    \textit{Твердження} \par\par\vspace{0.2cm}
+    \textit{Твердження} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.4cm} p{9cm}@{}}
     \textbf{1} & не має спільних точок з функцією $y=\left(\dfrac{2}{3}\right)^x$ \\[0.4cm]
     \textbf{2} & є графіком функції $y=x-2$ \\[0.4cm]
@@ -1027,13 +1109,15 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-    \nopagebreak\vspace{0.5cm}
+    \nopagebreak\nbvspace{0.5cm}
     \matchingGrid
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-\textit{Пряма} \par\par\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\textit{Пряма} \par\par\nbvspace{0.2cm}
 
+\nmtnobreak
 % Таблиця з графіками
 \begin{center}
 \begingroup
@@ -1086,18 +1170,17 @@
 \end{tabular}
 \endgroup
 \end{center}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
-\typeTitle{НМТ 2025}
-
 \begin{samepage}
-\noindent\zadnum Узгодьте функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = -x$. \nmtyear{2025}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Узгодьте функцію (1–3) із кількістю (А–Д) спільних точок її графіка з прямою $y = -x$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.30\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $y = -x^3$ \\[0.4cm]
     \textbf{2} & $y = 2 - x$ \\[0.4cm]
@@ -1106,7 +1189,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-    \textit{Кількість спільних точок} \par\par\vspace{0.2cm}
+    \textit{Кількість спільних точок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & жодної \\[0.2cm]
     \textbf{Б} & одна \\[0.2cm]
@@ -1120,16 +1203,17 @@
     \raggedleft
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Узгодьте вираз (1–3) із значенням $m$ (А–Д), за якого значення цього виразу дорівнює 1. \nmtyear{2025}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Узгодьте вираз (1–3) із значенням $m$ (А–Д), за якого значення цього виразу дорівнює 1. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.35\textwidth}
-    \textit{Вираз} \par\par\vspace{0.2cm}
+    \textit{Вираз} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $\displaystyle\frac{m}{4}$ \\[0.5cm]
     \textbf{2} & $4^6 : 4^{-m}$ \\[0.4cm]
@@ -1138,7 +1222,7 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-    \textit{Значення $m$} \par\par\vspace{0.2cm}
+    \textit{Значення $m$} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & $\displaystyle\frac{1}{4}$ \\[0.4cm]
     \textbf{Б} & $6$ \\[0.2cm]
@@ -1152,30 +1236,17 @@
     \raggedleft
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum Графік функції $y = 3^x$ паралельно перенесли на 2 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}
-\nopagebreak\vspace{0.3cm}
+\noindent\zadnum Доберіть до кожного початку речення (1–3) його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
 
-\answerTableTall{$y = 3^{x-2}$}{$y = 3^x - 2$}{$y = 3^{x+2}$}{$y = 3^x + 2$}{$y = \displaystyle\frac{3^x}{2}$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum Спростіть вираз $5^{1+x} \cdot 5^{1-x}$. \nmtyear{2025}
-\nopagebreak\vspace{0.3cm}
-
-\answerTable{$25^{1-x^2}$}{$5$}{$25$}{$5^{1-x^2}$}{$10$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum Доберіть до кожного початку речення (1–3) його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}
-\nopagebreak\vspace{0.3cm}
-
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Початок речення} \par\par\vspace{0.2cm}
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & Якщо $(m + 1)^2 - 1 = n$, то \\[0.4cm]
     \textbf{2} & Якщо $\sqrt{2^m} = 2^n$, то \\[0.4cm]
@@ -1184,13 +1255,13 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & $n = 2m$. \\[0.2cm]
     \textbf{Б} & $n = m^2$. \\[0.2cm]
     \textbf{В} & $n = m^2 + 2m$. \\[0.2cm]
     \textbf{Г} & $n = \sqrt{m}$. \\[0.2cm]
-    \textbf{Д} & $n = \displaystyle\frac{m}{2}$. \\
+    \textbf{Д} & $n = \displaystyle\frac{m}{2}$. \\[0.35cm]
     \end{tabular}
 \end{minipage}%
 \hfill
@@ -1198,7 +1269,7 @@
     \raggedleft
     \matchingGrid
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -1208,54 +1279,56 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         \draw[step=1cm,gray!50,very thin] (-4.5,-0.5) grid (6.5,8.5);
         \draw[->, >=stealth, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
         \draw[->, >=stealth, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
-        
+
         \node[below left] at (0,0) {$0$};
         \node[below] at (1,0) {$1$};
         \node[left] at (0,1) {$-1$}; % На картинці тут -1 позначено як засічка, але насправді це 1, просто риска
         \node[left] at (0,1) {$1$};
         \node[below] at (6,0) {$6$};
         \node[below] at (-4,0) {$-4$};
-        
+
         % Графік
         % [-4; 0] -> y = sqrt(-x). (-4, 2) -> (0,0)
         \draw[thick] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
-        
+
         % [0; 2] -> y = x^3. (0,0) -> (2, 8)
         \draw[thick] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
-        
+
         % [2; 6] -> y = 12 - 2x. (2, 8) -> (6, 0)
         \draw[thick] (2, 8) -- (6, 0);
-        
+
         \fill (-4, 2) circle (3pt);
         \fill (6, 0) circle (3pt);
-        \node[fill=white, inner sep=1.5pt, right] at (4, 4) {$y=f(x)$};
+        \node[right, fill=white, inner sep=1.5pt] at (4, 4) {$y=f(x)$};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-    \textit{Проміжок} \par\par\vspace{0.2cm}
+    \textit{Проміжок} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{1} & $[-4; 0]$ \\[0.4cm]
     \textbf{2} & $(0; 2]$ \\[0.4cm]
     \textbf{3} & $(2; 6]$ \\
     \end{tabular}
 
-    \nopagebreak\vspace{1.0cm}
+    \nopagebreak\nbvspace{1.0cm}
     \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Функція} \par\par\vspace{0.2cm}
+    \textit{Функція} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} l@{}}
     \textbf{А} & $y=x^3$ \\[0.3cm]
     \textbf{Б} & $y=12-2x$ \\[0.3cm]
@@ -1264,18 +1337,20 @@
     \textbf{Д} & $y=\sqrt{-x}$ \\
     \end{tabular}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
 \noindent\zadnum Установіть відповідність між твердженням \mbox{(1--3)} та прямою, зображеною на рисунку \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 
+\nmtnobreak
 \noindent
 \begin{minipage}[t]{0.60\textwidth}
-    \textit{Твердження} \par\par\vspace{0.2cm}
+    \textit{Твердження} \par\par\nbvspace{0.2cm}
     \begin{tabular}{@{}p{0.4cm} p{9cm}@{}}
     \textbf{1} & не має спільних точок з функцією $y=\log_2(x-1)$ \\[0.4cm]
     \textbf{2} & є графіком функції $y=\dfrac{2x}{3}-2$ \\[0.4cm]
@@ -1284,13 +1359,15 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-    \nopagebreak\vspace{0.5cm}
+    \nopagebreak\nbvspace{0.5cm}
     \matchingGrid
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-\textit{Пряма} \par\par\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\textit{Пряма} \par\par\nbvspace{0.2cm}
 
+\nmtnobreak
 % Таблиця з графіками
 \begin{center}
 \begingroup
@@ -1343,7 +1420,7 @@
 \end{tabular}
 \endgroup
 \end{center}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \endgroup

@@ -192,7 +192,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -233,12 +233,12 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -262,6 +262,11 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
@@ -269,7 +274,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
-               "nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse"}
+               "nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
 # старі макроси, які перейменовуємо в тілі на нові
 RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\matchTable\b", r"\\matchingGrid"),
@@ -317,7 +322,7 @@ COMPAT = r"""% --- сумісність зі старою базою (діє, я
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -568,7 +573,7 @@ def clean_chunk(chunk):
     t = "\n".join(lines)
     t = re.sub(r"\n{3,}", "\n\n", t)
     # \vspace одразу після рядка з текстом = у горизонтальному режимі; завершуємо абзац, щоб наступний блок (minipage) не приклеївся до рядка умови
-    t = re.sub(r"(?m)^(?!\s*$)(?![ \t]*(?:\\begin|\\end|\\vspace|\\par|%|\\hfill|\\noindent|\\centering|\\answer|\\matching|\\nmtAnswerBox|\\zadtask|\\zadnum|\\item|\\hline|\\cline|\\multicolumn|\\textbf\{[А-Д1-3]\}|.*(?:\\\\|&|\\par)\s*$))(.*\S)[ \t]*\n([ \t]*(?:\\vspace\*?\{|\\noindent|\\begin\{(?:minipage|center)\}))", r"\1\\par\n\2", t)
+    t = re.sub(r"(?m)^(?!\s*$)(?![ \t]*(?:\\begin|\\end|\\vspace|\\par|%|\\hfill|\\noindent\s*(?:\\begin|\\hfill|\\zadnum\s*\\begin|$)|\\centering|\\answer|\\matching|\\nmtAnswerBox|\\item|\\hline|\\cline|\\multicolumn|\\textbf\{[А-Д1-3]\}|.*(?:\\\\|&|\\par)\s*$))(.*\S)[ \t]*\n([ \t]*(?:\\vspace\*?\{|\\noindent|\\begin\{(?:minipage|center)\}))", r"\1\\par\n\2", t)
     # \begin{minipage} одразу після речення в тому ж рядку -- завершити абзац (але не після \hfill)
     t = re.sub(r"([.?!:;)])[ \t]+(\\begin\{minipage\})", r"\1\\par\2", t)
     # залишкові жовті маркери редагування у старих файлах (з урахуванням вкладених дужок)
@@ -675,15 +680,78 @@ def fix_cyr_math(t):
     out.append(t[last:])
     return "".join(out)
 
+def read_args(t, i, n):
+    """n аргументів {..} починаючи з t[i] (пробіли між ними допускаються); (список, індекс після) або (None, i)"""
+    args = []; j = i
+    for _ in range(n):
+        while j < len(t) and t[j] in " \t": j += 1
+        if j >= len(t) or t[j] != "{": return None, i
+        k = balanced(t, j); args.append(t[j + 1:k]); j = k + 1
+    return args, j
+
+def relocate_small_table(t):
+    """\\answerTableSmall із довгими текстами/дробами, що стоїть останньою у лівому minipage поряд із minipage рисунка,
+    -> звичайна таблиця на всю ширину під обома колонками (клітинки не переносять слова, дроби не обрізаються)"""
+    pos = 0
+    while True:
+        i = t.find("\\answerTableSmall{", pos)
+        if i < 0: break
+        args, j = read_args(t, i + len("\\answerTableSmall"), 5)
+        if args is None: pos = i + 1; continue
+        plain = [re.sub(r"\\[a-zA-Z]+|[${}^_\\]", "", a).strip() for a in args]
+        if not (any(len(c) >= 6 for c in plain) or any(re.search(r"\\d?frac|\\sqrt", a) for a in args)): pos = j; continue
+        m_end = re.compile(r"\s*(?:%[^\n]*\n\s*)*\\end\{minipage\}").match(t, j)
+        if not m_end: pos = j; continue
+        m_fig = re.compile(r"\s*(?:\\hfill|\\hspace\{[^}]*\}|\\quad)?\s*\\begin\{minipage\}").match(t, m_end.end())
+        if not m_fig: pos = j; continue
+        k = t.find("\\end{minipage}", m_fig.end())
+        if k < 0 or "\\begin{minipage}" in t[m_fig.end():k]: pos = j; continue
+        k_end = k + len("\\end{minipage}")
+        start = i
+        m_sp = re.search(r"(\n[ \t]*(?:\\nopagebreak)?\\vspace\*?\{[^}]*\}[ \t]*)$", t[:i])
+        if m_sp: start = m_sp.start()
+        table = "\\answerTable{" + "}{".join(args) + "}"
+        t = t[:start] + t[j:k_end] + "\n\n\\nopagebreak\\vspace{0.3cm}\n" + table + t[k_end:]
+        pos = start + (k_end - j) + len(table) + 30
+    return t
+
+def widen_grid_minipage(t):
+    """сітка відповідності у minipage вужчому за 0.20\\textwidth стискається; розширюємо до 0.21 за рахунок найширшого minipage"""
+    begins = list(re.finditer(r"\\begin\{minipage\}(\[[a-z]\])?\{(0\.\d+)\\textwidth\}", t))
+    for idx in range(len(begins) - 1, -1, -1):
+        m = begins[idx]; w = float(m.group(2))
+        if w >= 0.20: continue
+        k = t.find("\\end{minipage}", m.end())
+        if k < 0 or "\\matchingGrid" not in t[m.end():k]: continue
+        # найширший minipage перед ним у тому ж макеті (не далі ніж 2 minipage назад)
+        cand = [b for b in begins[max(0, idx - 2):idx] if float(b.group(2)) >= 0.35]
+        if not cand: continue
+        big = max(cand, key=lambda b: float(b.group(2)))
+        delta = round(0.21 - w, 2)
+        nb = "%.2f" % (float(big.group(2)) - delta)
+        t = t[:big.start(2)] + nb + t[big.end(2):m.start(2)] + "0.21" + t[m.end(2):]
+        begins = list(re.finditer(r"\\begin\{minipage\}(\[[a-z]\])?\{(0\.\d+)\\textwidth\}", t))
+    return t
+
 def fix_figures_tables(t):
     """підпис y=f(x)/y=g(x) на кривій -> білий фон; дроби -> висока таблиця; голі числа в таблиці -> математика; сирі '|' у словах; поля відповіді з \\framebox"""
+    COLORS = r"(?:mainGreen|headerblue|yearOrange|red|blue|green|gray|black|cyan|magenta|orange|violet|brown|purple|teal|olive)(?:![0-9]+(?:![a-zA-Z]+)?)*"
     def node_fix(m):
         opts = m.group(1) or ""
-        if "fill=" in opts: return m.group(0)
         opts = opts[1:-1] if opts else ""
-        opts = ("fill=white, inner sep=1.5pt" + (", " + opts if opts else ""))
-        return "\\node[" + opts + "]" + m.group(2) + m.group(3)
+        parts = [x.strip() for x in opts.split(",") if x.strip()]
+        if any(x.startswith("fill=") for x in parts) and not re.fullmatch(COLORS, parts[-1] or "-"):
+            return m.group(0)
+        parts = [("text=" + re.sub(r"^color=", "", x)) if re.fullmatch(r"(?:color=)?" + COLORS, x) else x for x in parts if not x.startswith("fill=")]
+        parts += ["fill=white", "inner sep=1.5pt"]
+        return "\\node[" + ", ".join(parts) + "]" + m.group(2) + m.group(3)
     t = re.sub(r"\\node(\[[^\]]*\])?(\s*at\s*\([^)]*\))?(\s*\{\$y\s*=\s*[fg]\(x\)\$\})", node_fix, t)
+    t = relocate_small_table(t)
+    t = widen_grid_minipage(t)
+    # рисунок першим у minipage[t] -- вирівнюємо верх, а не базову лінію рисунка
+    t = re.sub(r"(\\begin\{minipage\}\[t\]\{[^}]*\})([ \t]*\n[ \t]*)(?=\\centering|\\begin\{(?:center|flushright|flushleft|nmtfit|tikzpicture)\}|\\includegraphics)", r"\1\\vspace{0pt}\2", t)
+    # рядки таблиць із дробами -- додатковий інтервал, щоб дроби не накладалися
+    t = re.sub(r"(?m)^([ \t]*\\textbf\{[А-Д1-3]\}.*\\d?frac.*?)\\\\[ \t]*$", r"\1\\\\[0.35cm]", t)
     t = re.sub(r"(?m)^([ \t]*)\\answerTable\{(?=.*\\d?frac)", r"\1\\answerTableTall{", t)
     def num_args(m):
         return "\\answerTable" + (m.group(1) or "") + "".join("{$%s$}" % a if re.fullmatch(r"-?\d+(?:[.,]\d+)?", a) else "{%s}" % a for a in m.group(2)[1:-1].split("}{"))
@@ -709,6 +777,31 @@ def load_2026():
     for u in by_unit:
         by_unit[u].sort(key=lambda x: (SESSIONS.index(x[0]["session"]), x[0]["n"]))
     return by_unit
+
+SAFE_ENVS = {"enumerate", "itemize", "description", "center", "flushleft", "flushright", "samepage"}
+
+def unbreakable(s):
+    """Завдання як одне ціле: усі вертикальні проміжки й межі абзаців верхнього рівня всередині
+    завдання стають нерозривними (легальні місця розриву сторінки лишаються тільки між завданнями).
+    Маркер \\nmtnobreak не вставляємо всередину оточень (tikzpicture, minipage, tabular ...),
+    де він не потрібен."""
+    s = s.strip("\n")
+    s = re.sub(r"\\vspace\{", r"\\nbvspace{", s)
+    s = re.sub(r"\\(medskip|bigskip|smallskip)(?![a-zA-Z])", r"\\nopagebreak\\\1", s)
+    out, depth, blank = [], 0, False
+    for ln in s.split("\n"):
+        if ln.strip() == "":
+            blank = True
+            continue
+        if blank:
+            out.append("")
+            if depth == 0: out.append("\\nmtnobreak")
+            blank = False
+        out.append(ln)
+        for m in re.finditer(r"\\(begin|end)\{([^}]*)\}", re.sub(r"(?<!\\)%.*", "", ln)):
+            if m.group(2) in SAFE_ENVS: continue
+            depth += 1 if m.group(1) == "begin" else -1
+    return "\n".join(out)
 
 def prep_2026(t):
     c = t["latex"]
@@ -795,45 +888,65 @@ def build_unit(key, by2026, log):
         it["_plain"] = plain_sig
         seen.add(sig); uniq.append(it)
     items = uniq
-    # групування за роками (стабільно)
-    years = sorted({it["year"] for it in items})
-    if [it["year"] for it in items] != sorted(it["year"] for it in items):
-        warn("порядок завдань за роками змінено (згруповано за роками)")
-    parts = []
-    counts = collections.OrderedDict()
-    gl = 0
-    for y in years:
-        grp = [it for it in items if it["year"] == y]
-        counts[y] = len(grp)
-        parts.append("\\typeTitle{НМТ %s}\n" % y)
-        for it in grp:
-            gl += 1
-            s = it["out"]
-            if it["inferred"]: s = "% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)\n" + s
-            last = s.rstrip().split("\n")[-1]
-            if not re.search(r"answerTable|nmtAnswerBox|matchingGrid", last): s += "\n\\par\\vspace{0.25cm}"
-            parts.append("\\begin{samepage}\n" + s + "\n\\end{samepage}\n")
-    # 2026
+    # ---- групування за типом: тестові (А--Д) -> відповідності -> коротка відповідь; усередині типу -- за роками
+    def old_type(t):
+        body = re.sub(r"%[^\n]*", "", t)
+        has_table = bool(re.search(r"\\answerTable|\\answerListVertical", body))
+        if re.search(r"\\matchingGrid|\\matchingLayout", body) or (re.search(r"[Уу]становіть відповідність|[Уу]згодьте|[Уу]відповідніть|доберіть (його )?закінчення|[Дд]оберіть до", body) and not has_table):
+            return "matching"
+        if has_table or (re.search(r"\\textbf\{А\}", body) and re.search(r"\\textbf\{Д\}", body)) or "label=\\textbf{\\Alph*}" in body:
+            return "single"
+        return "input"
+    TYPE_ORDER = ["single", "matching", "input"]
+    TYPE_TITLE = {"single": "Завдання з вибором однієї відповіді (А--Д)", "matching": "Завдання на встановлення відповідності", "input": "Завдання з короткою відповіддю"}
+    TYPE_SHORT = {"single": "тестових", "matching": "на відповідність", "input": "з короткою відповіддю"}
     t26 = by2026.get(key, [])
-    ans_lines = []
-    if t26:
-        counts["2026"] = len(t26)
-        parts.append("\\typeTitle{НМТ 2026}\n")
-        for t, primary, secondary in t26:
+    entries = []
+    for k, it in enumerate(items):
+        entries.append(dict(kind="old", type=old_type(it["out"]), year=it["year"], seq=k, it=it))
+    for k, (t, primary, secondary) in enumerate(t26):
+        entries.append(dict(kind="2026", type=t["type"], year="2026", seq=k, t=t, primary=primary, secondary=secondary))
+    counts = collections.OrderedDict()
+    for y in sorted({e["year"] for e in entries}): counts[y] = sum(1 for e in entries if e["year"] == y)
+    type_counts = collections.OrderedDict((tp, sum(1 for e in entries if e["type"] == tp)) for tp in TYPE_ORDER if any(e["type"] == tp for e in entries))
+    parts = []; ans_lines = []; gl = 0
+    for tp in TYPE_ORDER:
+        grp = sorted([e for e in entries if e["type"] == tp], key=lambda e: (e["year"], 0 if e["kind"] == "old" else 1, e["seq"]))
+        if not grp: continue
+        parts.append("\\typeTitle{%s}\n" % TYPE_TITLE[tp])
+        for e in grp:
             gl += 1
-            note = f"% НМТ 2026, сесія {t['session']}, завдання №{t['n']}"
-            if t.get("restored"): note += " (відновлено за збірником)"
-            if primary: note += f" --- основна тема: {UNITS[primary][3]}"
-            if secondary: note += " --- також у темі: " + ", ".join(UNITS[s][3] for s in secondary)
-            s = note + "\n" + prep_2026(t) + "\n"
-            if t.get("answer"):
-                s += "% Відповідь: " + t["answer"].replace("\n", " ") + "\n"
-                ans_lines.append((gl, t["answer"], t["session"], t["n"]))
-            if t.get("solution"):
-                s += "\\ifshowsolutions\\solution{" + t["solution"].strip() + "}\\fi\n"
-            parts.append("\\begin{samepage}\n" + s + "\\end{samepage}\n")
+            if e["kind"] == "old":
+                it = e["it"]; s = it["out"]
+                if tp == "input" and "\\nmtAnswerBox" not in s:
+                    s = s.rstrip() + "\n\\nmtAnswerBox"
+                if tp == "single" and "\\nmtAnswerBox" in s:
+                    # тестове завдання зі старого файлу з випадковим полем для відповіді -- прибираємо поле
+                    s = re.sub(r"(\\nopagebreak)?\\vspace\{[^}]*\}\s*\n\\nmtAnswerBox[ \t]*\n?", "", s)
+                    s = re.sub(r"\\nmtAnswerBox[ \t]*\n?", "", s)
+                if it["inferred"]: s = "% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)\n" + s
+                s = unbreakable(s)
+                last = s.rstrip().split("\n")[-1]
+                # між завданнями -- явне дозволене місце розриву сторінки (всередині завдання розривів немає)
+                s += "\n\\par\\penalty-20" + ("" if re.search(r"answerTable|nmtAnswerBox|matchingGrid", last) else "\\vspace{0.25cm}")
+                parts.append("\\begin{samepage}\n" + s + "\n\\end{samepage}\n")
+            else:
+                t = e["t"]
+                note = f"% НМТ 2026, сесія {t['session']}, завдання №{t['n']}"
+                if t.get("restored"): note += " (відновлено за збірником)"
+                if e["primary"]: note += f" --- основна тема: {UNITS[e['primary']][3]}"
+                if e["secondary"]: note += " --- також у темі: " + ", ".join(UNITS[x][3] for x in e["secondary"])
+                s = note + "\n" + unbreakable(prep_2026(t)) + "\n"
+                if t.get("answer"):
+                    s += "% Відповідь: " + t["answer"].replace("\n", " ") + "\n"
+                    ans_lines.append((gl, t["answer"], t["session"], t["n"]))
+                if t.get("solution"):
+                    s += "\\ifshowsolutions\\solution{" + t["solution"].strip() + "}\\fi\n"
+                s += "\\par\\penalty-20\n"
+                parts.append("\\begin{samepage}\n" + s + "\\end{samepage}\n")
     total = sum(counts.values())
     stat = ", ".join("\\mbox{%s~--- %s}" % (y, c) for y, c in counts.items())
+    tstat = "; ".join("\\mbox{%s~--- %s}" % (TYPE_SHORT[tp], c) for tp, c in type_counts.items())
     header = f"База завдань НМТ 2023--2026 \\textendash{{}} Тема {key}"
     out = [PREAMBLE.replace("@@HEADER@@", header)]
     out.append("\n\\begin{document}\n\\begingroup\\setcounter{zad}{0}\n")
@@ -844,6 +957,7 @@ def build_unit(key, by2026, log):
             if c.startswith("\\newcommand{\\matchingLayout"):
                 for a, b in ML_WIDTHS: c = c.replace(a, b)
                 c = re.sub(r"(\\begin\{minipage\}\[t\]\{[^}]*\})", r"\1\\vspace{0pt}\\raggedright", c)
+            c = re.sub(r"\\vspace\{(?!0pt\})", r"\\nbvspace{", c)   # усередині завдання розривів сторінки немає
             out.append(c + "\n")
         for c in pre_defs: out.append(c + "\n")
         out.append("\n")
@@ -865,7 +979,7 @@ def build_unit(key, by2026, log):
         out.append("\\graphicspath{{./}{%s/}}\n" % folder)
     out.append("\\chapterTitle{Тема %s. %s}\n" % (key, title))
     secnum, secname = SECTION_OF[key]
-    out.append("\\noindent{\\small\\color{gray!80} Розділ %s. %s \\quad\\textbullet\\quad Усього завдань: %d (НМТ %s).}\\par\\vspace{0.2cm}\n\n" % (secnum, secname, total, stat))
+    out.append("\\noindent{\\small\\color{gray!80} Розділ %s. %s \\quad\\textbullet\\quad Усього завдань: %d (НМТ %s); %s.}\\par\\vspace{0.2cm}\n\n" % (secnum, secname, total, stat, tstat))
     out.append("\n".join(parts))
     if ans_lines:
         out.append("\n\\ifshowsolutions\n\\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}\n\\begin{multicols}{3}\\noindent\n")

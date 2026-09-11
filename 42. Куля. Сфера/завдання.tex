@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -224,7 +229,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -235,15 +240,16 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 42. Куля. Сфера}
-\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 26 (НМТ \mbox{2023~--- 3}, \mbox{2024~--- 4}, \mbox{2025~--- 9}, \mbox{2026~--- 10}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 26 (НМТ \mbox{2023~--- 3}, \mbox{2024~--- 4}, \mbox{2025~--- 9}, \mbox{2026~--- 10}); \mbox{тестових~--- 21}; \mbox{з короткою відповіддю~--- 5}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % === ЗАВДАННЯ 1 (Свічки) ===
 \noindent\zadnum На сайт інтернет-магазину надійшло замовлення на придбання свічки у формі \textbf{кулі}. Яку із зображених свічок має вибрати для цього замовлення менеджер магазину? \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{
     % В - Куля
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
@@ -291,51 +297,49 @@
     \end{tikzpicture}\end{nmtfit}
 }
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 2 (Теорія - утворення сфери) ===
 \noindent\zadnum Доберіть закінчення речення так, щоб утворилося правильне твердження: «\textbf{Сфера} утворена обертанням... \nmtyear{2023}
 
+\nmtnobreak
 \answerListVertical
 {круга навколо хорди, що не є діаметром».}
 {кола навколо його діаметра».}
 {кола навколо хорди, що не є діаметром».}
 {круга навколо прямої, що не проходить через його центр».}
 {кола навколо його дотичної».}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 3 (Координати) ===
 \noindent\zadnum Сфера з центром у точці $O(-2; -4; 3)$ проходить через точку $A(3; -1; 2)$. Визначте діаметр цієї сфери. \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$2\sqrt{51}$}{$2\sqrt{35}$}{$3\sqrt{3}$}{$\sqrt{35}$}{$6\sqrt{3}$}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % === ЗАВДАННЯ 4 (Об'єм півкулі, R=9) ===
 \noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
 Обчисліть об'єм півкулі радіуса 9 (див. рисунок). \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$162\pi$}{$486\pi$}{$324\pi$}{$972\pi$}{$243\pi$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
     % Основа (еліпс)
@@ -353,9 +357,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -363,12 +367,12 @@
 \noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
 Точки $A$ та $B$ лежать на сфері, причому $AB=10$~см (див. рисунок). Укажіть із-поміж наведених \textit{найменше можливе} значення радіуса цієї сфери. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{11~см}{4~см}{6~см}{8~см}{3~см}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
     % Сфера
@@ -385,43 +389,35 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 6 (Площа сфери, D=18) ===
 \noindent\zadnum Визначте площу сфери, діаметр якої дорівнює 18~см. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$324\pi$~см$^2$}{$658\pi$~см$^2$}{$108\pi$~см$^2$}{$972\pi$~см$^2$}{$54\pi$~см$^2$}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 7 (Точка A всередині, OA=6) ===
 \noindent\zadnum Точка $A$ розташована всередині сфери з центром у точці $O$. Укажіть \textit{найменше можливе} значення діаметра цієї сфери, якщо $OA=6$. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$13$}{$11$}{$15$}{$18$}{$7$}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2025}
-
-\begin{samepage}
-% === ЗАВДАННЯ 8 (Сфера і призма) ===
-\noindent\zadnum Задано сферу з площею поверхні $64\pi$~см$^2$ і правильну трикутну призму. Радіус кола, уписаного в основу призми, дорівнює радіусу сфери, а висота призми дорівнює стороні її основи. Визначте об'єм (у см$^3$) призми. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -429,12 +425,12 @@
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус меншої кулі? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$13$}{$16$}{$26$}{$17$}{$12$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Куля 1
@@ -453,9 +449,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -463,12 +459,12 @@
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано сфери, що мають внутрішній дотик (див. рисунок). $A(9; -2; 4)$ – точка дотику сфер, $B(1; 7; -8)$ – центр меншої сфери. Яким \textit{найменшим} з-поміж наведених може бути радіус сфери з центром у точці $O$? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$17$}{$56$}{$21$}{$42$}{$36$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Велика сфера
@@ -487,9 +483,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -497,12 +493,12 @@
 \noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус більшої кулі? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$13$}{$12$}{$17$}{$10$}{$26$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     % Куля 1
@@ -521,60 +517,36 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 12 (Точка належить сфері) ===
 \noindent\zadnum У прямокутній системі координат у просторі задано сферу з центром у початку координат, якій належить точка $A(0; 0; -5)$. Яка з наведених точок також належить цій сфері? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$(0; 1; 4)$}{$(5; 5; 5)$}{$(0; 0; 5)$}{$(5; 5; 0)$}{$(0; 0; 10)$}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 13 (Сфера і піраміда 4-кутна) ===
-\noindent\zadnum Задано сферу з площею поверхні $648\pi$~см$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об'єм піраміди (у см$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 14 (Точка всередині сфери) ===
 \noindent\zadnum У прямокутній системі координат у просторі задано сферу з центром у точці $O(11; -3; -5)$. Точка $A(-1; 2; -5)$ належить цій сфері. Яка з наведених точок лежить усередині сфери? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$(11; -3; -19)$}{$(11; -3; 19)$}{$(11; -3; 9)$}{$(11; -3; 6)$}{$(11; -3; 10)$}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 15 (Сфера і конус) ===
-\noindent\zadnum Площа поверхні сфери дорівнює $300\pi$~см$^2$. Радіус основи конуса дорівнює радіусу сфери. Твірна конуса нахилена до площини основи під кутом $30^\circ$. Визначте об'єм (у см$^3$) конуса $V$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 16 (Сфера і піраміда 3-кутна) ===
-\noindent\zadnum Задано сферу з площею поверхні $432\pi$~см$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об'єм (у см$^3$) піраміди. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №10 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
@@ -582,54 +554,30 @@
 \answerTable{$4$}{$6$}{$8$}{$12$}{$24$}
 % Відповідь: Б
 \ifshowsolutions\solution{Найбільша відстань між точками сфери~--- це діаметр, тож $MN$ є діаметром. $MN=\sqrt{(4-(-4))^2+(-3-5)^2+(4-0)^2}=\sqrt{64+64+16}=\sqrt{144}=12$. Радіус $R=\dfrac{12}{2}=6$. Відповідь: \textbf{Б} ($6$).}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 2.06, завдання №21 --- основна тема: Конус
-\noindent
-\begin{minipage}[c]{0.62\textwidth}
-\zadnum Радіус основи й твірна конуса відносяться як $3 : 5$, а площа його бічної поверхні дорівнює $135\pi$. Площа повної поверхні півсфери дорівнює $243\pi$. У скільки разів об'єм півсфери більший за об'єм конуса? \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.36\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
-    \draw[thick, dashed] (-1.0,0) arc (180:0:1.0 and 0.28);
-    \draw[thick] (-1.0,0) arc (180:360:1.0 and 0.28);
-    \draw[thick] (-1.0,0) -- (0,2.4) -- (1.0,0);
-    \begin{scope}[shift={(3.4,0)}]
-        \draw[thick] (-1.1,0) arc (180:0:1.1 and 1.1);
-        \draw[thick] (-1.1,0) -- (1.1,0);
-        \draw[thick, dashed] (-1.1,0) arc (180:0:1.1 and 0.28);
-        \draw[thick] (-1.1,0) arc (180:360:1.1 and 0.28);
-    \end{scope}
-\end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\nmtAnswerBox
-% Відповідь: $1{,}5$
-\ifshowsolutions\solution{Конус: $r:l=3:5$, $S_{\text{бік}}=\pi rl=135\pi$. Із $l=\dfrac{5r}{3}$: $\pi r\cdot\dfrac{5r}{3}=135\pi$, тож $r^2=81$, $r=9$, $l=15$, висота $h=\sqrt{l^2-r^2}=\sqrt{225-81}=12$, $V_{\text{кон}}=\dfrac13\pi r^2h=\dfrac13\pi\cdot81\cdot12=324\pi$. Півсфера: $3\pi R^2=243\pi$, $R=9$, $V_{\text{півсф}}=\dfrac23\pi R^3=\dfrac23\pi\cdot729=486\pi$. Відношення $\dfrac{486\pi}{324\pi}=1{,}5$.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №5
-\zadtask{Укажіть просторову фігуру, яка не має основи. \nmtyear{2026}
-\nopagebreak\vspace{0.2cm}
+\zadtask{Укажіть просторову фігуру, яка не має основи. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.2cm}
 \par\noindent\textbf{А}\ \ призма
 \par\noindent\textbf{Б}\ \ конус
 \par\noindent\textbf{В}\ \ циліндр
 \par\noindent\textbf{Г}\ \ куля
 \par\noindent\textbf{Д}\ \ піраміда
-\nopagebreak\vspace{0.3cm}}
+\nopagebreak\nbvspace{0.3cm}}
 % Відповідь: Г
 \ifshowsolutions\solution{Призма, конус, циліндр і піраміда мають основу (основи). Куля основи не має. Відповідь: \textbf{Г}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №5
 \noindent
 \begin{minipage}[c]{0.62\textwidth}
-\zadnum Площина $\beta$ дотикається сфери в точці $M$ (див. рисунок). Скільки можна провести площин, кожна з яких перпендикулярна до площини $\beta$ і має зі сферою \textit{лише одну} спільну точку? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadnum Площина $\beta$ дотикається сфери в точці $M$ (див. рисунок). Скільки можна провести площин, кожна з яких перпендикулярна до площини $\beta$ і має зі сферою \textit{лише одну} спільну точку? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=2pt, topsep=2pt]
 \item жодної
 \item лише одну
@@ -655,9 +603,10 @@
     \node[left] at (0.35, 0.05) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 % Відповідь: Д
 \ifshowsolutions\solution{Площина має зі сферою лише одну спільну точку тоді й тільки тоді, коли вона дотична до сфери. Через точку дотику $M$ можна провести безліч площин, перпендикулярних до $\beta$, і кожна з них дотикається сфери в $M$. Отже, таких площин безліч. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -688,14 +637,15 @@
     \fill (N) circle (2pt) node[left] {$N$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(5; -2; 0)$}{$(-1; 2; 8)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №5
-\zadtask{Куля утворена обертанням \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Куля утворена обертанням \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
     \item кола навколо його діаметра
     \item круга навколо прямої, що проходить через його центр
@@ -703,13 +653,15 @@
     \item круга навколо прямої, що не проходить через його центр
     \item кола навколо дотичної
 \end{enumerate}
-\nopagebreak\vspace{0.1cm}}
+\nopagebreak\nbvspace{0.1cm}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №12 --- також у темі: Координати і вектори на площині і в просторі. Рівняння кола
 \zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-3;\, 1;\, 5)$, яка дотикається до координатної площини $xy$ у точці $N$. Визначте координати точки $N$. \nmtyear{2026}}
 \answerTable{$(-3; 1; -5)$}{$(-3; 1; 0)$}{$(0; 0; 5)$}{$(-3; 0; 5)$}{$(0; 1; 5)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -717,12 +669,13 @@
 \zadtask{У прямокутній системі координат у просторі задано сферу з центром у точці $(6;\, 2;\, 5)$, яка дотикається до координатної площини $xz$. Визначте діаметр цієї сфери. \nmtyear{2026}}
 \answerTable{$10$}{$4$}{$2$}{$6$}{$12$}
 % Відповідь: Б
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №5
-\zadtask{Сфера утворена обертанням \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Сфера утворена обертанням \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
     \item кола навколо його діаметра
     \item кола навколо його хорди, що не є діаметром кола
@@ -730,8 +683,9 @@
     \item круга навколо його хорди, що не є діаметром круга
     \item кола навколо дотичної
 \end{enumerate}
-\nopagebreak\vspace{0.1cm}}
+\nopagebreak\nbvspace{0.1cm}}
 % Відповідь: А
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -739,18 +693,88 @@
 \zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-9;\, 12;\, 5)$. Визначте діаметр цієї сфери, якщо вона проходить через початок координат. \nmtyear{2026}}
 \answerTableTall{$30$}{$26$}{$10\sqrt{10}$}{$4\sqrt{21}$}{$5\sqrt{10}$}
 % Відповідь: В
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання з короткою відповіддю}
+
+\begin{samepage}
+% === ЗАВДАННЯ 8 (Сфера і призма) ===
+\noindent\zadnum Задано сферу з площею поверхні $64\pi$~см$^2$ і правильну трикутну призму. Радіус кола, уписаного в основу призми, дорівнює радіусу сфери, а висота призми дорівнює стороні її основи. Визначте об'єм (у см$^3$) призми. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 13 (Сфера і піраміда 4-кутна) ===
+\noindent\zadnum Задано сферу з площею поверхні $648\pi$~см$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об'єм піраміди (у см$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 15 (Сфера і конус) ===
+\noindent\zadnum Площа поверхні сфери дорівнює $300\pi$~см$^2$. Радіус основи конуса дорівнює радіусу сфери. Твірна конуса нахилена до площини основи під кутом $30^\circ$. Визначте об'єм (у см$^3$) конуса $V$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 16 (Сфера і піраміда 3-кутна) ===
+\noindent\zadnum Задано сферу з площею поверхні $432\pi$~см$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об'єм (у см$^3$) піраміди. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 2.06, завдання №21 --- основна тема: Конус
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Радіус основи й твірна конуса відносяться як $3 : 5$, а площа його бічної поверхні дорівнює $135\pi$. Площа повної поверхні півсфери дорівнює $243\pi$. У скільки разів об'єм півсфери більший за об'єм конуса? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
+    \draw[thick, dashed] (-1.0,0) arc (180:0:1.0 and 0.28);
+    \draw[thick] (-1.0,0) arc (180:360:1.0 and 0.28);
+    \draw[thick] (-1.0,0) -- (0,2.4) -- (1.0,0);
+    \begin{scope}[shift={(3.4,0)}]
+        \draw[thick] (-1.1,0) arc (180:0:1.1 and 1.1);
+        \draw[thick] (-1.1,0) -- (1.1,0);
+        \draw[thick, dashed] (-1.1,0) arc (180:0:1.1 and 0.28);
+        \draw[thick] (-1.1,0) arc (180:360:1.1 and 0.28);
+    \end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\nmtAnswerBox
+% Відповідь: $1{,}5$
+\ifshowsolutions\solution{Конус: $r:l=3:5$, $S_{\text{бік}}=\pi rl=135\pi$. Із $l=\dfrac{5r}{3}$: $\pi r\cdot\dfrac{5r}{3}=135\pi$, тож $r^2=81$, $r=9$, $l=15$, висота $h=\sqrt{l^2-r^2}=\sqrt{225-81}=12$, $V_{\text{кон}}=\dfrac13\pi r^2h=\dfrac13\pi\cdot81\cdot12=324\pi$. Півсфера: $3\pi R^2=243\pi$, $R=9$, $V_{\text{півсф}}=\dfrac23\pi R^3=\dfrac23\pi\cdot729=486\pi$. Відношення $\dfrac{486\pi}{324\pi}=1{,}5$.}\fi
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{17.}~Б \ {\scriptsize\color{gray}(30.05, №10)}\par
-\noindent\textbf{18.}~$1{,}5$ \ {\scriptsize\color{gray}(2.06, №21)}\par
-\noindent\textbf{19.}~Г \ {\scriptsize\color{gray}(4.06, №5)}\par
-\noindent\textbf{20.}~Д \ {\scriptsize\color{gray}(5.06, №5)}\par
-\noindent\textbf{24.}~Б \ {\scriptsize\color{gray}(16.06, №12)}\par
-\noindent\textbf{25.}~А \ {\scriptsize\color{gray}(18.06, №5)}\par
-\noindent\textbf{26.}~В \ {\scriptsize\color{gray}(19.06, №12)}\par
+\noindent\textbf{13.}~Б \ {\scriptsize\color{gray}(30.05, №10)}\par
+\noindent\textbf{14.}~Г \ {\scriptsize\color{gray}(4.06, №5)}\par
+\noindent\textbf{15.}~Д \ {\scriptsize\color{gray}(5.06, №5)}\par
+\noindent\textbf{19.}~Б \ {\scriptsize\color{gray}(16.06, №12)}\par
+\noindent\textbf{20.}~А \ {\scriptsize\color{gray}(18.06, №5)}\par
+\noindent\textbf{21.}~В \ {\scriptsize\color{gray}(19.06, №12)}\par
+\noindent\textbf{26.}~$1{,}5$ \ {\scriptsize\color{gray}(2.06, №21)}\par
 \end{multicols}
 \fi
 

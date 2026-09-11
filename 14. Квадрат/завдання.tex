@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -239,7 +244,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -250,9 +255,9 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 14. Квадрат}
-\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 25 (НМТ \mbox{2023~--- 5}, \mbox{2024~--- 5}, \mbox{2025~--- 7}, \mbox{2026~--- 8}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 25 (НМТ \mbox{2023~--- 5}, \mbox{2024~--- 5}, \mbox{2025~--- 7}, \mbox{2026~--- 8}); \mbox{тестових~--- 14}; \mbox{на відповідність~--- 11}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
@@ -260,7 +265,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
         \coordinate (A) at (0,0);
@@ -268,20 +273,20 @@
         \coordinate (C) at (4,4);
         \coordinate (D) at (4,0);
         \coordinate (O) at (2,2); % Центр
-        
+
         % Зафарбована частина (половина трикутника AOD)
         \coordinate (M) at (2,0); % Середина AD
         \fill[gray!40] (A) -- (O) -- (M) -- cycle;
-        
+
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
         \draw[thick] (B) -- (D);
         \draw[thick] (O) -- (M);
-        
+
         % Позначки рівності на AD
         \draw (1, -0.1) -- (1, 0.1);
         \draw (3, -0.1) -- (3, 0.1);
-        
+
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
@@ -290,72 +295,10 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$72$ \textit{см}$^2$}{$108$ \textit{см}$^2$}{$48$ \textit{см}$^2$}{$144$ \textit{см}$^2$}{$96$ \textit{см}$^2$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$. На сторонах $AD$ і $BC$ вибрано точки $K$ і $M$ так, що $AK = 4$ \textit{см}, $MC = 10$ \textit{см}, $KM = DM$. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        % Розрахунок: нехай сторона a.
-        % K(4,0), M(a-10, a), D(a,0).
-        % KM^2 = (a-10-4)^2 + a^2 = (a-14)^2 + a^2.
-        % DM^2 = 10^2 + a^2.
-        % (a-14)^2 = 100 => a-14 = 10 (бо сторона > 14) => a=24.
-        % AK=4 (масштаб), сторона 24.
-        
-        \def\side{24}
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,\side);
-        \coordinate (C) at (\side,\side);
-        \coordinate (D) at (\side,0);
-        
-        \coordinate (K) at (4,0);
-        \coordinate (M) at (14,\side); % 24 - 10 = 14
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M) -- (D);
-        
-        % Позначки рівності
-        \draw ($(K)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
-        \draw ($(D)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (K) {$K$};
-        \node[above] at (M) {$M$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Величина} \par\par\vspace{0.2cm}
-    \textbf{1} \quad довжина сторони квадрата $ABCD$ \\
-    \textbf{2} \quad довжина відрізка $DM$ \\
-    \textbf{3} \quad відстань від середини відрізка $DM$ до прямої $AB$
-}{
-    \textit{Значення величини} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 24 \textit{см} \\
-    \textbf{Б} & 25 \textit{см} \\
-    \textbf{В} & 19 \textit{см} \\
-    \textbf{Г} & 18 \textit{см} \\
-    \textbf{Д} & 26 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -364,20 +307,20 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,12);
         \coordinate (C) at (12,12);
         \coordinate (D) at (12,0);
-        
+
         % BK:KC = 3:1 => BK=9, KC=3.
         \coordinate (K) at (9,12);
-        
+
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (K);
-        
+
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
@@ -388,8 +331,10 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$20$ \textit{см}}{$9$ \textit{см}}{$15$ \textit{см}}{$18$ \textit{см}}{$16$ \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -398,7 +343,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         \draw[thick] (0,0) rectangle (12,12);
@@ -407,499 +352,53 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$36$}{$48$}{$24$}{$60$}{$12$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
-        % P=24 => сторона 6.
-        % Трапеція AKCD. Основи AK і CD. CD=6. Середня лінія 10 -> AK+6 = 20 -> AK=14.
-        % BK = 14-6 = 8.
-        \coordinate (A) at (0,0);
-        \coordinate (D) at (6,0);
-        \coordinate (C) at (6,6);
-        \coordinate (B) at (0,6);
-        \coordinate (K) at (0,14);
-        
-        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Контур трапеції
-        \draw[thick] (B) -- (C); % Верхня сторона квадрата
-        
-        % Прямий кут
-        \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
-        
-        \node[left] at (A) {$A$};
-        \node[below right] at (D) {$D$};
-        \node[right] at (C) {$C$};
-        \node[left] at (B) {$B$};
-        \node[left] at (K) {$K$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $BK$ \\
-    \textbf{2} \quad $KC$ \\
-    \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см} \\
-    \textbf{Б} & 7 \textit{см} \\
-    \textbf{В} & 8 \textit{см} \\
-    \textbf{Г} & 9 \textit{см} \\
-    \textbf{Д} & 10 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2024}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $24$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}.\nmtyear{2024}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-    % Лінії m та n
-    
-    
-    % Координати
-    % Висота квадрата = 24/4 = 6. У нас масштаб 0.6, тому y=4 відповідає 6 одиницям
-    % BC = KL = 6. AD = 9 (бо 6:AD=2:3). MQ = 9.
-    % Приймемо в TikZ одиницях: Висота = 4. Тоді реальна = 6. k = 1.5
-    % Тоді ширина квадрата в TikZ = 4.
-    
-    % Квадрат DKLM
-    \coordinate (D) at (4,0);
-    \coordinate (M) at (8,0);
-    \coordinate (L) at (8,4);
-    \coordinate (K) at (4,4);
-    
-  
-    
-    
-    % Трапеція ABCD
-    % BC = 6 (реальних) -> 4 (TikZ). AD = 9 (реальних) -> 6 (TikZ)
-    % A має бути лівіше D на 6. 4-6 = -2.
-    % B має бути над A? На рисунку кут A прямий.
-    \coordinate (A) at (0,0); % Зсунемо все, щоб D було на 4
-    % Тоді A = (4-4, 0)? Ні, AD=6 (TikZ). D=4, тоді A=-2.
-    % Перерахуємо координати для гарного вигляду (зсув вправо)
-    
-    % Зсув +2 по X
-    \coordinate (D) at (6,0);
-    \coordinate (M) at (10,0);
-    \coordinate (L) at (10,4);
-    \coordinate (K) at (6,4);
-    
-    % Трапеція (прямокутна за рисунком)
-    \coordinate (A) at (2,0); % AD = 4 (TikZ) -> 6 реальних? Ні.
-    % Давайте простіше: Висота h. Квадрат h x h.
-    % BC = h. AD = 1.5h. 
-    % A=(0,0), B=(0,h), C=(h,h), D=(1.5h, 0).
-    % Квадрат DKLM: D=(1.5h, 0), M=(2.5h, 0), L=(2.5h, h), K=(1.5h, h).
-    % Паралелограм: M=(2.5h, 0), Q=(4h, 0) (бо MQ=AD=1.5h).
-    
-    % Масштаб h=3
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \coordinate (C) at (3,3); % BC=3
-    \coordinate (D) at (4.5,0); % AD=4.5 (3*1.5)
-    
-    \coordinate (K_sq) at (4.5,3);
-    \coordinate (L_sq) at (7.5,3); % KL=3
-    \coordinate (M_sq) at (7.5,0);
-    
-    \coordinate (N) at (9.5,3); % На око зсув
-    \coordinate (P) at (14,3); % NP = MQ = 4.5
-    \coordinate (Q) at (12,0); % MQ = 4.5. M=7.5 -> Q=12.
-    \coordinate (N_par) at (9.5,3); % P - N = 4.5. 14-9.5=4.5. OK.
-    
-    % Заливаємо
-    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
-    \fill[violet!20] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
-    \fill[yellow!20] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
-    
-    % Контури
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; % Трапеція
-    \draw[thick] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle; % Квадрат
-    \draw[thick] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle; % Паралелограм
-    
-    % Лінії m та n (довгі)
-    \draw[thick] (-1,0) -- (15,0) node[above] {$n$};
-    \draw[thick] (-1,3) -- (15,3) node[above] {$m$};
-    
-    % Прямий кут
-    \draw (A) rectangle ++(0.3,0.3);
-    
-    % Підписи
-    \node[below] at (A) {$A$};
-    \node[above] at (B) {$B$};
-    \node[above] at (C) {$C$};
-    \node[below] at (D) {$D$};
-    \node[above] at (K_sq) {$K$};
-    \node[above] at (L_sq) {$L$};
-    \node[below] at (M_sq) {$M$};
-    \node[above] at (N_par) {$N$};
-    \node[above] at (P) {$P$};
-    \node[below] at (Q) {$Q$};
-    
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\matchingLayout{
-\textit{ Фігура} \par\par\vspace{0.2cm}
-    \textbf{1} \quad квадрат $DKLM$ \\
-    \textbf{2} \quad паралелограм $MNPQ$ \\
-    \textbf{3} \quad трапеція $ABCD$
-}{
-\textit{ Площа фігури} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-
-    \textbf{А} & 48 \\
-    \textbf{Б} & 90 \\
-    \textbf{В} & 54 \\
-    \textbf{Г} & 36 \\
-    \textbf{Д} & 45 \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$, площа якого $144$ \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,10);
-        \coordinate (C) at (10,10);
-        \coordinate (D) at (10,0);
-        
-        \coordinate (K) at (5,10);
-        \coordinate (M) at (10,5);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M);
-        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
-        
-        % Позначки середин
-        \draw (2.5, 9.8) -- (2.5, 10.2);
-        \draw (7.5, 9.8) -- (7.5, 10.2);
-        
-        \draw (9.8, 7.5) -- (10.2, 7.5);
-        \draw (9.8, 2.5) -- (10.2, 2.5);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (K) {$K$};
-        \node[right] at (M) {$M$};
-        
-        \fill (K) circle (5pt);
-        \fill (M) circle (5pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad сторона квадрата \\
-    \textbf{2} \quad $KM$ \\
-    \textbf{3} \quad відстань від точки $A$ до центра кола, описаного навколо трикутника $KMC$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см} \\
-    \textbf{Б} & $6\sqrt{2}$ \textit{см} \\
-    \textbf{В} & 12 \textit{см} \\
-    \textbf{Г} & $8\sqrt{2}$ \textit{см} \\
-    \textbf{Д} & $9\sqrt{2}$ \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \zadtask{Сума двох паралельних сторін квадрата дорівнює $16$ \textit{см}. Знайдіть площу цього квадрата. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$16$ \textit{см}$^2$}{$32$ \textit{см}$^2$}{$8$ \textit{см}$^2$}{$64$ \textit{см}$^2$}{$256$ \textit{см}$^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Діагоналі будь-якого ромба ділять його кути навпіл. \\
 II. & Діагоналі будь-якого чотирикутника точкою перетину діляться навпіл. \\
 III. & Діагоналі будь-якого квадрата перпендикулярні. \\
 \end{tabular}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише III}{лише II та III}{лише I та III}{лише I та II}{лише I}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Геометрична фігура} \par\par\vspace{0.2cm}
-    \textbf{1} \quad ромб з висотою $4$ \textit{см} \\
-    \textbf{2} \quad трикутник з площею $24$ \textit{см}$^2$ та периметром $12$ \textit{см} \\
-    \textbf{3} \quad квадрат з периметром $64$ \textit{см}
-}{
-    \textit{Радіус кола, вписаного у фігуру} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 4 \textit{см} \\
-    \textbf{Б} & $\sqrt{3}$ \textit{см} \\
-    \textbf{В} & 8 \textit{см} \\
-    \textbf{Г} & 6 \textit{см} \\
-    \textbf{Д} & 2 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2025}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$. На стороні $BC$ вибрано точку $K$, так що $KC = 4$ \textit{см}. Точка $M$ --- середина відрізка $AK$. Пряма, що проходить через точку $M$, паралельна стороні $BC$, і перетинає $AB$ та $CD$ в точках $N$ і $P$ відповідно. $NM = 6$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Розрахунок: NM = (AB - 4)/2? Ні.
-        % Нехай сторона a. K(a-4, a). A(0,0). M((a-4)/2, a/2).
-        % N(0, a/2). NM = (a-4)/2. 
-        % (a-4)/2 = 6 => a-4=12 => a=16.
-        % Сторона 16. KC=4. BK=12.
-        
-        \def\side{16}
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,\side);
-        \coordinate (C) at (\side,\side);
-        \coordinate (D) at (\side,0);
-        
-        \coordinate (K) at (12,\side); % KC=4
-        \coordinate (M) at (6, 8); % Середина AK (A(0,0), K(12,16)) -> (6,8)
-        
-        \coordinate (N) at (0,8);
-        \coordinate (P) at (\side,8);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (K);
-        \draw[thick] (N) -- (P);
-        
-        % Позначки рівності AM=MK
-        \draw ($(A)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
-        \draw ($(M)!0.5!(K)$) ++(-0.5,0.5) -- ++(1,-1);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (K) {$K$};
-        \node[left] at (N) {$N$};
-        \node[right] at (P) {$P$};
-        \node[above left] at (M) {$M$};
-        
-        \fill (M) circle (10pt);
-        \fill (K) circle (10pt);
-        \fill (N) circle (10pt);
-        \fill (P) circle (10pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $AB$ \\
-    \textbf{2} \quad $MP$ \\
-    \textbf{3} \quad $AK$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 10 \textit{см} \\
-    \textbf{Б} & 12 \textit{см} \\
-    \textbf{В} & 16 \textit{см} \\
-    \textbf{Г} & 18 \textit{см} \\
-    \textbf{Д} & 20 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній трапеції $ABCD$ проведено висоту $CK$. $ABCK$ --- квадрат з діагоналлю $12\sqrt{2}$ \textit{см}. $CD = 13$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Квадрат діагональ 12sqrt(2) -> сторона 12.
-        % Висота CK=12. CD=13. KD=5. AD=17.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,12);
-        \coordinate (C) at (12,12);
-        \coordinate (K) at (12,0);
-        \coordinate (D) at (17,0);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (C) -- (K);
-        
-        % Прямий кут
-        \draw (12,1) -- (13,1) -- (13,0);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below] at (K) {$K$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad висота трапеції $ABCD$ \\
-    \textbf{2} \quad $AD$ \\
-    \textbf{3} \quad середня лінія трапеції $ABCD$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 12 \textit{см} \\
-    \textbf{Б} & 14,5 \textit{см} \\
-    \textbf{В} & 17 \textit{см} \\
-    \textbf{Г} & 18 \textit{см} \\
-    \textbf{Д} & 29 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
 I. & Точка перетину діагоналей квадрата рівновіддалена від його вершин. \\
 II. & Сума довжин діагоналей квадрата дорівнює сумі довжин його сторін. \\
 III. & Діагональ квадрата ділить його на два рівновеликих трикутники. \\
 \end{tabular}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I}{лише I та III}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На стороні $BC$ квадрата $ABCD$ вибрано точку $K$ так, що $BK = KC$. Діагональ $BD$ квадрата і відрізок $AK$ перетинаються в точці $M$. Периметр квадрата $ABCD$ дорівнює $120$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % P=120 -> сторона 30.
-        % BK=KC=15.
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,30);
-        \coordinate (C) at (30,30);
-        \coordinate (D) at (30,0);
-        \coordinate (K) at (15,30);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (K);
-        \draw[thick] (B) -- (D);
-        
-        \coordinate (M) at (intersection of A--K and B--D);
-        
-        % Позначки рівності BK=KC
-        \draw (7.5, 29) -- (7.5, 31);
-        \draw (22.5, 29) -- (22.5, 31);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (K) {$K$};
-        \node[right] at (M) {$M$};
-        
-        \fill (M) circle (15pt);
-        \fill (K) circle (15pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $BK$ \\
-    \textbf{2} \quad $BD$ \\
-    \textbf{3} \quad $MD$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $12\sqrt{2}$ \textit{см} \\
-    \textbf{Б} & 15 \textit{см} \\
-    \textbf{В} & $20\sqrt{2}$ \textit{см} \\
-    \textbf{Г} & $18\sqrt{2}$ \textit{см} \\
-    \textbf{Д} & $30\sqrt{2}$ \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -908,94 +407,39 @@ III. & Діагональ квадрата ділить його на два р�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,24);
         \coordinate (C) at (24,24);
         \coordinate (D) at (24,0);
-        
+
         % AM:MD = 1:2 -> AM=8, MD=16.
         \coordinate (M) at (8,0);
         % KC=6 -> BK=18. K(18, 24).
         \coordinate (K) at (18,24);
-        
+
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (M) -- (K);
-        
+
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (K) {$K$};
         \node[below] at (M) {$M$};
-        
+
         \fill (M) circle (15pt);
         \fill (K) circle (15pt);
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$32$ \textit{см}}{$26$ \textit{см}}{$25$ \textit{см}}{$34$ \textit{см}}{$27$ \textit{см}}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Square ABCD perimeter 40 -> side 10.
-        % CM = 26. In rect DCKM, side CD=10. CM is diagonal.
-        % DM = sqrt(26^2 - 10^2) = 24.
-        % Total width AM = 10 + 24 = 34.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,10);
-        \coordinate (C) at (10,10);
-        \coordinate (D) at (10,0);
-        
-        \coordinate (K) at (24,10);
-        \coordinate (M) at (24,0);
-        
-        \draw[thick] (A) -- (B) -- (K) -- (M) -- cycle;
-        \draw[thick] (D) -- (C); % Separator
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above right] at (K) {$K$};
-        \node[below right] at (M) {$M$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Сторона квадрата $ABCD$ \\
-    \textbf{2} \quad $CK$ \\
-    \textbf{3} \quad Відстань між центром квадрата і точкою перетину діагоналей прямокутника $ABKM$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 10 \textit{см} \\
-    \textbf{Б} & 12 \textit{см} \\
-    \textbf{В} & 16 \textit{см} \\
-    \textbf{Г} & 17 \textit{см} \\
-    \textbf{Д} & 24 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1004,30 +448,30 @@ III. & Діагональ квадрата ділить його на два р�
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
         % Side calculation: Diagonal = 12 => Side = 12/sqrt(2) = 6sqrt(2) approx 8.48.
         % Let's use scale side = 8 for drawing.
-        
+
         \coordinate (A) at (0,0);
         \coordinate (D) at (8,0);
         \coordinate (C) at (8,8);
         \coordinate (B) at (0,8);
-        
+
         % Angle KAB = 30 deg. AB is vertical.
         % So AK makes 30 deg with vertical AB.
         % Or 60 deg with horizontal AD.
         % We need K on BC (top side, y=8).
         % x_K = 8 * tan(30) = 8 * 0.577 = 4.61.
         \coordinate (K) at (4.61, 8);
-        
+
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (K);
-        
+
         % Angle 30 at A (between AB and AK)
         \pic [draw, pic text={\small $30^\circ$}, angle radius=0.6cm, angle eccentricity=1.7] {angle = K--A--B};
-        
+
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
@@ -1038,11 +482,11 @@ III. & Діагональ квадрата ділить його на два р�
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$12\sqrt{3}$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$18$ \textit{см}$^2$}{$36$ \textit{см}$^2$}{$36\sqrt{3}$ \textit{см}$^2$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №13 --- основна тема: Прямокутник
@@ -1074,59 +518,11 @@ III. & Діагональ квадрата ділить його на два р�
     \node[below] at (G) {$G$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$68$ см$^2$}{$64$ см$^2$}{$72$ см$^2$}{$70$ см$^2$}{$76$ см$^2$}
 % Відповідь: А
 \ifshowsolutions\solution{Площа квадрата $6\cdot 6=36$ см$^2$, площа прямокутника $4\cdot 9=36$ см$^2$. Спільний рівнобедрений трикутник має основу, рівну стороні прямокутника $4$ см, і висоту $2$ см, тож його площа $\dfrac{1}{2}\cdot 4\cdot 2=4$ см$^2$. Площа трафарету $=36+36-4=68$ см$^2$. Відповідь: \textbf{А}.}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 30.05, завдання №16 --- також у темі: Трикутники
-\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами \mbox{(1--3)} та їхніми значеннями \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-    \coordinate (K) at (2,6);
-    \coordinate (Mid) at (4,2);
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick] (B) -- (K) -- (C);
-    \fill (Mid) circle (2pt);
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \node[above] at (K) {$K$};
-    \node[right] at (Mid) {$M$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\vspace{0.2cm}
-\noindent
-\begin{minipage}[t]{0.45\textwidth}
-\textit{Величина}\par\vspace{0.15cm}
-\textbf{1} \quad довжина сторони квадрата\\[0.25cm]
-\textbf{2} \quad відстань від точки $K$ до прямої $AD$\\[0.25cm]
-\textbf{3} \quad довжина відрізка $KM$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Значення}\par\vspace{0.15cm}
-\textbf{А} \quad $12$\\[0.15cm]
-\textbf{Б} \quad $10$\\[0.15cm]
-\textbf{В} \quad $4\sqrt{3}$\\[0.15cm]
-\textbf{Г} \quad $4\sqrt{5}$\\[0.15cm]
-\textbf{Д} \quad $8$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}}
-% Відповідь: 1~--~Д, 2~--~А, 3~--~Г
-\ifshowsolutions\solution{Нехай сторона квадрата $a$. Ламана $BADM=BA+AD+DM=a+a+\dfrac a2=\dfrac{5a}{2}=20$, звідки $a=8$ (\textbf{1}~--~Д). Висота трикутника до $BC$ дорівнює $\dfrac a2=4$, тож відстань від $K$ до $AD$: $a+\dfrac a2=12$ (\textbf{2}~--~А). У координатах $K(4;12)$, $M(8;4)$: $KM=\sqrt{4^2+8^2}=\sqrt{80}=4\sqrt5$ (\textbf{3}~--~Г). Відповідь: \textbf{1~--~Д, 2~--~А, 3~--~Г}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1156,51 +552,11 @@ III. & Діагональ квадрата ділить його на два р�
     \node[below] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$6\sqrt{2}$ см}{$3\sqrt{3}$ см}{$6\sqrt{3}$ см}{$3\sqrt{2}$ см}{$3\sqrt{6}$ см}
 % Відповідь: Д
 \ifshowsolutions\solution{$\angle BKA=180^\circ-120^\circ=60^\circ$. У прямокутному трикутнику $ABK$ ($\angle A=90^\circ$): $AB=BK\sin 60^\circ=12\cdot\dfrac{\sqrt3}{2}=6\sqrt3$ --- сторона квадрата. Радіус описаного кола $R=\dfrac{a\sqrt2}{2}=\dfrac{6\sqrt3\cdot\sqrt2}{2}=3\sqrt6$ см. Відповідь: \textbf{Д}.}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 9.06, завдання №18
-\zadtask{На рисунку зображено квадрат $ABCD$, діагональ якого дорівнює $8\sqrt{2}$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\vspace{0.2cm}
-\noindent
-\begin{minipage}[t]{0.50\textwidth}
-\textit{Відрізок}\par\vspace{0.15cm}
-\textbf{1} \quad відстань між серединами сторін $AB$ і $AD$\\[0.25cm]
-\textbf{2} \quad радіус кола, уписаного в квадрат $ABCD$\\[0.25cm]
-\textbf{3} \quad медіана трикутника $ABC$, проведена з вершини $A$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.28\textwidth}
-\textit{Довжина відрізка}\par\vspace{0.15cm}
-\textbf{А} \quad $2\sqrt{2}$~см\\[0.15cm]
-\textbf{Б} \quad $4$~см\\[0.15cm]
-\textbf{В} \quad $4\sqrt{2}$~см\\[0.15cm]
-\textbf{Г} \quad $8$~см\\[0.15cm]
-\textbf{Д} \quad $4\sqrt{5}$~см
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0.4cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1229,8 +585,9 @@ III. & Діагональ квадрата ділить його на два р�
 
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{жодної}{лише одну}{лише дві}{лише три}{більше трьох}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1261,8 +618,9 @@ III. & Діагональ квадрата ділить його на два р�
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$4{,}5$~м}{$9$~м}{$6$~м}{$3$~м}{$1{,}5$~м}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1283,9 +641,10 @@ III. & Діагональ квадрата ділить його на два р�
     \node[left, font=\scriptsize, rotate=90, anchor=south] at (0,4) {$160$~см};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$800$~см$^2$}{$1200$~см$^2$}{$2000$~см$^2$}{$160$~см$^2$}{$1600$~см$^2$}
 % Відповідь: Д
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1317,19 +676,701 @@ III. & Діагональ квадрата ділить його на два р�
     \node[below right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$8$~см}{$9$~см}{$11$~см}{$12$~см}{$14$~см}
 % Відповідь: В
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$. На сторонах $AD$ і $BC$ вибрано точки $K$ і $M$ так, що $AK = 4$ \textit{см}, $MC = 10$ \textit{см}, $KM = DM$. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+        % Розрахунок: нехай сторона a.
+        % K(4,0), M(a-10, a), D(a,0).
+        % KM^2 = (a-10-4)^2 + a^2 = (a-14)^2 + a^2.
+        % DM^2 = 10^2 + a^2.
+        % (a-14)^2 = 100 => a-14 = 10 (бо сторона > 14) => a=24.
+        % AK=4 (масштаб), сторона 24.
+
+        \def\side{24}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\side);
+        \coordinate (C) at (\side,\side);
+        \coordinate (D) at (\side,0);
+
+        \coordinate (K) at (4,0);
+        \coordinate (M) at (14,\side); % 24 - 10 = 14
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (M) -- (D);
+
+        % Позначки рівності
+        \draw ($(K)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
+        \draw ($(D)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \node[above] at (M) {$M$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Величина} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad довжина сторони квадрата $ABCD$ \\
+    \textbf{2} \quad довжина відрізка $DM$ \\
+    \textbf{3} \quad відстань від середини відрізка $DM$ до прямої $AB$
+}{
+    \textit{Значення величини} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 24 \textit{см} \\
+    \textbf{Б} & 25 \textit{см} \\
+    \textbf{В} & 19 \textit{см} \\
+    \textbf{Г} & 18 \textit{см} \\
+    \textbf{Д} & 26 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        % P=24 => сторона 6.
+        % Трапеція AKCD. Основи AK і CD. CD=6. Середня лінія 10 -> AK+6 = 20 -> AK=14.
+        % BK = 14-6 = 8.
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (6,0);
+        \coordinate (C) at (6,6);
+        \coordinate (B) at (0,6);
+        \coordinate (K) at (0,14);
+
+        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Контур трапеції
+        \draw[thick] (B) -- (C); % Верхня сторона квадрата
+
+        % Прямий кут
+        \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
+
+        \node[left] at (A) {$A$};
+        \node[below right] at (D) {$D$};
+        \node[right] at (C) {$C$};
+        \node[left] at (B) {$B$};
+        \node[left] at (K) {$K$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $BK$ \\
+    \textbf{2} \quad $KC$ \\
+    \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & 7 \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 9 \textit{см} \\
+    \textbf{Д} & 10 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
+На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $24$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}.\nmtyear{2024}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+    % Лінії m та n
+
+    % Координати
+    % Висота квадрата = 24/4 = 6. У нас масштаб 0.6, тому y=4 відповідає 6 одиницям
+    % BC = KL = 6. AD = 9 (бо 6:AD=2:3). MQ = 9.
+    % Приймемо в TikZ одиницях: Висота = 4. Тоді реальна = 6. k = 1.5
+    % Тоді ширина квадрата в TikZ = 4.
+
+    % Квадрат DKLM
+    \coordinate (D) at (4,0);
+    \coordinate (M) at (8,0);
+    \coordinate (L) at (8,4);
+    \coordinate (K) at (4,4);
+
+    % Трапеція ABCD
+    % BC = 6 (реальних) -> 4 (TikZ). AD = 9 (реальних) -> 6 (TikZ)
+    % A має бути лівіше D на 6. 4-6 = -2.
+    % B має бути над A? На рисунку кут A прямий.
+    \coordinate (A) at (0,0); % Зсунемо все, щоб D було на 4
+    % Тоді A = (4-4, 0)? Ні, AD=6 (TikZ). D=4, тоді A=-2.
+    % Перерахуємо координати для гарного вигляду (зсув вправо)
+
+    % Зсув +2 по X
+    \coordinate (D) at (6,0);
+    \coordinate (M) at (10,0);
+    \coordinate (L) at (10,4);
+    \coordinate (K) at (6,4);
+
+    % Трапеція (прямокутна за рисунком)
+    \coordinate (A) at (2,0); % AD = 4 (TikZ) -> 6 реальних? Ні.
+    % Давайте простіше: Висота h. Квадрат h x h.
+    % BC = h. AD = 1.5h. 
+    % A=(0,0), B=(0,h), C=(h,h), D=(1.5h, 0).
+    % Квадрат DKLM: D=(1.5h, 0), M=(2.5h, 0), L=(2.5h, h), K=(1.5h, h).
+    % Паралелограм: M=(2.5h, 0), Q=(4h, 0) (бо MQ=AD=1.5h).
+
+    % Масштаб h=3
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,3);
+    \coordinate (C) at (3,3); % BC=3
+    \coordinate (D) at (4.5,0); % AD=4.5 (3*1.5)
+
+    \coordinate (K_sq) at (4.5,3);
+    \coordinate (L_sq) at (7.5,3); % KL=3
+    \coordinate (M_sq) at (7.5,0);
+
+    \coordinate (N) at (9.5,3); % На око зсув
+    \coordinate (P) at (14,3); % NP = MQ = 4.5
+    \coordinate (Q) at (12,0); % MQ = 4.5. M=7.5 -> Q=12.
+    \coordinate (N_par) at (9.5,3); % P - N = 4.5. 14-9.5=4.5. OK.
+
+    % Заливаємо
+    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[violet!20] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
+    \fill[yellow!20] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
+
+    % Контури
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; % Трапеція
+    \draw[thick] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle; % Квадрат
+    \draw[thick] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle; % Паралелограм
+
+    % Лінії m та n (довгі)
+    \draw[thick] (-1,0) -- (15,0) node[above] {$n$};
+    \draw[thick] (-1,3) -- (15,3) node[above] {$m$};
+
+    % Прямий кут
+    \draw (A) rectangle ++(0.3,0.3);
+
+    % Підписи
+    \node[below] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above] at (K_sq) {$K$};
+    \node[above] at (L_sq) {$L$};
+    \node[below] at (M_sq) {$M$};
+    \node[above] at (N_par) {$N$};
+    \node[above] at (P) {$P$};
+    \node[below] at (Q) {$Q$};
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\matchingLayout{
+\textit{ Фігура} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad квадрат $DKLM$ \\
+    \textbf{2} \quad паралелограм $MNPQ$ \\
+    \textbf{3} \quad трапеція $ABCD$
+}{
+\textit{ Площа фігури} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+
+    \textbf{А} & 48 \\
+    \textbf{Б} & 90 \\
+    \textbf{В} & 54 \\
+    \textbf{Г} & 36 \\
+    \textbf{Д} & 45 \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$, площа якого $144$ \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,10);
+        \coordinate (C) at (10,10);
+        \coordinate (D) at (10,0);
+
+        \coordinate (K) at (5,10);
+        \coordinate (M) at (10,5);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (M);
+        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
+
+        % Позначки середин
+        \draw (2.5, 9.8) -- (2.5, 10.2);
+        \draw (7.5, 9.8) -- (7.5, 10.2);
+
+        \draw (9.8, 7.5) -- (10.2, 7.5);
+        \draw (9.8, 2.5) -- (10.2, 2.5);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[right] at (M) {$M$};
+
+        \fill (K) circle (5pt);
+        \fill (M) circle (5pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad сторона квадрата \\
+    \textbf{2} \quad $KM$ \\
+    \textbf{3} \quad відстань від точки $A$ до центра кола, описаного навколо трикутника $KMC$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & $6\sqrt{2}$ \textit{см} \\
+    \textbf{В} & 12 \textit{см} \\
+    \textbf{Г} & $8\sqrt{2}$ \textit{см} \\
+    \textbf{Д} & $9\sqrt{2}$ \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
+Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Геометрична фігура} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad ромб з висотою $4$ \textit{см} \\
+    \textbf{2} \quad трикутник з площею $24$ \textit{см}$^2$ та периметром $12$ \textit{см} \\
+    \textbf{3} \quad квадрат з периметром $64$ \textit{см}
+}{
+    \textit{Радіус кола, вписаного у фігуру} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 4 \textit{см} \\
+    \textbf{Б} & $\sqrt{3}$ \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 6 \textit{см} \\
+    \textbf{Д} & 2 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$. На стороні $BC$ вибрано точку $K$, так що $KC = 4$ \textit{см}. Точка $M$ --- середина відрізка $AK$. Пряма, що проходить через точку $M$, паралельна стороні $BC$, і перетинає $AB$ та $CD$ в точках $N$ і $P$ відповідно. $NM = 6$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % Розрахунок: NM = (AB - 4)/2? Ні.
+        % Нехай сторона a. K(a-4, a). A(0,0). M((a-4)/2, a/2).
+        % N(0, a/2). NM = (a-4)/2. 
+        % (a-4)/2 = 6 => a-4=12 => a=16.
+        % Сторона 16. KC=4. BK=12.
+
+        \def\side{16}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\side);
+        \coordinate (C) at (\side,\side);
+        \coordinate (D) at (\side,0);
+
+        \coordinate (K) at (12,\side); % KC=4
+        \coordinate (M) at (6, 8); % Середина AK (A(0,0), K(12,16)) -> (6,8)
+
+        \coordinate (N) at (0,8);
+        \coordinate (P) at (\side,8);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        \draw[thick] (N) -- (P);
+
+        % Позначки рівності AM=MK
+        \draw ($(A)!0.5!(M)$) ++(-0.5,0.5) -- ++(1,-1);
+        \draw ($(M)!0.5!(K)$) ++(-0.5,0.5) -- ++(1,-1);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[left] at (N) {$N$};
+        \node[right] at (P) {$P$};
+        \node[above left] at (M) {$M$};
+
+        \fill (M) circle (10pt);
+        \fill (K) circle (10pt);
+        \fill (N) circle (10pt);
+        \fill (P) circle (10pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $AB$ \\
+    \textbf{2} \quad $MP$ \\
+    \textbf{3} \quad $AK$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & 18 \textit{см} \\
+    \textbf{Д} & 20 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній трапеції $ABCD$ проведено висоту $CK$. $ABCK$ --- квадрат з діагоналлю $12\sqrt{2}$ \textit{см}. $CD = 13$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % Квадрат діагональ 12sqrt(2) -> сторона 12.
+        % Висота CK=12. CD=13. KD=5. AD=17.
+
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,12);
+        \coordinate (C) at (12,12);
+        \coordinate (K) at (12,0);
+        \coordinate (D) at (17,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (C) -- (K);
+
+        % Прямий кут
+        \draw (12,1) -- (13,1) -- (13,0);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below] at (K) {$K$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad висота трапеції $ABCD$ \\
+    \textbf{2} \quad $AD$ \\
+    \textbf{3} \quad середня лінія трапеції $ABCD$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 12 \textit{см} \\
+    \textbf{Б} & 14,5 \textit{см} \\
+    \textbf{В} & 17 \textit{см} \\
+    \textbf{Г} & 18 \textit{см} \\
+    \textbf{Д} & 29 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На стороні $BC$ квадрата $ABCD$ вибрано точку $K$ так, що $BK = KC$. Діагональ $BD$ квадрата і відрізок $AK$ перетинаються в точці $M$. Периметр квадрата $ABCD$ дорівнює $120$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+        % P=120 -> сторона 30.
+        % BK=KC=15.
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,30);
+        \coordinate (C) at (30,30);
+        \coordinate (D) at (30,0);
+        \coordinate (K) at (15,30);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K);
+        \draw[thick] (B) -- (D);
+
+        \coordinate (M) at (intersection of A--K and B--D);
+
+        % Позначки рівності BK=KC
+        \draw (7.5, 29) -- (7.5, 31);
+        \draw (22.5, 29) -- (22.5, 31);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[right] at (M) {$M$};
+
+        \fill (M) circle (15pt);
+        \fill (K) circle (15pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $BK$ \\
+    \textbf{2} \quad $BD$ \\
+    \textbf{3} \quad $MD$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $12\sqrt{2}$ \textit{см} \\
+    \textbf{Б} & 15 \textit{см} \\
+    \textbf{В} & $20\sqrt{2}$ \textit{см} \\
+    \textbf{Г} & $18\sqrt{2}$ \textit{см} \\
+    \textbf{Д} & $30\sqrt{2}$ \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % Square ABCD perimeter 40 -> side 10.
+        % CM = 26. In rect DCKM, side CD=10. CM is diagonal.
+        % DM = sqrt(26^2 - 10^2) = 24.
+        % Total width AM = 10 + 24 = 34.
+
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,10);
+        \coordinate (C) at (10,10);
+        \coordinate (D) at (10,0);
+
+        \coordinate (K) at (24,10);
+        \coordinate (M) at (24,0);
+
+        \draw[thick] (A) -- (B) -- (K) -- (M) -- cycle;
+        \draw[thick] (D) -- (C); % Separator
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above right] at (K) {$K$};
+        \node[below right] at (M) {$M$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Сторона квадрата $ABCD$ \\
+    \textbf{2} \quad $CK$ \\
+    \textbf{3} \quad Відстань між центром квадрата і точкою перетину діагоналей прямокутника $ABKM$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & 17 \textit{см} \\
+    \textbf{Д} & 24 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 30.05, завдання №16 --- також у темі: Трикутники
+\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами \mbox{(1--3)} та їхніми значеннями \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.75, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (4,4);
+    \coordinate (D) at (4,0);
+    \coordinate (K) at (2,6);
+    \coordinate (Mid) at (4,2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K) -- (C);
+    \fill (Mid) circle (2pt);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+    \node[right] at (Mid) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Величина}\par\nbvspace{0.15cm}
+\textbf{1} \quad довжина сторони квадрата\\[0.25cm]
+\textbf{2} \quad відстань від точки $K$ до прямої $AD$\\[0.25cm]
+\textbf{3} \quad довжина відрізка $KM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення}\par\nbvspace{0.15cm}
+\textbf{А} \quad $12$\\[0.15cm]
+\textbf{Б} \quad $10$\\[0.15cm]
+\textbf{В} \quad $4\sqrt{3}$\\[0.15cm]
+\textbf{Г} \quad $4\sqrt{5}$\\[0.15cm]
+\textbf{Д} \quad $8$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\nopagebreak\nbvspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1~--~Д, 2~--~А, 3~--~Г
+\ifshowsolutions\solution{Нехай сторона квадрата $a$. Ламана $BADM=BA+AD+DM=a+a+\dfrac a2=\dfrac{5a}{2}=20$, звідки $a=8$ (\textbf{1}~--~Д). Висота трикутника до $BC$ дорівнює $\dfrac a2=4$, тож відстань від $K$ до $AD$: $a+\dfrac a2=12$ (\textbf{2}~--~А). У координатах $K(4;12)$, $M(8;4)$: $KM=\sqrt{4^2+8^2}=\sqrt{80}=4\sqrt5$ (\textbf{3}~--~Г). Відповідь: \textbf{1~--~Д, 2~--~А, 3~--~Г}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 9.06, завдання №18
+\zadtask{На рисунку зображено квадрат $ABCD$, діагональ якого дорівнює $8\sqrt{2}$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (4,4);
+    \coordinate (D) at (4,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.47\textwidth}
+\textit{Відрізок}\par\nbvspace{0.15cm}
+\textbf{1} \quad відстань між серединами сторін $AB$ і $AD$\\[0.25cm]
+\textbf{2} \quad радіус кола, уписаного в квадрат $ABCD$\\[0.25cm]
+\textbf{3} \quad медіана трикутника $ABC$, проведена з вершини $A$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Довжина відрізка}\par\nbvspace{0.15cm}
+\textbf{А} \quad $2\sqrt{2}$~см\\[0.15cm]
+\textbf{Б} \quad $4$~см\\[0.15cm]
+\textbf{В} \quad $4\sqrt{2}$~см\\[0.15cm]
+\textbf{Г} \quad $8$~см\\[0.15cm]
+\textbf{Д} \quad $4\sqrt{5}$~см
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{18.}~А \ {\scriptsize\color{gray}(23.05, №13)}\par
-\noindent\textbf{19.}~1~--~Д, 2~--~А, 3~--~Г \ {\scriptsize\color{gray}(30.05, №16)}\par
-\noindent\textbf{20.}~Д \ {\scriptsize\color{gray}(1.06, №10)}\par
-\noindent\textbf{24.}~Д \ {\scriptsize\color{gray}(15.06, №4)}\par
-\noindent\textbf{25.}~В \ {\scriptsize\color{gray}(18.06, №3)}\par
+\noindent\textbf{9.}~А \ {\scriptsize\color{gray}(23.05, №13)}\par
+\noindent\textbf{10.}~Д \ {\scriptsize\color{gray}(1.06, №10)}\par
+\noindent\textbf{13.}~Д \ {\scriptsize\color{gray}(15.06, №4)}\par
+\noindent\textbf{14.}~В \ {\scriptsize\color{gray}(18.06, №3)}\par
+\noindent\textbf{24.}~1~--~Д, 2~--~А, 3~--~Г \ {\scriptsize\color{gray}(30.05, №16)}\par
 \end{multicols}
 \fi
 

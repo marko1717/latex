@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -213,7 +218,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -224,872 +229,303 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 3. Степені. Одночлени. Стандартний вигляд числа}
-\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 64 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 22}, \mbox{2025~--- 17}, \mbox{2026~--- 9}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 64 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 22}, \mbox{2025~--- 17}, \mbox{2026~--- 9}); \mbox{тестових~--- 49}; \mbox{на відповідність~--- 15}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % Завдання 1
 \zadtask{Обчисліть $\left(4^{\frac{3}{2}}\right)^2$. \nmtyear{2023}}
 \answerTable{$32$}{$12$}{$64$}{$3$}{$16$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{$\dfrac{5^3 \cdot 2^4}{4^3 \cdot 5^2} =$ \nmtyear{2023}}
 \answerTableTall{$\dfrac{2}{5}$}{$\dfrac{5}{2}$}{$1$}{$\dfrac{5}{4}$}{$\dfrac{1}{2}$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 3 (на відповідність)
-\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a > 0$. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\sqrt{4a}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $2^{\log_4 a}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\left(\dfrac{2}{a}\right)^{-1}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Тотожно рівний вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $-\dfrac{2}{a}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $2a$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $2\sqrt{a}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $\sqrt{a}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $\dfrac{a}{2}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 4 (на відповідність)
-\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.45\textwidth}
-\textit{Початок речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad Якщо $n \sin m\pi = a$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad Якщо $\dfrac{2^m}{2^n} = 2^a$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad Якщо $\sqrt[n]{\sqrt[m]{2}} = \sqrt[a]{2}$, то
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.28\textwidth}
-\textit{Закінчення речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $a = mn$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $a = 0$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $a = m - n$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $a = n$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $a = \dfrac{m}{n}$.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 5 (на відповідність з числовою прямою)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $|a - 2{,}5|$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $a^0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\log_2 a$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{Спростіть вираз $7ab^2 \cdot ab^2$. \nmtyear{2023}}
 \answerTable{$8a^2b^4$}{$8ab^2$}{$7a^2b^4$}{$7ab^4$}{$7ab^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 7
 \zadtask{Спростіть вираз $a^6 \cdot (a^2)^3$. \nmtyear{2023}}
 \answerTable{$a^{12}$}{$a^{30}$}{$a^{11}$}{$a^{48}$}{$a^{36}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 8
 \zadtask{$0{,}5x^2 \cdot (-4x^4) =$ \nmtyear{2023}}
 \answerTable{$2x^6$}{$-2x^6$}{$-0{,}2x^8$}{$-0{,}2x^6$}{$-2x^8$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 9 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\ln \dfrac{1}{e}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $|e - 5|$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $e^0$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Проміжок}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $(-\infty; -1)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $[-1; 0)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $[0; 1)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $[1; 2)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $(2; +\infty)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 10
 \zadtask{$\dfrac{2^5 \cdot 5^7}{10^8} =$ \nmtyear{2023}}
 \answerTableTall{$\dfrac{1}{40}$}{$10^4$}{$\dfrac{1}{25}$}{$\dfrac{1}{8}$}{$\dfrac{5}{8}$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 11 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $a = -0{,}5$. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $|a|$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $a^3$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\dfrac{1}{a}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Проміжок}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $(-\infty; -2)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $[-2; -1)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $[-1; 0)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $[0; 1)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $[1; +\infty)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 12
 \zadtask{Спростіть вираз $\dfrac{(2x^2)^3}{4x^9}$. \nmtyear{2023}}
 \answerTableTall{$\dfrac{1}{2x}$}{$\dfrac{3}{2x^4}$}{$\dfrac{2}{x^3}$}{$\dfrac{4}{x^3}$}{$\dfrac{2}{x^4}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 13
 \zadtask{$7n^3 \cdot 8n^3 =$ \nmtyear{2023}}
 \answerTable{$56n^9$}{$56n^3$}{$15n^6$}{$56n^6$}{$15n^9$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 14
 \zadtask{$(-2x^4)^3 =$ \nmtyear{2023}}
 \answerTable{$-8x^{12}$}{$-8x^7$}{$-6x^7$}{$-2x^{12}$}{$-6x^{12}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 15
 \zadtask{Укажіть проміжок, якому належить значення виразу $\left(\dfrac{1}{4}\right)^{-2}$. \nmtyear{2023}}
 \answerTable{$(-\infty; -10]$}{$(-10; 0]$}{$(1; 10]$}{$(10; +\infty)$}{$(0; 1]$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 16
 \zadtask{$\dfrac{3^{10} \cdot 11^{12}}{33^{11}} =$ \nmtyear{2023}}
 \answerTableTall{$\dfrac{11}{3}$}{$\dfrac{3}{11}$}{$\dfrac{11}{9}$}{$33$}{$\dfrac{1}{33}$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % Завдання 17
 \zadtask{$\dfrac{(x^5)^2}{x^{-5}} =$ \nmtyear{2024}}
 \answerTable{$x^{15}$}{$x^{12}$}{$x^5$}{$x^2$}{$x^{-2}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 18
 \zadtask{$\left(\dfrac{5}{2}\right)^2 =$ \nmtyear{2024}}
 \answerTable{$12{,}5$}{$4{,}5$}{$5$}{$6{,}25$}{$3{,}5$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 19 (на відповідність з числовою прямою)
-\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $2\pi \cdot \pi^{-1}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $\mathrm{tg}\,\dfrac{5\pi}{4}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $\log_\pi \dfrac{1}{\pi^2}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 20
 \zadtask{В одному мегабайті міститься $2^{10}$ кілобайт. Скільки кілобайт у 16 мегабайтах? \nmtyear{2024}}
 \answerTable{$2^{40}$}{$2^{14}$}{$32^{10}$}{$2^{13}$}{$2^{18}$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 21 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.4\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\dfrac{3^{-5}}{3^{-6}}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\log_2 0{,}1 + \log_2 320$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $4\cos^2 30° - 4\sin^2 30°$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $2$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $3$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $4$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $5$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 22 (на відповідність)
-\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $a = 3$. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.4\textwidth}
-\textit{Початок речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad Значення виразу $a^{-1}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad Значення виразу $a^0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad Значення виразу $\sin(\pi a)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-\textit{Закінчення речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є раціональним нецілим числом.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є ірраціональним числом.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad є натуральним числом.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad дорівнює нулю.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad є цілим від'ємним числом.
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-\hfill\matchingGrid
-\end{samepage}
-
-\begin{samepage}
-% Завдання 23 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\log_\pi 1$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\sin\left(-\dfrac{\pi}{6}\right)$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $\pi^3 \cdot \pi^{-4}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-\textit{Твердження про значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є нецілим додатним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є нецілим від'ємним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad дорівнює 0
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad є цілим додатним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad є цілим від'ємним числом
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.15\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 24
 \zadtask{$\left(\dfrac{4}{5}a^5\right)^3 =$ \nmtyear{2024}}
 \answerTableTall{$\dfrac{12}{125}a^{8}$}{$\dfrac{64}{125}a^{8}$}{$\dfrac{64}{125}a^{125}$}{$\dfrac{12}{125}a^{15}$}{$\dfrac{64}{125}a^{15}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 25
 \zadtask{$\dfrac{x^5 \cdot x^{-2}}{x^{-5}} =$ \nmtyear{2024}}
 \answerTable{$x^{-2}$}{$x^2$}{$x^8$}{$x^{12}$}{$x^{15}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 26
 \zadtask{Запишіть число 89 млн 530 тис. у стандартному вигляді. \nmtyear{2024}}
 \answerTable{$8953 \cdot 10^4$}{$8{,}953 \cdot 10^{7}$}{$89{,}53 \cdot 10^{6}$}{$8{,}953 \cdot 10^{-7}$}{$895{,}3 \cdot 10^{5}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 27
 \zadtask{Маса одного протона приблизно дорівнює $1{,}67 \cdot 10^{-27}$ \textit{кг}. Визначте масу 100 таких протонів. \nmtyear{2024}}
 \answerTable{$167 \cdot 10^{-25}$ \textit{кг}}{$1{,}67 \cdot 10^{-30}$ \textit{кг}}{$1{,}67 \cdot 10^{-29}$ \textit{кг}}{$1{,}67 \cdot 10^{-24}$ \textit{кг}}{$1{,}67 \cdot 10^{-25}$ \textit{кг}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 28
 \zadtask{$(-2x^2)^3 =$ \nmtyear{2024}}
 \answerTable{$-2x^5$}{$-6x^6$}{$-8x^6$}{$-8x^5$}{$-2x^6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 29
 \zadtask{Спростіть вираз $0{,}3x^2 \cdot 3x^4$. \nmtyear{2024}}
 \answerTable{$0{,}9x^8$}{$0{,}6x^6$}{$3{,}3x^6$}{$0{,}6x^8$}{$0{,}9x^6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 30
 \zadtask{В одному грамі ґрунту міститься близько $4 \cdot 10^7$ бактерій. Скільки бактерій міститься в одному кілограмі ґрунту? \nmtyear{2024}}
 \answerTable{$4 \cdot 10^{9}$}{$4 \cdot 10^{14}$}{$4000 \cdot 10^{10}$}{$4 \cdot 10^{10}$}{$4 \cdot 10^{21}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 31
 \zadtask{Обчисліть $\dfrac{33^4}{9 \cdot 11^3}$. \nmtyear{2024}}
 \answerTableTall{$\dfrac{9}{11}$}{$990$}{$\dfrac{11}{9}$}{$33$}{$99$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 32
 \zadtask{Спростіть вираз $4a^3 \cdot 7a^2$. \nmtyear{2024}}
 \answerTable{$11a^5$}{$11a^6$}{$28a^8$}{$28a^5$}{$28a^6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 33
 \zadtask{$\left(1\dfrac{1}{4}\right)^{-1} =$ \nmtyear{2024}}
 \answerTableTall{$\dfrac{5}{4}$}{$1$}{$-1\dfrac{1}{4}$}{$\dfrac{1}{4}$}{$\dfrac{4}{5}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 34
 \zadtask{Маса Землі приблизно становить $5{,}972 \cdot 10^{24}$ \textit{кг}. Відомо, що маса екзопланети в 10 разів більша за масу Землі. Знайдіть масу екзопланети. \nmtyear{2024}}
 \answerTable{$5{,}972 \cdot 10^{26}$ \textit{кг}}{$5{,}972 \cdot 10^{27}$ \textit{кг}}{$5{,}972 \cdot 10^{25}$ \textit{кг}}{$59{,}72 \cdot 10^{25}$ \textit{кг}}{$5{,}972 \cdot 10^{23}$ \textit{кг}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 35
 \zadtask{$\left(\dfrac{1}{20} \cdot 25\right)^{-1} =$ \nmtyear{2024}}
 \answerTable{$-1{,}25$}{$0{,}2$}{$1{,}2$}{$0{,}002$}{$0{,}8$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 36 (на відповідність з числовою прямою)
-\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу, якщо $a = -2$. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $|a|$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $a^0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\mathrm{tg}(\pi a)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 37
 \zadtask{Обчисліть $18^5 \cdot 9^{-5}$. \nmtyear{2024}}
 \answerTable{$10$}{$0$}{$1$}{$2$}{$32$}
+\par\penalty-20
 \end{samepage}
-
-\begin{samepage}
-% Завдання 38 (на відповідність з числовою прямою)
-\zadtask{Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.4\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $2e \cdot \dfrac{1}{e}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\ln 1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $(e - 1)(e + 1) - e^2$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.15\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2025}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{Масу дорогоцінних каменів вимірюють у каратах. Один карат дорівнює $0{,}2$ \textit{г}. Обчисліть масу діаманта масою $0{,}8$ карата, подану в кілограмах. \nmtyear{2025}}
 \answerTable{$1{,}6 \cdot 10^{-4}$ \textit{кг}}{$4 \cdot 10^{-3}$ \textit{кг}}{$4 \cdot 10^{-4}$ \textit{кг}}{$1{,}6 \cdot 10^{-3}$ \textit{кг}}{$1{,}6 \cdot 10^{-2}$ \textit{кг}}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 3 (на відповідність)
-\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.45\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\dfrac{3}{3^{-3}}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\log_8 \sqrt[3]{2}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $2(\cos 30° - 0{,}5)(\cos 30° + 0{,}5)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $\dfrac{1}{9}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $\sqrt{3}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $3$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $81$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.15\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 4
 \zadtask{$\left(1\dfrac{2}{3}\right)^{-1} =$ \nmtyear{2025}}
 \answerTableTall{$1\dfrac{3}{2}$}{$-1\dfrac{2}{3}$}{$\dfrac{3}{5}$}{$\dfrac{5}{3}$}{$1{,}5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 5
 \zadtask{В одному гігабайті міститься $2^{20}$ кілобайт. Скільки кілобайт у 8 гігабайтах? \nmtyear{2025}}
 \answerTable{$2^{160}$}{$16^{20}$}{$2^{60}$}{$2^{23}$}{$2^{20}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{$0{,}6x^3 \cdot 5x^4 =$ \nmtyear{2025}}
 \answerTable{$0{,}3x^{12}$}{$3x^7$}{$0{,}3x^7$}{$30x^7$}{$3x^{12}$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 7 (на відповідність)
-\zadtask{Узгодьте вираз \mbox{(1--3)} із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює $1$. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{minipage}[t]{0.35\textwidth}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\dfrac{m}{4}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $4^6 : 4^{-m}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $\log_{16} 2 + \log_{16} m$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Значення $m$}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $\dfrac{1}{4}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $6$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $4$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $-6$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $8$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 8
 \zadtask{$(-6x^3)^2 =$ \nmtyear{2025}}
 \answerTable{$-12x^5$}{$36x^6$}{$-6x^5$}{$36x^5$}{$-36x^6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 9
 \zadtask{$3^{100} =$ \nmtyear{2025}}
 \answerTableTall{$3^{50} + 3^{50}$}{$3^{10} \cdot 3^{10}$}{$(3^{50})^{50}$}{$(3^{10})^{10}$}{$\dfrac{3^{1000}}{3^{10}}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 10
 \zadtask{$\dfrac{2}{9}y^{-2} \cdot 3y^4 =$ \nmtyear{2025}}
 \answerTableTall{$\dfrac{2}{9}y^{-2}$}{$\dfrac{5}{9}y^2$}{$\dfrac{2}{3}y^{-2}$}{$\dfrac{2}{3}y$}{$\dfrac{2}{3}y^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 11
 \zadtask{Насадження ялівцю, що займають площу $1$ \textit{га}, за день виділяють в атмосферу фітонциди масою $30$ \textit{кг}. Яку масу фітонцидів виділять насадження ялівцю, що ростуть на $2000$ \textit{га}, за $30$ днів? \nmtyear{2025}}
 \answerTable{$1{,}8 \cdot 10^7$ \textit{кг}}{$1{,}1 \cdot 10^5$ \textit{кг}}{$1{,}8 \cdot 10^5$ \textit{кг}}{$1{,}8 \cdot 10^6$ \textit{кг}}{$2 \cdot 10^3$ \textit{кг}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 12
 \zadtask{$\dfrac{0{,}25^2}{0{,}5^3 \cdot 0{,}125} =$ \nmtyear{2025}}
 \answerTable{$4$}{$0{,}5$}{$1$}{$0{,}25$}{$2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 13
 \zadtask{Найбільший алмаз <<Куллінан>> має вагу $3106$ метричні карати. Визначте масу цього алмаза в кілограмах, якщо $1$ карат дорівнює $0{,}2$ \textit{г}. \nmtyear{2025}}
 \answerTable{$6{,}212 \cdot 10^{-3}$ \textit{кг}}{$6{,}212 \cdot 10^{-1}$ \textit{кг}}{$1{,}553 \cdot 10^{3}$ \textit{кг}}{$1{,}553 \cdot 10^{-3}$ \textit{кг}}{$6{,}212 \cdot 10^{3}$ \textit{кг}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 14
 \zadtask{$\dfrac{20^7 \cdot 0{,}1^6}{4^5} =$ \nmtyear{2025}}
 \answerTableTall{$0{,}25$}{$\dfrac{1}{256}$}{$0{,}0025$}{$1{,}25$}{$8$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 15
 \zadtask{Спростіть вираз $5^{1+x} \cdot 5^{1-x}$. \nmtyear{2025}}
 \answerTable{$25^{1-x^2}$}{$25$}{$5^{1-x^2}$}{$5$}{$10$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 16
 \zadtask{Озеро Ялпуг є найбільшою природною водоймою в Україні. Його площа становить $149$ млн $\text{м}^2$. Запишіть це число у стандартному вигляді. \nmtyear{2025}}
 \answerTable{$0{,}149 \cdot 10^{8}$}{$14{,}9 \cdot 10^{-8}$}{$14{,}9 \cdot 10^{8}$}{$149 \cdot 10^{6}$}{$1{,}49 \cdot 10^{8}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 17
 \zadtask{$\dfrac{a^{18}a^{-3}}{(3a^6)^2} =$ \nmtyear{2025}}
 \answerTableTall{$\dfrac{a^{-4{,}5}}{6}$}{$\dfrac{1}{9a^{18}}$}{$\dfrac{a^3}{6}$}{$\dfrac{a^3}{9}$}{$\dfrac{a^7}{9}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 18
 \zadtask{Визначте максимальну швидкість (у \textit{м/с}) фантастичного зорельота, якщо вона становить $0{,}01$ від швидкості світла у вакуумі. Уважайте, що швидкість світла у вакуумі дорівнює $3 \cdot 10^8$ \textit{м/с}. \nmtyear{2025}}
 \answerTable{$3 \cdot 10^{10}$ \textit{м/с}}{$3 \cdot 0{,}1^{8}$ \textit{м/с}}{$3 \cdot 10^{6}$ \textit{м/с}}{$3 \cdot 10^{0{,}08}$ \textit{м/с}}{$3 \cdot 10^{4}$ \textit{м/с}}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №4
@@ -1097,6 +533,7 @@
 \answerTable{$3x^6$}{$6x^6$}{$5x^3$}{$3x^3$}{$7x^3$}
 % Відповідь: Г
 \ifshowsolutions\solution{$\dfrac{6x^3+3x^3}{3}=\dfrac{9x^3}{3}=3x^3$. Відповідь: \textbf{Г}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1105,46 +542,684 @@
 \answerTable{$149{,}6 \cdot 10^6$}{$1{,}496 \cdot 10^8$}{$0{,}1496 \cdot 10^9$}{$1496 \cdot 10^5$}{$14{,}96 \cdot 10^7$}
 % Відповідь: Б
 \ifshowsolutions\solution{$149{,}6$~млн $=149\,600\,000=1{,}496\cdot10^8$. У стандартному вигляді множник має задовольняти $1\leqslant a<10$, тож $1{,}496\cdot10^8$. Відповідь: \textbf{Б}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №13
 \zadtask{$\dfrac{(a^3)^4}{a^4 \cdot a^8} =$ \nmtyear{2026}}
 \answerTableTall{$1$}{$a^{\frac{1}{2}}$}{$a^6$}{$0$}{$-1$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №6 --- основна тема: Числа. Звичайні та десяткові дроби. Модуль числа
 \zadtask{$|5^{-1} - 3| =$ \nmtyear{2026}}
 \answerTable{$-2{,}8$}{$2{,}8$}{$-8$}{$2$}{$8$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №1
 \zadtask{Комп'ютерна графіка використовує RGB-кодування, яке дозволяє відтворити $16{,}7$~мільйонів кольорів. Позначте запис цього числа в стандартному вигляді. \nmtyear{2026}}
 \answerTable{$1{,}67 \cdot 10^{8}$}{$167 \cdot 10^{5}$}{$1{,}67 \cdot 10^{6}$}{$16{,}7 \cdot 10^{6}$}{$1{,}67 \cdot 10^{7}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №6
 \zadtask{Спростіть вираз $\dfrac{a^3 a^5}{a^4}$, де $a \neq 0$. \nmtyear{2026}}
 \answerTable{$a^{4}$}{$a^{12}$}{$a^{2}$}{$a^{11}$}{$a^{3{,}75}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 12.06, завдання №6
+\zadtask{Яка з нерівностей є правильною, якщо $a = 2^{-3}$, $b = \lg 1$, $c = (-3)^2$? \nmtyear{2026}}
+\answerTable{$c < a < b$}{$a < b < c$}{$a < c < b$}{$b < a < c$}{$c < b < a$}
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a > 0$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\sqrt{4a}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $2^{\log_4 a}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\left(\dfrac{2}{a}\right)^{-1}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Тотожно рівний вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $-\dfrac{2}{a}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $2a$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $2\sqrt{a}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $\sqrt{a}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $\dfrac{a}{2}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 4 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Початок речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad Якщо $n \sin m\pi = a$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad Якщо $\dfrac{2^m}{2^n} = 2^a$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad Якщо $\sqrt[n]{\sqrt[m]{2}} = \sqrt[a]{2}$, то
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Закінчення речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $a = mn$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $a = 0$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $a = m - n$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $a = n$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $a = \dfrac{m}{n}$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 5 (на відповідність з числовою прямою)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $|a - 2{,}5|$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $a^0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\log_2 a$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 9 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\ln \dfrac{1}{e}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $|e - 5|$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $e^0$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Проміжок}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $(-\infty; -1)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $[-1; 0)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $[0; 1)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $[1; 2)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $(2; +\infty)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 11 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $a = -0{,}5$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $|a|$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $a^3$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\dfrac{1}{a}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Проміжок}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $(-\infty; -2)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $[-2; -1)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $[-1; 0)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $[0; 1)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $[1; +\infty)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 19 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $2\pi \cdot \pi^{-1}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $\mathrm{tg}\,\dfrac{5\pi}{4}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $\log_\pi \dfrac{1}{\pi^2}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 21 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.4\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\dfrac{3^{-5}}{3^{-6}}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\log_2 0{,}1 + \log_2 320$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $4\cos^2 30° - 4\sin^2 30°$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $2$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $3$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $4$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $5$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 22 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $a = 3$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.4\textwidth}
+\textit{Початок речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad Значення виразу $a^{-1}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad Значення виразу $a^0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad Значення виразу $\sin(\pi a)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\textit{Закінчення речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є раціональним нецілим числом.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є ірраціональним числом.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad є натуральним числом.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad дорівнює нулю.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad є цілим від'ємним числом.
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\hfill\matchingGrid
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Завдання 23 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\log_\pi 1$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\sin\left(-\dfrac{\pi}{6}\right)$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $\pi^3 \cdot \pi^{-4}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.34\textwidth}
+\textit{Твердження про значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є нецілим додатним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є нецілим від'ємним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad дорівнює 0
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad є цілим додатним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad є цілим від'ємним числом
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 36 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу, якщо $a = -2$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $|a|$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $a^0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\mathrm{tg}(\pi a)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 38 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.34\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $2e \cdot \dfrac{1}{e}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\ln 1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $(e - 1)(e + 1) - e^2$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.39\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\dfrac{3}{3^{-3}}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\log_8 \sqrt[3]{2}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $2(\cos 30° - 0{,}5)(\cos 30° + 0{,}5)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $\dfrac{1}{9}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $\sqrt{3}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $3$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $81$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 7 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює $1$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\dfrac{m}{4}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $4^6 : 4^{-m}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $\log_{16} 2 + \log_{16} m$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення $m$}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $\dfrac{1}{4}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $6$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $4$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $-6$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $8$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
 \zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-\textit{Вираз}\par\vspace{0.15cm}
+\textit{Вираз}\par\nbvspace{0.15cm}
 \textbf{1} \quad $\left|\dfrac{2}{5} - \dfrac{12}{3}\right|$\\[0.3cm]
 \textbf{2} \quad $\dfrac{\sqrt{24}}{\sqrt{6}}$\\[0.3cm]
 \textbf{3} \quad $5^3 \cdot 0{,}2^4$
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-\textit{Значення виразу}\par\vspace{0.15cm}
+\textit{Значення виразу}\par\nbvspace{0.15cm}
 \textbf{А} \quad $0{,}2$\\[0.15cm]
 \textbf{Б} \quad $2$\\[0.15cm]
 \textbf{В} \quad $3{,}6$\\[0.15cm]
@@ -1153,31 +1228,26 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
+\nopagebreak\nbvspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 12.06, завдання №6
-\zadtask{Яка з нерівностей є правильною, якщо $a = 2^{-3}$, $b = \lg 1$, $c = (-3)^2$? \nmtyear{2026}}
-\answerTable{$c < a < b$}{$a < b < c$}{$a < c < b$}{$b < a < c$}{$c < b < a$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №16 --- також у темі: Многочлени. Формули скороченого множення
 \zadtask{Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-\textit{Числовий вираз}\par\vspace{0.15cm}
+\textit{Числовий вираз}\par\nbvspace{0.15cm}
 \textbf{1} \quad $\dfrac{1}{n} : \dfrac{1}{2}$\\[0.3cm]
 \textbf{2} \quad $10n^2 - 2n(5n - 1)$\\[0.3cm]
 \textbf{3} \quad $\log_{25} 5^n$
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-\textit{Тотожно рівний вираз}\par\vspace{0.15cm}
+\textit{Тотожно рівний вираз}\par\nbvspace{0.15cm}
 \textbf{А} \quad $-2n$\\[0.15cm]
 \textbf{Б} \quad $\dfrac{2}{n}$\\[0.15cm]
 \textbf{В} \quad $\dfrac{n}{2}$\\[0.15cm]
@@ -1186,16 +1256,17 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
+\nopagebreak\nbvspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{56.}~Г \ {\scriptsize\color{gray}(1.06, №4)}\par
-\noindent\textbf{57.}~Б \ {\scriptsize\color{gray}(4.06, №1)}\par
+\noindent\textbf{43.}~Г \ {\scriptsize\color{gray}(1.06, №4)}\par
+\noindent\textbf{44.}~Б \ {\scriptsize\color{gray}(4.06, №1)}\par
 \end{multicols}
 \fi
 

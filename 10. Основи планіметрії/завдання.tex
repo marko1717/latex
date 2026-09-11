@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -229,7 +234,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -241,15 +246,16 @@
 
 \graphicspath{{./}{10. Основи планіметрії/}}
 \chapterTitle{Тема 10. Основи планіметрії}
-\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 33 (НМТ \mbox{2023~--- 7}, \mbox{2024~--- 9}, \mbox{2025~--- 8}, \mbox{2026~--- 9}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 33 (НМТ \mbox{2023~--- 7}, \mbox{2024~--- 9}, \mbox{2025~--- 8}, \mbox{2026~--- 9}); \mbox{тестових~--- 32}; \mbox{на відповідність~--- 1}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % Завдання 1
 \zadtask{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань між серединами відрізків $AM$ і $MB$, якщо $AM = 12$ \textit{см}, $MB = 2AM$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1]
     % Відрізок AB
@@ -266,25 +272,29 @@
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
+\nmtnobreak
 \answerTable{16 \textit{см}}{18 \textit{см}}{24 \textit{см}}{9 \textit{см}}{12 \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{На відрізку $AB$ вибрано точку $C$ так, що $AC : CB = 2 : 3$. Визначте довжину відрізка $AC$, якщо $CB = 12$ \textit{см}. \nmtyear{2023}}
 \answerTable{4 \textit{см}}{12 \textit{см}}{8 \textit{см}}{18 \textit{см}}{6 \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 3
 \zadtask{З вершини розгорнутого кута $AOB$, зображеного на рисунку, проведено два промені $OK$ і $OM$ так, що $\angle KOB = 110°$, $\angle MOB = 30°$. Обчисліть градусну міру кута $KOM$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$80°$}{$60°$}{$140°$}{$90°$}{$70°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Координати
@@ -308,48 +318,49 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 4
 \zadtask{На рисунку зображено прямі, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha = 25°$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$155°$}{$115°$}{$165°$}{$145°$}{$65°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Точка перетину
     \coordinate (O) at (0,0);
-    
+
     % Перша пряма (горизонтальна): y = 0
     \coordinate (P1) at (-2,0);
     \coordinate (P2) at (2.5,0);
-    
+
     % Друга пряма (похила): проходить через O під кутом 25°
     \coordinate (Q1) at (205:1.8);  % -155° = 205°
     \coordinate (Q2) at (25:1.8);   % 25°
-    
+
     % Допоміжні точки для кута alpha
     \coordinate (ARight) at (1.5,0);      % точка на горизонтальній прямій справа
     \coordinate (AUp) at (25:1.2);        % точка на похилій прямій вгору
-    
+
     % Допоміжні точки для кута beta
     \coordinate (BLeft) at (-1.5,0);      % точка на горизонтальній прямій зліва
     \coordinate (BUp) at (25:1.2);        % точка на похилій прямій вгору
-    
+
     % Малюємо прямі
     \draw[thick] (P1) -- (P2);
     \draw[thick] (Q1) -- (Q2);
-    
+
     % Дуга для кута alpha (AUp -- O -- ARight)
     \pic[draw, angle radius=0.8cm] {angle = ARight--O--AUp};
     \node at (1.25,0.25) {$\alpha$};
-    
+
     % Подвійна дуга для кута beta (BUp -- O -- BLeft)
     \pic[draw, angle radius=0.4cm] {angle = BUp--O--BLeft};
     \pic[draw, angle radius=0.55cm] {angle = BUp--O--BLeft};
@@ -357,14 +368,15 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 5
 \zadtask{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань від середини відрізка $AM$ до точки $B$, якщо $AB = 26$ \textit{см}, $AM = 8$ \textit{см}. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1]
     % Відрізок AB
@@ -381,19 +393,22 @@
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
+\nmtnobreak
 \answerTable{18 \textit{см}}{17 \textit{см}}{20 \textit{см}}{22 \textit{см}}{24 \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$33°$}{$53°$}{$42°$}{$32°$}{$37°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.75]
     % Паралельні прямі m і n (вертикальні)
@@ -401,54 +416,55 @@
     \coordinate (M2) at (0,1.5);
     \coordinate (N1) at (1.8,-1.5);
     \coordinate (N2) at (1.8,1.5);
-    
+
     % Січна l: y = -0.929x + 0.836
     \coordinate (L1) at (-0.5,1.3);
     \coordinate (L2) at (2.3,-1.3);
-    
+
     % Точки перетину (обчислені)
     \coordinate (P) at (0,0.836);      % перетин l і m
     \coordinate (Q) at (1.8,-0.836);   % перетин l і n
-    
+
     % Допоміжні точки для кутів
     \coordinate (MDown) at (0,0);       % точка на m нижче P
     \coordinate (LRightP) at (0.9,0);   % точка на l правіше P
     \coordinate (NDown) at (1.8,1.4);  % точка на n нижче Q
     \coordinate (LLeftQ) at (0.9,0);    % точка на l лівіше Q
-    
+
     % Малюємо прямі
     \draw[thick] (M1) -- (M2);
     \draw[thick] (N1) -- (N2);
     \draw[thick] (L1) -- (L2);
-    
+
     % Підписи прямих
     \node[left] at (-0.3,1.4) {$l$};
     \node[above] at (0,1.5) {$m$};
     \node[above] at (1.8,1.5) {$n$};
-    
+
     % Дуга для кута alpha (MDown -- P -- LRightP)
     \pic[draw, angle radius=0.4cm] {angle = MDown--P--LRightP};
     \node at (0.25,0.1) {$\alpha$};
-    
+
     % Дуга для кута beta (NDown -- Q -- LLeftQ)
     \pic[draw, angle radius=0.4cm] {angle = NDown--Q--LLeftQ};
     \node at (1.45,0.08) {$\beta$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 7
 \zadtask{Із точки $O$, яка лежить на прямій $AB$, проведено промені $OM$ і $OK$ (див. рисунок). Відомо, що $\angle BOM = 30°$, $\angle MOK = 80°$. Визначте градусну міру кута $AOK$. Уважайте, що промені $OK$, $OM$ і пряма $AB$ лежать в одній площині. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$80°$}{$110°$}{$60°$}{$50°$}{$70°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Координати
@@ -472,66 +488,66 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % Завдання 8
 \zadtask{Кут між орбітою та віссю обертання Землі дорівнює $66{,}5°$ (див. рисунок). Визначте кут нахилу осі обертання Землі до осі, перпендикулярної до земної орбіти. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$13{,}5°$}{$23{,}5°$}{$21{,}5°$}{$33{,}5°$}{$22{,}5°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[width=0.75\textwidth]{earth_axis.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 1
 \zadtask{На рисунку зображено прямі $m$ і $n$, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha + \beta + \gamma = 230°$. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$120°$}{$140°$}{$145°$}{$50°$}{$130°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Точка перетину
     \coordinate (O) at (0,0);
-    
+
     % Пряма m (горизонтальна)
     \draw[thick] (-2,0) -- (2.5,0);
     \node[below] at (-1.8,0) {$m$};
-    
+
     % Пряма n (нахилена з лівого верхнього у правий нижній)
     \draw[thick] (-0.8,0.8) -- (1.5,-1.5);
     \node[above left] at (-0.6,0.6) {$n$};
-    
+
     % Допоміжні точки
     \coordinate (R) at (2.5,0);      % праворуч на m
     \coordinate (L) at (-2,0);       % ліворуч на m
     \coordinate (U) at (-0.8,0.8);   % вгору на n
     \coordinate (D) at (1.5,-1.5);   % вниз на n
-    
+
     % Кут α (гострий) - між n (вгору) і m (ліворуч)
     \pic[draw, angle radius=0.45cm] {angle = U--O--L};
     \node at (-0.65,0.35) {\small $\alpha$};
-    
+
     % Кут β (тупий, подвійна дуга) - між m (праворуч) і n (вгору)
     \pic[draw, angle radius=0.4cm] {angle = R--O--U};
     \pic[draw, angle radius=0.50cm] {angle = R--O--U};
     \node at (0.75,0.45) {\small $\beta$};
-    
+
     % Кут γ (гострий, потрійна дуга) - між m (праворуч) і n (вниз)
     \pic[draw, angle radius=0.35cm] {angle = D--O--R};
     \pic[draw, angle radius=0.45cm] {angle = D--O--R};
@@ -540,41 +556,42 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{На рисунку зображено план парку, де в точці $O$ розташовано фонтан, а від нього проведено доріжки $OA$, $OB$ і $OC$ так, що $OA \perp OB$, $\angle COA = \angle COB = \alpha$. Визначте градусну міру кута $\alpha$. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$135°$}{$90°$}{$150°$}{$145°$}{$125°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Точка O
     \coordinate (O) at (0,0);
-    
+
     % Промені OA (вгору), OB (вправо), OC (вниз-вправо)
     \coordinate (A) at (0,2);
     \coordinate (B) at (2,0);
     \coordinate (C) at (-1,-1.5);
-    
+
     % Промені
     \draw[thick] (O) -- (A);
     \draw[thick] (O) -- (B);
     \draw[thick] (O) -- (C);
-    
+
     % Прямий кут
     \draw (0,0.3) -- (0.3,0.3) -- (0.3,0);
-    
+
     % Кути α
     \pic[draw, angle radius=0.5cm] {angle = C--O--B};
     \pic[draw, angle radius=0.55cm] {angle = A--O--C};
-    
+
     % Підписи
     \node[above] at (A) {$A$};
     \node[right] at (B) {$B$};
@@ -585,37 +602,38 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 3
 \zadtask{У прямокутній системі координат $xy$ зображено Пізанську вежу $OA$, яка утворює з віссю $y$ кут $4°$. Визначте кут, який утворює ця вежа з віссю $x$. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$86°$}{$96°$}{$94°$}{$84°$}{$76°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Осі координат
     \draw[->] (-0.5,0) -- (2.5,0) node[right] {$x$};
     \draw[->] (0,-0.5) -- (0,2.5) node[above] {$y$};
     \node[below left] at (0,0) {$O$};
-    
+
     % Вежа OA (нахилена від осі y на 4°)
     \coordinate (O) at (0,0);
     \coordinate (A) at (76:2.2);
     \draw[thick] (O) -- (A);
     \node[above right] at (A) {$A$};
-    
+
     % Кут 4° між OA і віссю y
     \coordinate (Y) at (0,2.5);
     \pic[draw, angle radius=0.8cm] {angle = A--O--Y};
     \node at (0.2,1.5) {\small $4°$};
-    
+
     % Кут ? між OA і віссю x
     \coordinate (X) at (2.5,0);
     \pic[draw, angle radius=0.5cm] {angle = X--O--A};
@@ -624,80 +642,84 @@
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 4
 \zadtask{Кут $\alpha$ дорівнює шостій частині розгорнутого кута. Знайдіть градусну міру кута $\beta$, що суміжний із кутом $\alpha$. \nmtyear{2024}}
 \answerTable{$120°$}{$150°$}{$30°$}{$140°$}{$60°$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \zadtask{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут $\alpha$ потрібно повернути цій групі, щоб вони рухалися в напрямку <<захід>>? \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$95°$}{$85°$}{$115°$}{$105°$}{$75°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.42\textwidth}
+\begin{minipage}[t]{0.42\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.15]{tourists_compass.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{На рисунку прямі $AB$, $AC$ і $CB$ лежать в одній площині, $\angle CAB = 30°$, $\angle ACB = 100°$. Які з наведених тверджень є правильним? \nmtyear{2024}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{rl}
 I. & $\angle ABC = 50°$. \\
 II. & $AC^2 + BC^2 = AB^2$. \\
 III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{tabular}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
-\answerTableSmall{лише III}{лише II}{лише I}{лише I та II}{лише I та III}
+
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.2]
     % Точки трикутника
     \coordinate (A) at (0,0);
     \coordinate (B) at (3.5,0.2);
     \coordinate (C) at (2.2,1.5);
-    
+
     % Пряма CD (продовження через C)
     \coordinate (D) at (3.5,1.5);
     \coordinate (Cleft) at (0.5,1.5);
-    
+
     % Трикутник
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-    
+
     % Пряма CD
     \draw[thick] (Cleft) -- (D);
-    
+
     % Кут 30° при A
     \pic[draw, angle radius=0.6cm] {angle = B--A--C};
     \node at (1,0.3) {\footnotesize $30°$};
-    
+
     % Кут 100° при C (внутрішній)
     \pic[draw, angle radius=0.4cm] {angle = A--C--B};
     \pic[draw, angle radius=0.5cm] {angle = A--C--B};
     \node at (2,0.7) {\footnotesize $100°$};
-    
+
     % Кут 40° (зовнішній при C)
     \pic[draw, angle radius=0.35cm] {angle = B--C--D};
     \pic[draw, angle radius=0.45cm] {angle = B--C--D};
     \pic[draw, angle radius=0.55cm] {angle = B--C--D};
     \node at (3.1,1.2) {\footnotesize $40°$};
-    
+
     % Підписи
     \node[below left] at (A) {$A$};
     \node[below right] at (B) {$B$};
@@ -706,59 +728,65 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{лише III}{лише II}{лише I}{лише I та II}{лише I та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 7
 \zadtask{Драбина $BC$ приставлена до вертикальної стіни $AB$ й спирається на горизонтальну поверхню $AC$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $BCA$ нахилу драбини до поверхні $AC$. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$12°$}{$78°$}{$18°$}{$82°$}{$72°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.43\textwidth}
+\begin{minipage}[t]{0.43\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.14]{ladder_wall.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 8
 \zadtask{У прямокутній системі координат $xy$ відрізок $OA$ утворює з віссю $y$ кут $15°$, $O$ --- початок координат. Точка $B$ належить осі $y$. Визначте градусну міру кута $AOB$. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$175°$}{$105°$}{$165°$}{$155°$}{$115°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
     % Осі координат
     \draw[->] (-0.5,0) -- (2.5,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2.5) node[above] {$y$};
     \node[above left] at (0,0) {$O$};
-    
+
     % Відрізок OA (15° від осі y, у першій чверті)
     \coordinate (O) at (0,0);
     \coordinate (A) at (70:2.5);
     \draw[thick] (O) -- (A);
     \node[above right] at (A) {$A$};
-    
+
     % Точка B на від'ємній частині осі y
     \coordinate (B) at (0,-1.5);
     \filldraw (B) circle (1.5pt);
     \node[left] at (B) {$B$};
-    
+
     % Кут 15° між OA і віссю y (додатною)
     \coordinate (Yup) at (0,2.5);
     \pic[draw, angle radius=0.7cm] {angle = A--O--Yup};
     \node at (0.3,1.3) {\footnotesize $15°$};
-    
+
     % Кут ? (AOB)
     \pic[draw, angle radius=0.4cm] {angle = B--O--A};
     \pic[draw, angle radius=0.55cm] {angle = B--O--A};
@@ -766,72 +794,74 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\typeTitle{НМТ 2025}
 
 \begin{samepage}
 % Завдання 16
 \zadtask{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут потрібно повернути цій групі, щоб вони рухалися в напрямку <<південний схід>>? \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$110°$}{$85°$}{$125°$}{$75°$}{$120°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.2]{tourists_southeast.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 17
 \zadtask{На рисунку зображено елемент декору паркану, що складається з дев'яти стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома сусідніми стрілками. \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$15°$}{$18°$}{$20°$}{$10°$}{$9°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.5]{fence_arrows_9.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 18
 \zadtask{На рисунку зображено елемент декору паркану, що складається з п'яти довгих і чотирьох коротких стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома довгими сусідніми стрілками. \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$18°$}{$36°$}{$20°$}{$30°$}{$40°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.15]{fence_arrows_5_4.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 19
 \zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\beta$, якщо $\alpha = 35°$. \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$125°$}{$145°$}{$55°$}{$135°$}{$155°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.75]
     % Паралельні прямі m і n (вертикальні)
@@ -839,36 +869,36 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
     \coordinate (M2) at (0,1.5);
     \coordinate (N1) at (1.8,-1.5);
     \coordinate (N2) at (1.8,1.5);
-    
+
     % Січна l: y = -0.929x + 0.836
     \coordinate (L1) at (-0.5,1.3);
     \coordinate (L2) at (2.3,-1.3);
-    
+
     % Точки перетину (обчислені)
     \coordinate (P) at (0,0.836);      % перетин l і m
     \coordinate (Q) at (1.8,-0.836);   % перетин l і n
-    
+
     % Допоміжні точки для кутів
     \coordinate (MDown) at (0,0);       % точка на m нижче P
     \coordinate (LRightP) at (0.9,0);   % точка на l правіше P
     \coordinate (NUp) at (1.8,0);       % точка на n вище Q (для суміжного кута)
     \coordinate (LLeftQ) at (0.9,-0.5); % точка на l лівіше Q
-   
+
     \coordinate (LBelowQ) at (2.3,-1.3);   % точка на l нижче Q
     % Малюємо прямі
     \draw[thick] (M1) -- (M2);
     \draw[thick] (N1) -- (N2);
     \draw[thick] (L1) -- (L2);
-    
+
     % Підписи прямих
     \node[left] at (-0.3,1.4) {$l$};
     \node[above] at (0,1.5) {$m$};
     \node[above] at (1.8,1.5) {$n$};
-    
+
     % Дуга для кута alpha (MDown -- P -- LRightP)
     \pic[draw, angle radius=0.4cm] {angle = MDown--P--LRightP};
     \node at (0.32,0.2) {\small $\alpha$};
-    
+
     % Дуга для кута beta (суміжний - між l (ліворуч) і n (вгору))
     \pic[draw, angle radius=0.4cm] {angle = LBelowQ--Q--NUp};
     \pic[draw, angle radius=0.55cm] {angle = LBelowQ--Q--NUp};
@@ -876,47 +906,49 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 20
 \zadtask{Пряма $n$ перетинає паралельні прямі $m$ і $l$ (див. рисунок). Які з наведених тверджень є правильними для кутів 1, 2, 3, 4, 5? \nmtyear{2025}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{rl}
 I. & $\angle 2$ і $\angle 5$ --- вертикальні. \\
 II. & $\angle 1 = \angle 4$. \\
 III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{tabular}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
-\answerTableSmall{лише III}{лише II та III}{лише I та III}{I, II та III}{лише II}
+
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.75]
     % Паралельні прямі m і l (горизонтальні)
     \draw[thick] (0,1.8) -- (4,1.8);
     \node[right] at (4,1.8) {$m$};
-    
+
     \draw[thick] (0,0) -- (4,0);
     \node[right] at (4,0) {$l$};
-    
+
     % Січна n
     \draw[thick] (0.8,-0.5) -- (3.2,2.3);
     \node[above] at (3.1,2.3) {$n$};
-    
+
     % Точки перетину
     \coordinate (P) at (2.35,1.8);
     \coordinate (Q) at (1.35,0);
-    
+
     % Кути при m
     \node at (2.75,2.05) {\small $5$};
     \node at (2.1,1.45) {\small $4$};
-    
+
     % Кути при l
     \node at (1.1,0.25) {\small $3$};
     \node at (1.5,-0.25) {\small $2$};
@@ -924,55 +956,63 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{лише III}{лише II та III}{лише I та III}{I, II та III}{лише II}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 21
 \zadtask{Смартфон $AC$ приставлено до вертикальної підставки $BD$ й спирається на горизонтальну поверхню $AD$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $CAD$ нахилу смартфона до поверхні $AD$. \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$37°$}{$63°$}{$53°$}{$73°$}{$27°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.2]{smartphone_stand.png}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 22
 \zadtask{Продуктивність сонячної панелі $OA$ є максимальною, якщо панель перпендикулярна до напрямку $CD$ падіння сонячних променів (див. рисунок). Визначте градусну міру кута $\alpha$ між панеллю й горизонтальною поверхнею $OD$, якщо в заданий час кут падіння сонячних променів дорівнює $51°$. Уважайте, що прямі $OA$, $CD$ та $OD$ лежать в одній площині. \nmtyear{2025}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.42\textwidth}
 \answerTableSmall{$41°$}{$49°$}{$141°$}{$129°$}{$39°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \includegraphics[scale=0.15]{solar_panel.png}
 \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.7cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.7cm}
 
+\nmtnobreak
 % Завдання 23
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2025}}
-\nopagebreak\vspace{0.3cm}
+\zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2025}}\par
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.34\textwidth}
 \answerTableSmall{$42°$}{$53°$}{$37°$}{$32°$}{$33°$}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
+\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=1]
     % Паралельні прямі m і n (вертикальні)
@@ -980,45 +1020,43 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \coordinate (M2) at (0,1.5);
     \coordinate (N1) at (1.8,-1.5);
     \coordinate (N2) at (1.8,1.5);
-    
+
     % Січна l: y = -0.929x + 0.836
     \coordinate (L1) at (-0.5,1.3);
     \coordinate (L2) at (2.3,-1.3);
-    
+
     % Точки перетину (обчислені)
     \coordinate (P) at (0,0.836);      % перетин l і m
     \coordinate (Q) at (1.8,-0.836);   % перетин l і n
-    
+
     % Допоміжні точки для кутів
     \coordinate (MDown) at (0,0);       % точка на m нижче P
     \coordinate (LRightP) at (0.9,0);   % точка на l правіше P
     \coordinate (NDown) at (1.8,1.4);  % точка на n нижче Q
     \coordinate (LLeftQ) at (0.9,0);    % точка на l лівіше Q
-    
+
     % Малюємо прямі
     \draw[thick] (M1) -- (M2);
     \draw[thick] (N1) -- (N2);
     \draw[thick] (L1) -- (L2);
-    
+
     % Підписи прямих
     \node[left] at (-0.3,1.4) {$l$};
     \node[above] at (0,1.5) {$m$};
     \node[above] at (1.8,1.5) {$n$};
-    
+
     % Дуга для кута alpha (MDown -- P -- LRightP)
     \pic[draw, angle radius=0.4cm] {angle = MDown--P--LRightP};
     \node at (0.25,0.1) {$\alpha$};
-    
+
     % Дуга для кута beta (NDown -- Q -- LLeftQ)
     \pic[draw, angle radius=0.4cm] {angle = NDown--Q--LLeftQ};
     \node at (1.45,0.08) {$\beta$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №4
@@ -1049,10 +1087,11 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \node[font=\tiny] at (0.52,0.18) {$?$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$66^\circ$}{$62^\circ$}{$52^\circ$}{$60^\circ$}{$50^\circ$}
 % Відповідь: Г
 \ifshowsolutions\solution{Точки $A$, $B$, $K$ лежать на одній прямій, тому $\angle DKA = 180^\circ - \angle BKD = 180^\circ - 128^\circ = 52^\circ$. У трикутнику $AKD$: $\angle BAD = 180^\circ - \angle ADK - \angle DKA = 180^\circ - 68^\circ - 52^\circ = 60^\circ$. Відповідь: \textbf{Г} ($60^\circ$).}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1061,6 +1100,7 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \answerTable{$16$~\textit{см}}{$14$~\textit{см}}{$3$~\textit{см}}{$8$~\textit{см}}{$13$~\textit{см}}
 % Відповідь: Д
 \ifshowsolutions\solution{Нехай $BK=x$, тоді $AK=x+5$, а $AK+BK=AB$: $x+5+x=21$, $2x=16$, $x=8$. Отже $AK=8+5=13$~см. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1089,22 +1129,24 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \node[below, font=\small] at (3,-0.65) {$147$~см};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$98$~см}{$49$~см}{$97$~см}{$108$~см}{$88$~см}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №9
-\zadtask{Які твердження щодо кутів на площині є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Які твердження щодо кутів на площині є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
 \item Якщо два прямі кути мають спільну сторону, то інші сторони цих кутів лежать на одній прямій.
 \item Якщо два кути мають спільну вершину, то вони вертикальні.
 \item Якщо два кути мають спільну сторону, то вони суміжні.
 \end{enumerate}
-\nopagebreak\vspace{0.1cm}}
+\nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише I}{лише II}{лише III}{лише I та II}{лише II та III}
 % Відповідь: А
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1129,9 +1171,11 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 
-\par\vspace{0.2cm}
+\nmtnobreak
+\par\nbvspace{0.2cm}
 \answerTable{$75^\circ$}{$105^\circ$}{$115^\circ$}{$125^\circ$}{$95^\circ$}
 % Відповідь: Б
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1157,70 +1201,25 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \node[below, font=\small] at (45,-54) {?};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$60$~см}{$90$~см}{$120$~см}{$150$~см}{$180$~см}
 % Відповідь: Г
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №9
-\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
 \item Доповняльні промені мають спільний початок і лежать на одній прямій.
 \item Суміжні кути мають спільну сторону.
 \item Якщо два кути рівні, то вони обов'язково є вертикальними.
 \end{enumerate}
-\nopagebreak\vspace{0.1cm}}
+\nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише I}{лише II}{лише I та II}{лише II та III}{I, II та III}
 % Відповідь: В
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 18.06, завдання №18 --- основна тема: Трикутники
-\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
-    \draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);
-    % точки: верхній ряд A,B,C; нижній ряд K,L,M
-    \coordinate (A) at (1,3);
-    \coordinate (B) at (3,3);
-    \coordinate (C) at (5,3);
-    \coordinate (K) at (0,0);
-    \coordinate (L) at (2,0);
-    \coordinate (M) at (4,0);
-    \foreach \p/\lab/\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {
-        \fill (\p) circle (2.5pt);
-        \node[\pos, font=\scriptsize] at (\p) {$\lab$};
-    }
-    \node[font=\scriptsize] at (6.5,3.5) {$1$~см$^2$};
-    \draw[gray!60] (6,3) rectangle (7,4);
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\vspace{0.2cm}
-\noindent
-\begin{minipage}[t]{0.42\textwidth}
-\textit{Фігура}\par\vspace{0.15cm}
-\textbf{1} \quad $ACM$\\[0.25cm]
-\textbf{2} \quad $ABLK$\\[0.25cm]
-\textbf{3} \quad $BCML$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
-\textit{Площа фігури}\par\vspace{0.15cm}
-\textbf{А} \quad $8$~см$^2$\\[0.15cm]
-\textbf{Б} \quad $10$~см$^2$\\[0.15cm]
-\textbf{В} \quad $12$~см$^2$\\[0.15cm]
-\textbf{Г} \quad $14$~см$^2$\\[0.15cm]
-\textbf{Д} \quad $16$~см$^2$\\[0.15cm]
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}}
-% Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1265,9 +1264,60 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \draw[blue!70, thick] (1.0,2.5) ellipse (0.42 and 0.14);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$22{,}5^\circ$}{$23{,}5^\circ$}{$32{,}5^\circ$}{$33{,}5^\circ$}{$113{,}5^\circ$}
 % Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №18 --- основна тема: Трикутники
+\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);
+    % точки: верхній ряд A,B,C; нижній ряд K,L,M
+    \coordinate (A) at (1,3);
+    \coordinate (B) at (3,3);
+    \coordinate (C) at (5,3);
+    \coordinate (K) at (0,0);
+    \coordinate (L) at (2,0);
+    \coordinate (M) at (4,0);
+    \foreach \p/\lab/\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {
+        \fill (\p) circle (2.5pt);
+        \node[\pos, font=\scriptsize] at (\p) {$\lab$};
+    }
+    \node[font=\scriptsize] at (6.5,3.5) {$1$~см$^2$};
+    \draw[gray!60] (6,3) rectangle (7,4);
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Фігура}\par\nbvspace{0.15cm}
+\textbf{1} \quad $ACM$\\[0.25cm]
+\textbf{2} \quad $ABLK$\\[0.25cm]
+\textbf{3} \quad $BCML$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Площа фігури}\par\nbvspace{0.15cm}
+\textbf{А} \quad $8$~см$^2$\\[0.15cm]
+\textbf{Б} \quad $10$~см$^2$\\[0.15cm]
+\textbf{В} \quad $12$~см$^2$\\[0.15cm]
+\textbf{Г} \quad $14$~см$^2$\\[0.15cm]
+\textbf{Д} \quad $16$~см$^2$\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\nopagebreak\nbvspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
@@ -1279,8 +1329,8 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \noindent\textbf{29.}~Б \ {\scriptsize\color{gray}(16.06, №3)}\par
 \noindent\textbf{30.}~Г \ {\scriptsize\color{gray}(17.06, №3)}\par
 \noindent\textbf{31.}~В \ {\scriptsize\color{gray}(18.06, №9)}\par
-\noindent\textbf{32.}~1--Б,\ \ 2--А,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №18)}\par
-\noindent\textbf{33.}~Б \ {\scriptsize\color{gray}(19.06, №3)}\par
+\noindent\textbf{32.}~Б \ {\scriptsize\color{gray}(19.06, №3)}\par
+\noindent\textbf{33.}~1--Б,\ \ 2--А,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №18)}\par
 \end{multicols}
 \fi
 

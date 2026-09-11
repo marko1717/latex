@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -244,7 +249,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -255,9 +260,9 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 17. Коло, круг і їх елементи}
-\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 72 (НМТ \mbox{2023~--- 22}, \mbox{2024~--- 19}, \mbox{2025~--- 11}, \mbox{2026~--- 20}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 72 (НМТ \mbox{2023~--- 22}, \mbox{2024~--- 19}, \mbox{2025~--- 11}, \mbox{2026~--- 20}); \mbox{тестових~--- 42}; \mbox{на відповідність~--- 30}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
@@ -265,12 +270,12 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (2.5cm);
-        
+
         % Triangle vertices
         % Angle B is 20 deg. Triangle is isosceles (AB=BC).
         % Arc AC = 2 * 20 = 40 deg.
@@ -279,20 +284,20 @@
         \coordinate (B) at (90:2.5);
         \coordinate (A) at (220:2.5);
         \coordinate (C) at (320:2.5);
-        
+
         \draw[thick] (A) -- (B) -- (C) -- (A);
-        
+
         % Angle 20
         \pic [draw, pic text={\scriptsize $20^\circ$}, angle radius=0.7cm, angle eccentricity=1.9] {angle = A--B--C};
-        
+
         % Marks for AB=BC
         \draw[thick] ($(A)!0.5!(B)$) ++(160:0.1) -- ++(-20:0.2);
         \draw[thick] ($(B)!0.5!(C)$) ++(20:0.1) -- ++(-160:0.2);
-        
+
         \node[below left] at (A) {$A$};
         \node[above] at (B) {$B$};
         \node[below right] at (C) {$C$};
-        
+
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
         \fill (C) circle (1.5pt);
@@ -300,8 +305,10 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$160^\circ$}{$140^\circ$}{$80^\circ$}{$70^\circ$}{$170^\circ$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -316,28 +323,28 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
-        
+
         % A at top
         \coordinate (A) at (0,1.5);
         % Tangent horizontal
         \draw[thick] (-2,1.5) -- (2.5,1.5);
-        
+
         % Angle 60. B is on tangent.
         % B is at (1.5/tan(30), 1.5) = (1.5 * 1.732, 1.5) approx (2.6, 1.5).
         % Let's verify angle AOB is 60. Slope OA vertical. Slope OB: dx = 2.6, dy = 1.5.
         % Tan(theta) = x/y = tan(60). Correct.
         \coordinate (B) at ({1.5*tan(60)}, 1.5); 
-        
+
         % Secant line OB
         \draw[thick] ($(O)!-0.4!(B)$) -- (B);
-        
+
         \draw[thick] (O) -- (A);
-        
+
         % Points C and D on circle along line OB
         % Calculate manually. Angle is 90-60=30 from horizontal? No, A is (0,1.5).
         % Angle of OB from vertical is 60. From horizontal is 30.
@@ -347,25 +354,27 @@
         \draw[thick] (A) -- (C);
         % Angle 60 at O (AOB)
         \pic [draw, pic text={\small $60^\circ$}, angle radius=0.4cm, angle eccentricity=1.7] {angle = C--O--A};
-        
+
         \node[below] at (O) {$O$};
         \node[above] at (A) {$A$};
         \node[above] at (B) {$B$};
         \node[right] at (C) {$C$};
         \node[below left] at (D) {$D$};
-        
+
         \fill (O) circle (1.5pt);
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
         \fill (C) circle (1.5pt);
         \fill (D) circle (1.5pt);
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II та III}{лише III}{лише I та II}{I, II та III}{лише I та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -377,8 +386,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I}{лише I та II}{I, II та III}{лише III}{лише I та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -387,12 +398,12 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
-        
+
         % Arc AB corresponds to inscribed angle 30 -> Central angle 60.
         % Let C be at 180 (left).
         % A at 30, B at -30 (so arc is 60).
@@ -401,17 +412,17 @@
         \coordinate (C) at (180:1.5);
         \coordinate (A) at (60:1.5);
         \coordinate (B) at (0:1.5);
-        
+
         \draw[thick] (A) -- (C) -- (B);
         % Bold arc AB
         \draw[very thick] (1.5,0) arc (0:60:1.5);
-        
+
         \pic [draw, pic text={\small $30^\circ$}, angle radius=0.4cm, angle eccentricity=2.4] {angle = B--C--A};
-        
+
         \node[above] at (A) {$A$};
         \node[right] at (B) {$B$};
         \node[left] at (C) {$C$};
-        
+
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
         \fill (C) circle (1.5pt);
@@ -419,8 +430,10 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$300$ \textit{см}}{$150$ \textit{см}}{$250$ \textit{см}}{$200$ \textit{см}}{$75$ \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -432,8 +445,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та III}{лише I та II}{лише I}{лише II та III}{I, II та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -445,8 +460,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II}{лише II та III}{лише I та III}{лише III}{лише I та II}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -458,247 +475,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{I, II та III}{лише I та II}{лише I та III}{лише II та III}{лише III}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$ та коло, побудоване на його меншій діагоналі $BD$ так, як на діаметрі. Точка $K$ --- точка перетину цього кола з діагоналлю $AC$, $AK = 5$ \textit{см}, $KC = 35$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % AC = 40. Center of Rhombus O (mid of AC) is at 20.
-        % K is at 5 from A. A=(0,0), C=(40,0). K=(5,0).
-        % O=(20,0).
-        % Circle on BD as diameter. Center is O.
-        % K is on the circle? No, K is intersection of circle and AC.
-        % So distance OK is radius. OK = 20 - 5 = 15.
-        % Radius = 15. BD = 30. BO = 15.
-        % A=(0,0), O=(20,0), B=(20,15).
-        % AB = sqrt(20^2 + 15^2) = sqrt(400+225) = sqrt(625) = 25.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (C) at (40,0);
-        \coordinate (O) at (20,0);
-        \coordinate (B) at (20,15);
-        \coordinate (D) at (20,-15);
-        \coordinate (K) at (5,0); % Actually on the left side
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (B) -- (D);
-        
-        \draw[thick] (O) circle (15cm);
-        
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above right] at (K) {$K$};
-        \fill (K) circle (15pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Величина} \par\par\vspace{0.2cm}
-    \textbf{1} \quad діаметр заданого кола \\
-    \textbf{2} \quad довжина сторони ромба $ABCD$ \\
-    \textbf{3} \quad висота ромба $ABCD$
-}{
-    \textit{Значення величини} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 15 \textit{см} \\
-    \textbf{Б} & 20 \textit{см} \\
-    \textbf{В} & 24 \textit{см} \\
-    \textbf{Г} & 25 \textit{см} \\
-    \textbf{Д} & 30 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 4 (Середини сторін K і M) ===
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$. Точки $K$ і $M$ --- відповідно середини сторін $AB$ і $BC$, $AB = 12$ \textit{см}, $MC = 8$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        % AB=12, BC=16 (MC=8 => BC=16)
-        % A(0,0) - ні, нехай B буде верхній лівий, як зазвичай A внизу.
-        % За рисунком: A внизу зліва. B зверху зліва.
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,12);
-        \coordinate (C) at (16,12);
-        \coordinate (D) at (16,0);
-        
-        \coordinate (K) at (0,6); % Середина AB
-        \coordinate (M) at (8,12); % Середина BC (8, 12)
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (K) -- (M) -- (C); % Лінія на рисунку йде від A до K, потім до M, потім C?
-        % На рисунку просто точки. Проведемо лінію AK і MC для візуалізації, як на скріншоті.
-        % На скріншоті відрізки: AK з'єднано з M? Ні.
-        % Просто позначено рівність відрізків.
-        
-        % Позначки рівності
-        \draw (-0.5,3) -- (0.5,3); % AK
-        \draw (-0.5,9) -- (0.5,9); % KB
-        \draw[thick] (A)  -- (C);
-        \draw (4,11.5) -- (4,12.5); \draw (4.2,11.5) -- (4.2,12.5); % BM
-        \draw (12,11.5) -- (12,12.5); \draw (12.2,11.5) -- (12.2,12.5); % MC
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[left] at (K) {$K$};
-        \node[above] at (M) {$M$};
-        
-        \fill (K) circle (10pt);
-        \fill (M) circle (10pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $BC$ \\
-    \textbf{2} \quad діаметр кола, описаного навколо прямокутника $ABCD$ \\
-    \textbf{3} \quad відстань від точки $D$ до середини $KM$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 10 \textit{см} \\
-    \textbf{Б} & 15 \textit{см} \\
-    \textbf{В} & 16 \textit{см} \\
-    \textbf{Г} & 18 \textit{см} \\
-    \textbf{Д} & 20 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 5 (Коло і півколо) ===
-\noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
-У прямокутник $ABCD$ вписано коло із центром в точці $O$, яке дотикається до сторін $AB$, $BC$ і $AD$, та півколо з діаметром $CD$ (див. рисунок). Коло й півколо мають лише одну спільну точку. $AB = 8$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
-        % AB=8. Коло R=4. Центр O(4,4).
-        % BC=12. Півколо на CD. R=4. Центр (12,4).
-        % Дотикаються в точці (8,4).
-        
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,8);
-        \coordinate (C) at (12,8);
-        \coordinate (D) at (12,0);
-        \coordinate (O) at (4,4);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        
-        % Коло
-        \draw[thick] (O) circle (4cm);
-        
-        % Півколо (дуга від C до D зліва)
-        \draw[thick] (C) arc (90:270:4cm);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node at (O) {$\cdot$};
-        \node[below right] at (O) {$O$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина сторони $BC$ \\
-    \textbf{2} \quad Довжина відрізка $OC$ \\
-    \textbf{3} \quad Відстань від середини відрізка $AO$ до прямої $CD$
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & дорівнює 10 \textit{см}. \\
-    \textbf{Б} & дорівнює 12 \textit{см}. \\
-    \textbf{В} & дорівнює 16 \textit{см}. \\
-    \textbf{Г} & дорівнює $4\sqrt{5}$ \textit{см}. \\
-    \textbf{Д} & дорівнює $4\sqrt{3}$ \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У ромб, менша діагональ якого $30$ \textit{см}, вписано коло радіуса $12$ \textit{см} (див. рисунок). До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        \coordinate (A) at (-15,0); % Половина діагоналі
-        \coordinate (C) at (15,0);
-        \coordinate (B) at (0,20); % Знайдено з пропорцій (12, 15, 20)
-        \coordinate (D) at (0,-20);
-        \coordinate (O) at (0,0);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (O) circle (12cm);
-        
-        % Діагоналі (тонкі, як на рисунку немає, але для розуміння центру)
-        %\draw[gray, thin] (A)--(C); \draw[gray, thin] (B)--(D);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Величина} \par\par\vspace{0.2cm}
-    \textbf{1} \quad висота ромба \\
-    \textbf{2} \quad проєкція меншої діагоналі на сторону ромба \\
-    \textbf{3} \quad сторона ромба
-}{
-    \textit{Значення величини} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 18 \textit{см} \\
-    \textbf{Б} & 20 \textit{см} \\
-    \textbf{В} & 24 \textit{см} \\
-    \textbf{Г} & 25 \textit{см} \\
-    \textbf{Д} & 30 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -707,227 +487,34 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
         \coordinate (O) at (0,0);
         \coordinate (O1) at (14,0); % 2 + 10 = 12 distance
-        
+
         \draw[thick] (O) circle (5cm);
         \draw[thick] (O1) circle (9cm);
-        
+
         \fill (O) circle (15pt) node[left] {$O$};
         \fill (O1) circle (15pt) node[right] {$O_1$};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$6$ \textit{см}}{$9$ \textit{см}}{$4$ \textit{см}}{$8$ \textit{см}}{$12$ \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \zadtask{Точки $A$ і $B$ лежать на колі радіуса $16$. Укажіть найбільше можливе значення довжини відрізка $AB$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$64$}{$48$}{$8$}{$16$}{$32$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутному трикутнику $ACB$ $\angle C = 90^\circ, \angle B = 24^\circ$. На продовжені катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-        \coordinate (C) at (0,0);
-        \coordinate (B) at (4,0);
-        \coordinate (A) at (0,2); % CA < CB visually
-        % K is on extension of AC downwards.
-        % AK = KB. Let K = (0, y_k). A = (0, 2). B = (4, 0).
-        % AK = 2 - y_k (since y_k < 0).
-        % KB = sqrt(4^2 + y_k^2).
-        % (2 - y_k)^2 = 16 + y_k^2
-        % 4 - 4y_k + y_k^2 = 16 + y_k^2
-        % -4y_k = 12 => y_k = -3.
-        \coordinate (K) at (0,-3);
-        
-        \draw[thick] (K) -- (A) -- (B) -- cycle; % Triangle ABK
-        \draw[thick] (K) -- (B); 
-        \draw[thick] (C) -- (B); % Leg CB
-        
-        % Right angle at C
-        \draw (0,0) rectangle (0.3,0.3);
-        
-        % Mark AK = KB?
-        % Visual marks
-        \draw[thick] ($(A)!0.5!(K)$) ++(0.15,0) -- ++(-0.3,0);
-        \draw[thick] ($(K)!0.5!(B)$) ++(120:0.15) -- ++(-60:0.3);
-        
-        % Angle 24
-        \pic [draw, pic text={\small $24^\circ$}, angle radius=.5cm, angle eccentricity=1.8] {angle = A--B--C};
-        
-        \node[left] at (A) {$A$};
-        \node[left] at (C) {$C$};
-        \node[left] at (K) {$K$};
-        \node[right] at (B) {$B$};
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Кут} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $\angle BAC$ \\
-    \textbf{2} \quad $\angle KBC$ \\
-    \textbf{3} \quad $\angle OKB$
-}{
-    \textit{Градусна міра кута} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $24^\circ$ \\
-    \textbf{Б} & $34^\circ$ \\
-    \textbf{В} & $42^\circ$ \\
-    \textbf{Г} & $66^\circ$ \\
-    \textbf{Д} & $72^\circ$ \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90^\circ, \angle B = 32^\circ$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-        \coordinate (C) at (0,0);
-        \coordinate (A) at (0,3);
-        \coordinate (B) at (5,0);
-        
-        % K on BC. AK = KB.
-        % Let K = (x, 0).
-        % AK^2 = x^2 + 3^2. KB^2 = (5-x)^2.
-        % x^2 + 9 = 25 - 10x + x^2.
-        % 10x = 16 => x = 1.6.
-        \coordinate (K) at (1.6, 0);
-        
-        \draw[thick] (A) -- (C) -- (B) -- cycle;
-        \draw[thick] (A) -- (K);
-        
-        % Marks AK = KB
-        \draw[thick] ($(A)!0.5!(K)$) ++(150:0.15) -- ++(-30:0.3);
-        \draw[thick] ($(K)!0.5!(B)$) ++(90:0.15) -- ++(-90:0.3);
-        
-        % Right angle
-        \draw (0,0) rectangle (0.3,0.3);
-        
-        % Angle 32
-        \pic [draw, pic text={\small $32^\circ$}, angle radius=1.0cm, angle eccentricity=1.4] {angle = A--B--C};
-        
-        \node[above] at (A) {$A$};
-        \node[below] at (C) {$C$};
-        \node[below] at (K) {$K$};
-        \node[below] at (B) {$B$};
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Кут} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $\angle KAB$ \\
-    \textbf{2} \quad $\angle KAC$ \\
-    \textbf{3} \quad $\angle OKB$
-}{
-    \textit{Градусна міра кута} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $24^\circ$ \\
-    \textbf{Б} & $26^\circ$ \\
-    \textbf{В} & $32^\circ$ \\
-    \textbf{Г} & $58^\circ$ \\
-    \textbf{Д} & $64^\circ$ \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено коло з центром у точці $O$, $AB$ --- діаметр цього кола. Пряма $a$ --- дотична до цього кола, що перетинає продовження діаметра $AB$ у точці $K$, $C$ --- точка дотику. Установіть відповідність між величиною \mbox{(1--3)} та її значенням \mbox{(А--Д)}, якщо дуга $AC = 130^\circ$. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-        \coordinate (O) at (0,0);
-        \draw[thick] (O) circle (1.5cm);
-        \coordinate (L) at (-1.5,2);
-        \coordinate (A) at (-1.5,0);
-        \coordinate (B) at (1.5,0);
-        \coordinate (K) at (3.5,0);
-        
-        % Tangent from K.
-        % OK = 3.5, R=1.5. Angle COK = arccos(1.5/3.5) approx 64.6 deg.
-        % C is at (1.5*cos(64.6), 1.5*sin(64.6)).
-        \coordinate (C) at (64.6:1.5);
-        
-        \draw[thick] (A) -- (K);
-        \draw[thick] (L) -- (C);
-        \draw[thick] (C) -- (K) node[midway, above right] {$a$};
-        \draw[thick] (O) -- (C);
-        
-        % Bold arc AC
-        \draw[very thick] (A) arc (180:64.6:1.5);
-        
-        \node[left] at (A) {$A$};
-        \node[below right] at (B) {$B$}; % B is slightly covered by line
-        \node[below] at (O) {$O$};
-        \node[above] at (K) {$K$};
-        \node[above right] at (C) {$C$};
-        
-        \fill (O) circle (1.5pt);
-        \fill (A) circle (1.5pt);
-        \fill (B) circle (1.5pt);
-        \fill (K) circle (1.5pt);
-        \fill (C) circle (1.5pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Величина} \par\par\vspace{0.2cm}
-    \textbf{1} \quad дуга $CB$ \\
-    \textbf{2} \quad $\angle CKA$ \\
-    \textbf{3} \quad $\angle ABC$
-}{
-    \textit{Значення величини} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $30^\circ$ \\
-    \textbf{Б} & $40^\circ$ \\
-    \textbf{В} & $50^\circ$ \\
-    \textbf{Г} & $65^\circ$ \\
-    \textbf{Д} & $70^\circ$ \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -939,58 +526,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та II}{лише II}{лише II та III}{I, II та III}{лише I та III}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Периметр рівнобедреного трикутника (див. рисунок) дорівнює $32$ \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AB=BC=10. P=32. AC = 32 - 20 = 12.
-        % Height h = sqrt(100 - 36) = 8.
-        \coordinate (A) at (-6,0);
-        \coordinate (C) at (6,0);
-        \coordinate (B) at (0,8);
-        
-        \draw[thick] (A) -- (B) -- (C) -- cycle;
-        
-        % Marks
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.3) -- ++(-30:0.6);
-        \draw[thick] ($(B)!0.5!(C)$) ++(30:0.3) -- ++(-150:0.6);
-        
-        \node[below left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[below right] at (C) {$C$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $AC$ \\
-    \textbf{2} \quad висота, проведена з \par \quad вершини $B$ \\
-    \textbf{3} \quad радіус кола, \par \quad описаного навколо \par \quad трикутника $ABC$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6{,}25 \textit{см} \\
-    \textbf{Б} & 7{,}5 \textit{см} \\
-    \textbf{В} & 8 \textit{см} \\
-    \textbf{Г} & 12 \textit{см} \\
-    \textbf{Д} & 12{,}5 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1006,7 +545,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (A) at (0,0);
@@ -1039,13 +578,15 @@
         \fill (K) circle (1.5pt);
         \fill (L) circle (1.5pt);
         \fill (M) circle (1.5pt);
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II та III}{лише I та II}{I, II та III}{лише III}{лише II}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1054,7 +595,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
 
     % Спроба 2 (як на скріншоті)
@@ -1064,103 +605,24 @@
         \coordinate (C) at (3,0);  % Правий
         \coordinate (B) at (0,4);  % Верхній
         \coordinate (D) at (0,-4); % Нижній
-        
+
         % Менша діагональ AC (на скріншоті горизонтальна лінія - це менша діагональ)
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
-        
+
         \draw[thick] (O) circle (2.4cm); % Приблизно
-        
+
         % Кут бета
         \pic [draw, pic text={\small $\beta$}, angle radius=0.8cm, angle eccentricity=1.3] {angle = B--C--A};
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{$a\sin^2\beta$}{$a\sin\beta$}{$\dfrac{a\sin 2\beta}{2}$}{$a\cos\beta$}{$a\cos^2\beta$}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Ромб $ABCD$ та коло із центром у точці $O$, довжина якого $12\pi$ \textit{см}, лежать в одній площині (див. рисунок). Сторона ромба $AB$ перетинає коло в точці $K$, $AD$ --- діаметр кола, $AK = OA$. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.2]
-        % Довжина 12pi -> R=6. AD=12. O - центр AD.
-        % AK = OA = 6. O=(6,0), A=(0,0), D=(12,0).
-        % Трикутник AOK: AO=6, OK=6(радіус), AK=6. Рівносторонній.
-        % Кут A = 60 градусів.
-        % Ромб ABCD зі стороною 12 і кутом 60.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (D) at (12,0);
-        \coordinate (O) at (6,0);
-        
-        % Точка B (кут 60, сторона 12)
-        \coordinate (B) at (60:12);
-        \coordinate (C) at ($(D)+(B)-(A)$);
-        
-        % Точка K (перетин AB і кола). Оскільки A=60, R=6, AK=6.
-        \coordinate (K) at (60:6);
-        
-        % Коло
-        \draw[thick] (O) circle (6cm);
-        
-        % Ромб
-        \draw[thick] (A) -- (B) -- (C) -- (D); % Нижня частина перекривається колом?
-        % На рисунку коло малюється поверх сторони AD?
-        % А, AD - діаметр. Значить AD лежить на осі.
-        \draw[thick] (A) -- (D); 
-        
-        % Відрізок OK
-        \draw[thick] (O) -- (K);
-        
-        % Позначки рівності AK = AO
-        \draw (3, -0.2) -- (3, 0.2); % AO
-        \draw (60:3) ++(150:0.2) -- ++(-30:0.4); % AK
-        \draw ($(O)!0.5!(K)$) ++(60:0.2) -- ++(240:0.4); % OK (теж радіус, але в умові AK=OA)
-        
-        % Точки
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[right] at (D) {$D$};
-        \node[above left] at (K) {$K$};
-        \node[below] at (O) {$O$};
-        
-        \fill (O) circle (10pt);
-        \fill (K) circle (10pt);
-        \fill (A) circle (10pt);
-        \fill (D) circle (10pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина радіуса $OA$ \\
-    \textbf{2} \quad Довжина діагоналі $BD$ ромба $ABCD$ \\
-    \textbf{3} \quad Довжина висоти ромба
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & дорівнює 6 \textit{см}. \\
-    \textbf{Б} & дорівнює $6\sqrt{3}$ \textit{см}. \\
-    \textbf{В} & дорівнює 12 \textit{см}. \\
-    \textbf{Г} & дорівнює $6\sqrt{2}$ \textit{см}. \\
-    \textbf{Д} & дорівнює $12\sqrt{3}$ \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1169,7 +631,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
         \draw[thick] (0,0) rectangle (12,12);
@@ -1178,11 +640,11 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$48$}{$36$}{$60$}{$12$}{$24$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
@@ -1190,7 +652,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (O) at (0,0);
@@ -1198,36 +660,38 @@
         % Tangent line
         \draw[thick] (-2,1.5) -- (3.5,1.5) node[above] {$K$};
         \draw[thick] (O) circle (1.5cm);
-        
+
         % Point B. Angle AOB = 55.
         % AB / OA = tan(55). OA = 1.5. AB = 1.5 * tan(55) approx 2.14
         \coordinate (B) at (2.14, 1.5);
-        
+
         \draw[thick] (O) -- (A);
         \draw[thick] (O) -- (B);
-        
+
         % Angle 55
         \pic [draw, pic text={\small $55^\circ$}, angle radius=0.4cm, angle eccentricity=1.8] {angle = B--O--A};
-        
+
         % Exterior Angle at B (OBK)
         \coordinate (K_end) at (3.5, 1.5);
         \pic [draw, pic text={\small ?}, angle radius=0.4cm, angle eccentricity=1.8] {angle = O--B--K_end};
         \pic [draw, angle radius=0.3cm, angle eccentricity=1.8] {angle = O--B--K_end};
-        
+
         \node[left] at (O) {$O$};
         \node[above] at (A) {$A$};
         \node[above] at (B) {$B$};
-        
+
         \fill (O) circle (1.5pt);
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$135^\circ$}{$125^\circ$}{$55^\circ$}{$145^\circ$}{$155^\circ$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1236,28 +700,28 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
         \coordinate (A) at (0,0);
         % R1 = 8. Touch point at (8,0).
         % R2 = 5. Center C at (8+5, 0) = (13,0).
         % Point B at (13+5, 0) = (18,0).
-        
+
         \coordinate (C) at (13,0);
         \coordinate (B) at (18,0);
         \coordinate (LineEnd) at (22,0);
         \coordinate (LineStart) at (-10,0);
-        
+
         \draw[thick] (LineStart) -- (LineEnd);
-        
+
         \draw[thick] (A) circle (8cm);
         \draw[thick] (C) circle (5cm);
-        
+
         \node[above] at (A) {$A$};
         \node[above] at (C) {$C$};
         \node[above right] at (B) {$B$};
-        
+
         \fill (A) circle (15pt);
         \fill (C) circle (15pt);
         \fill (B) circle (15pt);
@@ -1265,8 +729,10 @@
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$21$ \textit{см}}{$16$ \textit{см}}{$26$ \textit{см}}{$13$ \textit{см}}{$18$ \textit{см}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1278,8 +744,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{I, II та III}{лише I та III}{лише I}{лише II}{лише I та II}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1291,8 +759,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{I, II та III}{лише I та III}{лише III}{лише I та II}{лише I}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1304,69 +774,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та II}{лише II та III}{лише I та III}{лише III}{лише II}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90^\circ$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        \coordinate (C) at (0,0);
-        \coordinate (B) at (16,0);
-        % R=10 -> Hypotenuse AB=20.
-        % AC = sqrt(400 - 256) = 12.
-        \coordinate (A) at (0,12);
-        
-        % M is midpoint of CB
-        \coordinate (M) at (8,0);
-        
-        \draw[thick] (A) -- (C) -- (B) -- cycle;
-        \draw[thick] (A) -- (M);
-        
-        % Right angle
-        \draw (C) rectangle ++(1.5,1.5);
-        
-        % Marks for CM = MB
-        \draw[thick] (4, -0.3) -- (4, 0.3);
-        \draw[thick] (12, -0.3) -- (12, 0.3);
-        
-        \node[left] at (A) {$A$};
-        \node[below left] at (C) {$C$};
-        \node[below] at (M) {$M$};
-        \node[below right] at (B) {$B$};
-        
-        \fill (M) circle (7pt);
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $AC$ \\
-    \textbf{2} \quad найбільша середня \par \quad лінія трикутника $ABC$ \\
-    \textbf{3} \quad $AM$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 10 \textit{см} \\
-    \textbf{Б} & 12 \textit{см} \\
-    \textbf{В} & 16 \textit{см} \\
-    \textbf{Г} & $4\sqrt{11}$ \textit{см} \\
-    \textbf{Д} & $4\sqrt{13}$ \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1378,8 +789,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II}{лише I та II}{лише II та III}{I, II та III}{лише III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1394,28 +807,28 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
-        
+
         % A at top
         \coordinate (A) at (0,1.5);
         % Tangent horizontal
         \draw[thick] (-2,1.5) -- (2.5,1.5);
-        
+
         % Angle 60. B is on tangent.
         % B is at (1.5/tan(30), 1.5) = (1.5 * 1.732, 1.5) approx (2.6, 1.5).
         % Let's verify angle AOB is 60. Slope OA vertical. Slope OB: dx = 2.6, dy = 1.5.
         % Tan(theta) = x/y = tan(60). Correct.
         \coordinate (B) at ({1.5*tan(60)}, 1.5); 
-        
+
         % Secant line OB
         \draw[thick] ($(O)!-0.4!(B)$) -- (B);
-        
+
         \draw[thick] (O) -- (A);
-        
+
         % Points C and D on circle along line OB
         % Calculate manually. Angle is 90-60=30 from horizontal? No, A is (0,1.5).
         % Angle of OB from vertical is 60. From horizontal is 30.
@@ -1425,397 +838,27 @@
         \draw[thick] (A) -- (C);
         % Angle 60 at O (AOB)
         \pic [draw, pic text={\small $60^\circ$}, angle radius=0.4cm, angle eccentricity=1.7] {angle = C--O--A};
-        
+
         \node[below] at (O) {$O$};
         \node[above] at (A) {$A$};
         \node[above] at (B) {$B$};
         \node[right] at (C) {$C$};
         \node[below left] at (D) {$D$};
-        
+
         \fill (O) circle (1.5pt);
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
         \fill (C) circle (1.5pt);
         \fill (D) circle (1.5pt);
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та III}{лише I та II}{лише III}{лише II та III}{I, II та III}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Навколо кола описано рівнобічну трапецію (див. рисунок), периметр якої дорівнює $100$ \textit{см}. Різниця основ трапеції дорівнює $14$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        % Circumscribed isosceles trapezoid.
-        % Sum of bases = Sum of legs = Perimeter / 2 = 50.
-        % a + b = 50. a - b = 14.
-        % 2a = 64 -> a = 32 (bottom). b = 18 (top).
-        % c = 25.
-        % Height h = sqrt(c^2 - ((a-b)/2)^2) = sqrt(25^2 - 7^2) = sqrt(625-49) = sqrt(576) = 24.
-        % Radius = 12.
-        
-        \coordinate (O) at (0,12);
-        \coordinate (A) at (-16,0);
-        \coordinate (D) at (16,0);
-        \coordinate (B) at (-9,24);
-        \coordinate (C) at (9,24);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (O) circle (12cm);
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина середньої лінії \par \quad трапеції \\
-    \textbf{2} \quad Довжина більшої основи \par \quad трапеції \\
-    \textbf{3} \quad Довжина висоти трапеції
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & дорівнює 18 \textit{см}. \\
-    \textbf{Б} & дорівнює 24 \textit{см}. \\
-    \textbf{В} & дорівнює 25 \textit{см}. \\
-    \textbf{Г} & дорівнює 32 \textit{см}. \\
-    \textbf{Д} & дорівнює 36 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$, у який вписано коло з центром у точці $O$. З тупого кута $B$ на сторону $AD$ проведено висоту $BK$, коло дотикається до сторони $AD$ у точці $M$. $AK = 7$ \textit{см}, $KM = 9$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AK = 7, KM = 9. M - точка дотику.
-        % У ромбі точка дотику M ділить сторону.
-        % Центр O проектується в M. OM perp AD.
-        % BK - висота. BK || OM. OM = R. BK = 2R.
-        % У трикутнику OAM...
-        % Нехай це просто рисунок.
-        % A=(0,0). K=(7,0). M=(16,0). (AK+KM=16).
-        % Висота h. B = (7, h).
-        % AB^2 = AK^2 + BK^2 = 49 + h^2.
-        % Також AM = AB - MD? Ні. Властивість дотичної: AM = ...
-        % Для малювання: приймемо h = 24 (наприклад).
-        
-        \coordinate (A) at (0,0);
-        \coordinate (K) at (7,0);
-        \coordinate (M) at (10.5,0);
-        \coordinate (D) at (14,0); % AD прибл.
-        \coordinate (B) at (7,12); % Висота прибл.
-        \coordinate (C) at (21,12);
-        
-        % Центр O: середина висоти (y=9), по x: M=(16,0) -> O=(16,9).
-        \coordinate (O) at (10.5,6);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K);
-        \draw[thick] (O) circle (6cm);
-        
-        % Прямий кут
-        \pic [draw, angle radius=0.3cm] {right angle = B--K--D};
-        
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below] at (K) {$K$};
-        \node[below] at (M) {$M$};
-        \node[right] at (O) {$O$};
-        
-        \fill (O) circle (4pt);
-        \fill (M) circle (4pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $AD$ \\
-    \textbf{2} \quad $BK$ \\
-    \textbf{3} \quad $OM$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 12 \textit{см} \\
-    \textbf{Б} & 15 \textit{см} \\
-    \textbf{В} & 20 \textit{см} \\
-    \textbf{Г} & 24 \textit{см} \\
-    \textbf{Д} & 25 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$, площа якого $144$ \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,10);
-        \coordinate (C) at (10,10);
-        \coordinate (D) at (10,0);
-        
-        \coordinate (K) at (5,10);
-        \coordinate (M) at (10,5);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M);
-        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
-        
-        % Позначки середин
-        \draw (2.5, 9.8) -- (2.5, 10.2);
-        \draw (7.5, 9.8) -- (7.5, 10.2);
-        
-        \draw (9.8, 7.5) -- (10.2, 7.5);
-        \draw (9.8, 2.5) -- (10.2, 2.5);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (K) {$K$};
-        \node[right] at (M) {$M$};
-        
-        \fill (K) circle (5pt);
-        \fill (M) circle (5pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad сторона квадрата \\
-    \textbf{2} \quad $KM$ \\
-    \textbf{3} \quad відстань від точки $A$ до центра кола, описаного навколо трикутника $KMC$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см} \\
-    \textbf{Б} & $6\sqrt{2}$ \textit{см} \\
-    \textbf{В} & 12 \textit{см} \\
-    \textbf{Г} & $8\sqrt{2}$ \textit{см} \\
-    \textbf{Д} & $9\sqrt{2}$ \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
-        % P=24 => сторона 6.
-        % Трапеція AKCD. Основи AK і CD. CD=6. Середня лінія 10 -> AK+6 = 20 -> AK=14.
-        % BK = 14-6 = 8.
-        \coordinate (A) at (0,0);
-        \coordinate (D) at (6,0);
-        \coordinate (C) at (6,6);
-        \coordinate (B) at (0,6);
-        \coordinate (K) at (0,14);
-        
-        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Контур трапеції
-        \draw[thick] (B) -- (C); % Верхня сторона квадрата
-        
-        % Прямий кут
-        \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
-        
-        \node[left] at (A) {$A$};
-        \node[below right] at (D) {$D$};
-        \node[right] at (C) {$C$};
-        \node[left] at (B) {$B$};
-        \node[left] at (K) {$K$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $BK$ \\
-    \textbf{2} \quad $KC$ \\
-    \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см} \\
-    \textbf{Б} & 7 \textit{см} \\
-    \textbf{В} & 8 \textit{см} \\
-    \textbf{Г} & 9 \textit{см} \\
-    \textbf{Д} & 10 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Навколо кола радіуса $4$ \textit{см} описано рівнобічну трапецію, середня лінія якої дорівнює $10$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}.\nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
-        % R=4, h=8. Midline=10 => a+b=20.
-        % Inscribed => a+b = 2c => 2c=20 => c=10.
-        % Leg c=10. Height h=8. Projection x=6.
-        % b = a - 12. 2a - 12 = 20 => 2a=32 => a=16. b=4.
-        
-        \coordinate (O) at (0,4);
-        \coordinate (A) at (-8,0);
-        \coordinate (D) at (8,0);
-        \coordinate (B) at (-2,8);
-        \coordinate (C) at (2,8);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (O) circle (4cm);
-        
-        % Візуально:
-        % Нижня основа 16 (від -8 до 8).
-        % Верхня основа 4 (від -2 до 2).
-        % Висота 8.
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Висота трапеції \\
-    \textbf{2} \quad Бічна сторона трапеції \\
-    \textbf{3} \quad Більша основа трапеції
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 8 \textit{см} \\
-    \textbf{Б} & 10 \textit{см} \\
-    \textbf{В} & 12 \textit{см} \\
-    \textbf{Г} & 16 \textit{см} \\
-    \textbf{Д} & 20 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Точка $O$ --- центр кола, зображеного на рисунку. До цього кола проведено дотичну $KB$, $B$ --- точка дотику. На колі вибрано точки $A$ і $C$ так, що $AB = BC$, $\angle ABC = 50^\circ$. Установіть відповідність між кутом \mbox{(1--3)} та його градусною мірою \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-        \coordinate (O) at (0,0);
-        \draw[thick] (O) circle (1.5cm);
-        
-        % B at top (90 deg)
-        \coordinate (B) at (90:1.5);
-        \coordinate (K) at (-2.5, 1.5);
-        \draw[thick] (K) -- (2.5, 1.5); % Tangent line
-        
-        % Inscribed isosceles triangle ABC. AB=BC.
-        % Angle ABC = 50.
-        % Arc AC corresponds to 50? No, inscribed angle B=50 means Arc AC = 100.
-        % Remaining arc = 260. Arc AB = Arc BC = 130.
-        % B is at 90. A is at 90+130 = 220. C is at 90-130 = -40 (320).
-        \coordinate (A) at (220:1.5);
-        \coordinate (C) at (320:1.5);
-        
-        \draw[thick] (A) -- (B) -- (C);
-        \draw[thick] (A) -- (O);
-        \draw[thick] (C) -- (O);
-        
-        
-        % Angle 50
-        \pic [draw, pic text={\scriptsize $50^\circ$}, angle radius=0.4cm, angle eccentricity=1.8] {angle = A--B--C};
-        
-        % Marks for AB = BC
-        \draw[thick] ($(A)!0.5!(B)$) ++(160:0.1) -- ++(-20:0.2);
-        \draw[thick] ($(B)!0.5!(C)$) ++(20:0.1) -- ++(-160:0.2);
-        
-        \node[above] at (K) {$K$};
-        \node[above] at (B) {$B$};
-        \node[below left] at (A) {$A$};
-        \node[below right] at (C) {$C$};
-        \node[below] at (O) {$O$};
-        
-        \fill (O) circle (1.5pt);
-        \fill (A) circle (1.5pt);
-        \fill (B) circle (1.5pt);
-        \fill (C) circle (1.5pt);
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Кут} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $\angle AOC$ \\
-    \textbf{2} \quad $\angle BOC$ \\
-    \textbf{3} \quad $\angle KBA$
-}{
-    \textit{Градусна міра кута} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $50^\circ$ \\
-    \textbf{Б} & $65^\circ$ \\
-    \textbf{В} & $100^\circ$ \\
-    \textbf{Г} & $90^\circ$ \\
-    \textbf{Д} & $130^\circ$ \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1827,329 +870,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II та III}{I, II та III}{лише II}{лише III}{лише I та III}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника, друге коло з центром у точці $O_2$, довжиною $16\pi$ \textit{см}, дотикається до сторін $AB$, $BC$ та $AD$. $BC = 30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % Circle 2 length 16pi -> R=8. Diameter 16.
-        % Touches AB, BC, AD -> Height AB = 16.
-        % Width BC = 30.
-        \def\w{30}
-        \def\h{16}
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,\h);
-        \coordinate (C) at (\w,\h);
-        \coordinate (D) at (\w,0);
-        
-        % Center O2: r=8 from AB, r=8 from AD. (8,8)
-        \coordinate (O2) at (8,8);
-        
-        % Center O1: Midpoint of rect (15,8)
-        \coordinate (O1) at (15,8);
-        
-        % Circumcircle radius: sqrt(15^2+8^2) = 17.
-        
-        % Draw Circumcircle (O1) - Green
-        \draw[thick, green!60!black] (O1) circle (17);
-        
-        % Draw Inscribed-like Circle (O2) - Orange
-        \draw[thick, orange!80!black] (O2) circle (8);
-        
-        % Draw Rectangle
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        
-        % Points
-        \fill (O1) circle (15pt) node[right] {$O_1$};
-        \fill (O2) circle (15pt) node[left] {$O_2$};
-        
-        % Labels
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (15, \h) {30 \textit{см}};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина сторони $AB$ дорівнює \\
-    \textbf{2} \quad Довжина радіуса кола, описаного навколо прямокутника $ABCD$ дорівнює \\
-    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 7 \textit{см}. \\
-    \textbf{Б} & 9 \textit{см}. \\
-    \textbf{В} & 12 \textit{см}. \\
-    \textbf{Г} & 16 \textit{см}. \\
-    \textbf{Д} & 17 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Геометрична фігура} \par\par\vspace{0.2cm}
-    \textbf{1} \quad ромб з висотою $4$ \textit{см} \\
-    \textbf{2} \quad трикутник з площею $24$ \textit{см}$^2$ та периметром $12$ \textit{см} \\
-    \textbf{3} \quad квадрат з периметром $64$ \textit{см}
-}{
-    \textit{Радіус кола, вписаного у фігуру} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 4 \textit{см} \\
-    \textbf{Б} & $\sqrt{3}$ \textit{см} \\
-    \textbf{В} & 8 \textit{см} \\
-    \textbf{Г} & 6 \textit{см} \\
-    \textbf{Д} & 2 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L, N, P$ належать прямій $m$, а точки $K, M, Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого $156$. Установіть відповідність між відрізом \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-        \def\h{12}
-        \draw[thick] (-2,0) -- (50,0) node[above] {$n$};
-        \draw[thick] (-2,\h) -- (50,\h) node[above] {$m$};
-        
-        % Коло
-        \draw[thick] (6,6) circle (6cm);
-        
-        % Трикутник
-        \coordinate (K) at (14,0);
-        \coordinate (M) at (24,0); % Схематично
-        \coordinate (L) at (19,\h);
-        \draw[thick] (K) -- (L) -- (M) -- cycle;
-        
-        % Ромб
-        % M спільна точка? Ні, точки K, M, Q на прямій.
-        % M - вершина трикутника і ромба? Так, MNPQ.
-        \coordinate (N) at (29,\h);
-        \coordinate (Q) at (37,0); % Сторона 13
-        \coordinate (P) at (42,\h);
-        
-        \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
-        
-        % Підписи
-        \node[below] at (K) {$K$};
-        \node[above] at (L) {$L$};
-        \node[below] at (M) {$M$};
-        \node[above] at (N) {$N$};
-        \node[above] at (P) {$P$};
-        \node[below] at (Q) {$Q$};
-        
-    \end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad діаметр круга \\
-    \textbf{2} \quad довжина сторони трикутника $KLM$ \\
-    \textbf{3} \quad довжина сторони ромба $MNPQ$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $8\sqrt{3}$ \\
-    \textbf{Б} & 6 \\
-    \textbf{В} & 12 \\
-    \textbf{Г} & 13 \\
-    \textbf{Д} & 15 \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ і кругові сектори $BCL$ та $KAD$, що мають одну спільну точку $M$. $N$ --- проєкція точки $M$ на пряму $AB$, $BC = 12$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Centers are A and C. Radius 12.
-        % AB = 12*sqrt(3) approx 20.8
-        \def\r{12}
-        \def\w{20.78}
-        \coordinate (A) at (0,0);
-        \coordinate (D) at (\w,0);
-        \coordinate (B) at (0,\r); % BC is width? No, BC=12. So height is 12?
-        % Text: BC=12. Drawing shows BC as top side. Usually AB is height, BC width.
-        % If BC=12 is width. Then Rect is 12 wide.
-        % Let's assume standard orientation: AB vertical, BC horizontal.
-        % Then Center C (top right). Radius CB = 12 (height).
-        % Center A (bottom left). Radius AD = 12 (width).
-        % Touch at M. Diagonal AC = 24.
-        % AC^2 = AB^2 + BC^2 => 576 = AB^2 + 144 => AB^2 = 432 => AB = 12sqrt(3).
-        % So Height AB = 20.8, Width BC = 12.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,20.78);
-        \coordinate (C) at (12,20.78);
-        \coordinate (D) at (12,0);
-        
-        % Fill gray
-        \fill[white!30] (A) -- (B) -- (C) -- (D) -- cycle;
-        
-        % Sector KAD (Center A, radius 12?) No, K is on AB.
-        % Drawing shows Sector KAD. K on AB. D is corner.
-        % If center is A, radius is AD = 12.
-        % Arc from D to K.
-        \coordinate (K) at (0, 12);
-        \fill[gray!30] (A) -- (D) arc (0:90:12) -- cycle;
-        \draw[thick] (D) arc (0:90:12);
-        
-        % Sector BCL (Center C, radius 12?) L is on CD.
-        % Drawing shows Sector BCL. B is corner.
-        % If center is C, radius CB = 12.
-        % Arc from B to L.
-        \coordinate (L) at (12, 8.78); % 20.78 - 12
-        \fill[gray!30] (C) -- (B) arc (180:270:12) -- cycle;
-        \draw[thick] (B) arc (180:270:12);
-        
-        % Point M (intersection)
-        \coordinate (M) at (intersection of A--C and 0,12--12,12); % Rough
-        % Exact M is midpoint of AC. (6, 10.39)
-        \coordinate (M) at (6, 10.39);
-        
-        % Projection N on AB. N = (0, 10.39).
-        \coordinate (N) at (0, 10.39);
-        
-        % Lines
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C); % Diagonal
-        \draw[thick] (M) -- (N);
-        
-        % Right angle at N
-        \draw (0, 10.39) rectangle ++(1, -1);
-        
-        % Labels
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[left] at (K) {$K$};
-        \node[right] at (L) {$L$};
-        \node[above] at (M) {$M$};
-        \node[left] at (N) {$N$};
-        
-        \fill (M) circle (15pt);
-        \fill (N) circle (15pt);
-        \fill (K) circle (10pt);
-        \fill (L) circle (10pt);
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина $AN$ \\
-    \textbf{2} \quad Довжина $AB$ \\
-    \textbf{3} \quad Довжина $AC$
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & дорівнює 24 \textit{см}. \\
-    \textbf{Б} & дорівнює 18 \textit{см}. \\
-    \textbf{В} & дорівнює $8\sqrt{3}$ \textit{см}. \\
-    \textbf{Г} & дорівнює $6\sqrt{3}$ \textit{см}. \\
-    \textbf{Д} & є натуральним числом. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2025}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Діагональ $AC$ рівнобічної трапеції $ABCD$ утворює зі стороною $CD$ кут $120^\circ$ (див. рисунок). Довжини основ трапеції дорівнюють $12$ \textit{см} і $30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        \coordinate (A) at (-15,0);
-        \coordinate (D) at (15,0);
-        % Bases 30 and 12. Top base centered.
-        % Coordinates for C approx to look like the image.
-        \coordinate (B) at (-6, 12);
-        \coordinate (C) at (6, 12);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        
-        % Obtuse angle 120 at C (ACD)
-        \pic [draw, pic text={\scriptsize $120^\circ$}, angle radius=0.3cm, angle eccentricity=1.5] {angle = A--C--D};
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина середньої лінії трапеції \par \quad дорівнює \\
-    \textbf{2} \quad Довжина проєкції сторони $AB$ \par \quad на пряму $AD$ дорівнює \\
-    \textbf{3} \quad Довжина радіуса кола, описаного \par \quad навколо трапеції, дорівнює
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 9 \textit{см}. \\
-    \textbf{Б} & $20\sqrt{3}$ \textit{см}. \\
-    \textbf{В} & 21 \textit{см}. \\
-    \textbf{Г} & $10\sqrt{3}$ \textit{см}. \\
-    \textbf{Д} & 18 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2161,8 +885,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише III}{лише I}{лише II}{лише II і III}{I, II та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2171,38 +897,40 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
+    \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
-        
+
         % 3 equal parts -> 120 degrees apart
         % Let B be at 90. A at 90+120=210. C at 90-120=-30 (330).
         \coordinate (B) at (90:1.5);
         \coordinate (A) at (210:1.5);
         \coordinate (C) at (330:1.5);
-        
+
         \draw[thick] (O) -- (A);
         \draw[thick] (O) -- (B);
         \draw[thick] (O) -- (C);
-        
+
         \node at (O) [below =-2pt] {$O$};
         \node at (A) [below left] {$A$};
         \node at (B) [above] {$B$};
         \node at (C) [below right] {$C$};
-        
+
         \fill (O) circle (1.5pt);
         \fill (A) circle (1.5pt);
         \fill (B) circle (1.5pt);
         \fill (C) circle (1.5pt);
-        
+
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{$120^\circ$}{$100^\circ$}{$60^\circ$}{$135^\circ$}{$180^\circ$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2214,8 +942,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та III}{лише III}{лише I}{лише I та II}{I, II та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2227,8 +957,10 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише I та II}{лише II}{лише I}{лише III}{лише I та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2240,395 +972,23 @@
 \end{enumerate}
 }
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{лише II}{лише III}{лише I та II}{лише I та III}{лише I}
+\par\penalty-20
 \end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення \mbox{(1--3)} із його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.1]
-        % R_circ = 25 (Area 625pi). Diam = 50.
-        % AB = 30. BC = sqrt(50^2 - 30^2) = 40.
-        % O2 touches AB, BC, AD. Diameter = AB = 30. Radius r=15.
-        
-        \def\w{40}
-        \def\h{30}
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,\h);
-        \coordinate (C) at (\w,\h);
-        \coordinate (D) at (\w,0);
-        
-        \coordinate (O1) at (20,15); % Center of rect
-        \coordinate (O2) at (15,15); % Center of inscribed-like circle (r=15)
-        
-        % Circumcircle (Green)
-        \draw[thick, green!60!black] (O1) circle (25cm);
-        
-        % Inscribed-like circle (Orange)
-        \draw[thick, orange!80!black] (O2) circle (15cm);
-        
-        % Rectangle
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        
-        % Points
-        \fill (O1) circle (20pt) node[right] {$O_1$};
-        \fill (O2) circle (20pt) node[left] {$O_2$};
-        
-        % Labels
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
-    \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
-    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 5 \textit{см}. \\
-    \textbf{Б} & 10 \textit{см}. \\
-    \textbf{В} & 15 \textit{см}. \\
-    \textbf{Г} & 25 \textit{см}. \\
-    \textbf{Д} & 40 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Точка $O$ --- середина діагоналі $AC$ ромба $ABCD$ (див. рисунок). $AK$ --- висота ромба, $AK = 12$ \textit{см}, $BK = 5$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Сторона 13 (5, 12, 13).
-        % A зліва, C справа. B зверху.
-        % AK висота на BC. K на BC.
-        % B = (x, y). C = (x+13, y)? Ні, це ромб.
-        % Нехай центр (0,0). AC горизонталь? Ні, на малюнку AC горизонталь.
-        % Але AK висота.
-        % Побудуємо за розмірами.
-        
-        \coordinate (A) at (-12,0);
-        \coordinate (C) at (12,0);
-        \coordinate (O) at (0,0);
-        
-        % Для малюнка схематично:
-        \coordinate (B) at (0, 8); % Приблизно
-        \coordinate (D) at (0,-8);
-        
-        % Точка K на стороні BC. AK перпендикулярно BC.
-        % Це складно вирахувати точно для схеми, намалюємо "як бачимо".
-        \coordinate (K) at (4, 5.3); % Точка на BC
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        
-        
-        % Перемальовуємо без BD, додаємо AK
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (A) -- (K);
-        
-        % Прямий кут AKB? Ні, AK висота -> кут AKB = 90? 
-        % На малюнку K лежить на BC. Кут AKC = 90? Ні, AK perp BC.
-        % Значить кут AKB = 90.
-        
-        
-        % Позначки O
-        \draw (-6, -0.5) -- (-6, 0.5); % AO
-        \draw (6, -0.5) -- (6, 0.5);   % OC
-        
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above right] at (K) {$K$};
-        \node[below] at (O) {$O$};
-        \pic [draw, angle radius=0.3cm] {right angle = A--K--B};
-        \fill (O) circle (10pt);
-        
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Сторона ромба \\
-    \textbf{2} \quad Радіус кола, \par \quad уписаного в ромб \\
-    \textbf{3} \quad $OK$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см} \\
-    \textbf{Б} & 12 \textit{см} \\
-    \textbf{В} & $2\sqrt{13}$ \textit{см} \\
-    \textbf{Г} & 13 \textit{см} \\
-    \textbf{Д} & $4\sqrt{13}$ \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
-Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AB=12. K is vertex of isosceles right triangle on AB.
-        % Height of K from AB = AB/2 = 6.
-        % Circle touches AB, BC, AD? No, touches BC, AD, CD (right side).
-        % Drawing: AB is left side. Circle is inside right part.
-        % Center O is at distance R=6 from BC and AD. y=6.
-        % K is on the circle. K is at (6,6).
-        % Circle touches BC, AD. Radius 6.
-        % If K(6,6) is on circle, and O is (12,6), then radius is 6.
-        % So Circle touches side CD? Maybe.
-        
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,12);
-        \coordinate (C) at (18,12); % W=18
-        \coordinate (D) at (18,0);
-        
-        \coordinate (K) at (6,6);
-        \coordinate (O) at (12,6);
-        
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (O) circle (6cm);
-        \draw[thick] (A) -- (K) -- (B);
-        
-        % Right angle at K
-        \pic [draw, angle radius=0.3cm] {right angle = B--K--A};
-        
-        % Ticks on AK, BK
-        \draw ($(A)!0.5!(K)$) ++(135:0.4) -- ++(-45:0.8);
-        \draw ($(B)!0.5!(K)$) ++(45:0.4) -- ++(-135:0.8);
-        
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[right] at (K) {$K$};
-        \fill (O) circle (10pt) node[right] {$O$};
-        \fill (K) circle (10pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Початок речення} \par\par\vspace{0.2cm}
-    \textbf{1} \quad Довжина радіуса $OK$ кола дорівнює \\
-    \textbf{2} \quad Довжина відрізка $BK$ дорівнює \\
-    \textbf{3} \quad Відстань від точки $O$ до вершини $A$ дорівнює
-}{
-    \textit{Закінчення речення} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 6 \textit{см}. \\
-    \textbf{Б} & 8 \textit{см}. \\
-    \textbf{В} & $6\sqrt{2}$ \textit{см}. \\
-    \textbf{Г} & $6\sqrt{5}$ \textit{см}. \\
-    \textbf{Д} & 18 \textit{см}. \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$ й коло із центром у точці $O$, побудоване на діагоналі ромба $BD$ як на діаметрі. Точки $K$ й $N$ є точками перетину кола з діагоналлю $AC$ й стороною $CD$ відповідно. $AK = 5$ \textit{см}, $AO = 20$ \textit{см}. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\vspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
-        \coordinate (A) at (-20, 0); % AO = 20 за масштабом
-        \coordinate (C) at (20, 0);
-        \coordinate (O) at (0, 0);
-        
-        % Радіус OK = AO - AK = 20 - 5 = 15.
-        % Коло будується на BD як на діаметрі, отже BO = OD = R = 15.
-        \coordinate (B) at (0, 15);
-        \coordinate (D) at (0, -15);
-        
-        % Точка K - перетин кола з AC (зліва)
-        \coordinate (K) at (-15, 0);
-        
-        % Точка N - перетин кола зі стороною CD
-        % Це складно вирахувати точно, поставимо точку візуально на колі і стороні CD
-        % Рівняння прямої CD: y - (-15) = (15/20)*(x - 0) -> y = 0.75x - 15.
-        % Коло: x^2 + y^2 = 225.
-        % Перетин N.
-        \coordinate (N) at (14.5,-4); % Приблизні координати
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        
-        \draw[thick] (O) circle (15cm);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above] at (O) {$O$};
-        \node[above right] at (K) {$K$};
-        \node[right] at (N) {$N$};
-
-        \fill (O) circle (12pt);
-        \fill (K) circle (12pt);
-        \fill (N) circle (12pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Відрізок} \par\par\vspace{0.2cm}
-    \textbf{1} \quad $BO$ \\
-    \textbf{2} \quad $AB$ \\
-    \textbf{3} \quad $BN$
-}{
-    \textit{Довжина відрізка} \par\par\vspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & 15 \textit{см} \\
-    \textbf{Б} & 20 \textit{см} \\
-    \textbf{В} & 24 \textit{см} \\
-    \textbf{Г} & 25 \textit{см} \\
-    \textbf{Д} & 30 \textit{см} \\
-    \end{tabular}
-}{
-    \matchingGrid
-}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 38 (Кольорові фігури) ===
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $n$ і $m$ розміщено круговий сектор $ABC$, рівнобедрений трикутник $DKL$ ($DK=KL$) й паралелограм $LMNP$ (див. рисунок). Площа сектора $ABC$ дорівнює $64\pi$ \textit{см}$^2$, площа паралелограма $LMNP$ дорівнює $288$ \textit{см}$^2$, $DK = 20$ \textit{см}. Увідповідніть відрізок \mbox{(1--3)} та його довжину \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-    % Висота між прямими h.
-    % Сектор ABC: 1/4 кола. Площа = 64pi => R^2 = 256 => R=16. h=16.
-    \def\h{16}
-    
-    % Координати
-    % Сектор. Центр у точці B(0,16). A(0,0). C(16,16).
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,\h);
-    \coordinate (C) at (\h,\h);
-    
-    % Трикутник DKL. DK=20. Висота 16. Проєкція катета = sqrt(400-256) = 12.
-    % Основа DL = 24.
-    % D починається трохи правіше C. Нехай shift=4. D(20,0).
-    \coordinate (D) at (20,0);
-    \coordinate (K) at (32,\h); % 20+12
-    \coordinate (L) at (44,0);  % 32+12
-    
-    % Паралелограм LMNP. Площа 288. Висота 16. Основа LP = 288/16 = 18.
-    % L(44,0). P(62,0).
-    % Зсув верхньої сторони MN довільний (паралелограм). Нехай зсув 6.
-    % M(50,16). N(68,16).
-    \coordinate (M) at (50,\h);
-    \coordinate (P) at (62,0);
-    \coordinate (N) at (68,\h);
-    
-    % Заливка
-    % Сектор (центр B, радіус 16, кут 270..360)
-    \fill[yellow!20] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;
-    
-    % Трикутник
-    \fill[cyan!20] (D) -- (K) -- (L) -- cycle;
-    
-    % Паралелограм
-    \fill[red!20] (L) -- (M) -- (N) -- (P) -- cycle;
-    
-    % Лінії m та n
-    \draw[thick] (-2,0) -- (70,0) node[above] {$n$};
-    \draw[thick] (-2,\h) -- (70,\h) node[above] {$m$};
-    
-    % Контури фігур
-    \draw[thick] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;
-    \draw[thick] (D) -- (K) -- (L) -- cycle;
-    \draw[thick] (L) -- (M) -- (N) -- (P) -- cycle; % LMNP
-    
-    % Підписи
-    \node[below] at (A) {$A$};
-    \node[above] at (B) {$B$};
-    \node[above] at (C) {$C$};
-    \node[below] at (D) {$D$};
-    \node[above] at (K) {$K$};
-    \node[below] at (L) {$L$};
-    \node[above] at (M) {$M$};
-    \node[above] at (N) {$N$};
-    \node[below] at (P) {$P$};
-    
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\matchingLayout{
-    \textbf{1} \quad $AB$ \\
-    \textbf{2} \quad $DL$ \\
-    \textbf{3} \quad $LP$
-}{
-    \begin{tabular}{ll}
-    \textbf{А} & 12 \textit{см} \\
-    \textbf{Б} & 16 \textit{см} \\
-    \textbf{В} & 18 \textit{см} \\
-    \textbf{Г} & 20 \textit{см} \\
-    \textbf{Д} & 24 \textit{см} \\
-    \end{tabular}
-}{\matchingGrid}
-\end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №10
-\zadtask{Які з наведених тверджень є істинними? \nmtyear{2026}
-\nopagebreak\vspace{0.15cm}
+\zadtask{Які з наведених тверджень є істинними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.15cm}
 \noindent\hspace{1em}I. Пряма, що проходить через центр кола і лежить з ним в одній площині, має з ним дві спільні точки. \\
 \noindent\hspace{1em}II. Діаметр кола, перпендикулярний до хорди, проходить через середину цієї хорди. \\
 \noindent\hspace{1em}III. У колі можна провести два діаметри, які не перетинаються.}
 \answerTable{лише I і II}{лише II}{лише I}{лише II і III}{усі три}
 % Відповідь: А
 \ifshowsolutions\solution{I~--- істинне (січна через центр перетинає коло у двох точках). II~--- істинне (діаметр, перпендикулярний до хорди, ділить її навпіл). III~--- хибне (будь-які два діаметри перетинаються в центрі). Істинні I і II. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2671,10 +1031,11 @@
     \fill[gray] (0,20) circle [radius=0.3];
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\nopagebreak\vspace{0.2cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$500$}{$50$}{$1000$}{$800$}{$100$}
 % Відповідь: Г
 \ifshowsolutions\solution{Чотири вирізані чверті кола радіусом $5$ разом дають одне коло, а два долучені півкола радіусом $5$ — також одне коло; їх площі взаємно компенсуються. Тому площа фігури дорівнює площі прямокутника $ABCD$ зі сторонами $50$~м і $20$~м: $50\cdot20=1000$ (м$^2$). Відповідь: \textbf{В} ($1000$).}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2700,10 +1061,11 @@
          angle eccentricity=0.65, font=\small] {angle = P1--O--P2};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$36^\circ$}{$32^\circ$}{$24^\circ$}{$42^\circ$}{$48^\circ$}
 % Відповідь: А
 \ifshowsolutions\solution{Розгорнутий кут півкола $180^\circ$ поділено на $5$ рівних частин, тож кожна частина (і кут $\alpha$ між сусідніми радіусами) дорівнює $\dfrac{180^\circ}{5}=36^\circ$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2733,75 +1095,27 @@
     \node[below] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$6\sqrt{2}$ см}{$3\sqrt{3}$ см}{$6\sqrt{3}$ см}{$3\sqrt{2}$ см}{$3\sqrt{6}$ см}
 % Відповідь: Д
 \ifshowsolutions\solution{$\angle BKA=180^\circ-120^\circ=60^\circ$. У прямокутному трикутнику $ABK$ ($\angle A=90^\circ$): $AB=BK\sin 60^\circ=12\cdot\dfrac{\sqrt3}{2}=6\sqrt3$ --- сторона квадрата. Радіус описаного кола $R=\dfrac{a\sqrt2}{2}=\dfrac{6\sqrt3\cdot\sqrt2}{2}=3\sqrt6$ см. Відповідь: \textbf{Д}.}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 2.06, завдання №18 --- основна тема: Прямокутник
-\zadtask{Прямокутник $ABCD$ і коло з центром $O$ розташовані так, що коло дотикається до середин бічних сторін $AB$ і $CD$ та перетинає сторону $BC$ у точках $K$ і $M$ (див. рисунок). Відомо, що $BK = 3$ см, $BM = 27$ см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.2, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,18);
-    \coordinate (C) at (30,18);
-    \coordinate (D) at (30,0);
-    \coordinate (O) at (15,9);
-    \coordinate (K) at (3,18);
-    \coordinate (M) at (27,18);
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick, mainGreen] (O) circle (15);
-    \fill (O) circle (4pt); \node[below right] at (O) {$O$};
-    \fill (K) circle (4pt); \node[above] at (K) {$K$};
-    \fill (M) circle (4pt); \node[above] at (M) {$M$};
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\vspace{0.2cm}
-\noindent
-\begin{minipage}[t]{0.42\textwidth}
-\textit{Відрізок}\par\vspace{0.2cm}
-\textbf{1} \quad $KM$\\[0.25cm]
-\textbf{2} \quad $KO$\\[0.25cm]
-\textbf{3} \quad $AB$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Довжина}\par\vspace{0.2cm}
-\textbf{А} \quad $3$ см\\[0.15cm]
-\textbf{Б} \quad $15$ см\\[0.15cm]
-\textbf{В} \quad $18$ см\\[0.15cm]
-\textbf{Г} \quad $24$ см\\[0.15cm]
-\textbf{Д} \quad $30$ см
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}}
-% Відповідь: 1~--~Г, 2~--~Б, 3~--~В
-\ifshowsolutions\solution{$KM=BM-BK=27-3=24$ см -- \textbf{Г}. Коло дотикається середин $AB$ і $CD$, тож його радіус дорівнює половині сторони $BC$; за симетрією $BC=BK+KM+BK=30$, отже $r=KO=15$ см -- \textbf{Б}. Відстань від $O$ до $BC$ дорівнює $\sqrt{r^2-(KM/2)^2}=\sqrt{225-144}=9$, тому $AB=2\cdot9=18$ см -- \textbf{В}. Відповідь: \textbf{1--Г, 2--Б, 3--В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №9
-\zadnum Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadnum Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
 \item Будь-яка хорда кола більша за його радіус.
 \item Кінці діаметра кола ділять коло навпіл.
 \item Рівні хорди кола стягують рівні дуги.
 \end{enumerate}
-\nopagebreak\vspace{0.12cm}
+\nopagebreak\nbvspace{0.12cm}
 \answerTable{лише II}{лише I та II}{лише III}{лише II та III}{I, II та III}
 % Відповідь: Г
 \ifshowsolutions\solution{I~--- хибне: хорда може бути меншою за радіус. II~--- правильне: кінці діаметра ділять коло на дві рівні півкола. III~--- правильне: рівні хорди стягують рівні дуги. Отже правильні лише II та III. Відповідь: \textbf{Г}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2834,23 +1148,25 @@
     \node[font=\tiny] at (5.9,0.5) {$30^\circ$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$288$ см$^2$}{$576$ см$^2$}{$216\sqrt{3}$ см$^2$}{$288\sqrt{3}$ см$^2$}{$576\sqrt{3}$ см$^2$}
 % Відповідь: В
 \ifshowsolutions\solution{Радіус $r$ дорівнює відстані від $O$ до $AD$: $r = OD\sin30^\circ = 24\cdot\dfrac12 = 12$ см, а $OK = r = 12$. Сторона $CD$ (висота прямокутника) дорівнює діаметру: $CD = 2r = 24$ см. Відстань між паралельними $OK$ і $CD$ дорівнює $OD\cos30^\circ = 24\cdot\dfrac{\sqrt3}{2} = 12\sqrt3$. $OKCD$~--- прямокутна трапеція: $S = \dfrac{OK + CD}{2}\cdot 12\sqrt3 = \dfrac{12+24}{2}\cdot 12\sqrt3 = 216\sqrt3$ см$^2$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №9 --- також у темі: Трикутники
-\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \par\noindent\hangindent=2.2em\textbf{I.}\ \ Коло, уписане в рівнобедрений трикутник, дотикається до середини його основи.
 \par\noindent\hangindent=2.2em\textbf{II.}\ \ Центр кола, описаного навколо тупокутного трикутника, лежить усередині трикутника.
 \par\noindent\hangindent=2.2em\textbf{III.}\ \ Коло, побудоване на гіпотенузі прямокутного трикутника як на діаметрі, проходить через вершину прямого кута.
-\nopagebreak\vspace{0.15cm}
+\nopagebreak\nbvspace{0.15cm}
 \answerTable{лише I}{лише I та II}{I, II та III}{лише II та III}{лише I та III}}
 % Відповідь: Д
 \ifshowsolutions\solution{I~--- правильне (точка дотику вписаного кола з основою рівнобедреного трикутника збігається з її серединою). II~--- хибне: центр описаного кола тупокутного трикутника лежить \emph{поза} трикутником. III~--- правильне (вписаний кут, що спирається на діаметр, прямий). Правильні I та III. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2867,34 +1183,36 @@
     \filldraw[fill=white, draw=cyan!60!black, thick] (0,0) circle (0.6);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.1cm}
+\par\nbvspace{0.1cm}
 \begin{flushleft}
 \textbf{А}\ \ $S = 2\pi R - 6\pi$ \qquad \textbf{Б}\ \ $S = \pi R^2 - 6\pi$ \qquad \textbf{В}\ \ $S = \pi(R-3)^2$\\[0.15cm]
 \textbf{Г}\ \ $S = \pi R^2 + 9\pi$ \qquad \textbf{Д}\ \ $S = \pi R^2 - 9\pi$
 \end{flushleft}
 % Відповідь: Д
 \ifshowsolutions\solution{Площа кільця $=$ площа більшого круга мінус площа меншого: $S=\pi R^2-\pi\cdot3^2=\pi R^2-9\pi$. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №9 --- також у темі: Трикутники
-\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
 \item У будь-який ромб можна вписати коло.
 \item У будь-яку прямокутну трапецію можна вписати коло.
 \item У будь-якому трикутнику бісектриси кутів проходять через центр вписаного в цей трикутник кола.
 \end{enumerate}
-\nopagebreak\vspace{0.15cm}}
+\nopagebreak\nbvspace{0.15cm}}
 \answerTable{лише III}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №9 --- також у темі: Трикутники
 \noindent
 \begin{minipage}[c]{0.62\textwidth}
-\zadnum Трикутник $ABC$ вписано в коло з центром у точці $O$, що належить стороні $AC$ (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
+\zadnum Трикутник $ABC$ вписано в коло з центром у точці $O$, що належить стороні $AC$ (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=2pt]
 \item $\angle ABC$ є прямим.
 \item $\angle BAC$ вдвічі менший від $\angle BOC$.
@@ -2919,8 +1237,9 @@
     \node[above right] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2950,8 +1269,9 @@
     \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=1.6, font=\scriptsize] {angle = B--D--K};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$144$~см$^2$}{$288$~см$^2$}{$108\sqrt{3}$~см$^2$}{$216\sqrt{3}$~см$^2$}{$144\sqrt{3}$~см$^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -2982,14 +1302,15 @@
     \node[above right, xshift=-0.05cm] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$10^\circ$}{$20^\circ$}{$30^\circ$}{$40^\circ$}{$45^\circ$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №14 --- основна тема: Ромб
-\zadtask{У ромб $ABCD$ вписано коло із центром $O$, відрізок $OK$~--- радіус цього кола, відрізок $BD$~--- діагональ ромба (див. рисунок). Визначте площу ромба $ABCD$, якщо $OK = 6$~см, а $\angle CDB = 75^\circ$. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
+\zadtask{У ромб $ABCD$ вписано коло із центром $O$, відрізок $OK$~--- радіус цього кола, відрізок $BD$~--- діагональ ромба (див. рисунок). Визначте площу ромба $ABCD$, якщо $OK = 6$~см, а $\angle CDB = 75^\circ$. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.1, thick, line join=round]
     \coordinate (O) at (0,0);
@@ -3012,14 +1333,1875 @@
     \node[below left] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\nopagebreak\vspace{0.1cm}}
+\nopagebreak\nbvspace{0.1cm}}
 \answerTable{$144\sqrt{3}$~см$^2$}{$144$~см$^2$}{$96\sqrt{3}$~см$^2$}{$288$~см$^2$}{$288\sqrt{3}$~см$^2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 17.06, завдання №9
+\zadtask{Які з наведених тверджень щодо кола є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
+\item Дуга кола~--- це відрізок, який сполучає $2$ точки на колі.
+\item Центральний кут~--- це кут, вершина якого лежить на колі.
+\item Вписаний кут, що спирається на діаметр,~--- прямий.
+\end{enumerate}
+\nopagebreak\nbvspace{0.1cm}}
+\answerTable{лише I}{лише II}{лише III}{лише I та III}{лише II та III}
+% Відповідь: В
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №14 --- основна тема: Трикутники
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На катеті $CB$ прямокутного трикутника $ABC$ вибрано точку $O$ так, що півколо з центром у точці $O$ дотикається катета $AC$ в точці $C$, а гіпотенузи $AB$~--- у точці $K$. $OB = 6$~см, $\angle COK = 120^\circ$. Визначте довжину відрізка $AC$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.62, thick, line join=round]
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (6,0);
+    \coordinate (A) at (0,3.46);
+    \coordinate (O) at (2,0);
+    % K точка дотику на AB
+    \coordinate (K) at ($(A)!(O)!(B)$);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (O) -- (K);
+    \draw (2,0) ++(0:2) arc (0:180:2);
+    \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
+    \pic[draw, angle radius=0.4cm, pic text={\scriptsize $120^\circ$}, angle eccentricity=1.7] {angle = K--O--C};
+    \node[above left] at (A) {$A$};
+    \node[below left] at (C) {$C$};
+    \node[below right] at (B) {$B$};
+    \node[below] at (O) {$O$};
+    \node[above right] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\answerTable{$3$~см}{$3\sqrt{3}$~см}{$6\sqrt{3}$~см}{$9$~см}{$9\sqrt{3}$~см}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 19.06, завдання №9 --- також у темі: Трикутники
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
+\item Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.
+\item Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.
+\item У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.
+\end{enumerate}
+\nopagebreak\nbvspace{0.1cm}}
+\answerTable{лише II}{лише III}{лише I та II}{лише I та III}{I, II та III}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено ромб $ABCD$ та коло, побудоване на його меншій діагоналі $BD$ так, як на діаметрі. Точка $K$ --- точка перетину цього кола з діагоналлю $AC$, $AK = 5$ \textit{см}, $KC = 35$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+        % AC = 40. Center of Rhombus O (mid of AC) is at 20.
+        % K is at 5 from A. A=(0,0), C=(40,0). K=(5,0).
+        % O=(20,0).
+        % Circle on BD as diameter. Center is O.
+        % K is on the circle? No, K is intersection of circle and AC.
+        % So distance OK is radius. OK = 20 - 5 = 15.
+        % Radius = 15. BD = 30. BO = 15.
+        % A=(0,0), O=(20,0), B=(20,15).
+        % AB = sqrt(20^2 + 15^2) = sqrt(400+225) = sqrt(625) = 25.
+
+        \coordinate (A) at (0,0);
+        \coordinate (C) at (40,0);
+        \coordinate (O) at (20,0);
+        \coordinate (B) at (20,15);
+        \coordinate (D) at (20,-15);
+        \coordinate (K) at (5,0); % Actually on the left side
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (B) -- (D);
+
+        \draw[thick] (O) circle (15cm);
+
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above right] at (K) {$K$};
+        \fill (K) circle (15pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Величина} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad діаметр заданого кола \\
+    \textbf{2} \quad довжина сторони ромба $ABCD$ \\
+    \textbf{3} \quad висота ромба $ABCD$
+}{
+    \textit{Значення величини} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 15 \textit{см} \\
+    \textbf{Б} & 20 \textit{см} \\
+    \textbf{В} & 24 \textit{см} \\
+    \textbf{Г} & 25 \textit{см} \\
+    \textbf{Д} & 30 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 4 (Середини сторін K і M) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$. Точки $K$ і $M$ --- відповідно середини сторін $AB$ і $BC$, $AB = 12$ \textit{см}, $MC = 8$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+        % AB=12, BC=16 (MC=8 => BC=16)
+        % A(0,0) - ні, нехай B буде верхній лівий, як зазвичай A внизу.
+        % За рисунком: A внизу зліва. B зверху зліва.
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,12);
+        \coordinate (C) at (16,12);
+        \coordinate (D) at (16,0);
+
+        \coordinate (K) at (0,6); % Середина AB
+        \coordinate (M) at (8,12); % Середина BC (8, 12)
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (K) -- (M) -- (C); % Лінія на рисунку йде від A до K, потім до M, потім C?
+        % На рисунку просто точки. Проведемо лінію AK і MC для візуалізації, як на скріншоті.
+        % На скріншоті відрізки: AK з'єднано з M? Ні.
+        % Просто позначено рівність відрізків.
+
+        % Позначки рівності
+        \draw (-0.5,3) -- (0.5,3); % AK
+        \draw (-0.5,9) -- (0.5,9); % KB
+        \draw[thick] (A)  -- (C);
+        \draw (4,11.5) -- (4,12.5); \draw (4.2,11.5) -- (4.2,12.5); % BM
+        \draw (12,11.5) -- (12,12.5); \draw (12.2,11.5) -- (12.2,12.5); % MC
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[left] at (K) {$K$};
+        \node[above] at (M) {$M$};
+
+        \fill (K) circle (10pt);
+        \fill (M) circle (10pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $BC$ \\
+    \textbf{2} \quad діаметр кола, описаного навколо прямокутника $ABCD$ \\
+    \textbf{3} \quad відстань від точки $D$ до середини $KM$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 15 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & 18 \textit{см} \\
+    \textbf{Д} & 20 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 5 (Коло і півколо) ===
+\noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
+У прямокутник $ABCD$ вписано коло із центром в точці $O$, яке дотикається до сторін $AB$, $BC$ і $AD$, та півколо з діаметром $CD$ (див. рисунок). Коло й півколо мають лише одну спільну точку. $AB = 8$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        % AB=8. Коло R=4. Центр O(4,4).
+        % BC=12. Півколо на CD. R=4. Центр (12,4).
+        % Дотикаються в точці (8,4).
+
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,8);
+        \coordinate (C) at (12,8);
+        \coordinate (D) at (12,0);
+        \coordinate (O) at (4,4);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+        % Коло
+        \draw[thick] (O) circle (4cm);
+
+        % Півколо (дуга від C до D зліва)
+        \draw[thick] (C) arc (90:270:4cm);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node at (O) {$\cdot$};
+        \node[below right] at (O) {$O$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина сторони $BC$ \\
+    \textbf{2} \quad Довжина відрізка $OC$ \\
+    \textbf{3} \quad Відстань від середини відрізка $AO$ до прямої $CD$
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 10 \textit{см}. \\
+    \textbf{Б} & дорівнює 12 \textit{см}. \\
+    \textbf{В} & дорівнює 16 \textit{см}. \\
+    \textbf{Г} & дорівнює $4\sqrt{5}$ \textit{см}. \\
+    \textbf{Д} & дорівнює $4\sqrt{3}$ \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У ромб, менша діагональ якого $30$ \textit{см}, вписано коло радіуса $12$ \textit{см} (див. рисунок). До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+        \coordinate (A) at (-15,0); % Половина діагоналі
+        \coordinate (C) at (15,0);
+        \coordinate (B) at (0,20); % Знайдено з пропорцій (12, 15, 20)
+        \coordinate (D) at (0,-20);
+        \coordinate (O) at (0,0);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (O) circle (12cm);
+
+        % Діагоналі (тонкі, як на рисунку немає, але для розуміння центру)
+        %\draw[gray, thin] (A)--(C); \draw[gray, thin] (B)--(D);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Величина} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad висота ромба \\
+    \textbf{2} \quad проєкція меншої діагоналі на сторону ромба \\
+    \textbf{3} \quad сторона ромба
+}{
+    \textit{Значення величини} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 18 \textit{см} \\
+    \textbf{Б} & 20 \textit{см} \\
+    \textbf{В} & 24 \textit{см} \\
+    \textbf{Г} & 25 \textit{см} \\
+    \textbf{Д} & 30 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутному трикутнику $ACB$ $\angle C = 90^\circ, \angle B = 24^\circ$. На продовжені катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+        \coordinate (C) at (0,0);
+        \coordinate (B) at (4,0);
+        \coordinate (A) at (0,2); % CA < CB visually
+        % K is on extension of AC downwards.
+        % AK = KB. Let K = (0, y_k). A = (0, 2). B = (4, 0).
+        % AK = 2 - y_k (since y_k < 0).
+        % KB = sqrt(4^2 + y_k^2).
+        % (2 - y_k)^2 = 16 + y_k^2
+        % 4 - 4y_k + y_k^2 = 16 + y_k^2
+        % -4y_k = 12 => y_k = -3.
+        \coordinate (K) at (0,-3);
+
+        \draw[thick] (K) -- (A) -- (B) -- cycle; % Triangle ABK
+        \draw[thick] (K) -- (B); 
+        \draw[thick] (C) -- (B); % Leg CB
+
+        % Right angle at C
+        \draw (0,0) rectangle (0.3,0.3);
+
+        % Mark AK = KB?
+        % Visual marks
+        \draw[thick] ($(A)!0.5!(K)$) ++(0.15,0) -- ++(-0.3,0);
+        \draw[thick] ($(K)!0.5!(B)$) ++(120:0.15) -- ++(-60:0.3);
+
+        % Angle 24
+        \pic [draw, pic text={\small $24^\circ$}, angle radius=.5cm, angle eccentricity=1.8] {angle = A--B--C};
+
+        \node[left] at (A) {$A$};
+        \node[left] at (C) {$C$};
+        \node[left] at (K) {$K$};
+        \node[right] at (B) {$B$};
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Кут} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $\angle BAC$ \\
+    \textbf{2} \quad $\angle KBC$ \\
+    \textbf{3} \quad $\angle OKB$
+}{
+    \textit{Градусна міра кута} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $24^\circ$ \\
+    \textbf{Б} & $34^\circ$ \\
+    \textbf{В} & $42^\circ$ \\
+    \textbf{Г} & $66^\circ$ \\
+    \textbf{Д} & $72^\circ$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90^\circ, \angle B = 32^\circ$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+        \coordinate (C) at (0,0);
+        \coordinate (A) at (0,3);
+        \coordinate (B) at (5,0);
+
+        % K on BC. AK = KB.
+        % Let K = (x, 0).
+        % AK^2 = x^2 + 3^2. KB^2 = (5-x)^2.
+        % x^2 + 9 = 25 - 10x + x^2.
+        % 10x = 16 => x = 1.6.
+        \coordinate (K) at (1.6, 0);
+
+        \draw[thick] (A) -- (C) -- (B) -- cycle;
+        \draw[thick] (A) -- (K);
+
+        % Marks AK = KB
+        \draw[thick] ($(A)!0.5!(K)$) ++(150:0.15) -- ++(-30:0.3);
+        \draw[thick] ($(K)!0.5!(B)$) ++(90:0.15) -- ++(-90:0.3);
+
+        % Right angle
+        \draw (0,0) rectangle (0.3,0.3);
+
+        % Angle 32
+        \pic [draw, pic text={\small $32^\circ$}, angle radius=1.0cm, angle eccentricity=1.4] {angle = A--B--C};
+
+        \node[above] at (A) {$A$};
+        \node[below] at (C) {$C$};
+        \node[below] at (K) {$K$};
+        \node[below] at (B) {$B$};
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Кут} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $\angle KAB$ \\
+    \textbf{2} \quad $\angle KAC$ \\
+    \textbf{3} \quad $\angle OKB$
+}{
+    \textit{Градусна міра кута} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $24^\circ$ \\
+    \textbf{Б} & $26^\circ$ \\
+    \textbf{В} & $32^\circ$ \\
+    \textbf{Г} & $58^\circ$ \\
+    \textbf{Д} & $64^\circ$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено коло з центром у точці $O$, $AB$ --- діаметр цього кола. Пряма $a$ --- дотична до цього кола, що перетинає продовження діаметра $AB$ у точці $K$, $C$ --- точка дотику. Установіть відповідність між величиною \mbox{(1--3)} та її значенням \mbox{(А--Д)}, якщо дуга $AC = 130^\circ$. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
+        \coordinate (O) at (0,0);
+        \draw[thick] (O) circle (1.5cm);
+        \coordinate (L) at (-1.5,2);
+        \coordinate (A) at (-1.5,0);
+        \coordinate (B) at (1.5,0);
+        \coordinate (K) at (3.5,0);
+
+        % Tangent from K.
+        % OK = 3.5, R=1.5. Angle COK = arccos(1.5/3.5) approx 64.6 deg.
+        % C is at (1.5*cos(64.6), 1.5*sin(64.6)).
+        \coordinate (C) at (64.6:1.5);
+
+        \draw[thick] (A) -- (K);
+        \draw[thick] (L) -- (C);
+        \draw[thick] (C) -- (K) node[midway, above right] {$a$};
+        \draw[thick] (O) -- (C);
+
+        % Bold arc AC
+        \draw[very thick] (A) arc (180:64.6:1.5);
+
+        \node[left] at (A) {$A$};
+        \node[below right] at (B) {$B$}; % B is slightly covered by line
+        \node[below] at (O) {$O$};
+        \node[above] at (K) {$K$};
+        \node[above right] at (C) {$C$};
+
+        \fill (O) circle (1.5pt);
+        \fill (A) circle (1.5pt);
+        \fill (B) circle (1.5pt);
+        \fill (K) circle (1.5pt);
+        \fill (C) circle (1.5pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Величина} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad дуга $CB$ \\
+    \textbf{2} \quad $\angle CKA$ \\
+    \textbf{3} \quad $\angle ABC$
+}{
+    \textit{Значення величини} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $30^\circ$ \\
+    \textbf{Б} & $40^\circ$ \\
+    \textbf{В} & $50^\circ$ \\
+    \textbf{Г} & $65^\circ$ \\
+    \textbf{Д} & $70^\circ$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Периметр рівнобедреного трикутника (див. рисунок) дорівнює $32$ \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % AB=BC=10. P=32. AC = 32 - 20 = 12.
+        % Height h = sqrt(100 - 36) = 8.
+        \coordinate (A) at (-6,0);
+        \coordinate (C) at (6,0);
+        \coordinate (B) at (0,8);
+
+        \draw[thick] (A) -- (B) -- (C) -- cycle;
+
+        % Marks
+        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.3) -- ++(-30:0.6);
+        \draw[thick] ($(B)!0.5!(C)$) ++(30:0.3) -- ++(-150:0.6);
+
+        \node[below left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[below right] at (C) {$C$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $AC$ \\
+    \textbf{2} \quad висота, проведена з \par \quad вершини $B$ \\
+    \textbf{3} \quad радіус кола, \par \quad описаного навколо \par \quad трикутника $ABC$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6{,}25 \textit{см} \\
+    \textbf{Б} & 7{,}5 \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 12 \textit{см} \\
+    \textbf{Д} & 12{,}5 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Ромб $ABCD$ та коло із центром у точці $O$, довжина якого $12\pi$ \textit{см}, лежать в одній площині (див. рисунок). Сторона ромба $AB$ перетинає коло в точці $K$, $AD$ --- діаметр кола, $AK = OA$. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.2]
+        % Довжина 12pi -> R=6. AD=12. O - центр AD.
+        % AK = OA = 6. O=(6,0), A=(0,0), D=(12,0).
+        % Трикутник AOK: AO=6, OK=6(радіус), AK=6. Рівносторонній.
+        % Кут A = 60 градусів.
+        % Ромб ABCD зі стороною 12 і кутом 60.
+
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (12,0);
+        \coordinate (O) at (6,0);
+
+        % Точка B (кут 60, сторона 12)
+        \coordinate (B) at (60:12);
+        \coordinate (C) at ($(D)+(B)-(A)$);
+
+        % Точка K (перетин AB і кола). Оскільки A=60, R=6, AK=6.
+        \coordinate (K) at (60:6);
+
+        % Коло
+        \draw[thick] (O) circle (6cm);
+
+        % Ромб
+        \draw[thick] (A) -- (B) -- (C) -- (D); % Нижня частина перекривається колом?
+        % На рисунку коло малюється поверх сторони AD?
+        % А, AD - діаметр. Значить AD лежить на осі.
+        \draw[thick] (A) -- (D); 
+
+        % Відрізок OK
+        \draw[thick] (O) -- (K);
+
+        % Позначки рівності AK = AO
+        \draw (3, -0.2) -- (3, 0.2); % AO
+        \draw (60:3) ++(150:0.2) -- ++(-30:0.4); % AK
+        \draw ($(O)!0.5!(K)$) ++(60:0.2) -- ++(240:0.4); % OK (теж радіус, але в умові AK=OA)
+
+        % Точки
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[right] at (D) {$D$};
+        \node[above left] at (K) {$K$};
+        \node[below] at (O) {$O$};
+
+        \fill (O) circle (10pt);
+        \fill (K) circle (10pt);
+        \fill (A) circle (10pt);
+        \fill (D) circle (10pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина радіуса $OA$ \\
+    \textbf{2} \quad Довжина діагоналі $BD$ ромба $ABCD$ \\
+    \textbf{3} \quad Довжина висоти ромба
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 6 \textit{см}. \\
+    \textbf{Б} & дорівнює $6\sqrt{3}$ \textit{см}. \\
+    \textbf{В} & дорівнює 12 \textit{см}. \\
+    \textbf{Г} & дорівнює $6\sqrt{2}$ \textit{см}. \\
+    \textbf{Д} & дорівнює $12\sqrt{3}$ \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90^\circ$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        \coordinate (C) at (0,0);
+        \coordinate (B) at (16,0);
+        % R=10 -> Hypotenuse AB=20.
+        % AC = sqrt(400 - 256) = 12.
+        \coordinate (A) at (0,12);
+
+        % M is midpoint of CB
+        \coordinate (M) at (8,0);
+
+        \draw[thick] (A) -- (C) -- (B) -- cycle;
+        \draw[thick] (A) -- (M);
+
+        % Right angle
+        \draw (C) rectangle ++(1.5,1.5);
+
+        % Marks for CM = MB
+        \draw[thick] (4, -0.3) -- (4, 0.3);
+        \draw[thick] (12, -0.3) -- (12, 0.3);
+
+        \node[left] at (A) {$A$};
+        \node[below left] at (C) {$C$};
+        \node[below] at (M) {$M$};
+        \node[below right] at (B) {$B$};
+
+        \fill (M) circle (7pt);
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $AC$ \\
+    \textbf{2} \quad найбільша середня \par \quad лінія трикутника $ABC$ \\
+    \textbf{3} \quad $AM$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 10 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & 16 \textit{см} \\
+    \textbf{Г} & $4\sqrt{11}$ \textit{см} \\
+    \textbf{Д} & $4\sqrt{13}$ \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Навколо кола описано рівнобічну трапецію (див. рисунок), периметр якої дорівнює $100$ \textit{см}. Різниця основ трапеції дорівнює $14$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+        % Circumscribed isosceles trapezoid.
+        % Sum of bases = Sum of legs = Perimeter / 2 = 50.
+        % a + b = 50. a - b = 14.
+        % 2a = 64 -> a = 32 (bottom). b = 18 (top).
+        % c = 25.
+        % Height h = sqrt(c^2 - ((a-b)/2)^2) = sqrt(25^2 - 7^2) = sqrt(625-49) = sqrt(576) = 24.
+        % Radius = 12.
+
+        \coordinate (O) at (0,12);
+        \coordinate (A) at (-16,0);
+        \coordinate (D) at (16,0);
+        \coordinate (B) at (-9,24);
+        \coordinate (C) at (9,24);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (O) circle (12cm);
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина середньої лінії \par \quad трапеції \\
+    \textbf{2} \quad Довжина більшої основи \par \quad трапеції \\
+    \textbf{3} \quad Довжина висоти трапеції
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 18 \textit{см}. \\
+    \textbf{Б} & дорівнює 24 \textit{см}. \\
+    \textbf{В} & дорівнює 25 \textit{см}. \\
+    \textbf{Г} & дорівнює 32 \textit{см}. \\
+    \textbf{Д} & дорівнює 36 \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено ромб $ABCD$, у який вписано коло з центром у точці $O$. З тупого кута $B$ на сторону $AD$ проведено висоту $BK$, коло дотикається до сторони $AD$ у точці $M$. $AK = 7$ \textit{см}, $KM = 9$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % AK = 7, KM = 9. M - точка дотику.
+        % У ромбі точка дотику M ділить сторону.
+        % Центр O проектується в M. OM perp AD.
+        % BK - висота. BK || OM. OM = R. BK = 2R.
+        % У трикутнику OAM...
+        % Нехай це просто рисунок.
+        % A=(0,0). K=(7,0). M=(16,0). (AK+KM=16).
+        % Висота h. B = (7, h).
+        % AB^2 = AK^2 + BK^2 = 49 + h^2.
+        % Також AM = AB - MD? Ні. Властивість дотичної: AM = ...
+        % Для малювання: приймемо h = 24 (наприклад).
+
+        \coordinate (A) at (0,0);
+        \coordinate (K) at (7,0);
+        \coordinate (M) at (10.5,0);
+        \coordinate (D) at (14,0); % AD прибл.
+        \coordinate (B) at (7,12); % Висота прибл.
+        \coordinate (C) at (21,12);
+
+        % Центр O: середина висоти (y=9), по x: M=(16,0) -> O=(16,9).
+        \coordinate (O) at (10.5,6);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (K);
+        \draw[thick] (O) circle (6cm);
+
+        % Прямий кут
+        \pic [draw, angle radius=0.3cm] {right angle = B--K--D};
+
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[below] at (K) {$K$};
+        \node[below] at (M) {$M$};
+        \node[right] at (O) {$O$};
+
+        \fill (O) circle (4pt);
+        \fill (M) circle (4pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $AD$ \\
+    \textbf{2} \quad $BK$ \\
+    \textbf{3} \quad $OM$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 12 \textit{см} \\
+    \textbf{Б} & 15 \textit{см} \\
+    \textbf{В} & 20 \textit{см} \\
+    \textbf{Г} & 24 \textit{см} \\
+    \textbf{Д} & 25 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$, площа якого $144$ \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,10);
+        \coordinate (C) at (10,10);
+        \coordinate (D) at (10,0);
+
+        \coordinate (K) at (5,10);
+        \coordinate (M) at (10,5);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (K) -- (M);
+        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
+
+        % Позначки середин
+        \draw (2.5, 9.8) -- (2.5, 10.2);
+        \draw (7.5, 9.8) -- (7.5, 10.2);
+
+        \draw (9.8, 7.5) -- (10.2, 7.5);
+        \draw (9.8, 2.5) -- (10.2, 2.5);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (K) {$K$};
+        \node[right] at (M) {$M$};
+
+        \fill (K) circle (5pt);
+        \fill (M) circle (5pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad сторона квадрата \\
+    \textbf{2} \quad $KM$ \\
+    \textbf{3} \quad відстань від точки $A$ до центра кола, описаного навколо трикутника $KMC$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & $6\sqrt{2}$ \textit{см} \\
+    \textbf{В} & 12 \textit{см} \\
+    \textbf{Г} & $8\sqrt{2}$ \textit{см} \\
+    \textbf{Д} & $9\sqrt{2}$ \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        % P=24 => сторона 6.
+        % Трапеція AKCD. Основи AK і CD. CD=6. Середня лінія 10 -> AK+6 = 20 -> AK=14.
+        % BK = 14-6 = 8.
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (6,0);
+        \coordinate (C) at (6,6);
+        \coordinate (B) at (0,6);
+        \coordinate (K) at (0,14);
+
+        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Контур трапеції
+        \draw[thick] (B) -- (C); % Верхня сторона квадрата
+
+        % Прямий кут
+        \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
+
+        \node[left] at (A) {$A$};
+        \node[below right] at (D) {$D$};
+        \node[right] at (C) {$C$};
+        \node[left] at (B) {$B$};
+        \node[left] at (K) {$K$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $BK$ \\
+    \textbf{2} \quad $KC$ \\
+    \textbf{3} \quad відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & 7 \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 9 \textit{см} \\
+    \textbf{Д} & 10 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Навколо кола радіуса $4$ \textit{см} описано рівнобічну трапецію, середня лінія якої дорівнює $10$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}.\nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+        % R=4, h=8. Midline=10 => a+b=20.
+        % Inscribed => a+b = 2c => 2c=20 => c=10.
+        % Leg c=10. Height h=8. Projection x=6.
+        % b = a - 12. 2a - 12 = 20 => 2a=32 => a=16. b=4.
+
+        \coordinate (O) at (0,4);
+        \coordinate (A) at (-8,0);
+        \coordinate (D) at (8,0);
+        \coordinate (B) at (-2,8);
+        \coordinate (C) at (2,8);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (O) circle (4cm);
+
+        % Візуально:
+        % Нижня основа 16 (від -8 до 8).
+        % Верхня основа 4 (від -2 до 2).
+        % Висота 8.
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Висота трапеції \\
+    \textbf{2} \quad Бічна сторона трапеції \\
+    \textbf{3} \quad Більша основа трапеції
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 8 \textit{см} \\
+    \textbf{Б} & 10 \textit{см} \\
+    \textbf{В} & 12 \textit{см} \\
+    \textbf{Г} & 16 \textit{см} \\
+    \textbf{Д} & 20 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Точка $O$ --- центр кола, зображеного на рисунку. До цього кола проведено дотичну $KB$, $B$ --- точка дотику. На колі вибрано точки $A$ і $C$ так, що $AB = BC$, $\angle ABC = 50^\circ$. Установіть відповідність між кутом \mbox{(1--3)} та його градусною мірою \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+        \coordinate (O) at (0,0);
+        \draw[thick] (O) circle (1.5cm);
+
+        % B at top (90 deg)
+        \coordinate (B) at (90:1.5);
+        \coordinate (K) at (-2.5, 1.5);
+        \draw[thick] (K) -- (2.5, 1.5); % Tangent line
+
+        % Inscribed isosceles triangle ABC. AB=BC.
+        % Angle ABC = 50.
+        % Arc AC corresponds to 50? No, inscribed angle B=50 means Arc AC = 100.
+        % Remaining arc = 260. Arc AB = Arc BC = 130.
+        % B is at 90. A is at 90+130 = 220. C is at 90-130 = -40 (320).
+        \coordinate (A) at (220:1.5);
+        \coordinate (C) at (320:1.5);
+
+        \draw[thick] (A) -- (B) -- (C);
+        \draw[thick] (A) -- (O);
+        \draw[thick] (C) -- (O);
+
+        % Angle 50
+        \pic [draw, pic text={\scriptsize $50^\circ$}, angle radius=0.4cm, angle eccentricity=1.8] {angle = A--B--C};
+
+        % Marks for AB = BC
+        \draw[thick] ($(A)!0.5!(B)$) ++(160:0.1) -- ++(-20:0.2);
+        \draw[thick] ($(B)!0.5!(C)$) ++(20:0.1) -- ++(-160:0.2);
+
+        \node[above] at (K) {$K$};
+        \node[above] at (B) {$B$};
+        \node[below left] at (A) {$A$};
+        \node[below right] at (C) {$C$};
+        \node[below] at (O) {$O$};
+
+        \fill (O) circle (1.5pt);
+        \fill (A) circle (1.5pt);
+        \fill (B) circle (1.5pt);
+        \fill (C) circle (1.5pt);
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Кут} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $\angle AOC$ \\
+    \textbf{2} \quad $\angle BOC$ \\
+    \textbf{3} \quad $\angle KBA$
+}{
+    \textit{Градусна міра кута} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $50^\circ$ \\
+    \textbf{Б} & $65^\circ$ \\
+    \textbf{В} & $100^\circ$ \\
+    \textbf{Г} & $90^\circ$ \\
+    \textbf{Д} & $130^\circ$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника, друге коло з центром у точці $O_2$, довжиною $16\pi$ \textit{см}, дотикається до сторін $AB$, $BC$ та $AD$. $BC = 30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+        % Circle 2 length 16pi -> R=8. Diameter 16.
+        % Touches AB, BC, AD -> Height AB = 16.
+        % Width BC = 30.
+        \def\w{30}
+        \def\h{16}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\h);
+        \coordinate (C) at (\w,\h);
+        \coordinate (D) at (\w,0);
+
+        % Center O2: r=8 from AB, r=8 from AD. (8,8)
+        \coordinate (O2) at (8,8);
+
+        % Center O1: Midpoint of rect (15,8)
+        \coordinate (O1) at (15,8);
+
+        % Circumcircle radius: sqrt(15^2+8^2) = 17.
+
+        % Draw Circumcircle (O1) - Green
+        \draw[thick, green!60!black] (O1) circle (17);
+
+        % Draw Inscribed-like Circle (O2) - Orange
+        \draw[thick, orange!80!black] (O2) circle (8);
+
+        % Draw Rectangle
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+        % Points
+        \fill (O1) circle (15pt) node[right] {$O_1$};
+        \fill (O2) circle (15pt) node[left] {$O_2$};
+
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[above] at (15, \h) {30 \textit{см}};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина сторони $AB$ дорівнює \\
+    \textbf{2} \quad Довжина радіуса кола, описаного навколо прямокутника $ABCD$ дорівнює \\
+    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 7 \textit{см}. \\
+    \textbf{Б} & 9 \textit{см}. \\
+    \textbf{В} & 12 \textit{см}. \\
+    \textbf{Г} & 16 \textit{см}. \\
+    \textbf{Д} & 17 \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
+Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Геометрична фігура} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad ромб з висотою $4$ \textit{см} \\
+    \textbf{2} \quad трикутник з площею $24$ \textit{см}$^2$ та периметром $12$ \textit{см} \\
+    \textbf{3} \quad квадрат з периметром $64$ \textit{см}
+}{
+    \textit{Радіус кола, вписаного у фігуру} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 4 \textit{см} \\
+    \textbf{Б} & $\sqrt{3}$ \textit{см} \\
+    \textbf{В} & 8 \textit{см} \\
+    \textbf{Г} & 6 \textit{см} \\
+    \textbf{Д} & 2 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
+Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L, N, P$ належать прямій $m$, а точки $K, M, Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого $156$. Установіть відповідність між відрізом \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+
+\nmtnobreak
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+        \def\h{12}
+        \draw[thick] (-2,0) -- (50,0) node[above] {$n$};
+        \draw[thick] (-2,\h) -- (50,\h) node[above] {$m$};
+
+        % Коло
+        \draw[thick] (6,6) circle (6cm);
+
+        % Трикутник
+        \coordinate (K) at (14,0);
+        \coordinate (M) at (24,0); % Схематично
+        \coordinate (L) at (19,\h);
+        \draw[thick] (K) -- (L) -- (M) -- cycle;
+
+        % Ромб
+        % M спільна точка? Ні, точки K, M, Q на прямій.
+        % M - вершина трикутника і ромба? Так, MNPQ.
+        \coordinate (N) at (29,\h);
+        \coordinate (Q) at (37,0); % Сторона 13
+        \coordinate (P) at (42,\h);
+
+        \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
+
+        % Підписи
+        \node[below] at (K) {$K$};
+        \node[above] at (L) {$L$};
+        \node[below] at (M) {$M$};
+        \node[above] at (N) {$N$};
+        \node[above] at (P) {$P$};
+        \node[below] at (Q) {$Q$};
+
+    \end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad діаметр круга \\
+    \textbf{2} \quad довжина сторони трикутника $KLM$ \\
+    \textbf{3} \quad довжина сторони ромба $MNPQ$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & $8\sqrt{3}$ \\
+    \textbf{Б} & 6 \\
+    \textbf{В} & 12 \\
+    \textbf{Г} & 13 \\
+    \textbf{Д} & 15 \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ і кругові сектори $BCL$ та $KAD$, що мають одну спільну точку $M$. $N$ --- проєкція точки $M$ на пряму $AB$, $BC = 12$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % Centers are A and C. Radius 12.
+        % AB = 12*sqrt(3) approx 20.8
+        \def\r{12}
+        \def\w{20.78}
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (\w,0);
+        \coordinate (B) at (0,\r); % BC is width? No, BC=12. So height is 12?
+        % Text: BC=12. Drawing shows BC as top side. Usually AB is height, BC width.
+        % If BC=12 is width. Then Rect is 12 wide.
+        % Let's assume standard orientation: AB vertical, BC horizontal.
+        % Then Center C (top right). Radius CB = 12 (height).
+        % Center A (bottom left). Radius AD = 12 (width).
+        % Touch at M. Diagonal AC = 24.
+        % AC^2 = AB^2 + BC^2 => 576 = AB^2 + 144 => AB^2 = 432 => AB = 12sqrt(3).
+        % So Height AB = 20.8, Width BC = 12.
+
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,20.78);
+        \coordinate (C) at (12,20.78);
+        \coordinate (D) at (12,0);
+
+        % Fill gray
+        \fill[white!30] (A) -- (B) -- (C) -- (D) -- cycle;
+
+        % Sector KAD (Center A, radius 12?) No, K is on AB.
+        % Drawing shows Sector KAD. K on AB. D is corner.
+        % If center is A, radius is AD = 12.
+        % Arc from D to K.
+        \coordinate (K) at (0, 12);
+        \fill[gray!30] (A) -- (D) arc (0:90:12) -- cycle;
+        \draw[thick] (D) arc (0:90:12);
+
+        % Sector BCL (Center C, radius 12?) L is on CD.
+        % Drawing shows Sector BCL. B is corner.
+        % If center is C, radius CB = 12.
+        % Arc from B to L.
+        \coordinate (L) at (12, 8.78); % 20.78 - 12
+        \fill[gray!30] (C) -- (B) arc (180:270:12) -- cycle;
+        \draw[thick] (B) arc (180:270:12);
+
+        % Point M (intersection)
+        \coordinate (M) at (intersection of A--C and 0,12--12,12); % Rough
+        % Exact M is midpoint of AC. (6, 10.39)
+        \coordinate (M) at (6, 10.39);
+
+        % Projection N on AB. N = (0, 10.39).
+        \coordinate (N) at (0, 10.39);
+
+        % Lines
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C); % Diagonal
+        \draw[thick] (M) -- (N);
+
+        % Right angle at N
+        \draw (0, 10.39) rectangle ++(1, -1);
+
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[left] at (K) {$K$};
+        \node[right] at (L) {$L$};
+        \node[above] at (M) {$M$};
+        \node[left] at (N) {$N$};
+
+        \fill (M) circle (15pt);
+        \fill (N) circle (15pt);
+        \fill (K) circle (10pt);
+        \fill (L) circle (10pt);
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина $AN$ \\
+    \textbf{2} \quad Довжина $AB$ \\
+    \textbf{3} \quad Довжина $AC$
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & дорівнює 24 \textit{см}. \\
+    \textbf{Б} & дорівнює 18 \textit{см}. \\
+    \textbf{В} & дорівнює $8\sqrt{3}$ \textit{см}. \\
+    \textbf{Г} & дорівнює $6\sqrt{3}$ \textit{см}. \\
+    \textbf{Д} & є натуральним числом. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Діагональ $AC$ рівнобічної трапеції $ABCD$ утворює зі стороною $CD$ кут $120^\circ$ (див. рисунок). Довжини основ трапеції дорівнюють $12$ \textit{см} і $30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+        \coordinate (A) at (-15,0);
+        \coordinate (D) at (15,0);
+        % Bases 30 and 12. Top base centered.
+        % Coordinates for C approx to look like the image.
+        \coordinate (B) at (-6, 12);
+        \coordinate (C) at (6, 12);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+
+        % Obtuse angle 120 at C (ACD)
+        \pic [draw, pic text={\scriptsize $120^\circ$}, angle radius=0.3cm, angle eccentricity=1.5] {angle = A--C--D};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина середньої лінії трапеції \par \quad дорівнює \\
+    \textbf{2} \quad Довжина проєкції сторони $AB$ \par \quad на пряму $AD$ дорівнює \\
+    \textbf{3} \quad Довжина радіуса кола, описаного \par \quad навколо трапеції, дорівнює
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 9 \textit{см}. \\
+    \textbf{Б} & $20\sqrt{3}$ \textit{см}. \\
+    \textbf{В} & 21 \textit{см}. \\
+    \textbf{Г} & $10\sqrt{3}$ \textit{см}. \\
+    \textbf{Д} & 18 \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено прямокутник $ABCD$ та два кола. Перше коло з центром у точці $O_1$, описане навколо цього прямокутника. Площа круга, обмеженого колом з центром у точці $O_1$, дорівнює $625\pi$ \textit{см}$^2$. Друге коло з центром у точці $O_2$ дотикається до сторін $AB$, $BC$ та $AD$. $AB = 30$ \textit{см}. Узгодьте початок речення \mbox{(1--3)} із його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.1]
+        % R_circ = 25 (Area 625pi). Diam = 50.
+        % AB = 30. BC = sqrt(50^2 - 30^2) = 40.
+        % O2 touches AB, BC, AD. Diameter = AB = 30. Radius r=15.
+
+        \def\w{40}
+        \def\h{30}
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,\h);
+        \coordinate (C) at (\w,\h);
+        \coordinate (D) at (\w,0);
+
+        \coordinate (O1) at (20,15); % Center of rect
+        \coordinate (O2) at (15,15); % Center of inscribed-like circle (r=15)
+
+        % Circumcircle (Green)
+        \draw[thick, green!60!black] (O1) circle (25cm);
+
+        % Inscribed-like circle (Orange)
+        \draw[thick, orange!80!black] (O2) circle (15cm);
+
+        % Rectangle
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+
+        % Points
+        \fill (O1) circle (20pt) node[right] {$O_1$};
+        \fill (O2) circle (20pt) node[left] {$O_2$};
+
+        % Labels
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Відстань від $O_2$ до сторони $BC$ дорівнює \\
+    \textbf{2} \quad Довжина сторони $AD$ дорівнює \\
+    \textbf{3} \quad Довжина відрізка $O_1O_2$ дорівнює
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 5 \textit{см}. \\
+    \textbf{Б} & 10 \textit{см}. \\
+    \textbf{В} & 15 \textit{см}. \\
+    \textbf{Г} & 25 \textit{см}. \\
+    \textbf{Д} & 40 \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Точка $O$ --- середина діагоналі $AC$ ромба $ABCD$ (див. рисунок). $AK$ --- висота ромба, $AK = 12$ \textit{см}, $BK = 5$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % Сторона 13 (5, 12, 13).
+        % A зліва, C справа. B зверху.
+        % AK висота на BC. K на BC.
+        % B = (x, y). C = (x+13, y)? Ні, це ромб.
+        % Нехай центр (0,0). AC горизонталь? Ні, на малюнку AC горизонталь.
+        % Але AK висота.
+        % Побудуємо за розмірами.
+
+        \coordinate (A) at (-12,0);
+        \coordinate (C) at (12,0);
+        \coordinate (O) at (0,0);
+
+        % Для малюнка схематично:
+        \coordinate (B) at (0, 8); % Приблизно
+        \coordinate (D) at (0,-8);
+
+        % Точка K на стороні BC. AK перпендикулярно BC.
+        % Це складно вирахувати точно для схеми, намалюємо "як бачимо".
+        \coordinate (K) at (4, 5.3); % Точка на BC
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+
+        % Перемальовуємо без BD, додаємо AK
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+        \draw[thick] (A) -- (K);
+
+        % Прямий кут AKB? Ні, AK висота -> кут AKB = 90? 
+        % На малюнку K лежить на BC. Кут AKC = 90? Ні, AK perp BC.
+        % Значить кут AKB = 90.
+
+        % Позначки O
+        \draw (-6, -0.5) -- (-6, 0.5); % AO
+        \draw (6, -0.5) -- (6, 0.5);   % OC
+
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above right] at (K) {$K$};
+        \node[below] at (O) {$O$};
+        \pic [draw, angle radius=0.3cm] {right angle = A--K--B};
+        \fill (O) circle (10pt);
+
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Сторона ромба \\
+    \textbf{2} \quad Радіус кола, \par \quad уписаного в ромб \\
+    \textbf{3} \quad $OK$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см} \\
+    \textbf{Б} & 12 \textit{см} \\
+    \textbf{В} & $2\sqrt{13}$ \textit{см} \\
+    \textbf{Г} & 13 \textit{см} \\
+    \textbf{Д} & $4\sqrt{13}$ \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.6\textwidth}
+Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+        % AB=12. K is vertex of isosceles right triangle on AB.
+        % Height of K from AB = AB/2 = 6.
+        % Circle touches AB, BC, AD? No, touches BC, AD, CD (right side).
+        % Drawing: AB is left side. Circle is inside right part.
+        % Center O is at distance R=6 from BC and AD. y=6.
+        % K is on the circle. K is at (6,6).
+        % Circle touches BC, AD. Radius 6.
+        % If K(6,6) is on circle, and O is (12,6), then radius is 6.
+        % So Circle touches side CD? Maybe.
+
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (0,12);
+        \coordinate (C) at (18,12); % W=18
+        \coordinate (D) at (18,0);
+
+        \coordinate (K) at (6,6);
+        \coordinate (O) at (12,6);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (O) circle (6cm);
+        \draw[thick] (A) -- (K) -- (B);
+
+        % Right angle at K
+        \pic [draw, angle radius=0.3cm] {right angle = B--K--A};
+
+        % Ticks on AK, BK
+        \draw ($(A)!0.5!(K)$) ++(135:0.4) -- ++(-45:0.8);
+        \draw ($(B)!0.5!(K)$) ++(45:0.4) -- ++(-135:0.8);
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[right] at (K) {$K$};
+        \fill (O) circle (10pt) node[right] {$O$};
+        \fill (K) circle (10pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Початок речення} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad Довжина радіуса $OK$ кола дорівнює \\
+    \textbf{2} \quad Довжина відрізка $BK$ дорівнює \\
+    \textbf{3} \quad Відстань від точки $O$ до вершини $A$ дорівнює
+}{
+    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 6 \textit{см}. \\
+    \textbf{Б} & 8 \textit{см}. \\
+    \textbf{В} & $6\sqrt{2}$ \textit{см}. \\
+    \textbf{Г} & $6\sqrt{5}$ \textit{см}. \\
+    \textbf{Д} & 18 \textit{см}. \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено ромб $ABCD$ й коло із центром у точці $O$, побудоване на діагоналі ромба $BD$ як на діаметрі. Точки $K$ й $N$ є точками перетину кола з діагоналлю $AC$ й стороною $CD$ відповідно. $AK = 5$ \textit{см}, $AO = 20$ \textit{см}. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+        \coordinate (A) at (-20, 0); % AO = 20 за масштабом
+        \coordinate (C) at (20, 0);
+        \coordinate (O) at (0, 0);
+
+        % Радіус OK = AO - AK = 20 - 5 = 15.
+        % Коло будується на BD як на діаметрі, отже BO = OD = R = 15.
+        \coordinate (B) at (0, 15);
+        \coordinate (D) at (0, -15);
+
+        % Точка K - перетин кола з AC (зліва)
+        \coordinate (K) at (-15, 0);
+
+        % Точка N - перетин кола зі стороною CD
+        % Це складно вирахувати точно, поставимо точку візуально на колі і стороні CD
+        % Рівняння прямої CD: y - (-15) = (15/20)*(x - 0) -> y = 0.75x - 15.
+        % Коло: x^2 + y^2 = 225.
+        % Перетин N.
+        \coordinate (N) at (14.5,-4); % Приблизні координати
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (A) -- (C);
+
+        \draw[thick] (O) circle (15cm);
+
+        \node[left] at (A) {$A$};
+        \node[above] at (B) {$B$};
+        \node[right] at (C) {$C$};
+        \node[below] at (D) {$D$};
+        \node[above] at (O) {$O$};
+        \node[above right] at (K) {$K$};
+        \node[right] at (N) {$N$};
+
+        \fill (O) circle (12pt);
+        \fill (K) circle (12pt);
+        \fill (N) circle (12pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+    \textit{Відрізок} \par\par\nbvspace{0.2cm}
+    \textbf{1} \quad $BO$ \\
+    \textbf{2} \quad $AB$ \\
+    \textbf{3} \quad $BN$
+}{
+    \textit{Довжина відрізка} \par\par\nbvspace{0.2cm}
+    \begin{tabular}{ll}
+    \textbf{А} & 15 \textit{см} \\
+    \textbf{Б} & 20 \textit{см} \\
+    \textbf{В} & 24 \textit{см} \\
+    \textbf{Г} & 25 \textit{см} \\
+    \textbf{Д} & 30 \textit{см} \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 38 (Кольорові фігури) ===
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
+На паралельних прямих $n$ і $m$ розміщено круговий сектор $ABC$, рівнобедрений трикутник $DKL$ ($DK=KL$) й паралелограм $LMNP$ (див. рисунок). Площа сектора $ABC$ дорівнює $64\pi$ \textit{см}$^2$, площа паралелограма $LMNP$ дорівнює $288$ \textit{см}$^2$, $DK = 20$ \textit{см}. Увідповідніть відрізок \mbox{(1--3)} та його довжину \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+    % Висота між прямими h.
+    % Сектор ABC: 1/4 кола. Площа = 64pi => R^2 = 256 => R=16. h=16.
+    \def\h{16}
+
+    % Координати
+    % Сектор. Центр у точці B(0,16). A(0,0). C(16,16).
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,\h);
+    \coordinate (C) at (\h,\h);
+
+    % Трикутник DKL. DK=20. Висота 16. Проєкція катета = sqrt(400-256) = 12.
+    % Основа DL = 24.
+    % D починається трохи правіше C. Нехай shift=4. D(20,0).
+    \coordinate (D) at (20,0);
+    \coordinate (K) at (32,\h); % 20+12
+    \coordinate (L) at (44,0);  % 32+12
+
+    % Паралелограм LMNP. Площа 288. Висота 16. Основа LP = 288/16 = 18.
+    % L(44,0). P(62,0).
+    % Зсув верхньої сторони MN довільний (паралелограм). Нехай зсув 6.
+    % M(50,16). N(68,16).
+    \coordinate (M) at (50,\h);
+    \coordinate (P) at (62,0);
+    \coordinate (N) at (68,\h);
+
+    % Заливка
+    % Сектор (центр B, радіус 16, кут 270..360)
+    \fill[yellow!20] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;
+
+    % Трикутник
+    \fill[cyan!20] (D) -- (K) -- (L) -- cycle;
+
+    % Паралелограм
+    \fill[red!20] (L) -- (M) -- (N) -- (P) -- cycle;
+
+    % Лінії m та n
+    \draw[thick] (-2,0) -- (70,0) node[above] {$n$};
+    \draw[thick] (-2,\h) -- (70,\h) node[above] {$m$};
+
+    % Контури фігур
+    \draw[thick] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;
+    \draw[thick] (D) -- (K) -- (L) -- cycle;
+    \draw[thick] (L) -- (M) -- (N) -- (P) -- cycle; % LMNP
+
+    % Підписи
+    \node[below] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above] at (K) {$K$};
+    \node[below] at (L) {$L$};
+    \node[above] at (M) {$M$};
+    \node[above] at (N) {$N$};
+    \node[below] at (P) {$P$};
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\matchingLayout{
+    \textbf{1} \quad $AB$ \\
+    \textbf{2} \quad $DL$ \\
+    \textbf{3} \quad $LP$
+}{
+    \begin{tabular}{ll}
+    \textbf{А} & 12 \textit{см} \\
+    \textbf{Б} & 16 \textit{см} \\
+    \textbf{В} & 18 \textit{см} \\
+    \textbf{Г} & 20 \textit{см} \\
+    \textbf{Д} & 24 \textit{см} \\
+    \end{tabular}
+}{\matchingGrid}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 2.06, завдання №18 --- основна тема: Прямокутник
+\zadtask{Прямокутник $ABCD$ і коло з центром $O$ розташовані так, що коло дотикається до середин бічних сторін $AB$ і $CD$ та перетинає сторону $BC$ у точках $K$ і $M$ (див. рисунок). Відомо, що $BK = 3$ см, $BM = 27$ см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.2, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,18);
+    \coordinate (C) at (30,18);
+    \coordinate (D) at (30,0);
+    \coordinate (O) at (15,9);
+    \coordinate (K) at (3,18);
+    \coordinate (M) at (27,18);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick, mainGreen] (O) circle (15);
+    \fill (O) circle (4pt); \node[below right] at (O) {$O$};
+    \fill (K) circle (4pt); \node[above] at (K) {$K$};
+    \fill (M) circle (4pt); \node[above] at (M) {$M$};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Відрізок}\par\nbvspace{0.2cm}
+\textbf{1} \quad $KM$\\[0.25cm]
+\textbf{2} \quad $KO$\\[0.25cm]
+\textbf{3} \quad $AB$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Довжина}\par\nbvspace{0.2cm}
+\textbf{А} \quad $3$ см\\[0.15cm]
+\textbf{Б} \quad $15$ см\\[0.15cm]
+\textbf{В} \quad $18$ см\\[0.15cm]
+\textbf{Г} \quad $24$ см\\[0.15cm]
+\textbf{Д} \quad $30$ см
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\nopagebreak\nbvspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1~--~Г, 2~--~Б, 3~--~В
+\ifshowsolutions\solution{$KM=BM-BK=27-3=24$ см -- \textbf{Г}. Коло дотикається середин $AB$ і $CD$, тож його радіус дорівнює половині сторони $BC$; за симетрією $BC=BK+KM+BK=30$, отже $r=KO=15$ см -- \textbf{Б}. Відстань від $O$ до $BC$ дорівнює $\sqrt{r^2-(KM/2)^2}=\sqrt{225-144}=9$, тому $AB=2\cdot9=18$ см -- \textbf{В}. Відповідь: \textbf{1--Г, 2--Б, 3--В}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №18 --- основна тема: Прямокутник
-\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
+\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick, line join=round]
     \coordinate (A) at (0,0);
@@ -3038,17 +3220,17 @@
     \node[below right, xshift=0.1cm] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\nopagebreak\vspace{0.2cm}
+\nopagebreak\nbvspace{0.2cm}
 \noindent
-\begin{minipage}[t]{0.50\textwidth}
-\textit{Відрізок}\par\vspace{0.15cm}
+\begin{minipage}[t]{0.47\textwidth}
+\textit{Відрізок}\par\nbvspace{0.15cm}
 \textbf{1} \quad $BC$\\[0.25cm]
 \textbf{2} \quad $BD$\\[0.25cm]
 \textbf{3} \quad відстань від точки $C$ до відрізка $BD$
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.28\textwidth}
-\textit{Довжина відрізка}\par\vspace{0.15cm}
+\textit{Довжина відрізка}\par\nbvspace{0.15cm}
 \textbf{А} \quad $4{,}8$~см\\[0.15cm]
 \textbf{Б} \quad $5$~см\\[0.15cm]
 \textbf{В} \quad $8$~см\\[0.15cm]
@@ -3056,18 +3238,19 @@
 \textbf{Д} \quad $14$~см\\[0.15cm]
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0.4cm}
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №18 --- основна тема: Трапеція
-\zadtask{Усередині рівнобічної трапеції $ABCD$ вибрано точку $M$, яка рівновіддалена від усіх вершин трапеції. $\angle BMC = 60^\circ$, $\angle MAD = 30^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}
-\nopagebreak\vspace{0.3cm}
+\zadtask{Усередині рівнобічної трапеції $ABCD$ вибрано точку $M$, яка рівновіддалена від усіх вершин трапеції. $\angle BMC = 60^\circ$, $\angle MAD = 30^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
 \begin{minipage}[t]{0.65\textwidth}
-\nopagebreak\vspace{0.6cm}
+\nopagebreak\nbvspace{0.6cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1, line join=round, line cap=round]
     % Центр кола (точка M)
@@ -3120,17 +3303,18 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \noindent
 \begin{minipage}[t]{0.42\textwidth}
-\textit{Кут}\par\vspace{0.15cm}
+\textit{Кут}\par\nbvspace{0.15cm}
 \textbf{1} \quad $\angle AMD$\\[0.25cm]
 \textbf{2} \quad $\angle AMB$\\[0.25cm]
 \textbf{3} \quad $\angle ABC$
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}
-\textit{Градусна міра кута}\par\vspace{0.15cm}
+\textit{Градусна міра кута}\par\nbvspace{0.15cm}
 \textbf{А} \quad $90^\circ$\\[0.15cm]
 \textbf{Б} \quad $105^\circ$\\[0.15cm]
 \textbf{В} \quad $120^\circ$\\[0.15cm]
@@ -3139,33 +3323,34 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
+\nopagebreak\nbvspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №18 --- основна тема: Прямокутник
-\zadtask{На рисунку зображено прямокутник $ABCD$, у який вписано коло з центром у точці $O$, що дотикається до сторін $BC$ й $AD$, та два півкола, побудованих на сторонах $AB$ і $CD$ як на діаметрах, що мають лише одну спільну точку з колом. $BC = 12$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}}
-\nopagebreak\vspace{0.3cm}
+\zadtask{На рисунку зображено прямокутник $ABCD$, у який вписано коло з центром у точці $O$, що дотикається до сторін $BC$ й $AD$, та два півкола, побудованих на сторонах $AB$ і $CD$ як на діаметрах, що мають лише одну спільну точку з колом. $BC = 12$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}}\par
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \begin{minipage}[c]{0.52\textwidth}
 \begin{minipage}[t]{0.48\textwidth}
-\textit{Відрізок}\par\vspace{0.15cm}
+\textit{Відрізок}\par\nbvspace{0.15cm}
 \textbf{1} \quad радіус кола\\[0.25cm]
 \textbf{2} \quad $CD$\\[0.25cm]
 \textbf{3} \quad $AO$
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
-\textit{Довжина відрізка}\par\vspace{0.15cm}
+\textit{Довжина відрізка}\par\nbvspace{0.15cm}
 \textbf{А} \quad $3$~см\\[0.15cm]
 \textbf{Б} \quad $4$~см\\[0.15cm]
 \textbf{В} \quad $3\sqrt{3}$~см\\[0.15cm]
 \textbf{Г} \quad $6$~см\\[0.15cm]
 \textbf{Д} \quad $3\sqrt{5}$~см
 \end{minipage}
-\nopagebreak\vspace{0.4cm}
+\nopagebreak\nbvspace{0.4cm}
 
 \matchingGrid
 \end{minipage}%
@@ -3195,85 +3380,25 @@
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 % Відповідь: 1--А; 2--Г; 3--Д
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 17.06, завдання №9
-\zadtask{Які з наведених тверджень щодо кола є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Дуга кола~--- це відрізок, який сполучає $2$ точки на колі.
-\item Центральний кут~--- це кут, вершина якого лежить на колі.
-\item Вписаний кут, що спирається на діаметр,~--- прямий.
-\end{enumerate}
-\nopagebreak\vspace{0.1cm}}
-\answerTable{лише I}{лише II}{лише III}{лише I та III}{лише II та III}
-% Відповідь: В
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 18.06, завдання №14 --- основна тема: Трикутники
-\noindent
-\begin{minipage}[c]{0.56\textwidth}
-\zadnum На катеті $CB$ прямокутного трикутника $ABC$ вибрано точку $O$ так, що півколо з центром у точці $O$ дотикається катета $AC$ в точці $C$, а гіпотенузи $AB$~--- у точці $K$. $OB = 6$~см, $\angle COK = 120^\circ$. Визначте довжину відрізка $AC$. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.42\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.62, thick, line join=round]
-    \coordinate (C) at (0,0);
-    \coordinate (B) at (6,0);
-    \coordinate (A) at (0,3.46);
-    \coordinate (O) at (2,0);
-    % K точка дотику на AB
-    \coordinate (K) at ($(A)!(O)!(B)$);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (O) -- (K);
-    \draw (2,0) ++(0:2) arc (0:180:2);
-    \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
-    \pic[draw, angle radius=0.4cm, pic text={\scriptsize $120^\circ$}, angle eccentricity=1.7] {angle = K--O--C};
-    \node[above left] at (A) {$A$};
-    \node[below left] at (C) {$C$};
-    \node[below right] at (B) {$B$};
-    \node[below] at (O) {$O$};
-    \node[above right] at (K) {$K$};
-\end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\vspace{0.2cm}
-\answerTable{$3$~см}{$3\sqrt{3}$~см}{$6\sqrt{3}$~см}{$9$~см}{$9\sqrt{3}$~см}
-% Відповідь: Б
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 19.06, завдання №9 --- також у темі: Трикутники
-\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.
-\item Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.
-\item У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.
-\end{enumerate}
-\nopagebreak\vspace{0.1cm}}
-\answerTable{лише II}{лише III}{лише I та II}{лише I та III}{I, II та III}
-% Відповідь: Б
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{53.}~А \ {\scriptsize\color{gray}(23.05, №10)}\par
-\noindent\textbf{54.}~Г \ {\scriptsize\color{gray}(30.05, №15)}\par
-\noindent\textbf{55.}~А \ {\scriptsize\color{gray}(1.06, №3)}\par
-\noindent\textbf{56.}~Д \ {\scriptsize\color{gray}(1.06, №10)}\par
-\noindent\textbf{57.}~1~--~Г, 2~--~Б, 3~--~В \ {\scriptsize\color{gray}(2.06, №18)}\par
-\noindent\textbf{58.}~Г \ {\scriptsize\color{gray}(3.06, №9)}\par
-\noindent\textbf{59.}~В \ {\scriptsize\color{gray}(3.06, №14)}\par
-\noindent\textbf{60.}~Д \ {\scriptsize\color{gray}(4.06, №9)}\par
-\noindent\textbf{61.}~Д \ {\scriptsize\color{gray}(5.06, №3)}\par
-\noindent\textbf{69.}~1--А; 2--Г; 3--Д \ {\scriptsize\color{gray}(16.06, №18)}\par
-\noindent\textbf{70.}~В \ {\scriptsize\color{gray}(17.06, №9)}\par
-\noindent\textbf{71.}~Б \ {\scriptsize\color{gray}(18.06, №14)}\par
-\noindent\textbf{72.}~Б \ {\scriptsize\color{gray}(19.06, №9)}\par
+\noindent\textbf{27.}~А \ {\scriptsize\color{gray}(23.05, №10)}\par
+\noindent\textbf{28.}~Г \ {\scriptsize\color{gray}(30.05, №15)}\par
+\noindent\textbf{29.}~А \ {\scriptsize\color{gray}(1.06, №3)}\par
+\noindent\textbf{30.}~Д \ {\scriptsize\color{gray}(1.06, №10)}\par
+\noindent\textbf{31.}~Г \ {\scriptsize\color{gray}(3.06, №9)}\par
+\noindent\textbf{32.}~В \ {\scriptsize\color{gray}(3.06, №14)}\par
+\noindent\textbf{33.}~Д \ {\scriptsize\color{gray}(4.06, №9)}\par
+\noindent\textbf{34.}~Д \ {\scriptsize\color{gray}(5.06, №3)}\par
+\noindent\textbf{40.}~В \ {\scriptsize\color{gray}(17.06, №9)}\par
+\noindent\textbf{41.}~Б \ {\scriptsize\color{gray}(18.06, №14)}\par
+\noindent\textbf{42.}~Б \ {\scriptsize\color{gray}(19.06, №9)}\par
+\noindent\textbf{69.}~1~--~Г, 2~--~Б, 3~--~В \ {\scriptsize\color{gray}(2.06, №18)}\par
+\noindent\textbf{72.}~1--А; 2--Г; 3--Д \ {\scriptsize\color{gray}(16.06, №18)}\par
 \end{multicols}
 \fi
 

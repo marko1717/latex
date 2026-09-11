@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -213,7 +218,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -224,189 +229,212 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 9. Системи рівнянь}
-\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 40 (НМТ \mbox{2023~--- 13}, \mbox{2024~--- 10}, \mbox{2025~--- 6}, \mbox{2026~--- 11}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 2. Рівняння і нерівності \quad\textbullet\quad Усього завдань: 40 (НМТ \mbox{2023~--- 13}, \mbox{2024~--- 10}, \mbox{2025~--- 6}, \mbox{2026~--- 11}); \mbox{тестових~--- 40}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % Завдання 1
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 10x - 4y = 26, \\ 6x + 4y = 6. \end{cases}$ Для одержаного розв'язку $(x_0; y_0)$ обчисліть добуток $x_0 \cdot y_0$. \nmtyear{2023}}
 \answerTable{$3$}{$-3$}{$6$}{$4$}{$-6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 2^{3x-y} = 2^7, \\ 2x + y = 3. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 \cdot y_0 =$ \nmtyear{2023}}
 \answerTable{$-1$}{$2$}{$-3$}{$1$}{$-2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 3
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} x(4 - y) = 14, \\ x(4 - y) = 3x - 7. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $y_0 =$ \nmtyear{2023}}
 \answerTable{$-6$}{$2$}{$7$}{$6$}{$-2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 4
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{x}{4} = 3y - 1, \\ x - 2y = 1. \end{cases}$ Для одержаного розв'язку $(x_0; y_0)$ системи знайдіть суму $x_0 + y_0$. \nmtyear{2023}}
 \answerTable{$2{,}5$}{$1$}{$1{,}6$}{$-2$}{$22$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 5
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} x + 2y = 8, \\ x - 2y = -4. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 \cdot y_0 =$ \nmtyear{2023}}
 \answerTable{$2$}{$3$}{$5$}{$6$}{$-10$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{2x + y}{x} = 5, \\ 4x - y = -2. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 + y_0 =$ \nmtyear{2023}}
 \answerTable{$-8$}{$4$}{$8$}{$-6$}{$-4$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 7
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{3}{x + y} = -\dfrac{1}{2}, \\ 2x - y = 12. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 \cdot y_0 =$ \nmtyear{2023}}
 \answerTable{$-8$}{$2$}{$-10$}{$16$}{$-16$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 8
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} x(y + 2) = 12, \\ x(2y - 1) = 12. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 =$ \nmtyear{2023}}
 \answerTableTall{$12$}{$2{,}4$}{$4$}{$3$}{$\dfrac{5}{12}$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 9
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{1}{3y} = \dfrac{2}{x}, \\ x - y = 30. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 + y_0 =$ \nmtyear{2023}}
 \answerTable{$42$}{$35$}{$150$}{$36$}{$-150$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 10
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{x}{2y} = -3, \\ x + y = 10. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 =$ \nmtyear{2023}}
 \answerTable{$4$}{$2$}{$12$}{$-2$}{$-12$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 11
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} xy - 2x = 3, \\ xy = 2x - y + 11. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 \cdot y_0 =$ \nmtyear{2023}}
 \answerTable{$8$}{$4$}{$0{,}5$}{$8{,}5$}{$16$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 12
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \sqrt{2x} = \sqrt{6}, \\ x - 4y = 7. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $y_0 =$ \nmtyear{2023}}
 \answerTable{$3$}{$1{,}25$}{$-1$}{$-6$}{$-2{,}5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 13
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 2x = \dfrac{y}{5}, \\ 4x - y = 3. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 + y_0 =$ \nmtyear{2023}}
 \answerTable{$2{,}5$}{$-0{,}5$}{$-5{,}5$}{$-5$}{$-4{,}5$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % Завдання 14
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{8}{x} = -2, \\ x + \dfrac{y}{2} = 0. \end{cases}$ \nmtyear{2024}}
 \answerTable{$(-0{,}25; 0{,}5)$}{$(4; -8)$}{$(0{,}25; -0{,}5)$}{$(-4; -8)$}{$(-4; 8)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 15
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{2}{y} = \dfrac{7}{x}, \\ x - 4y = 2. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 \answerTable{$-18$}{$10$}{$-10$}{$22$}{$18$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 16
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} x + 2y = 8, \\ 3x - 4y = -1. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 \answerTable{$2{,}5$}{$3$}{$5$}{$5{,}5$}{$7{,}6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 17
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 2x - \dfrac{y}{3} = 7, \\[0.6cm] 4x + \dfrac{2y}{3} = 6. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 \answerTable{$-1{,}5$}{$-6$}{$-3{,}5$}{$2{,}5$}{$-4{,}5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 18
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{2}{x} = -0{,}5, \\[0.6cm] \dfrac{y}{3} = 2. \end{cases}$ \nmtyear{2024}}
 \answerTableTall{$\left(-\dfrac{1}{4}; \dfrac{2}{3}\right)$}{$\left(-\dfrac{1}{4}; 6\right)$}{$(6; -4)$}{$\left(-4; \dfrac{2}{3}\right)$}{$(-4; 6)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 19
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 4x - 3y = -1, \\ 5x - 2y = 4. \end{cases}$ \nmtyear{2024}}
 \answerTable{$(-2; 3)$}{$(2; -3)$}{$(3; 2)$}{$(-2; -3)$}{$(2; 3)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 20
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 2^x + 2y = 0, \\ 2^x - 4y = 6. \end{cases}$ \nmtyear{2024}}
 \answerTable{$(-3; 3)$}{$(3; -3)$}{$(1; -1)$}{$(-1; 1)$}{$(2; -2)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 21
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{2}{x} + \dfrac{5}{y} = 5, \\[0.6cm] \dfrac{1}{x} - \dfrac{2}{y} = 7. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $\dfrac{1}{x_0} + \dfrac{1}{y_0} =$ \nmtyear{2024}}
 \answerTable{$4$}{$3$}{$5$}{$6$}{$12$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 22
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} y - \dfrac{2}{x} = 3, \\[0.6cm] y + \dfrac{1}{x} = 9. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 \answerTable{$2$}{$3{,}5$}{$4{,}5$}{$6$}{$7{,}5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 23
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \sqrt{y} - \dfrac{6}{x} = 6, \\[0.6cm] \sqrt{y} + \dfrac{4}{x} = 1. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2024}}
 \answerTable{$2$}{$9$}{$-2$}{$7$}{$83$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2025}
 
 \begin{samepage}
 % Завдання 24
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{x}{2x + y} = \dfrac{1}{5}, \\[0.6cm] 4x + 2 = y. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2025}}
 \answerTable{$12$}{$8$}{$-6$}{$-8$}{$6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 25
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 2^{y+2x} = 64, \\ 2x - y = 12. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2025}}
 \answerTable{$-3$}{$4{,}5$}{$1{,}5$}{$9$}{$7{,}5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 26
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} -2x = 6, \\[0.6cm] \dfrac{y}{3} = 9. \end{cases}$ \nmtyear{2025}}
 \answerTable{$(-3; 27)$}{$(3; -27)$}{$(4; 3)$}{$(4; 27)$}{$(-3; 3)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 27
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} x - \dfrac{3}{y} = 3, \\[0.6cm] x + \dfrac{1}{y} = 11. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2025}}
 \answerTable{$-2{,}5$}{$2$}{$9{,}5$}{$6{,}5$}{$5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 28
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} \dfrac{y}{4} = 2, \\[0.6cm] x = -2y + 1. \end{cases}$ \nmtyear{2025}}
 \answerTable{$(-3; 2)$}{$(-5; 2)$}{$(-15; 8)$}{$(-17; 8)$}{$(0; 0{,}5)$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 29
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases} 3x + 9 = x + 1, \\ |x - 1| + 2y + 7 = 0. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2025}}
 \answerTable{$-10$}{$10{,}5$}{$-0{,}5$}{$-2$}{$-5$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №15 --- також у темі: Показникові рівняння
@@ -414,6 +442,7 @@
 \answerTable{$-2{,}5$}{$-1{,}5$}{$2{,}5$}{$-3{,}5$}{$1{,}5$}
 % Відповідь: А
 \ifshowsolutions\solution{З першого рівняння $5^x=5^{1/2}$, тож $x_0=0{,}5$. Підставимо: $\dfrac{y+1}{2\cdot 0{,}5+3}=\dfrac{1-4\cdot 0{,}5}{2}$, тобто $\dfrac{y+1}{4}=-\dfrac{1}{2}$, звідки $y+1=-2$, $y_0=-3$. Тоді $x_0+y_0=0{,}5-3=-2{,}5$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -422,6 +451,7 @@
 \answerTableTall{$(4;\, 6)$}{$(-4;\, 6)$}{$(-4;\, -6)$}{$(4;\, -6)$}{$\left(-\dfrac{1}{4};\, 6\right)$}
 % Відповідь: Б
 \ifshowsolutions\solution{З першого рівняння $\dfrac{2}{x}=-0{,}5\Rightarrow x=-4$; з другого $\dfrac{y}{3}=2\Rightarrow y=6$. Розв'язок $(-4;\,6)$. Відповідь: \textbf{Б}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -430,6 +460,7 @@
 \answerTableTall{$\left(\dfrac{1}{2};\, 8\right)$}{$(2;\, 8)$}{$\left(\dfrac{1}{2};\, -8\right)$}{$\left(-\dfrac{1}{2};\, 8\right)$}{$\left(8;\, \dfrac{1}{2}\right)$}
 % Відповідь: А
 \ifshowsolutions\solution{Віднявши перше рівняння від другого, дістаємо $y=11-3=8$. Підставляємо у перше: $8x-2x=3$, $6x=3$, $x=\dfrac{1}{2}$. Отже $\left(\dfrac{1}{2};\,8\right)$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -438,6 +469,7 @@
 \answerTable{$18$}{$29$}{$-6$}{$-4$}{$9$}
 % Відповідь: Д
 \ifshowsolutions\solution{Із $\log_2 x = 2$ маємо $x_0 = 4$. Тоді $\dfrac{y+10}{5} = \dfrac{6}{2} = 3$, звідки $y+10 = 15$, $y_0 = 5$. Отже $x_0 + y_0 = 9$. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -446,6 +478,7 @@
 \answerTable{$(6;\, 1)$}{$(3;\, 2)$}{$(-2;\, 5)$}{$(2;\, 3)$}{$(2;\, 4)$}
 % Відповідь: Г
 \ifshowsolutions\solution{Додаємо рівняння: $2x=4$, $x=2$. Тоді $2+2y=8$, $2y=6$, $y=3$. Отже $(2;\,3)$. Відповідь: \textbf{Г}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -454,6 +487,7 @@
 \answerTable{$(-4;\, 8)$}{$(4;\, -8)$}{$(-4;\, -8)$}{$(4;\, 8)$}{$(-2;\, 4)$}
 % Відповідь: А
 \ifshowsolutions\solution{З першого рівняння $\dfrac{8}{x}=-2\Rightarrow x=-4$. Підставляємо в друге: $-4+\dfrac{y}{2}=0\Rightarrow y=8$. Розв'язок $(-4;\,8)$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -464,6 +498,7 @@
 \]
 Якщо $(x_0; y_0)$~--- розв'язок системи, то $x_0 \cdot y_0 = $ \nmtyear{2026}}
 \answerTable{$-1$}{$3$}{$2$}{$-4$}{$-3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -474,6 +509,7 @@
 \]
 Якщо $(x_0; y_0)$~--- розв'язок системи, то $x_0 + 2y_0 =$ \nmtyear{2026}}
 \answerTable{$2$}{$8{,}5$}{$9$}{$10$}{$8$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -486,6 +522,7 @@ $\begin{cases}
 Якщо $(x_0; y_0)$ --- розв'язок системи, то $y_0 =$ \nmtyear{2026}}
 \answerTable{$-3$}{$-27$}{$6$}{$-9$}{$3$}
 % Відповідь: А
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -493,6 +530,7 @@ $\begin{cases}
 \zadtask{Укажіть пару чисел, що є розв'язком системи рівнянь $\begin{cases}xy = 32,\\ y = \dfrac{x}{2}.\end{cases}$ \nmtyear{2026}}
 \answerTableTall{$(4; 8)$}{$(16; 2)$}{$(-4; -8)$}{$(2; 4)$}{$(8; 4)$}
 % Відповідь: Д
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -500,6 +538,7 @@ $\begin{cases}
 \zadtask{Розв'яжіть систему рівнянь $\begin{cases}2^{3x - y} = 2^7,\\ 2x + y = 3.\end{cases}$ Якщо $(x_0;\, y_0)$~--- розв'язок цієї системи, то $x_0 \cdot y_0 = $ \nmtyear{2026}}
 \answerTable{$2$}{$-2$}{$-1$}{$-3$}{$1$}
 % Відповідь: Б
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions

@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -213,7 +218,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -224,21 +229,23 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 4. Многочлени. Формули скороченого множення}
-\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 47 (НМТ \mbox{2023~--- 8}, \mbox{2024~--- 12}, \mbox{2025~--- 18}, \mbox{2026~--- 9}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 47 (НМТ \mbox{2023~--- 8}, \mbox{2024~--- 12}, \mbox{2025~--- 18}, \mbox{2026~--- 9}); \mbox{тестових~--- 32}; \mbox{на відповідність~--- 15}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % Завдання 1
 \zadtask{$-2xy^2 - (3xy^2 - 2x^2y) =$ \nmtyear{2023}}
 \answerTable{$xy^2 - 2x^2y$}{$-5xy^2 - 2x^2y$}{$-5xy^2 + 2x^2y$}{$-6xy^2 + 2x^2y$}{$-3xy^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 2
 \zadtask{Розкладіть на множники вираз $(7x - 1)^2 - 9x^2$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $(4x - 1)(10x - 1)$ \\
 \textbf{Б} & $(4x - 1)(10x + 1)$ \\
@@ -246,83 +253,43 @@
 \textbf{Г} & $(4x - 1)^2$ \\
 \textbf{Д} & $(-2x - 1)(16x - 1)$ \\
 \end{tabular}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 3 (на відповідність)
-\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.38\textwidth}
-\textit{Початок речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad Якщо $|-n| = a$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad Якщо $(n - 2)(n + 1) - n^2 = a$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad Якщо $2^{-\lg n} = 2^{\lg a}$, то
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.25\textwidth}
-\textit{Закінчення речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $a = -n - 2$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $a = \dfrac{1}{n}$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $a = n$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $a = -2$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $a = -n$.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 4
 \zadtask{$(\sqrt{2} - a)(\sqrt{2} + a) =$ \nmtyear{2023}}
 \answerTable{$2 - a^2$}{$\sqrt[4]{2} - a^2$}{$2 - \sqrt{a}$}{$2 - a$}{$\sqrt{2} - a^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 5
 \zadtask{$2(5x + 6) =$ \nmtyear{2023}}
 \answerTable{$5x + 8$}{$7x + 12$}{$10x + 12$}{$7x + 8$}{$10x + 6$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 6
 \zadtask{Спростіть вираз $2a - (3b - 2a)$. \nmtyear{2023}}
 \answerTable{$-6ab + 4a$}{$-3b$}{$4a - 3b$}{$-6ab - 4a^2$}{$-6ab - 4a$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 7
 \zadtask{$(\sqrt{3} - 1)(1 + \sqrt{3}) =$ \nmtyear{2023}}
 \answerTable{$2$}{$4$}{$-2$}{$1$}{$5$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 8 (виправлене - відповіді в окремих рядках)
 \zadtask{Спростіть вираз $3a - 2(4 - a)$. \nmtyear{2023}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $a - 8$ \\
 \textbf{Б} & $-3a^2 + 14a - 8$ \\
@@ -330,22 +297,22 @@
 \textbf{Г} & $5a - 8$ \\
 \textbf{Д} & $10a$ \\
 \end{tabular}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % Завдання 9
 \zadtask{$(a - b)(3a + 3b) =$ \nmtyear{2024}}
 \answerTable{$3a^2 - 3b^2$}{$6a - 6b$}{$9a^2 + 9b^2$}{$3a^2 + 3b^2$}{$9a^2 - 9b^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 10
 \zadtask{Розкладіть вираз $4x^2 - 144$ на множники. \nmtyear{2024}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $(2x - 12)^2$ \\
 \textbf{Б} & $(2x - 72)^2$ \\
@@ -353,179 +320,43 @@
 \textbf{Г} & $2(x - 6)(x + 6)$ \\
 \textbf{Д} & $(2x - 72)(2x + 72)$ \\
 \end{tabular}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 11
 \zadtask{$(4x - 5)^2 =$ \nmtyear{2024}}
 \answerTable{$16x^2 - 40x + 25$}{$16x^2 - 25$}{$16x^2 + 25$}{$4x^2 - 25$}{$16x^2 - 20x + 25$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 12
 \zadtask{$(a + b)^{-2} =$ \nmtyear{2024}}
 \answerTableTall{$\dfrac{1}{a^2 + b^2}$}{$\dfrac{a^2 + b^2}{a^2b^2}$}{$\dfrac{1}{a^2 + 2ab + b^2}$}{$-a^2 - 2ab - b^2$}{$-a^2 - b^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 13
 \zadtask{Спростіть вираз $3x^2 \cdot (2x - 7)$. \nmtyear{2024}}
 \answerTable{$6x^2 - 7$}{$6x^3 - 7$}{$6x^2 - 21$}{$6x^3 - 21x^2$}{$6x^3 - 21$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 14 (на відповідність - золотий перетин)
-\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі. Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.28\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\varphi \cdot \dfrac{\sqrt{5} - 1}{2}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\log_5(2\varphi - \sqrt{5})$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\varphi - 2$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Твердження про значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є натуральним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є цілим від'ємним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad дорівнює 0
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad є раціональним нецілим числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad є ірраціональним числом
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 15 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.28\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $(\sqrt{2} + 5)(\sqrt{2} - 5)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $2\log_2\sqrt{8}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $|1 - \sqrt{2}|$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Твердження про значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є цілим додатним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є цілим від'ємним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad дорівнює 0
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad є нецілим додатним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad є нецілим від'ємним числом
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 16
 \zadtask{$(3x + 4)(3x - 4) =$ \nmtyear{2024}}
 \answerTable{$9x^2 + 16$}{$9x - 16$}{$3x^2 - 16$}{$9x^2 - 16$}{$3x^2 + 16$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 17 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.25\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $x^2 + 8x + 16$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\dfrac{x - 1}{\sqrt{5}}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\lg x^0$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $5$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $\sqrt{5}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $1 - \sqrt{5}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $-5$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 18
 \zadtask{$40x^3 - 15x =$ \nmtyear{2024}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $5x(35x^2 - 10x)$ \\
 \textbf{Б} & $25x^2$ \\
@@ -533,214 +364,52 @@
 \textbf{Г} & $5x(8x^2 - 5)$ \\
 \textbf{Д} & $5x(8x^2 - 3)$ \\
 \end{tabular}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 19
 \zadtask{$-7(5x + y) =$ \nmtyear{2024}}
 \answerTable{$-35x + y$}{$-35x + 7y$}{$35x + y$}{$-2x + y$}{$-35x - 7y$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 20 (на відповідність)
-\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $(\sqrt{3} - 1)^2$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\sqrt[3]{-8^2}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $\dfrac{\sqrt{12}}{\sqrt{3}}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.5\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Твердження про значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є ірраціональним додатним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є ірраціональним від'ємним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad дорівнює 0
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad є натуральним числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad є цілим від'ємним числом
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2025}
-
-\begin{samepage}
-% Завдання 21 (на відповідність з числовою прямою)
-\zadtask{Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $2e \cdot \dfrac{1}{e}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $\ln 1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $(e - 1)(e + 1) - e^2$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 22
 \zadtask{Спростіть вираз $x(x - 2y) - (x - y)^2$. \nmtyear{2025}}
 \answerTable{$-y^2$}{$y^2$}{$-2xy$}{$-4xy - y^2$}{$-4xy$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 23
 \zadtask{$\left(\dfrac{2}{5}x + \dfrac{1}{3}\right)\left(\dfrac{1}{3} - \dfrac{2}{5}x\right) =$ \nmtyear{2025}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $\dfrac{4}{25}x^2 - \dfrac{1}{9}$ \\[0.3cm]
 \textbf{Б} & $\dfrac{1}{9} - \dfrac{4}{15}x + \dfrac{4}{25}x^2$ \\[0.3cm]
 \textbf{В} & $\dfrac{4}{25}x^2 + \dfrac{1}{9}$ \\[0.3cm]
 \textbf{Г} & $\dfrac{2}{5}x^2 - \dfrac{1}{3}$ \\[0.3cm]
-\textbf{Д} & $\dfrac{1}{9} - \dfrac{4}{25}x^2$ \\
+\textbf{Д} & $\dfrac{1}{9} - \dfrac{4}{25}x^2$ \\[0.35cm]
 \end{tabular}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 24
 \zadtask{$\left|\dfrac{2{,}5^2 - 7{,}5^2}{3{,}5 + 6{,}5}\right| =$ \nmtyear{2025}}
 \answerTable{$0{,}5$}{$1$}{$-5$}{$5$}{$-1$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 25 (на відповідність з числовою прямою - золотий перетин)
-\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    \draw[->] (-3,0) -- (3,0);
-    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-        \draw (\x,0.1) -- (\x,-0.1);
-        \node[above] at (\x,0.15) {$\name$};
-        \node[below] at (\x,-0.15) {$\x$};
-    }
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\dfrac{\sqrt{5} - 1}{2} - \varphi$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $(1 - \sqrt{5}) \cdot \varphi$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\log_5(2\varphi - \sqrt{5})$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Точка}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $K$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $L$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $M$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $N$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $P$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 26
 \zadtask{$12x^3 - x =$ \nmtyear{2025}}
 
-\nopagebreak\vspace{0.2cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \begin{tabular}{ll}
 \textbf{А} & $x(12x^2 - 1)$ \\
 \textbf{Б} & $12x(x^2 - 1)$ \\
@@ -748,328 +417,50 @@
 \textbf{Г} & $12x(x^3 - 1)$ \\
 \textbf{Д} & $x(11x^2 - x)$ \\
 \end{tabular}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 27 (на відповідність)
-\zadtask{Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.28\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\ln\dfrac{1}{e}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $e + 1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $(e - 1)^2 - e^2 + 2e$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Твердження про значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad є додатним цілим числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad є від'ємним цілим числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad є додатним нецілим числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad є від'ємним нецілим числом
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad дорівнює 0
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 28 (на відповідність)
-\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\log_3 27$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\mathrm{tg}\,\dfrac{2\pi}{3}$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{3} \quad $\dfrac{1}{\sqrt{5} - \sqrt{2}} : (\sqrt{5} + \sqrt{2})$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $-3$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $\sqrt{3}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $\dfrac{1}{3}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $-\sqrt{3}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $3$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 29
 \zadtask{$(3 + \sqrt{b})^2 =$ \nmtyear{2025}}
 \answerTable{$9 - 6\sqrt{b} + b$}{$9 + 3\sqrt{b} + b$}{$9 + 6\sqrt{b} + b$}{$3 + b$}{$9 + b$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 30
 \zadtask{$(3 - 3x)(x + 1) =$ \nmtyear{2025}}
 \answerTable{$3 + 6x - 3x^2$}{$-3x - 3x^2$}{$1 - 3x^2$}{$-3 - 3x^2$}{$3 - 3x^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 31
 \zadtask{$4x + x^2 - 5 - 2x^2 - 4x + 19 =$ \nmtyear{2025}}
 \answerTable{$2x^2 - 3x - 24$}{$-x^2 + 14$}{$2x^2 - 3x + 14$}{$x^2 + 14$}{$-x^2 - 24$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 32 (на відповідність - золотий перетин з проміжками)
-\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} та проміжок \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.25\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\varphi^0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $(\sqrt{5} - 1)\varphi$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $\log_{\frac{1}{5}}(2\varphi - 1)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Проміжок}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $(-\infty; -1]$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $(-1; 0]$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $(0; 1]$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $(1; 2]$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $(2; +\infty)$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 33
 \zadtask{$(x - 3)^2 =$ \nmtyear{2025}}
 \answerTable{$x^2 + 6x - 9$}{$x^2 - 6x + 9$}{$x^2 - 9$}{$x^2 + 3x - 9$}{$x^2 - 3x + 9$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 34
 \zadtask{$6 - x - (5x - 3) =$ \nmtyear{2025}}
 \answerTable{$3 + 4x$}{$9 - 6x$}{$9 - 4x$}{$9 + 4x$}{$3 - 6x$}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 35 (на відповідність)
-\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $\lg 100$
-
-\nopagebreak\vspace{0.3cm}
-\textbf{2} \quad $\sin\dfrac{3\pi}{2}$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $(2 + \sqrt{3})(2 - \sqrt{3})$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $-1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $0$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $2$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $10$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 36
 \zadtask{Спростіть вираз $a - (12a + 5a)$. \nmtyear{2025}}
 \answerTable{$-17a$}{$a - 17a^2$}{$-16a$}{$-6a$}{$-18a$}
+\par\penalty-20
 \end{samepage}
-
-\begin{samepage}
-% Завдання 37 (на відповідність)
-\zadtask{Доберіть до виразу \mbox{(1--3)} його значення \mbox{(А--Д)}, якщо $a = \sqrt{2}$. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.25\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Вираз}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad $a^6$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad $(a - 3)(a + 3)$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad $81^{\log_3 a}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Значення виразу}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $-7$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $-1$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $4$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $8$
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $64$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% Завдання 38 (на відповідність)
-\zadtask{Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.4\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Початок речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{1} \quad Якщо $(m + 1)^2 - 1 = n$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{2} \quad Якщо $\sqrt{2^m} = 2^n$, то
-
-\nopagebreak\vspace{0.2cm}
-\textbf{3} \quad Якщо $\log_{2^n} 4^m = 1$, то
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
-\nopagebreak\vspace{0pt}
-\textit{Закінчення речення}
-
-\nopagebreak\vspace{0.2cm}
-\textbf{А} \quad $n = 2m$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Б} \quad $n = m^2$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{В} \quad $n = m^2 + 2m$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Г} \quad $n = \sqrt{m}$.
-
-\nopagebreak\vspace{0.2cm}
-\textbf{Д} \quad $n = \dfrac{m}{2}$.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.18\textwidth}
-\nopagebreak\vspace{0pt}
-\matchingGrid
-\end{minipage}
-\par\vspace{0.25cm}
-\end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №2
@@ -1077,36 +468,7 @@
 \answerTable{$3 - 8x^2$}{$18 - 8x^2$}{$27 - 8x^2$}{$22x^2 + 33$}{$22x^2 + 3$}
 % Відповідь: А
 \ifshowsolutions\solution{Розкриваємо дужки: $15-4(2x^2+3)=15-8x^2-12=3-8x^2$. Відповідь: \textbf{А}.}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 3.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
-\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a \neq 0$. \nmtyear{2026}
-
-\nopagebreak\vspace{0.3cm}
-\noindent
-\begin{minipage}[t]{0.42\textwidth}
-\textit{Вираз}\par\vspace{0.2cm}
-\textbf{1} \quad $\sqrt[3]{\dfrac{27}{a^3}}$\\[0.55cm]
-\textbf{2} \quad $a^{-2}\cdot a^3 \cdot \log_{27} 3$\\[0.4cm]
-\textbf{3} \quad $\dfrac{(a-3)^2 - a^2 - 9}{2}$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\textwidth}
-\textit{Тотожно рівний вираз}\par\vspace{0.2cm}
-\textbf{А} \quad $-3a$\\[0.2cm]
-\textbf{Б} \quad $\dfrac{3}{a}$\\[0.25cm]
-\textbf{В} \quad $0$\\[0.2cm]
-\textbf{Г} \quad $\dfrac{a}{3}$\\[0.25cm]
-\textbf{Д} \quad $3a$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.5cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}
-% Відповідь: 1~--~Б, 2~--~Г, 3~--~А
-\ifshowsolutions\solution{\textbf{1}: $\sqrt[3]{\dfrac{27}{a^3}} = \dfrac{3}{a}$~--- Б. \textbf{2}: $a^{-2}\cdot a^3\cdot\log_{27}3 = a\cdot\dfrac13 = \dfrac{a}{3}$~--- Г. \textbf{3}: $\dfrac{(a-3)^2 - a^2 - 9}{2} = \dfrac{-6a}{2} = -3a$~--- А. Відповідь: \textbf{1~--~Б, 2~--~Г, 3~--~А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1115,34 +477,743 @@
 \answerTable{$8a - 52$}{$-8a - 52$}{$8a - 20$}{$-52$}{$8a + 52$}
 % Відповідь: А
 \ifshowsolutions\solution{$(a+6)(a-6)-(a-4)^2 = (a^2-36)-(a^2-8a+16)=8a-52$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №13
 \zadtask{Спростіть вираз $25b - (b - 5)(5 + b) + 25$. \nmtyear{2026}}
 \answerTableTall{$-b^2 + 25b + 50$}{$b^2 + 25b + 50$}{$-b^2 + 25$}{$-b^2 + 25b$}{$b^2 + 25b$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №13 --- основна тема: Дробові раціональні вирази і перетворення
 \zadtask{Якщо числа $x$ і $y$ задовольняють умови $5x - y = 4$ і $5x + y \neq 0$, то $\dfrac{5x + y}{25x^2 - y^2} =$ \nmtyear{2026}}
 \answerTable{$0{,}25$}{$-4$}{$1$}{$4$}{$-0{,}25$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 15.06, завдання №3
+\zadtask{Розкладіть на множники вираз $x^2 - 36$. \nmtyear{2026}}
+\answerTable{$(x-18)(x+18)$}{$(x-6)^2$}{$(x-6)(x+6)$}{$(x+6)^2$}{$(x-18)^2$}
+% Відповідь: В
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №6
+\zadtask{Яке число потрібно підставити замість $x$, щоб рівність $(3a + 4)^2 = 9a^2 + xa + 16$ була правильною? \nmtyear{2026}}
+\answerTable{$0$}{$7$}{$12$}{$24$}{$48$}
+% Відповідь: Г
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 19.06, завдання №6
+\zadtask{Спростіть вираз $(9a + 2b)^2 - 18ab$, якщо $a = \dfrac{1}{3}$. \nmtyear{2026}}
+\answerTableTall{$4b^2 + 9$}{$4b^2 - 6b + 9$}{$4b^2 + 6b + 9$}{$2b^2 - 6b + 9$}{$4b^2 + 6b + 6$}
+% Відповідь: В
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання на встановлення відповідності}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.35\textwidth}
+\textit{Початок речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad Якщо $|-n| = a$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad Якщо $(n - 2)(n + 1) - n^2 = a$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad Якщо $2^{-\lg n} = 2^{\lg a}$, то
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.25\textwidth}
+\textit{Закінчення речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $a = -n - 2$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $a = \dfrac{1}{n}$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $a = n$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $a = -2$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $a = -n$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 14 (на відповідність - золотий перетин)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі. Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.28\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\varphi \cdot \dfrac{\sqrt{5} - 1}{2}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\log_5(2\varphi - \sqrt{5})$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\varphi - 2$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Твердження про значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є натуральним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є цілим від'ємним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad дорівнює 0
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad є раціональним нецілим числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad є ірраціональним числом
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 15 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.28\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $(\sqrt{2} + 5)(\sqrt{2} - 5)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $2\log_2\sqrt{8}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $|1 - \sqrt{2}|$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Твердження про значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є цілим додатним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є цілим від'ємним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad дорівнює 0
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad є нецілим додатним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad є нецілим від'ємним числом
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 17 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.25\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $x^2 + 8x + 16$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\dfrac{x - 1}{\sqrt{5}}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\lg x^0$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $5$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $\sqrt{5}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $1 - \sqrt{5}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $-5$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 20 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.2\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $(\sqrt{3} - 1)^2$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\sqrt[3]{-8^2}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $\dfrac{\sqrt{12}}{\sqrt{3}}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Твердження про значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є ірраціональним додатним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є ірраціональним від'ємним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad дорівнює 0
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad є натуральним числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad є цілим від'ємним числом
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 21 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $2e \cdot \dfrac{1}{e}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $\ln 1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $(e - 1)(e + 1) - e^2$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 25 (на відповідність з числовою прямою - золотий перетин)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\dfrac{\sqrt{5} - 1}{2} - \varphi$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $(1 - \sqrt{5}) \cdot \varphi$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\log_5(2\varphi - \sqrt{5})$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Точка}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $K$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $L$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $M$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $N$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $P$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 27 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.28\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\ln\dfrac{1}{e}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $e + 1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $(e - 1)^2 - e^2 + 2e$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Твердження про значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad є додатним цілим числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad є від'ємним цілим числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad є додатним нецілим числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad є від'ємним нецілим числом
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad дорівнює 0
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 28 (на відповідність)
+\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\log_3 27$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\mathrm{tg}\,\dfrac{2\pi}{3}$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{3} \quad $\dfrac{1}{\sqrt{5} - \sqrt{2}} : (\sqrt{5} + \sqrt{2})$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $-3$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $\sqrt{3}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $\dfrac{1}{3}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $-\sqrt{3}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $3$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 32 (на відповідність - золотий перетин з проміжками)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} та проміжок \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.25\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\varphi^0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $(\sqrt{5} - 1)\varphi$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $\log_{\frac{1}{5}}(2\varphi - 1)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Проміжок}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $(-\infty; -1]$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $(-1; 0]$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $(0; 1]$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $(1; 2]$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $(2; +\infty)$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 35 (на відповідність)
+\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $\lg 100$
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{2} \quad $\sin\dfrac{3\pi}{2}$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $(2 + \sqrt{3})(2 - \sqrt{3})$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $-1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $0$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $2$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $10$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 37 (на відповідність)
+\zadtask{Доберіть до виразу \mbox{(1--3)} його значення \mbox{(А--Д)}, якщо $a = \sqrt{2}$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.25\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Вираз}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad $a^6$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad $(a - 3)(a + 3)$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad $81^{\log_3 a}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Значення виразу}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $-7$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $-1$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $4$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $8$
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $64$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 38 (на відповідність)
+\zadtask{Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.37\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Початок речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{1} \quad Якщо $(m + 1)^2 - 1 = n$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{2} \quad Якщо $\sqrt{2^m} = 2^n$, то
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{3} \quad Якщо $\log_{2^n} 4^m = 1$, то
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\nopagebreak\nbvspace{0pt}
+\textit{Закінчення речення}
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{А} \quad $n = 2m$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Б} \quad $n = m^2$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{В} \quad $n = m^2 + 2m$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Г} \quad $n = \sqrt{m}$.
+
+\nopagebreak\nbvspace{0.2cm}
+\textbf{Д} \quad $n = \dfrac{m}{2}$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.21\textwidth}
+\nopagebreak\nbvspace{0pt}
+\matchingGrid
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 3.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a \neq 0$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Вираз}\par\nbvspace{0.2cm}
+\textbf{1} \quad $\sqrt[3]{\dfrac{27}{a^3}}$\\[0.55cm]
+\textbf{2} \quad $a^{-2}\cdot a^3 \cdot \log_{27} 3$\\[0.4cm]
+\textbf{3} \quad $\dfrac{(a-3)^2 - a^2 - 9}{2}$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Тотожно рівний вираз}\par\nbvspace{0.2cm}
+\textbf{А} \quad $-3a$\\[0.2cm]
+\textbf{Б} \quad $\dfrac{3}{a}$\\[0.25cm]
+\textbf{В} \quad $0$\\[0.2cm]
+\textbf{Г} \quad $\dfrac{a}{3}$\\[0.25cm]
+\textbf{Д} \quad $3a$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\nopagebreak\nbvspace{0.5cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+% Відповідь: 1~--~Б, 2~--~Г, 3~--~А
+\ifshowsolutions\solution{\textbf{1}: $\sqrt[3]{\dfrac{27}{a^3}} = \dfrac{3}{a}$~--- Б. \textbf{2}: $a^{-2}\cdot a^3\cdot\log_{27}3 = a\cdot\dfrac13 = \dfrac{a}{3}$~--- Г. \textbf{3}: $\dfrac{(a-3)^2 - a^2 - 9}{2} = \dfrac{-6a}{2} = -3a$~--- А. Відповідь: \textbf{1~--~Б, 2~--~Г, 3~--~А}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №16 --- основна тема: Степені. Одночлени. Стандартний вигляд числа
 \zadtask{Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \begin{minipage}[t]{0.45\textwidth}
-\textit{Числовий вираз}\par\vspace{0.15cm}
+\textit{Числовий вираз}\par\nbvspace{0.15cm}
 \textbf{1} \quad $\dfrac{1}{n} : \dfrac{1}{2}$\\[0.3cm]
 \textbf{2} \quad $10n^2 - 2n(5n - 1)$\\[0.3cm]
 \textbf{3} \quad $\log_{25} 5^n$
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.3\textwidth}
-\textit{Тотожно рівний вираз}\par\vspace{0.15cm}
+\textit{Тотожно рівний вираз}\par\nbvspace{0.15cm}
 \textbf{А} \quad $-2n$\\[0.15cm]
 \textbf{Б} \quad $\dfrac{2}{n}$\\[0.15cm]
 \textbf{В} \quad $\dfrac{n}{2}$\\[0.15cm]
@@ -1151,41 +1222,21 @@
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\vspace{0.4cm}
+\nopagebreak\nbvspace{0.4cm}
 \begin{flushright}\matchingGrid\end{flushright}
 \end{minipage}}
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 15.06, завдання №3
-\zadtask{Розкладіть на множники вираз $x^2 - 36$. \nmtyear{2026}}
-\answerTable{$(x-18)(x+18)$}{$(x-6)^2$}{$(x-6)(x+6)$}{$(x+6)^2$}{$(x-18)^2$}
-% Відповідь: В
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 18.06, завдання №6
-\zadtask{Яке число потрібно підставити замість $x$, щоб рівність $(3a + 4)^2 = 9a^2 + xa + 16$ була правильною? \nmtyear{2026}}
-\answerTable{$0$}{$7$}{$12$}{$24$}{$48$}
-% Відповідь: Г
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 19.06, завдання №6
-\zadtask{Спростіть вираз $(9a + 2b)^2 - 18ab$, якщо $a = \dfrac{1}{3}$. \nmtyear{2026}}
-\answerTableTall{$4b^2 + 9$}{$4b^2 - 6b + 9$}{$4b^2 + 6b + 9$}{$2b^2 - 6b + 9$}{$4b^2 + 6b + 6$}
-% Відповідь: В
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{39.}~А \ {\scriptsize\color{gray}(2.06, №2)}\par
-\noindent\textbf{40.}~1~--~Б, 2~--~Г, 3~--~А \ {\scriptsize\color{gray}(3.06, №16)}\par
-\noindent\textbf{41.}~А \ {\scriptsize\color{gray}(5.06, №6)}\par
-\noindent\textbf{45.}~В \ {\scriptsize\color{gray}(15.06, №3)}\par
-\noindent\textbf{46.}~Г \ {\scriptsize\color{gray}(18.06, №6)}\par
-\noindent\textbf{47.}~В \ {\scriptsize\color{gray}(19.06, №6)}\par
+\noindent\textbf{26.}~А \ {\scriptsize\color{gray}(2.06, №2)}\par
+\noindent\textbf{27.}~А \ {\scriptsize\color{gray}(5.06, №6)}\par
+\noindent\textbf{30.}~В \ {\scriptsize\color{gray}(15.06, №3)}\par
+\noindent\textbf{31.}~Г \ {\scriptsize\color{gray}(18.06, №6)}\par
+\noindent\textbf{32.}~В \ {\scriptsize\color{gray}(19.06, №6)}\par
+\noindent\textbf{46.}~1~--~Б, 2~--~Г, 3~--~А \ {\scriptsize\color{gray}(3.06, №16)}\par
 \end{multicols}
 \fi
 

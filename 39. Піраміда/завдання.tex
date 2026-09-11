@@ -98,7 +98,7 @@
 \par\vspace{0.4cm}
 \begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
     halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-#1
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
 \end{tcolorbox}
 \par\vspace{0.3cm}
 }
@@ -139,12 +139,12 @@
 \noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
 }
 \newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
 \newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
 \newcounter{ans}
 \newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
 % мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\hfill\penalty50\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{(НМТ~#1)}}}
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
 % --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
 \newcommand{\solution}[1]{%
 \par\vspace{0.12cm}
@@ -168,6 +168,11 @@
 \par\vspace{0.3cm}
 \noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
 \noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -217,7 +222,7 @@
     \noindent
     \matchingGrid}
 \providecommand{\answerListVertical}[5]{%
-    \vspace{0.2cm}
+    \par\nopagebreak\vspace{0.2cm}
     \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
         \item[\textbf{А}] #1
         \item[\textbf{Б}] #2
@@ -228,164 +233,138 @@
     \vspace{0.2cm}}
 
 \chapterTitle{Тема 39. Піраміда}
-\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 49 (НМТ \mbox{2023~--- 10}, \mbox{2024~--- 14}, \mbox{2025~--- 15}, \mbox{2026~--- 10}).}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 49 (НМТ \mbox{2023~--- 10}, \mbox{2024~--- 14}, \mbox{2025~--- 15}, \mbox{2026~--- 10}); \mbox{тестових~--- 28}; \mbox{з короткою відповіддю~--- 21}.}\par\vspace{0.2cm}
 
-\typeTitle{НМТ 2023}
-
-\begin{samepage}
-% === ЗАВДАННЯ 1 (Діагональний переріз правильної 4-кутної - рівносторонній трикутник 6) ===
-\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник зі стороною 6. Визначте об’єм $V$ цієї піраміди. У відповіді запишіть значення $\dfrac{V}{\sqrt{3}}$. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 2 (Діагональний переріз прямокутний трикутник) ===
-\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм (у \text{см}$^3$) піраміди, якщо її бічне ребро дорівнює $6\sqrt{2}$~\text{см}. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 3 (Бічна грань правильної трикутної - рівносторонній) ===
-\noindent\zadnum Бічна грань правильної трикутної піраміди є рівностороннім трикутником зі стороною $4\sqrt{6}$~\text{см}. Визначте висоту (у \text{см}) цієї піраміди. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 4 (Бічна грань - прямокутний трикутник) ===
-\noindent\zadnum Бічна грань правильної трикутної піраміди є прямокутним трикутником з гіпотенузою 6~\text{см}. Визначте площу (у \text{см}$^2$) бічної поверхні цієї піраміди. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 5 (Правильна трикутна сторона 8sqrt3, апофема 8) ===
-\noindent\zadnum Сторона основи правильної трикутної піраміди дорівнює $8\sqrt{3}$, апофема – 8. Визначте об’єм цієї піраміди. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 6 (Діагональний переріз площа 72sqrt3) ===
-\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, площа якого дорівнює $72\sqrt{3}$. Визначте площу основи цієї піраміди. \nmtyear{2023}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
+\typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
 % === ЗАВДАННЯ 7 (Формула бічної пов. прав. 4-кутної) ===
 \noindent\zadnum Укажіть формулу для обчислення площі $S$ бічної поверхні правильної чотирикутної піраміди, сторона основи й апофема якої дорівнюють $a$. \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{$S=\dfrac{a^2}{2}$}{$S=2a^2$}{$S=a^4$}{$S=6a^2$}{$S=4a^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 8 (Формула повної поверхні 4-кутної) ===
 \noindent\zadnum Укажіть формулу, за якою визначається площа $S$ повної поверхні правильної чотирикутної піраміди, сторона основи якої і апофема дорівнюють $a$. \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{$S=6a^2$}{$S=3a^2$}{$S=2a^2$}{$S=5a^2$}{$S=a^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 9 (Формула об'єму прав. 4-кутної a і a) ===
 \noindent\zadnum Укажіть формулу для обчислення об’єму $V$ правильної чотирикутної піраміди, сторона основи й висота якої дорівнюють $a$. \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{$V=\sqrt{5}a^2$}{$V=\dfrac{a^3}{4}$}{$V=\sqrt{3}a^2$}{$V=\dfrac{a^3}{3}$}{$V=a^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 10 (Основа - прямокутний рівнобедрений трикутник) ===
 \noindent\zadnum Основою трикутної піраміди є рівнобедрений прямокутний трикутник із катетом $a$. Укажіть формулу для обчислення об’єму $V$ цієї піраміди, якщо її висота дорівнює катету основи. \nmtyear{2023}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{$V=\dfrac{a^3}{2}$}{$V=\dfrac{a^3}{6}$}{$V=\dfrac{a^3}{4}$}{$V=\dfrac{a^3}{3}$}{$V=a^3$}
+\par\penalty-20
 \end{samepage}
-
-\typeTitle{НМТ 2024}
 
 \begin{samepage}
 % === ЗАВДАННЯ 11 (Теорія - бічна грань 4-кутної) ===
 \noindent\zadnum Доберіть закінчення речення так, щоб утворилося правильне твердження: «Бічною гранню правильної чотирикутної піраміди є... \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \textbf{А} \quad квадрат».
 
+\nmtnobreak
 \noindent
 \textbf{Б} \quad рівнобедрений трикутник».
 
+\nmtnobreak
 \noindent
 \textbf{В} \quad прямокутний трикутник».
 
+\nmtnobreak
 \noindent
 \textbf{Г} \quad паралелограм».
 
+\nmtnobreak
 \noindent
 \textbf{Д} \quad відрізок».
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 12 (Прямокутник 6x8, H=діагональ) ===
 \noindent\zadnum В основі чотирикутної піраміди лежить прямокутник зі сторонами 6~см та 8~см, а висота піраміди дорівнює діагоналі основи. Знайдіть об’єм піраміди. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTableTall{160 \text{см}$^3$}{240 \text{см}$^3$}{$\dfrac{280}{3}$ \text{см}$^3$}{280 \text{см}$^3$}{480 \text{см}$^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 13 (Ромб сторона 10, діагональ 12, H=сторона) ===
 \noindent\zadnum Основою чотирикутної піраміди є ромб зі стороною 10~см. Менша діагональ ромба дорівнює 12~см. Знайдіть об’єм цієї піраміди, якщо її висота дорівнює стороні основи. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{1200 \text{см}$^3$}{320 \text{см}$^3$}{480 \text{см}$^3$}{640 \text{см}$^3$}{960 \text{см}$^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 14 (Правильна трикутна, S бічна) ===
 \noindent\zadnum Обчисліть площу бічної поверхні правильної трикутної піраміди, сторона основи якої дорівнює 8~см, а апофема на 2~см більша за сторону основи піраміди. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{120 \text{см}$^2$}{384 \text{см}$^2$}{72 \text{см}$^2$}{192 \text{см}$^2$}{240 \text{см}$^2$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 15 (Теорія - 4-кутна піраміда) ===
 \noindent\zadnum Укажіть многогранник, що має одну грань основи та чотири бічні грані. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \textbf{А} \quad трикутна призма
 
+\nmtnobreak
 \noindent
 \textbf{Б} \quad чотирикутна призма
 
+\nmtnobreak
 \noindent
 \textbf{В} \quad п’ятикутна призма
 
+\nmtnobreak
 \noindent
 \textbf{Г} \quad трикутна піраміда
 
+\nmtnobreak
 \noindent
 \textbf{Д} \quad чотирикутна піраміда
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -393,7 +372,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено чотирикутну піраміду $SABCD$. Чим є для цієї піраміди відрізок $SA$? \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad ребро основи
 
 \textbf{Б} \quad діагональ основи
@@ -406,7 +385,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \coordinate (A) at (0,0);
@@ -417,7 +396,7 @@
 
     \draw[dashed] (S) -- (B);
     \draw[dashed] (A) -- (B) -- (C);
-    
+
     \draw[thick] (S) -- (A) -- (D) -- (S) -- (C) -- (D);
     \draw[thick] (A) -- (D);
 
@@ -430,25 +409,29 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 17 (Трикутна піраміда, площа основи 25) ===
 \noindent\zadnum Площа основи трикутної піраміди дорівнює площі квадрата зі стороною 5~см. Визначте об’єм піраміди, якщо вершина віддалена на 24~см від площини основи. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{200 \text{см}$^3$}{160 \text{см}$^3$}{300 \text{см}$^3$}{480 \text{см}$^3$}{600 \text{см}$^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 18 (Ромб 12 і 20, H=15) ===
 \noindent\zadnum В основі чотирикутної піраміди лежить ромб з діагоналями 12~см і 20~см. Знайдіть об’єм цієї піраміди, якщо її висота дорівнює 15~см. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{1600 \text{см}$^3$}{1200 \text{см}$^3$}{600 \text{см}$^3$}{1800 \text{см}$^3$}{800 \text{см}$^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -456,7 +439,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$, $O$ – центр кола, вписаного у трикутник $ABC$. Укажіть площину, яка \textit{може} проходити через $OB$ та точку $A$. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad $ASB$
 
 \textbf{Б} \quad $ASC$
@@ -469,7 +452,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round, line cap=round,
     x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}] % Налаштування осей для 3D
@@ -488,7 +471,7 @@
     \draw[dashed] (C) -- (A);
     \draw[dashed] (C) -- (B);
     \draw[dashed] (S) -- (C);
-    
+
     % Додаткові пунктири для завдання (O, B, A на площині)
     \draw[dashed, gray] (A) -- (O) -- (B); 
     \draw[dashed, gray] (C) -- (O);
@@ -504,7 +487,7 @@
     \node[right] at (B) {$B$};
     \node[above left] at (C) {$C$}; % C ззаду
     \node[above] at (S) {$S$};
-    
+
     \fill[black] (O) circle (1.5pt) node[below right, yshift=-2pt] {$O$};
     \fill[black] (A) circle (1.5pt);
     \fill[black] (B) circle (1.5pt);
@@ -512,15 +495,17 @@
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
-\par\vspace{0.25cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 20 (Дубль ромба 12 і 20 - за запитом) ===
 \noindent\zadnum В основі чотирикутної піраміди лежить ромб з діагоналями 12~см і 20~см. Знайдіть об’єм цієї піраміди, якщо її висота дорівнює 15~см. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \answerTable{1600 \text{см}$^3$}{800 \text{см}$^3$}{1800 \text{см}$^3$}{600 \text{см}$^3$}{1200 \text{см}$^3$}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -528,7 +513,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Точка $M$ – середина ребра $AB$. Укажіть лінію перетину площин $SMC$ і $ABS$. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad $SM$
 
 \textbf{Б} \quad $AB$
@@ -541,7 +526,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
     x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
@@ -579,9 +564,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -589,7 +574,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Точка $M$ – середина ребра $AB$. Укажіть пряму, що лежить у площині $SCM$. \nmtyear{2024}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad $SB$
 
 \textbf{Б} \quad $AM$
@@ -602,7 +587,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
     x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
@@ -643,100 +628,39 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 23 (Координати - Прямокутний рівнобедрений в основі) ===
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі задано трикутну піраміду $SABC$ з вершиною $S(0; 0; 9)$. Основою піраміди є прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$), що лежить у площині $xy$, $A(-8; 10; 0)$, $B(8; -2; 0)$. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-    % Осі
-    \draw[-latex, gray] (0,0,0) -- (4,0,0) node[left] {$x$};
-    \draw[-latex, gray] (0,0,0) -- (0,4,0) node[right] {$y$};
-    \draw[-latex, gray] (0,0,0) -- (0,0,5) node[left] {$z$};
-    
-    % Точки (схематично для візуалізації умов)
-    \coordinate (S) at (0,0,4); % Масштабовано
-    \coordinate (A) at (2, -2, 0);
-    \coordinate (B) at (-1, 3, 0);
-    \coordinate (C) at (-1, -2, 0); % Прямий кут тут умовно
-
-    \draw[dashed] (A) -- (C) -- (B);
-    \draw[dashed] (S) -- (C);
-    
-    \draw[thick] (S) -- (A) -- (B) -- cycle;
-    \draw[thick] (S) -- (B);
-    
-    \node[above] at (S) {$S$};
-    \node[right] at (B) {$B$};
-    \node[left] at (A) {$A$};
-    \node[below] at (C) {$C$};
-    \node[left, font=\tiny] at (0,0,0) {$O$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\end{minipage}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 24 (Координати - Правильна чотирикутна, всі ребра рівні) ===
-\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну піраміду $SABCD$, $A(15; 1; 10)$, $B(-1; 5; 6)$. Усі ребра піраміди рівні. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
-
-\nopagebreak\vspace{0.3cm}
-\nmtAnswerBox
-\end{samepage}
-
-\typeTitle{НМТ 2025}
-
-\begin{samepage}
-% === ЗАВДАННЯ 25 (Діагональний переріз рівносторонній, H=4sqrt6) ===
-\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, висота піраміди дорівнює $4\sqrt{6}$~см. Визначте площу $S$ (у \text{см}$^2$) бічної поверхні цієї піраміди. У відповіді запишіть значення $\dfrac{S}{\sqrt{7}}$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 26 (Теорія - бічна грань шестикутної) ===
 \noindent\zadnum Бічна грань правильної шестикутної піраміди є \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
 \noindent
 \textbf{А} \quad рівнобедреним трикутником
 
+\nmtnobreak
 \noindent
 \textbf{Б} \quad паралелограмом, що не є прямокутником
 
+\nmtnobreak
 \noindent
 \textbf{В} \quad шестикутником
 
+\nmtnobreak
 \noindent
 \textbf{Г} \quad прямокутним трикутником з гострим кутом $30^\circ$
 
+\nmtnobreak
 \noindent
 \textbf{Д} \quad прямокутником
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 27 (Діаг. переріз прямокутний, площа основи 288) ===
-\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм цієї піраміди (у \text{см}$^3$), якщо площа її основи дорівнює 288~\text{см}$^2$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -744,7 +668,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Скільки всього різних площин, паралельних площині основи піраміди, можна провести через її вершину $S$? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad жодної
 
 \textbf{Б} \quad лише одну
@@ -757,11 +681,11 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
     x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-    
+
     \coordinate (A) at (3, -1, 0);
     \coordinate (B) at (1, 3, 0);
     \coordinate (C) at (-2, 0, 0);
@@ -773,7 +697,7 @@
     % Зробимо простіше: основа ABC, вершина S.
     % Невидиме ребро зазвичай те, що ззаду (AC або BC).
     % В даному ракурсі (C зліва ззаду, A спереду, B справа): CB невидиме.
-    
+
     % Перемалюємо чіткіше для відповідності скріншоту
     \draw[thick] (S) -- (A);
     \draw[thick] (S) -- (B);
@@ -781,7 +705,7 @@
     \draw[thick] (A) -- (B);
     \draw[thick] (A) -- (C);
     \draw[dashed] (C) -- (B); 
-    
+
     % Висота (віртуальна для розуміння)
     \draw[dashed, gray] (S) -- (0.5, 1, 0); 
 
@@ -793,25 +717,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 29 (Піраміда і циліндр, Sбіч циліндра 600pi) ===
-\noindent\zadnum Правильна чотирикутна піраміда й циліндр мають рівні висоти. Радіус кола, описаного навколо основи піраміди дорівнює радіусу кола основи циліндра. Площа бічної поверхні циліндра дорівнює $600\pi$~\text{см}$^2$, а площа його основи – $225\pi$~\text{см}$^2$. Знайдіть об’єм піраміди (у \text{см}$^3$). \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 30 (Сфера 648pi і піраміда 45 град) ===
-\noindent\zadnum Задано сферу з площею поверхні $648\pi$~\text{см}$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об’єм піраміди (у \text{см}$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -819,7 +727,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено чотирикутну піраміду $SABCD$. Скільки різних прямих, паралельних прямій $AB$, можна провести через точку $S$? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad жодної
 
 \textbf{Б} \quad лише одна
@@ -832,7 +740,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
     % Координати (класична проекція)
@@ -866,9 +774,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -876,7 +784,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$, $SO$ – висота піраміди. Укажіть пару прямих, що лежать в одній площині. \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad $SB$ і $AC$
 
 \textbf{Б} \quad $SO$ і $AC$
@@ -889,11 +797,11 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
     x={(-0.5cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-    
+
     \coordinate (A) at (3, -1, 0);
     \coordinate (B) at (1, 3, 0);
     \coordinate (C) at (-1, -1, 0);
@@ -921,9 +829,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -931,7 +839,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено чотирикутну піраміду $SABCD$. Скільки прямих, перпендикулярних до висоти $SO$, лежать в площині основи $ABCD$? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad жодної
 
 \textbf{Б} \quad лише одна
@@ -944,7 +852,7 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
     % Координати
@@ -952,7 +860,7 @@
     \coordinate (B) at (1.5, -1);
     \coordinate (C) at (2.5, 0.8);
     \coordinate (D) at (-1, 0.8);
-    
+
     % Центр перетину діагоналей (середина AC)
     \coordinate (O) at (0.25, -0.1); 
     \coordinate (S) at (0.25, 3.2); % Вершина чітко над центром
@@ -960,10 +868,10 @@
     % Основа (невидимі сторони)
     \draw[dashed] (A) -- (D) -- (C);
     \draw[dashed] (S) -- (D);
-    
+
     % Основа (видимі сторони)
     \draw[thick] (A) -- (B) -- (C);
-    
+
     % Ребра
     \draw[thick] (S) -- (A);
     \draw[thick] (S) -- (B);
@@ -981,7 +889,7 @@
     \node[left] at (D) {$D$};
     \node[above] at (S) {$S$};
     \node[below, font=\footnotesize, yshift=-2pt] at (O) {$O$};
-    
+
     % Позначення прямого кута біля висоти
     \draw (O) -- ++(0, 0.25) -- ++(0.25, 0);
 
@@ -989,17 +897,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 34 (Піраміда і циліндр 81pi, кут 45) ===
-\noindent\zadnum Задано правильну чотирикутну піраміду й циліндр з площею основи $81\pi$~\text{см}$^2$. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Бічне ребро піраміди утворює з площиною її основи кут $45^\circ$. Обчисліть об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -1007,7 +907,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$. $AM$ – медіана трикутника $ABC$. Скільки всього площин можна провести через пряму $AM$ та точку $S$? \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad жодної
 
 \textbf{Б} \quad лише одну
@@ -1020,11 +920,11 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
     x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-    
+
     \coordinate (A) at (2, -1, 0);
     \coordinate (B) at (0, 3, 0);
     \coordinate (C) at (-1.5, 0, 0);
@@ -1039,7 +939,7 @@
     \draw[thick] (S) -- (B);
     \draw[thick] (A) -- (B);
     \draw[thick] (A) -- (C);
-    
+
     \node[below left] at (A) {$A$};
     \node[right] at (B) {$B$};
     \node[left] at (C) {$C$};
@@ -1050,17 +950,9 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 37 (Сфера 432pi і трикутна піраміда) ===
-\noindent\zadnum Задано сферу з площею поверхні $432\pi$~\text{см}$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
@@ -1068,7 +960,7 @@
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. $SM$ – апофема піраміди. Бічною гранню цієї піраміди є \nmtyear{2025}
 
-\nopagebreak\vspace{0.3cm}
+\nopagebreak\nbvspace{0.3cm}
 \textbf{А} \quad $SA$
 
 \textbf{Б} \quad $SCM$
@@ -1081,11 +973,11 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\vspace{-0.3cm}
+\nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
     x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-    
+
     \coordinate (A) at (2, -1, 0);
     \coordinate (B) at (0, 3, 0);
     \coordinate (C) at (-1.5, 0, 0);
@@ -1115,28 +1007,10 @@
 \end{center}
 \end{minipage}
 
-\nopagebreak\vspace{0.5cm}
-
-\par\vspace{0.25cm}
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 39 (Конус і трикутна піраміда 25 см) ===
-\noindent\zadnum Твірна конуса і бічне ребро правильної трикутної піраміди дорівнює 25~\text{см}. Апофема піраміди дорівнює радіусу основи конуса. Знайдіть площу бічної поверхні піраміди (у \text{см}$^2$), якщо площа бічної поверхні конуса дорівнює $500\pi$~\text{см}$^2$. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% === ЗАВДАННЯ 40 (Конус і трикутна піраміда, медіана 9) ===
-\noindent\zadnum Конус і правильна трикутна піраміда мають рівні висоти. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи конуса. Обчисліть об’єм (у \text{см}$^3$) піраміди, якщо медіана основи піраміди дорівнює 9~\text{см}, а твірна конуса – 12~\text{см}. \nmtyear{2025}
-
-\nopagebreak\vspace{0.5cm}
-\nmtAnswerBox
-\end{samepage}
-
-\typeTitle{НМТ 2026}
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №3
@@ -1170,10 +1044,11 @@
     \node[below left] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTable{$MC$}{$AB$}{$SB$}{$BC$}{$SM$}
 % Відповідь: Д
 \ifshowsolutions\solution{Спільними точками площин $ABS$ і $MCS$ є $S$ (вершина) та $M$ (бо $M\in AB\subset ABS$ і $M\in MCS$). Через дві спільні точки площини перетинаються по прямій $SM$. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1201,7 +1076,7 @@
     \node[left] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \begin{flushleft}
 \textbf{А} \quad жодної \\[0.1cm]
 \textbf{Б} \quad лише одну \\[0.1cm]
@@ -1211,6 +1086,265 @@
 \end{flushleft}
 % Відповідь: Г
 \ifshowsolutions\solution{Апофема~--- це висота бічної грані, проведена з вершини $S$. Правильна трикутна піраміда має $3$ бічні грані, отже $3$ апофеми. Відповідь: \textbf{Г} (лише три).}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №5
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum На рисунку зображено правильну чотирикутну піраміду $SABCD$, $SO$~--- її висота. Скільки всього є прямих, перпендикулярних до $SO$ та які проходять через дві вершини основи піраміди? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.2cm}
+\par\noindent\textbf{А}\ \ лише одна
+\par\noindent\textbf{Б}\ \ дві
+\par\noindent\textbf{В}\ \ чотири
+\par\noindent\textbf{Г}\ \ шість
+\par\noindent\textbf{Д}\ \ більше шести
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.5,1.2);
+    \coordinate (C) at (5,1.2);
+    \coordinate (D) at (3.5,0);
+    \coordinate (O) at (2.5,0.6);
+    \coordinate (S) at (2.5,4.5);
+    \draw (A) -- (D) -- (C) -- (S) -- cycle;
+    \draw (S) -- (D);
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (S) -- (B);
+    \draw[dashed] (A) -- (C);
+    \draw[dashed] (B) -- (D);
+    \draw[dashed] (S) -- (O);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+    \node[above] at (S) {$S$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.3cm}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 11.06, завдання №5
+\zadtask{У якій просторовій фігурі можна провести апофему? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
+    \item у правильній піраміді
+    \item у конусі
+    \item у циліндрі
+    \item у призмі
+    \item у будь-якій піраміді
+\end{enumerate}
+\nopagebreak\nbvspace{0.1cm}}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №12 --- основна тема: Координати і вектори на площині і в просторі. Рівняння кола
+\zadtask{У прямокутній системі координат у просторі задано піраміду з вершиною $S(-5;\, 12;\, 16)$. Основа цієї піраміди лежить у координатній площині $xy$, точка $K$ є основою висоти цієї піраміди. Знайдіть відстань від точки $K$ до початку координат. \nmtyear{2026}}
+\answerTable{$13$}{$12$}{$5$}{$16$}{$7$}
+% Відповідь: А
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання з короткою відповіддю}
+
+\begin{samepage}
+% === ЗАВДАННЯ 1 (Діагональний переріз правильної 4-кутної - рівносторонній трикутник 6) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник зі стороною 6. Визначте об’єм $V$ цієї піраміди. У відповіді запишіть значення $\dfrac{V}{\sqrt{3}}$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 2 (Діагональний переріз прямокутний трикутник) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм (у \text{см}$^3$) піраміди, якщо її бічне ребро дорівнює $6\sqrt{2}$~\text{см}. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 3 (Бічна грань правильної трикутної - рівносторонній) ===
+\noindent\zadnum Бічна грань правильної трикутної піраміди є рівностороннім трикутником зі стороною $4\sqrt{6}$~\text{см}. Визначте висоту (у \text{см}) цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 4 (Бічна грань - прямокутний трикутник) ===
+\noindent\zadnum Бічна грань правильної трикутної піраміди є прямокутним трикутником з гіпотенузою 6~\text{см}. Визначте площу (у \text{см}$^2$) бічної поверхні цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 5 (Правильна трикутна сторона 8sqrt3, апофема 8) ===
+\noindent\zadnum Сторона основи правильної трикутної піраміди дорівнює $8\sqrt{3}$, апофема – 8. Визначте об’єм цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 6 (Діагональний переріз площа 72sqrt3) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, площа якого дорівнює $72\sqrt{3}$. Визначте площу основи цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 23 (Координати - Прямокутний рівнобедрений в основі) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат у просторі задано трикутну піраміду $SABC$ з вершиною $S(0; 0; 9)$. Основою піраміди є прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$), що лежить у площині $xy$, $A(-8; 10; 0)$, $B(8; -2; 0)$. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+    % Осі
+    \draw[-latex, gray] (0,0,0) -- (4,0,0) node[left] {$x$};
+    \draw[-latex, gray] (0,0,0) -- (0,4,0) node[right] {$y$};
+    \draw[-latex, gray] (0,0,0) -- (0,0,5) node[left] {$z$};
+
+    % Точки (схематично для візуалізації умов)
+    \coordinate (S) at (0,0,4); % Масштабовано
+    \coordinate (A) at (2, -2, 0);
+    \coordinate (B) at (-1, 3, 0);
+    \coordinate (C) at (-1, -2, 0); % Прямий кут тут умовно
+
+    \draw[dashed] (A) -- (C) -- (B);
+    \draw[dashed] (S) -- (C);
+
+    \draw[thick] (S) -- (A) -- (B) -- cycle;
+    \draw[thick] (S) -- (B);
+
+    \node[above] at (S) {$S$};
+    \node[right] at (B) {$B$};
+    \node[left] at (A) {$A$};
+    \node[below] at (C) {$C$};
+    \node[left, font=\tiny] at (0,0,0) {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 24 (Координати - Правильна чотирикутна, всі ребра рівні) ===
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну піраміду $SABCD$, $A(15; 1; 10)$, $B(-1; 5; 6)$. Усі ребра піраміди рівні. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 25 (Діагональний переріз рівносторонній, H=4sqrt6) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, висота піраміди дорівнює $4\sqrt{6}$~см. Визначте площу $S$ (у \text{см}$^2$) бічної поверхні цієї піраміди. У відповіді запишіть значення $\dfrac{S}{\sqrt{7}}$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 27 (Діаг. переріз прямокутний, площа основи 288) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм цієї піраміди (у \text{см}$^3$), якщо площа її основи дорівнює 288~\text{см}$^2$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 29 (Піраміда і циліндр, Sбіч циліндра 600pi) ===
+\noindent\zadnum Правильна чотирикутна піраміда й циліндр мають рівні висоти. Радіус кола, описаного навколо основи піраміди дорівнює радіусу кола основи циліндра. Площа бічної поверхні циліндра дорівнює $600\pi$~\text{см}$^2$, а площа його основи – $225\pi$~\text{см}$^2$. Знайдіть об’єм піраміди (у \text{см}$^3$). \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 30 (Сфера 648pi і піраміда 45 град) ===
+\noindent\zadnum Задано сферу з площею поверхні $648\pi$~\text{см}$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об’єм піраміди (у \text{см}$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 34 (Піраміда і циліндр 81pi, кут 45) ===
+\noindent\zadnum Задано правильну чотирикутну піраміду й циліндр з площею основи $81\pi$~\text{см}$^2$. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Бічне ребро піраміди утворює з площиною її основи кут $45^\circ$. Обчисліть об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 37 (Сфера 432pi і трикутна піраміда) ===
+\noindent\zadnum Задано сферу з площею поверхні $432\pi$~\text{см}$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 39 (Конус і трикутна піраміда 25 см) ===
+\noindent\zadnum Твірна конуса і бічне ребро правильної трикутної піраміди дорівнює 25~\text{см}. Апофема піраміди дорівнює радіусу основи конуса. Знайдіть площу бічної поверхні піраміди (у \text{см}$^2$), якщо площа бічної поверхні конуса дорівнює $500\pi$~\text{см}$^2$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 40 (Конус і трикутна піраміда, медіана 9) ===
+\noindent\zadnum Конус і правильна трикутна піраміда мають рівні висоти. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи конуса. Обчисліть об’єм (у \text{см}$^3$) піраміди, якщо медіана основи піраміди дорівнює 9~\text{см}, а твірна конуса – 12~\text{см}. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1244,6 +1378,7 @@
 \nmtAnswerBox
 % Відповідь: $64$
 \ifshowsolutions\solution{Для основи піраміди $r=\dfrac{a}{2\sqrt3}=4\sqrt3$, звідки сторона $a=24$. Площа бічної поверхні $S=\dfrac12\cdot 3a\cdot l=288$, тож $l=\dfrac{288}{36}=8$ (апофема). З $l^2=h^2+r^2$: $h^2=64-48=16$, $h=4$. Тоді висота й радіус конуса: $h=4$, $R=4\sqrt3$, а $V=\dfrac13\pi R^2 h=\dfrac13\pi\cdot48\cdot4=64\pi$. Отже $\dfrac{V}{\pi}=64$. Відповідь: \textbf{$64$}.}\fi
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1251,7 +1386,7 @@
 \noindent
 \begin{minipage}[c]{0.58\textwidth}
 \zadnum На рисунку зображено правильну чотирикутну призму та правильну чотирикутну піраміду. Сторона основи піраміди вдвічі менша від діагоналі основи призми. Усі ребра піраміди рівні й дорівнюють $3\sqrt{2}$~см. Знайдіть об'єм (у см$^3$) призми, якщо сума довжин висот призми та піраміди дорівнює $13$~см. \nmtyear{2026}
-\par\vspace{0.4cm}
+\par\nbvspace{0.4cm}
 \nmtAnswerBox
 \end{minipage}%
 \hfill
@@ -1284,49 +1419,10 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.3cm}
+\par\nbvspace{0.3cm}
 % Відповідь: $360$
 \ifshowsolutions\solution{Усі ребра піраміди $=3\sqrt2$, тож сторона її основи $a_p=3\sqrt2$, а діагональ основи $a_p\sqrt2=6$. Висота піраміди $h_2=\sqrt{(3\sqrt2)^2-3^2}=\sqrt{18-9}=3$. Сторона основи піраміди вдвічі менша від діагоналі основи призми, тож діагональ призми $=6\sqrt2$, а її сторона $a=\dfrac{6\sqrt2}{\sqrt2}=6$, площа основи $S=36$. Висота призми $h_1=13-3=10$, об'єм $V=36\cdot10=360$~см$^3$. Відповідь: \textbf{360}.}\fi
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 8.06, завдання №5
-\noindent
-\begin{minipage}[c]{0.62\textwidth}
-\zadnum На рисунку зображено правильну чотирикутну піраміду $SABCD$, $SO$~--- її висота. Скільки всього є прямих, перпендикулярних до $SO$ та які проходять через дві вершини основи піраміди? \nmtyear{2026}
-\nopagebreak\vspace{0.2cm}
-\par\noindent\textbf{А}\ \ лише одна
-\par\noindent\textbf{Б}\ \ дві
-\par\noindent\textbf{В}\ \ чотири
-\par\noindent\textbf{Г}\ \ шість
-\par\noindent\textbf{Д}\ \ більше шести
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.36\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (1.5,1.2);
-    \coordinate (C) at (5,1.2);
-    \coordinate (D) at (3.5,0);
-    \coordinate (O) at (2.5,0.6);
-    \coordinate (S) at (2.5,4.5);
-    \draw (A) -- (D) -- (C) -- (S) -- cycle;
-    \draw (S) -- (D);
-    \draw[dashed] (A) -- (B) -- (C);
-    \draw[dashed] (S) -- (B);
-    \draw[dashed] (A) -- (C);
-    \draw[dashed] (B) -- (D);
-    \draw[dashed] (S) -- (O);
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \node[below] at (O) {$O$};
-    \node[above] at (S) {$S$};
-\end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\vspace{0.3cm}
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1378,8 +1474,9 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1410,29 +1507,9 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 11.06, завдання №5
-\zadtask{У якій просторовій фігурі можна провести апофему? \nmtyear{2026}
-\nopagebreak\vspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
-    \item у правильній піраміді
-    \item у конусі
-    \item у циліндрі
-    \item у призмі
-    \item у будь-якій піраміді
-\end{enumerate}
-\nopagebreak\vspace{0.1cm}}
-\end{samepage}
-
-\begin{samepage}
-% НМТ 2026, сесія 18.06, завдання №12 --- основна тема: Координати і вектори на площині і в просторі. Рівняння кола
-\zadtask{У прямокутній системі координат у просторі задано піраміду з вершиною $S(-5;\, 12;\, 16)$. Основа цієї піраміди лежить у координатній площині $xy$, точка $K$ є основою висоти цієї піраміди. Знайдіть відстань від точки $K$ до початку координат. \nmtyear{2026}}
-\answerTable{$13$}{$12$}{$5$}{$16$}{$7$}
-% Відповідь: А
+\par\penalty-20
 \end{samepage}
 
 \begin{samepage}
@@ -1463,19 +1540,20 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\vspace{0.2cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $7200$
+\par\penalty-20
 \end{samepage}
 
 \ifshowsolutions
 \sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
 \begin{multicols}{3}\noindent
-\noindent\textbf{40.}~Д \ {\scriptsize\color{gray}(23.05, №3)}\par
-\noindent\textbf{41.}~Г \ {\scriptsize\color{gray}(30.05, №2)}\par
-\noindent\textbf{42.}~$64$ \ {\scriptsize\color{gray}(1.06, №21)}\par
-\noindent\textbf{43.}~$360$ \ {\scriptsize\color{gray}(4.06, №21)}\par
-\noindent\textbf{48.}~А \ {\scriptsize\color{gray}(18.06, №12)}\par
+\noindent\textbf{24.}~Д \ {\scriptsize\color{gray}(23.05, №3)}\par
+\noindent\textbf{25.}~Г \ {\scriptsize\color{gray}(30.05, №2)}\par
+\noindent\textbf{28.}~А \ {\scriptsize\color{gray}(18.06, №12)}\par
+\noindent\textbf{45.}~$64$ \ {\scriptsize\color{gray}(1.06, №21)}\par
+\noindent\textbf{46.}~$360$ \ {\scriptsize\color{gray}(4.06, №21)}\par
 \noindent\textbf{49.}~$7200$ \ {\scriptsize\color{gray}(19.06, №21)}\par
 \end{multicols}
 \fi
