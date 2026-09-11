@@ -1,0 +1,620 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} Варіант за 12 червня}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt, halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}\par\vspace{0.3cm}}
+\newcommand{\chapterTitle}[1]{\clearpage\sectionTitle{#1}}
+
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \ 
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}}
+
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\par\vspace{0.3cm}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ }
+
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} РЕАЛЬНИЙ ВАРІАНТ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} ВАРІАНТ ЗА 12 ЧЕРВНЯ}\\[0.6cm]
+{\large Real Test Notebook з усіма геометричними рисунками}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+
+\chapterTitle{ТЕСТОВИЙ ЗОШИТ (12 ЧЕРВНЯ)}
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише один правильний. Виберіть правильний варіант відповіді.}
+
+% ===== №1 =====
+\zadtask{Покупець придбав у супермаркеті $3$ пляшки соняшникової олії по $60$~грн кожна. На касі він розрахувався купюрою номіналом $500$~грн. Яку решту повинен отримати покупець?}
+\answerTable{$320$~грн}{$180$~грн}{$120$~грн}{$380$~грн}{$20$~грн}
+
+% ===== №2 =====
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+\zadnum На рисунку зображено графік залежності об'єму води в басейні (у м$^3$) від часу його спорожнення (у год). За графіком визначте, скільки кубічних метрів води залишиться в басейні через $5$ годин після початку його спорожнення.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.52\textwidth}
+\centering
+\begin{tikzpicture}[x=0.55cm, y=0.11cm, thick]
+    \draw[step=1, gray!30, very thin] (0,0) grid (8,40);
+    \draw[->] (0,0) -- (8.8,0) node[right, font=\scriptsize] {$t$, год};
+    \draw[->] (0,0) -- (0,46) node[above, font=\scriptsize] {$V$, м$^3$};
+    \foreach \y in {10,20,30,40} {\node[left, font=\scriptsize] at (0,\y) {\y};}
+    \foreach \xx in {1,2,3,4,5,6,7,8} {\node[below, font=\scriptsize] at (\xx,0) {\xx};}
+    \node[below left, font=\scriptsize] at (0,0) {0};
+    \draw[mainGreen, very thick] (0,40) -- (8,0);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$7$~м$^3$}{$10$~м$^3$}{$15$~м$^3$}{$20$~м$^3$}{$35$~м$^3$}
+
+% ===== №3 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Діагональ $AC$ прямокутника $ABCD$ утворює зі стороною $AB$ кут $60^\circ$ (див. рисунок). $AC = 8$~см. Визначте довжину сторони $AB$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.72, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,2.4);
+    \coordinate (C) at (5.2,2.4);
+    \coordinate (D) at (5.2,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (C);
+    \pic[draw, angle radius=0.3cm, pic text={$60^\circ$}, angle eccentricity=1.9, font=\scriptsize] {angle = C--A--B};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$2\sqrt{3}$~см}{$4$~см}{$4\sqrt{2}$~см}{$4\sqrt{3}$~см}{$2\sqrt{2}$~см}
+
+% ===== №4 =====
+\zadtask{Розв'яжіть рівняння $3(4x - 2) = 0$.}
+\answerTableTall{$2$}{$-0{,}5$}{$\dfrac{1}{6}$}{$\dfrac{1}{4}$}{$0{,}5$}
+
+% ===== №5 =====
+% ===== №5 =====
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum Через вершину $C$ ромба $ABCD$ проведено перпендикуляр $PC$ до площини ромба. Діагоналі ромба перетинаються в точці $O$. Укажіть пряму, яка перпендикулярна до прямої $PO$.
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ $BD$
+\par\noindent\textbf{Б}\ \ $CD$
+\par\noindent\textbf{В}\ \ $BC$
+\par\noindent\textbf{Г}\ \ $PC$
+\par\noindent\textbf{Д}\ \ $AC$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{-1.5cm} % Коригування для вирівнювання графіка з текстом
+\begin{center}
+\begin{tikzpicture}[scale=0.85, line join=round, line cap=round]
+    % Координати вершин
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (4.2,0);
+    \coordinate (B) at (1.8,2.2);
+    \coordinate (C) at (6.0,2.2);
+    \coordinate (O) at (3.0,1.1);
+    \coordinate (P) at (6.0,5.8);
+
+    % Малювання ромба
+    \draw[thick] (A) node[below left=-2pt] {$A$} -- 
+                 (B) node[above left=-2pt] {$B$} -- 
+                 (C) node[right=-2pt] {$C$} -- 
+                 (D) node[below right=-2pt] {$D$} -- cycle;
+                 
+    % Малювання діагоналей
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
+    
+    % Малювання перпендикуляра і похилої
+    \draw[thick] (C) -- (P) node[right=-2pt] {$P$};
+    \draw[thick] (P) -- (O);
+    
+    % Точка перетину діагоналей
+    \node[below=2pt] at (O) {$O$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\par\vspace{0.3cm}
+
+
+% ===== №6 =====
+\zadtask{Яка з нерівностей є правильною, якщо $a = 2^{-3}$, $b = \lg 1$, $c = (-3)^2$?}
+\answerTable{$c < a < b$}{$a < b < c$}{$a < c < b$}{$b < a < c$}{$c < b < a$}
+
+% ===== №7 =====
+\zadtask{Розв'яжіть нерівність $\log_6(3 - 2x) < \log_6 3$.}
+\answerTable{$(-\infty; 0)$}{$(1{,}5; +\infty)$}{$(0; +\infty)$}{$(-1{,}5; 0)$}{$(0; 1{,}5)$}
+
+% ===== №8 =====
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У прямокутній системі координат $xy$ зображено квадрат $KLMN$, $K(-1; 0)$, $L(-1; 2)$, $M(1; 2)$, $N(1; 0)$ (див. рисунок). Скільки спільних точок з квадратом $KLMN$ має графік рівняння $x^2 + y^2 = 4$?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
+    \draw[->] (-2.3,0) -- (2.3,0) node[right] {$x$};
+    \draw[->] (0,-1.3) -- (0,3.3) node[above] {$y$};
+    \node[below right, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (-1,0) {$-1$};
+    \node[below right, font=\scriptsize] at (1,0) {$1$};
+    \node[above left, font=\scriptsize] at (0,1) {$1$};
+    \node[above left, font=\scriptsize] at (0,2) {$2$};
+    \draw[mainGreen, very thick] (-1,0) rectangle (1,2);
+    \node[below left, font=\scriptsize] at (-1,0) {$K$};
+    \node[above left, font=\scriptsize] at (-1,2) {$L$};
+    \node[above right, font=\scriptsize] at (1,2) {$M$};
+    \node[below right, font=\scriptsize] at (1,0) {$N$};
+    
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{жодної}{лише одну}{лише дві}{лише три}{більше трьох}
+
+% ===== №9 =====
+\zadtask{На сторонах $AB$ та $BC$ трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які твердження є правильними?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item $AC \parallel MN$.
+\item Відрізок $MN$ є середньою лінією трикутника $ABC$.
+\item Площі трикутника $MBN$ та чотирикутника $AMNC$ рівні.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише II}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+
+% ===== №10 =====
+\zadtask{Визначте лінійну функцію, графік якої утворює з додатним напрямом осі $x$ кут $45^\circ$.}
+\answerTableTall{$y = 1 - x$}{$y = \dfrac{\sqrt{2}}{2}x - 1$}{$y = \dfrac{1}{\sqrt{3}}x + 1$}{$y = 1 - \sqrt{3}x$}{$y = x - 1$}
+
+% ===== №11 =====
+\zadtask{Від бази відпочинку «Затишна» до навколишніх озер веде кілька стежок. До озера Прозоре веде 2 стежки, до озера Мальовниче — 4 стежки, а до озера Пісочне — 3 стежки. Турист навмання вибирає одну стежку, щоб дійти до одного з озер. Яка ймовірність того, що турист вибере маршрут до озера Мальовниче?}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9, transform shape]
+    % --- Макроси для об'єктів ---
+    \tikzset{
+        tree/.pic={
+            \draw[brown!80!black, line width=1.2pt] (0,0) -- (0,0.4);
+            \fill[green!70!black] (0,0.4) + (0,0.15) ellipse (0.18 and 0.3);
+            \fill[green!50] (0.06,0.4) + (0,0.15) ellipse (0.08 and 0.2);
+        },
+        grass/.pic={
+            \draw[green!60!black, thick] (0,0) to[bend right=10] (-0.1, 0.15);
+            \draw[green!60!black, thick] (0,0) to[bend left=10] (0.1, 0.12);
+            \draw[green!60!black, thick] (0,0) -- (0, 0.2);
+        }
+    }
+
+    % --- Підписи озер ---
+    \node[above, font=\small] at (-4, 3.0) {Озеро Прозоре};
+    \node[above, font=\small] at (4, 3.0) {Озеро Пісочне};
+    \node[below, font=\small] at (0, -3.5) {Озеро Мальовниче};
+
+    % --- Стежки (малюються під піском і озерами) ---
+    % До Озера Прозоре (2 стежки)
+    \draw[line width=1.5pt, gray!70!black] (-0.8, 2.5) .. controls (-1.5, 1.5) and (-2, 1.5) .. (-3, 1.0);
+    \draw[line width=1.5pt, gray!70!black] (-0.4, 2.5) .. controls (-0.8, 1.5) and (-1.5, 0.5) .. (-2.6, 0.2);
+
+    % До Озера Пісочне (3 стежки)
+    \draw[line width=1.5pt, gray!70!black] (0.2, 2.5) .. controls (0.8, 1.5) and (2, 2.0) .. (3, 1.2);
+    \draw[line width=1.5pt, gray!70!black] (0.6, 2.5) .. controls (1.5, 1.5) and (2, 1.0) .. (3.2, 0.5);
+    \draw[line width=1.5pt, gray!70!black] (1.0, 2.5) .. controls (2.0, 1.5) and (3, 1.5) .. (4, 1.0);
+
+    % До Озера Мальовниче (4 стежки)
+    \draw[line width=1.5pt, gray!70!black] (-0.6, 2.5) .. controls (-1.0, 1.0) and (-1.5, -0.5) .. (-1.2, -1.5);
+    \draw[line width=1.5pt, gray!70!black] (-0.2, 2.5) .. controls (-0.4, 1.0) and (-0.5, -0.5) .. (-0.4, -1.4);
+    \draw[line width=1.5pt, gray!70!black] (0.2, 2.5) .. controls (0.4, 1.0) and (0.5, -0.5) .. (0.6, -1.4);
+    \draw[line width=1.5pt, gray!70!black] (0.6, 2.5) .. controls (1.0, 1.0) and (1.5, -0.5) .. (1.8, -1.6);
+
+    % --- Ліве озеро (Прозоре) ---
+    \fill[yellow!30] plot [smooth cycle] coordinates {(-5.5,0.5) (-4.5,1.7) (-2.8,1.2) (-2.5,-0.2) (-4.5,-0.3)};
+    \fill[cyan!40] plot [smooth cycle] coordinates {(-5.2,0.6) (-4.5,1.4) (-3.1,1.0) (-2.8,0.0) (-4.5,0.0)};
+    \draw[cyan!20, thick] (-4.5, 0.8) to[bend left=10] (-3.8, 0.8);
+    \draw[cyan!20, thick] (-4.0, 0.4) to[bend left=10] (-3.3, 0.4);
+    % Дерева та трава зліва
+    \pic[scale=0.9] at (-5.4, 1.2) {tree};
+    \pic[scale=1.1] at (-4.8, 1.7) {tree};
+    \pic[scale=1.0] at (-5.6, 0.2) {tree};
+    \pic[scale=0.8] at (-4.2, -0.4) {tree};
+    \pic at (-3.5, 1.3) {grass}; \pic at (-3.0, -0.2) {grass};
+
+    % --- Праве озеро (Пісочне) ---
+    \fill[yellow!30] plot [smooth cycle] coordinates {(2.5,0) (2.8,1.5) (4.5,1.8) (5.8,0.8) (5,-0.3)};
+    \fill[cyan!40] plot [smooth cycle] coordinates {(2.8,0.2) (3.1,1.2) (4.5,1.5) (5.4,0.7) (4.8,0.0)};
+    \draw[cyan!20, thick] (3.5, 0.8) to[bend left=10] (4.2, 0.8);
+    \draw[cyan!20, thick] (4.0, 0.4) to[bend left=10] (4.7, 0.4);
+    % Дерева та трава справа
+    \pic[scale=1.1] at (3.1, 1.5) {tree};
+    \pic[scale=0.9] at (5.5, 1.0) {tree};
+    \pic[scale=1.0] at (5.3, -0.1) {tree};
+    \pic at (4.5, 1.8) {grass}; \pic at (3.2, 0.0) {grass};
+
+    % --- Нижнє озеро (Мальовниче) ---
+    \fill[yellow!30] plot [smooth cycle] coordinates {(-2.5,-1.5) (-1,-1.0) (1.5,-1.2) (2.8,-2.0) (1.5,-3.5) (-1.5,-3.2)};
+    \fill[cyan!40] plot [smooth cycle] coordinates {(-2.2,-1.7) (-1,-1.3) (1.2,-1.5) (2.4,-2.1) (1.2,-3.1) (-1.2,-2.9)};
+    \draw[cyan!20, thick] (-0.5, -2.0) to[bend left=10] (0.5, -2.0);
+    \draw[cyan!20, thick] (0.0, -2.5) to[bend left=10] (1.0, -2.5);
+    \draw[cyan!20, thick] (-1.0, -2.5) to[bend left=10] (-0.2, -2.5);
+    % Дерева та трава знизу
+    \pic[scale=1.0] at (-2.3, -1.3) {tree};
+    \pic[scale=0.9] at (-2.0, -1.9) {tree};
+    \pic[scale=1.1] at (2.2, -1.2) {tree};
+    \pic[scale=0.8] at (2.6, -2.2) {tree};
+    \pic at (-1.5, -3.3) {grass}; \pic at (1.8, -3.4) {grass}; \pic at (0, -1.1) {grass};
+
+    % --- Будиночок (База "Затишна") ---
+    \node[above=0.1cm, font=\bfseries] at (0, 6.0) {База відпочинку «Затишна»};
+    \begin{scope}[shift={(0, 3.5)}, scale=0.8]
+        % Палі
+        \fill[brown!80!black] (-1.2, -0.8) rectangle (-1.0, 0);
+        \fill[brown!80!black] (-0.5, -0.8) rectangle (-0.3, 0);
+        \fill[brown!80!black] (0.3, -0.8) rectangle (0.5, 0);
+        \fill[brown!80!black] (1.0, -0.8) rectangle (1.2, 0);
+        
+        % Піщана основа під будинком
+        \fill[yellow!30] (0,-0.8) ellipse (1.8 and 0.4);
+        
+        % Стіни будинку
+        \fill[orange!40!brown] (-1.5, 0) rectangle (1.5, 1.8);
+        % Дах
+        \fill[brown!60!black] (-1.8, 1.8) -- (0, 2.8) -- (1.8, 1.8) -- cycle;
+        
+        % Двері
+        \fill[brown!80!black] (-0.3, 0) rectangle (0.3, 1.2);
+        \fill[orange!20] (-0.15, 0.5) rectangle (0.15, 1.0); 
+        
+        % Вікна
+        \fill[cyan!10] (-1.2, 0.6) rectangle (-0.5, 1.4);
+        \fill[cyan!10] (0.5, 0.6) rectangle (1.2, 1.4);
+        
+        % Рами вікон
+        \draw[thick, brown!80!black] (-1.2, 0.6) rectangle (-0.5, 1.4);
+        \draw[thick, brown!80!black] (-0.85, 0.6) -- (-0.85, 1.4);
+        \draw[thick, brown!80!black] (-1.2, 1.0) -- (-0.5, 1.0);
+        \draw[thick, brown!80!black] (0.5, 0.6) rectangle (1.2, 1.4);
+        \draw[thick, brown!80!black] (0.85, 0.6) -- (0.85, 1.4);
+        \draw[thick, brown!80!black] (0.5, 1.0) -- (1.2, 1.0);
+    \end{scope}
+
+\end{tikzpicture}
+\end{center}
+
+\answerTableTall{$\dfrac{4}{5}$}{$\dfrac{4}{9}$}{$\dfrac{1}{9}$}{$\dfrac{2}{9}$}{$\dfrac{1}{3}$}
+
+% ===== №12 =====
+\zadtask{У прямокутній системі координат у просторі задано точки $A(-6;\, 0;\, 8)$ і $B(-5;\, 2;\, 6)$. Знайдіть координати вектора $\vec{a} = \overrightarrow{OA} + \overrightarrow{AB}$, де $O$~--- початок координат.}
+\answerTable{$(-11; 2; 14)$}{$(1; 2; -2)$}{$(-5; 2; 6)$}{$(-1; -2; 2)$}{$(-6; 0; 8)$}
+
+% ===== №13 =====
+\zadtask{Обчисліть значення виразу $\sin^2 \alpha + 2\cos^2 \alpha$, якщо $\cos^2 \alpha = 0{,}6$.}
+\answerTable{$1{,}6$}{$2{,}2$}{$1{,}2$}{$2$}{$1{,}36$}
+
+% ===== №14 =====
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum Відпочинкова зона в Парку здоров'я складається з двох ділянок квадратної форми площею $144$~м$^2$ і $225$~м$^2$ і ділянки у формі прямокутного трикутника, гіпотенуза та катет якого є сторонами квадратів (див. рисунок). На ділянці трикутної форми розміщено фонтан, який на схемі зображений у формі кола, що дотикається до сторін трикутника. Визначте радіус цього кола.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{center}
+\begin{tikzpicture}[scale=0.75, line join=round, line cap=round]
+    % Лівий квадрат (225)
+    \draw[thick] (0,0) rectangle (-5,5);
+    \node at (-2.5, 2.5) {$225~м^2$};
+    
+    % Трикутник
+    \draw[thick] (0,0) -- (2.4, 1.8) -- (0,5) -- cycle;
+    
+    % Правий квадрат (144)
+    \draw[thick] (0,5) -- (3.2, 7.4) -- (5.6, 4.2) -- (2.4, 1.8) -- cycle;
+    \node at (2.8, 4.6) {$144~м^2$};
+    
+    % Коло (фонтан)
+    \draw[thick] (1, 2) circle (1);
+    \node[scale=0.95] at (1, 2) {фонтан};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4{,}5$~м}{$9$~м}{$6$~м}{$3$~м}{$1{,}5$~м}
+
+% ===== №15 =====
+\zadtask{Визначте додатний корінь рівняння $\dfrac{1}{x^2} - \dfrac{3}{x} - 10 = 0$.}
+\answerTable{$0{,}5$}{$0{,}8$}{$0{,}2$}{$0{,}25$}{$0{,}1$}
+\newpage
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний варіант, позначений буквою.}
+
+% ===== №16 =====
+\zadtask{Узгодьте вираз (1--3) з тотожно рівним йому виразом (А--Д).\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Числовий вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\dfrac{1}{n} : \dfrac{1}{2}$\\[0.3cm]
+\textbf{2} \quad $10n^2 - 2n(5n - 1)$\\[0.3cm]
+\textbf{3} \quad $\log_{25} 5^n$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Тотожно рівний вираз}\par\vspace{0.15cm}
+\textbf{А} \quad $-2n$\\[0.15cm]
+\textbf{Б} \quad $\dfrac{2}{n}$\\[0.15cm]
+\textbf{В} \quad $\dfrac{n}{2}$\\[0.15cm]
+\textbf{Г} \quad $2n$\\[0.15cm]
+\textbf{Д} \quad $2n^2$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №17 =====
+\zadtask{Доберіть до функції (1--3) її властивість (А--Д).\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = \sqrt{x - 3}$\\[0.25cm]
+\textbf{2} \quad $y = x^2 + 3$\\[0.25cm]
+\textbf{3} \quad $y = 3^x$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.66\textwidth}
+\textit{Властивість функції}\par\vspace{0.2cm}
+\textbf{А} \quad областю значень є проміжок $[3; +\infty)$\\[0.15cm]
+\textbf{Б} \quad областю визначення є проміжок $[3; +\infty)$\\[0.15cm]
+\textbf{В} \quad областю визначення є проміжок $[-3; +\infty)$\\[0.15cm]
+\textbf{Г} \quad зростає на множині всіх дійсних чисел\\[0.15cm]
+\textbf{Д} \quad є непарною
+\end{minipage}}
+
+% ===== №18 =====
+\zadtask{Усередині рівнобічної трапеції $ABCD$ вибрано точку $M$, яка рівновіддалена від усіх вершин трапеції. $\angle BMC = 60^\circ$, $\angle MAD = 30^\circ$. Узгодьте кут (1--3) з його градусною мірою (А--Д).
+\vspace{0.3cm}
+\begin{minipage}[t]{0.65\textwidth}
+\vspace{0.6cm}
+\begin{center}
+\begin{tikzpicture}[scale=1, line join=round, line cap=round]
+    % Центр кола (точка M)
+    \coordinate (M) at (0,0);
+    
+    % Вершини трапеції (лежать на колі радіуса 2.5)
+    \coordinate (B) at (120:2.5);
+    \coordinate (C) at (60:2.5);
+    \coordinate (A) at (210:2.5);
+    \coordinate (D) at (330:2.5);
+    
+    % Малювання трапеції
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    
+    % Відрізки від центру до вершин
+    \draw[thick] (M) -- (A);
+    \draw[thick] (M) -- (B);
+    \draw[thick] (M) -- (C);
+    \draw[thick] (M) -- (D);
+    
+    % Точка M
+    \fill (M) circle (1.5pt);
+    
+    % Підписи вершин
+    \node[below left=-2pt] at (A) {$A$};
+    \node[above left=-2pt] at (B) {$B$};
+    \node[above right=-2pt] at (C) {$C$};
+    \node[below right=-2pt] at (D) {$D$};
+    \node[right=2pt] at (M) {$M$};
+    
+    % Дуга та кут BMC = 60
+    \draw[thick] (60:0.6) arc (60:120:0.6);
+    \node at (90:0.85) {$60^{\circ}$};
+    
+    % Подвійна дуга та кут MAD = 30
+    \draw[thick] ($(A) + (0:0.75)$) arc (0:30:0.75);
+    \draw[thick] ($(A) + (0:0.9)$) arc (0:30:0.9);
+    \node at ($(A) + (15:1.3)$) {$30^{\circ}$};
+    
+    % Позначки рівності (одинарні штрихи на бічних сторонах)
+    \path (A) -- (B) node[midway, sloped] {$|$};
+    \path (C) -- (D) node[midway, sloped] {$|$};
+    
+    % Позначки рівності (подвійні штрихи на відрізках до центру)
+    \path (M) -- (A) node[midway, sloped] {$||$};
+    \path (M) -- (B) node[midway, sloped] {$||$};
+    \path (M) -- (C) node[midway, sloped] {$||$};
+    \path (M) -- (D) node[midway, sloped] {$||$};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Кут}\par\vspace{0.15cm}
+\textbf{1} \quad $\angle AMD$\\[0.25cm]
+\textbf{2} \quad $\angle AMB$\\[0.25cm]
+\textbf{3} \quad $\angle ABC$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Градусна міра кута}\par\vspace{0.15cm}
+\textbf{А} \quad $90^\circ$\\[0.15cm]
+\textbf{Б} \quad $105^\circ$\\[0.15cm]
+\textbf{В} \quad $120^\circ$\\[0.15cm]
+\textbf{Г} \quad $135^\circ$\\[0.15cm]
+\textbf{Д} \quad $150^\circ$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\newpage
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у спеціально відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+
+% ===== №19 =====
+\zadtask{Обчисліть $\displaystyle\int\limits_{0}^{3} \left(\sqrt{x+1} - 2\right)\left(\sqrt{x+1} + 2\right)dx$.}
+\nmtAnswerBox
+
+% ===== №20 =====
+\zadtask{Улітку середня місячна кількість відвідувачів кінотеатру «Мрія» становила $18\,000$ осіб. У червні кількість відвідувачів кінотеатру «Мрія» була на $40\,\%$ більшою, а в серпні~--- на $20\,\%$ більшою, ніж у липні. Визначте кількість відвідувачів кінотеатру «Мрія» в червні.}
+\nmtAnswerBox
+
+% ===== №21 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено правильну трикутну призму й циліндр. Радіус основи циліндра дорівнює радіусу кола, описаного навколо основи призми. Висота призми дорівнює периметру її основи. Визначте площу (у см$^2$) бічної поверхні призми, якщо висота циліндра дорівнює $4$~см, а його об'єм~--- $256\pi$~см$^3$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % трикутна призма
+    \coordinate (a) at (0,0);
+    \coordinate (b) at (2.4,0.5);
+    \coordinate (c) at (1.3,1.4);
+    \coordinate (a2) at (0,4);
+    \coordinate (b2) at (2.4,4.5);
+    \coordinate (c2) at (1.3,5.4);
+    \draw (a) -- (b) -- (c) -- cycle;
+    \draw (a2) -- (b2) -- (c2) -- cycle;
+    \draw (a) -- (a2);
+    \draw (b) -- (b2);
+    \draw[dashed] (c) -- (c2);
+    % циліндр
+    \begin{scope}[shift={(4.6,0.3)}]
+        \draw (0,2.6) ellipse (1.2 and 0.35);
+        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
+        \draw (-1.2,0) -- (-1.2,2.6);
+        \draw (1.2,0) -- (1.2,2.6);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+
+% ===== №22 =====
+\zadtask{Визначте \textit{суму} всіх цілих значень $a$, що належать відрізку $[-4;\, 8]$, за кожного з яких рівняння
+\[
+\dfrac{2^{|3x - a + 8|} - 32}{x + 2} = 0
+\]
+має два різні корені.}
+\nmtAnswerBox
+
+\end{document}

@@ -1,56 +1,163 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=2cm,bottom=2.5cm,top=2.5cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.16}
-\usetikzlibrary{calc,patterns,angles,quotes}
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 11}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Стандартна таблиця відповідей
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
-% Маленька таблиця відповідей (для завдань з рисунком збоку)
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\answerTableSmall}[5]{
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.1cm}|}}
 \hline
@@ -61,41 +168,76 @@
 \end{tabular}
 }
 
-% Таблиця для завдань на відповідність (3 рядки)
-\newcommand{\matchTable}{
-\begin{tabular}{|>{\centering\arraybackslash}p{0.3cm}|*{5}{>{\centering\arraybackslash}p{0.3cm}|}}
-\hline
-& \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\textbf{1} & \rule{0pt}{0.3cm} & & & & \\
-\hline
-\textbf{2} & \rule{0pt}{0.3cm} & & & & \\
-\hline
-\textbf{3} & \rule{0pt}{0.3cm} & & & & \\
-\hline
-\end{tabular}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\definecolor{gold}{RGB}{240, 190, 40}
+\definecolor{silver}{RGB}{170, 170, 175}
+\definecolor{bronze}{RGB}{190, 120, 70}
+\definecolor{hexcol}{RGB}{200,110,60}
+\newcommand{\hexthree}[2]{%
+    \draw[hexcol, line width=1.1pt]
+        ($(#1,#2)+(0:30)$) -- ($(#1,#2)+(60:30)$) -- ($(#1,#2)+(120:30)$) --
+        ($(#1,#2)+(180:30)$) -- ($(#1,#2)+(240:30)$) -- ($(#1,#2)+(300:30)$) -- cycle;
 }
 
-% Команда для завдань з правильним відступом
-\newcommand{\task}[2]{\noindent\makebox[1.5em][l]{\textbf{#1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{#2}}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+\graphicspath{{./}{11. Трикутники/}}
+\chapterTitle{Тема 11. Трикутники}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 82 (НМТ 2023~--- 20, 2024~--- 17, 2025~--- 19, 2026~--- 26).}\par\vspace{0.2cm}
 
-\begin{document}
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Трикутники}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2023}
 
 % Завдання 1
-\task{1}{На сторонах $AB$ та $BC$ трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{На сторонах $AB$ та $BC$ трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -106,10 +248,8 @@ III. & Площа трикутника $MBN$ та чотирикутника $AM
 
 \answerTable{лише I та III}{лише II та III}{лише I та II}{лише II}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 2
-\task{2}{Рівнобедрений трикутник $ABC$ ($AB = BC$) вписано в коло (див. рисунок). Визначте градусну міру меншої дуги $AB$, якщо $\angle ABC = 20°$. \nmtyear{2023}}
+\zadtask{Рівнобедрений трикутник $ABC$ ($AB = BC$) вписано в коло (див. рисунок). Визначте градусну міру меншої дуги $AB$, якщо $\angle ABC = 20°$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -153,10 +293,8 @@ III. & Площа трикутника $MBN$ та чотирикутника $AM
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 3
-\task{3}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -167,10 +305,8 @@ III. & У прямокутному трикутнику одна з його м�
 
 \answerTable{лише I та III}{лише I}{лише III}{лише I та II}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 4
-\task{4}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -181,16 +317,12 @@ III. & Висота, проведена з вершини прямого кут�
 
 \answerTable{лише I та III}{лише I}{I, II та III}{лише II}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 5
-\task{5}{Обчисліть довжину основи рівнобедреного трикутника, якщо його бічна сторона дорівнює 12 \textit{см}, а периметр~--- 40 \textit{см}. \nmtyear{2023}}
+\zadtask{Обчисліть довжину основи рівнобедреного трикутника, якщо його бічна сторона дорівнює 12 \textit{см}, а периметр~--- 40 \textit{см}. \nmtyear{2023}}
 \answerTable{16 \textit{см}}{14 \textit{см}}{12 \textit{см}}{28 \textit{см}}{8 \textit{см}}
 
-\vspace{0.5cm}
-
 % Завдання 6
-\task{6}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -201,10 +333,8 @@ III. & Існує гострокутний трикутник, у якого в�
 
 \answerTable{лише II}{I, II та III}{лише I та II}{лише I та III}{лише II та III}
 
-\vspace{0.5cm}
-
 % Завдання 7
-\task{7}{На сторонах $AB$ та $BC$ довільного трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{На сторонах $AB$ та $BC$ довільного трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -215,10 +345,8 @@ III. & Периметр трикутника $MBN$ дорівнює полови
 
 \answerTable{лише I та III}{лише II та III}{лише II}{лише I та II}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 8
-\task{8}{Задано довільний трикутник $ABC$, у якому $AM$~--- медіана. Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Задано довільний трикутник $ABC$, у якому $AM$~--- медіана. Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -229,10 +357,8 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 
 \answerTable{лише I та III}{лише I}{лише III}{лише II та III}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 9
-\task{9}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -243,10 +369,8 @@ III. & Діагональ будь-якого ромба ділить ромб �
 
 \answerTable{лише II та III}{лише I та III}{лише I}{лише III}{I, II та III}
 
-\newpage
-
 % Завдання 10 (на відповідність)
-\task{10}{У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$~--- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}}
+\zadtask{У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$~--- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.6\textwidth}
@@ -265,14 +389,12 @@ III. & Діагональ будь-якого ромба ділить ромб �
 \includegraphics[scale=0.15]{trapezoid_ABCD.png}
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 11
-\task{11}{Кути гострокутного трикутника $ABC$ задовольняють умову $\angle A < \angle B < \angle C$. Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Кути гострокутного трикутника $ABC$ задовольняють умову $\angle A < \angle B < \angle C$. Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -283,10 +405,8 @@ III. & Довжина висоти, проведеної з вершини $A$, 
 
 \answerTable{лише II та III}{лише I}{лише I та III}{I, II та III}{лише III}
 
-\vspace{0.5cm}
-
 % Завдання 12
-\task{12}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -297,10 +417,8 @@ III. & Діагоналі рівнобічної трапеції рівні. \\
 
 \answerTable{I, II та III}{лише II та III}{лише I та III}{лише III}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 13 (на відповідність, з рисунком)
-\task{13}{У прямокутному трикутнику $ACB$ $\angle C = 90°$, $\angle B = 24°$. На продовженні катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута (1--3) доберіть його градусну міру (А--Д). \nmtyear{2023}}
+\zadtask{У прямокутному трикутнику $ACB$ $\angle C = 90°$, $\angle B = 24°$. На продовженні катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута (1--3) доберіть його градусну міру (А--Д). \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -319,14 +437,12 @@ III. & Діагоналі рівнобічної трапеції рівні. \\
 \includegraphics[scale=0.15]{triangle_ACB_24.png}
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 14
-\task{14}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -337,10 +453,8 @@ III. & Менша діагональ паралелограма ділить й�
 
 \answerTable{лише I та III}{лише II та III}{I, II та III}{лише I}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 15 (на відповідність, з рисунком)
-\task{15}{На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90°$, $\angle B = 32°$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута (1--3) доберіть його градусну міру (А--Д). \nmtyear{2023}}
+\zadtask{На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90°$, $\angle B = 32°$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута (1--3) доберіть його градусну міру (А--Д). \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -359,14 +473,12 @@ III. & Менша діагональ паралелограма ділить й�
 \includegraphics[scale=0.65]{triangle_ACB_32.png}
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 16
-\task{16}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -377,10 +489,8 @@ III. & Середня лінія трикутника перетинає точ�
 
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I}{лише II та III}
 
-\vspace{0.5cm}
-
 % Завдання 17
-\task{17}{У рівнобедреному трикутнику $ABC$ ($AB = BC$) $BK$ --- бісектриса кута $B$, точка $K$ належить стороні $AC$. Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{У рівнобедреному трикутнику $ABC$ ($AB = BC$) $BK$ --- бісектриса кута $B$, точка $K$ належить стороні $AC$. Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -391,10 +501,8 @@ III. & $AK = KC$. \\
 
 \answerTable{лише I та III}{лише II та III}{лише I}{I, II та III}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 18
-\task{18}{Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -405,10 +513,8 @@ III. & У будь-якому прямокутному трикутнику су
 
 \answerTable{лише II}{лише II та III}{лише I та II}{лише III}{лише I та III}
 
-\vspace{0.5cm}
-
 % Завдання 19 (на відповідність, з простим рисунком TikZ)
-\task{19}{Периметр рівнобедреного трикутника (див. рисунок) дорівнює 32 \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}}
+\zadtask{Периметр рівнобедреного трикутника (див. рисунок) дорівнює 32 \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -446,14 +552,12 @@ III. & У будь-якому прямокутному трикутнику су
 \end{tikzpicture}
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 20 (з рисунком)
-\task{20}{У довільний трикутник $ABC$ вписано коло з центром у точці $O$, точки $K$, $L$, $M$ --- точки дотику (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2023}}
+\zadtask{У довільний трикутник $ABC$ вписано коло з центром у точці $O$, точки $K$, $L$, $M$ --- точки дотику (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -473,20 +577,10 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 
 \answerTable{лише II та III}{лише I та II}{лише II}{лише III}{I, II та III}
 
-%======================================================================
-% БЛОК: НМТ 2024
-%======================================================================
-
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2024}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2024}
 
 % Завдання 21 (на відповідність, з рисунком)
-\task{21}{Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L$, $N$, $P$ належать прямій $m$, а точки $K$, $M$, $Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого 156. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2024}}
+\zadtask{Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L$, $N$, $P$ належать прямій $m$, а точки $K$, $M$, $Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого 156. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -501,23 +595,17 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \begin{center}
 \begin{flushright}
 
-    
 \includegraphics[scale=0.4]{circle_parallel_lines_KLM.png}
 \end{flushright}
 \end{center}
 
-
 \vspace{0.3cm}
-\hfill\matchTable
+\hfill\matchingGrid
 \end{minipage}
 \hfill
 
-
-
-\vspace{0.7cm}
-
 % Завдання 23 (на відповідність, з рисунком)
-\task{23}{На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру (1--3) з її площею (А--Д). \nmtyear{2024}}
+\zadtask{На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру (1--3) з її площею (А--Д). \nmtyear{2024}}
 
 \begin{center}
 \begin{flushright}
@@ -537,15 +625,12 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{tabular}
 
 \vspace{0.3cm}
-\hfill\matchTable
+\hfill\matchingGrid
 \end{minipage}
 \hfill
 
-
-\vspace{0.7cm}
-
 % Завдання 25
-\task{25}{У паралелограмі $ABCD$ проведено висоту $BH$. На $BH$ вибрано точку $K$ так, що трикутник $CKD$ є правильним (див. рисунок). Знайдіть площу цього паралелограма, якщо периметр трикутника $CKD$ дорівнює 18, $\angle A = \alpha$. \nmtyear{2024}}
+\zadtask{У паралелограмі $ABCD$ проведено висоту $BH$. На $BH$ вибрано точку $K$ так, що трикутник $CKD$ є правильним (див. рисунок). Знайдіть площу цього паралелограма, якщо периметр трикутника $CKD$ дорівнює 18, $\angle A = \alpha$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.5\textwidth}
@@ -564,10 +649,8 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 26 (з рисунком)
-\task{26}{У трикутнику $ABC$ $\angle A = 40°$, $\angle B = 30°$ (див. рисунок). Визначте градусну міру зовнішнього кута при вершині $C$. \nmtyear{2024}}
+\zadtask{У трикутнику $ABC$ $\angle A = 40°$, $\angle B = 30°$ (див. рисунок). Визначте градусну міру зовнішнього кута при вершині $C$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -614,10 +697,8 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 27 (з рисунком)
-\task{27}{Зовнішній кут при вершині $A$ трикутника $ABC$ дорівнює $100°$, $\angle C = 20°$ (див. рисунок). Визначте градусну міру кута $B$. \nmtyear{2024}}
+\zadtask{Зовнішній кут при вершині $A$ трикутника $ABC$ дорівнює $100°$, $\angle C = 20°$ (див. рисунок). Визначте градусну міру кута $B$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -664,10 +745,8 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 29 (на відповідність, з рисунком)
-\task{29}{На рисунку зображено квадрат $ABCD$, площа якого 144 \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
+\zadtask{На рисунку зображено квадрат $ABCD$, площа якого 144 \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -681,7 +760,7 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{tabular}
 
 \vspace{0.3cm}
-\hfill\matchTable
+\hfill\matchingGrid
 \end{minipage}
 \hfill
 \begin{minipage}{0.4\textwidth}
@@ -724,10 +803,8 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 30 (з рисунком)
-\task{30}{Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -762,12 +839,8 @@ III. & Висота ромба, проведена з вершини $B$ до с
 
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I та III}{лише II та III}
 
-%======================================================================
-% БЛОК: НМТ 2024 (продовження)
-%======================================================================
-
 % Завдання 31
-\task{31}{У паралелограмі $ABCD$ з гострим кутом $\angle A = \alpha$ проведено висоту $BK$ і відрізок $KC$, трикутник $KDC$ є рівнобедреним (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $KD = 6$. \nmtyear{2024}}
+\zadtask{У паралелограмі $ABCD$ з гострим кутом $\angle A = \alpha$ проведено висоту $BK$ і відрізок $KC$, трикутник $KDC$ є рівнобедреним (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $KD = 6$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.5\textwidth}
@@ -825,10 +898,8 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 32
-\task{32}{У рівносторонньому трикутнику $ABC$ $AB = 24$ \textit{см}. З точки $K$, що є серединою сторони $AB$, на сторону $AC$ опущено перпендикуляр $KM$ (див. рисунок). До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}}
+\zadtask{У рівносторонньому трикутнику $ABC$ $AB = 24$ \textit{см}. З точки $K$, що є серединою сторони $AB$, на сторону $AC$ опущено перпендикуляр $KM$ (див. рисунок). До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.4\textwidth}
@@ -869,7 +940,7 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \textbf{Д} \quad дорівнює $12\sqrt{3}$ \textit{см}.
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{minipage}
 \hfill
 \begin{minipage}{0.22\textwidth}
@@ -905,10 +976,8 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 33
-\task{33}{На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90°$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює 10 \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
+\zadtask{На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90°$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює 10 \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.3\textwidth}
@@ -945,7 +1014,7 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \textbf{Д} \quad $4\sqrt{13}$ \textit{см}
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{minipage}
 \hfill
 \begin{minipage}{0.3\textwidth}
@@ -981,10 +1050,8 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 34
-\task{34}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -998,10 +1065,8 @@ III. & Точка перетину серединних перпендикуля
 
 \answerTable{лише I та III}{лише I}{лише II}{I, II та III}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 35
-\task{35}{На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90°$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює 24 \textit{см}, середня лінія трапеції $AKCD$ дорівнює 10 \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
+\zadtask{На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90°$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює 24 \textit{см}, середня лінія трапеції $AKCD$ дорівнює 10 \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.35\textwidth}
@@ -1021,7 +1086,7 @@ III. & Точка перетину серединних перпендикуля
 \quad\quad $ABCD$ та трикутника $KBC$
 
 \vspace{0.3cm}
-\matchTable
+\matchingGrid
 \end{minipage}
 \hfill
 \begin{minipage}{0.25\textwidth}
@@ -1075,10 +1140,8 @@ III. & Точка перетину серединних перпендикуля
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 36
-\task{36}{Трикутник $ABC$ є рівнобедреним ($AB = BC$), $\angle ABC = 50°$ (див. рисунок). Визначте градусну міру зовнішнього кута трикутника при вершині $A$. \nmtyear{2024}}
+\zadtask{Трикутник $ABC$ є рівнобедреним ($AB = BC$), $\angle ABC = 50°$ (див. рисунок). Визначте градусну міру зовнішнього кута трикутника при вершині $A$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -1124,7 +1187,7 @@ III. & Точка перетину серединних перпендикуля
 \end{minipage}
 
 % Завдання 37
-\task{37}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.3em}}p{14cm}}
@@ -1136,7 +1199,7 @@ III. & Діагоналі рівнобічної трапеції точкою �
 \answerTable{лише III}{лише I та II}{лише I та III}{лише II}{лише I}
 
 % Завдання 38
-\task{38}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1147,10 +1210,8 @@ III. & У рівнобедреному трикутнику одна з бісе
 
 \answerTable{лише III}{лише I та III}{лише II та III}{I, II та III}{лише II}
 
-\vspace{0.5cm}
-
 % Завдання 39
-\task{39}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1161,10 +1222,52 @@ III. & Середня лінія будь-якої трапеції ділить
 
 \answerTable{лише II та III}{лише I та III}{I, II та III}{лише III}{лише I та II}
 
-\vspace{0.5cm}
+% Завдання XX (на відповідність)
+\zadtask{Установіть відповідність між геометричною фігурою (1--3) та радіусом кола (А--Д), вписаного в цю фігуру. \nmtyear{2024}}
+
+\vspace{0.3cm}
+\begin{minipage}{0.45\textwidth}
+\textit{Геометрична фігура}
+
+\vspace{0.2cm}
+\textbf{1} \quad ромб з висотою 4 \textit{см}
+
+\vspace{0.2cm}
+\textbf{2} \quad трикутник з площею 24 \textit{см}$^2$
+
+\quad\quad та периметром 12 \textit{см}
+
+\vspace{0.2cm}
+\textbf{3} \quad квадрат з периметром 64 \textit{см}
+\end{minipage}
+\hfill
+\begin{minipage}{0.25\textwidth}
+\textit{Радіус кола, вписаного у фігуру}
+
+\vspace{0.2cm}
+\textbf{А} \quad 4 \textit{см}
+
+\vspace{0.2cm}
+\textbf{Б} \quad $\sqrt{3}$ \textit{см}
+
+\vspace{0.2cm}
+\textbf{В} \quad 8 \textit{см}
+
+\vspace{0.2cm}
+\textbf{Г} \quad 6 \textit{см}
+
+\vspace{0.2cm}
+\textbf{Д} \quad 2 \textit{см}
+\end{minipage}
+\hfill
+\begin{minipage}{0.2\textwidth}
+\matchingGrid
+\end{minipage}
+
+\typeTitle{НМТ 2025}
 
 % Завдання 40
-\task{40}{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $P$, а на стороні $BC$ --- точку $K$ так, що трикутник $PKD$ є рівностороннім, $BP \perp AD$, $PK = 6$, $\angle ABP = \alpha$ (див. рисунок). Визначте площу паралелограма $ABCD$. \nmtyear{2025}}
+\zadtask{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $P$, а на стороні $BC$ --- точку $K$ так, що трикутник $PKD$ є рівностороннім, $BP \perp AD$, $PK = 6$, $\angle ABP = \alpha$ (див. рисунок). Визначте площу паралелограма $ABCD$. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1228,62 +1331,8 @@ III. & Середня лінія будь-якої трапеції ділить
 \end{flushright}
 \end{minipage}
 
-% Завдання XX (на відповідність)
-\task{41}{Установіть відповідність між геометричною фігурою (1--3) та радіусом кола (А--Д), вписаного в цю фігуру. \nmtyear{2024}}
-
-\vspace{0.3cm}
-\begin{minipage}{0.45\textwidth}
-\textit{Геометрична фігура}
-
-\vspace{0.2cm}
-\textbf{1} \quad ромб з висотою 4 \textit{см}
-
-\vspace{0.2cm}
-\textbf{2} \quad трикутник з площею 24 \textit{см}$^2$
-
-\quad\quad та периметром 12 \textit{см}
-
-\vspace{0.2cm}
-\textbf{3} \quad квадрат з периметром 64 \textit{см}
-\end{minipage}
-\hfill
-\begin{minipage}{0.25\textwidth}
-\textit{Радіус кола, вписаного у фігуру}
-
-\vspace{0.2cm}
-\textbf{А} \quad 4 \textit{см}
-
-\vspace{0.2cm}
-\textbf{Б} \quad $\sqrt{3}$ \textit{см}
-
-\vspace{0.2cm}
-\textbf{В} \quad 8 \textit{см}
-
-\vspace{0.2cm}
-\textbf{Г} \quad 6 \textit{см}
-
-\vspace{0.2cm}
-\textbf{Д} \quad 2 \textit{см}
-\end{minipage}
-\hfill
-\begin{minipage}{0.2\textwidth}
-\matchTable
-\end{minipage}
-
-%======================================================================
-% БЛОК: НМТ 2025
-%======================================================================
-
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2025}}
-\end{center}
-
-\vspace{0.5cm}
-
 % Завдання 41
-\task{41}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1293,10 +1342,8 @@ III. & Діагоналі будь-якого прямокутника рівн�
 \end{tabular}
 \answerTable{лише III}{лише I та III}{лише II}{лише II та III}{лише I}
 
-\vspace{0.5cm}
-
 % Завдання 42
-\task{42}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1307,10 +1354,8 @@ III. & Діагональ ромба ділить його на два рівн�
 \end{tabular}
 \answerTable{лише II}{лише I та II}{лише I та III}{лише I}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 43
-\task{43}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1320,11 +1365,9 @@ III. & Навпроти найбільшої сторони трикутника
 \end{tabular}
 \answerTable{лише II}{лише I}{лише II та III}{лише III}{лише I та III}
 
-\vspace{0.5cm}
-
 % Завдання 44
 % Завдання 44
-\task{44}{У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{minipage}{0.58\textwidth}
@@ -1374,7 +1417,7 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
 \answerTable{лише I та II}{I, II та III}{лише I та III}{лише I}{лише II та III}
 
 % Завдання 45
-\task{45}{На рисунку зображено два рівні рівнобедрені трикутники $ABC$ ($AB = BC$) і $CMN$ ($CM = MN$), що лежать в одній площині. $AN = 8$ \textit{см}, $AB = 2\sqrt{17}$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}}
+\zadtask{На рисунку зображено два рівні рівнобедрені трикутники $ABC$ ($AB = BC$) і $CMN$ ($CM = MN$), що лежать в одній площині. $AN = 8$ \textit{см}, $AB = 2\sqrt{17}$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.5\textwidth}
@@ -1410,7 +1453,7 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
 \vspace{0.3cm}
@@ -1444,10 +1487,8 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.5cm}
-
 % Завдання 46
-\task{46}{Задано довільний трикутник $ABC$, у якому $AM$ --- медіана. Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Задано довільний трикутник $ABC$, у якому $AM$ --- медіана. Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1457,10 +1498,8 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 \end{tabular}
 \answerTable{лише I}{лише II та III}{лише I та III}{I, II та III}{лише I та II}
 
-\vspace{0.5cm}
-
 % Завдання 47
-\task{47}{Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}}
+\zadtask{Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.45\textwidth}
@@ -1496,7 +1535,7 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
 \vspace{0.3cm}
@@ -1541,10 +1580,8 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.5cm}
-
 % Завдання 48
-\task{48}{Діагональ квадрата $ABCD$ дорівнює 12 \textit{см}. На стороні $BC$ квадрата вибрано точку $K$ так, що $\angle KAB = 30°$ (див. рисунок). Визначте площу трикутника $ABK$. \nmtyear{2025}}
+\zadtask{Діагональ квадрата $ABCD$ дорівнює 12 \textit{см}. На стороні $BC$ квадрата вибрано точку $K$ так, що $\angle KAB = 30°$ (див. рисунок). Визначте площу трикутника $ABK$. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1583,10 +1620,8 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 49
-\task{49}{Задано довільний трикутник $ABC$, у якому $AM$ --- медіана. Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Задано довільний трикутник $ABC$, у якому $AM$ --- медіана. Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1596,10 +1631,8 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{tabular}
 \answerTable{лише III}{лише II та III}{лише II}{лише I та III}{лише I}
 
-\vspace{0.5cm}
-
 % Завдання 50
-\task{50}{У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}}
+\zadtask{У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1639,7 +1672,7 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{minipage}
 
 % Завдання 51
-\task{51}{На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури (1--3) її площу (А--Д). \nmtyear{2025}}
+\zadtask{На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури (1--3) її площу (А--Д). \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.5\textwidth}
@@ -1675,7 +1708,7 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
 \vspace{0.3cm}
@@ -1713,10 +1746,8 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{tikzpicture}
 \end{center}
 
-\vspace{0.5cm}
-
 % Завдання 52
-\task{52}{Визначте зовнішній кут при вершині $A$ трикутника $ABC$, якщо $\angle B = 50°$, $\angle C = 25°$ (див. рисунок). \nmtyear{2025}}
+\zadtask{Визначте зовнішній кут при вершині $A$ трикутника $ABC$, якщо $\angle B = 50°$, $\angle C = 25°$ (див. рисунок). \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1729,10 +1760,8 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 53
-\task{53}{На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60°$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LPQ$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою (1--3) та її периметром (А--Д). \nmtyear{2025}}
+\zadtask{На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60°$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LPQ$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою (1--3) та її периметром (А--Д). \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{center}
@@ -1773,13 +1802,11 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 54
-\task{54}{У трикутнику $ABC$ проведено бісектрису кута $A$. Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{У трикутнику $ABC$ проведено бісектрису кута $A$. Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1789,10 +1816,8 @@ III. & Центр вписаного в трикутник кола лежить
 \end{tabular}
 \answerTable{лише I та II}{лише I та III}{лише III}{лише I}{лише II}
 
-\vspace{0.5cm}
-
 % Завдання 55
-\task{55}{На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30°$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}}
+\zadtask{На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30°$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1806,7 +1831,7 @@ III. & Центр вписаного в трикутник кола лежить
 \end{minipage}
 
 % Завдання 56
-\task{56}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -1816,10 +1841,8 @@ III. & Діагональ квадрата ділить його на два р�
 \end{tabular}
 \answerTable{лише II}{лише I та III}{лише I та II}{лише I}{I, II та III}
 
-\vspace{0.5cm}
-
 % Завдання 57
-\task{57}{На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює 18 \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}}
+\zadtask{На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює 18 \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.55\textwidth}
@@ -1850,10 +1873,8 @@ III. & Діагональ квадрата ділить його на два р�
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 58
-\task{58}{На паралельних прямих $n$ і $m$ розміщено круговий сектор $ABC$, рівнобедрений трикутник $DKL$ ($DK = KL$) й паралелограм $LMNP$ (див. рисунок). Площа сектора $ABC$ дорівнює $64\pi$ \textit{см}$^2$, площа паралелограма $LMNP$ дорівнює 288 \textit{см}$^2$, $DK = 20$ \textit{см}. Увідповідніть відрізок (1--3) та його довжину (А--Д). \nmtyear{2025}}
+\zadtask{На паралельних прямих $n$ і $m$ розміщено круговий сектор $ABC$, рівнобедрений трикутник $DKL$ ($DK = KL$) й паралелограм $LMNP$ (див. рисунок). Площа сектора $ABC$ дорівнює $64\pi$ \textit{см}$^2$, площа паралелограма $LMNP$ дорівнює 288 \textit{см}$^2$, $DK = 20$ \textit{см}. Увідповідніть відрізок (1--3) та його довжину (А--Д). \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{center}
@@ -1936,9 +1957,775 @@ III. & Діагональ квадрата ділить його на два р�
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
+\typeTitle{НМТ 2026}
 
+% НМТ 2026, сесія 23.05, завдання №2
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum Дано трикутник $ABC$ з кутами $\angle A=30^\circ$ та $\angle B=35^\circ$. Знайдіть градусну міру кута $C$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.8, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (4.5,0);
+    \coordinate (B) at (1,2.8);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \pic [draw, angle radius=0.5cm, "$30^\circ$"{right, shift={(0.15,0.15)}}] {angle = C--A--B};
+    \pic [draw, angle radius=0.4cm, "$35^\circ$"{below, shift={(0.2,-0.1)}}] {angle = A--B--C};
+    \pic [draw, angle radius=0.5cm, red, "?"{left, shift={(-0.15,0.15)}}] {angle = B--C--A};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$75^\circ$}{$100^\circ$}{$115^\circ$}{$120^\circ$}{$30^\circ$}
+% Відповідь: В
+\ifshowsolutions\solution{Сума кутів трикутника $180^\circ$: $\angle C=180^\circ-30^\circ-35^\circ=115^\circ$. Відповідь: \textbf{В}.}\fi
 
+% НМТ 2026, сесія 30.05, завдання №9
+\zadtask{Розгляньте наведені нижче твердження. \nmtyear{2026}
+\vspace{0.2cm}
+\noindent
+\makebox[1.8em][l]{\textbf{I}}\, Найбільший кут прямокутного трикутника дорівнює половині розгорнутого кута.\par\vspace{0.1cm}
+\makebox[1.8em][l]{\textbf{II}}\, Сума двох кутів рівностороннього трикутника дорівнює $120^\circ$.\par\vspace{0.1cm}
+\makebox[1.8em][l]{\textbf{III}}\, Усі гострі кути гострокутного трикутника більші за $60^\circ$.\par\vspace{0.25cm}
+\noindent Які з тверджень є \textit{правильними}?
+\par\vspace{0.2cm}
+\begin{flushleft}
+\textbf{А} \quad лише I \\[0.1cm]
+\textbf{Б} \quad лише II \\[0.1cm]
+\textbf{В} \quad лише I та II \\[0.1cm]
+\textbf{Г} \quad лише II та III \\[0.1cm]
+\textbf{Д} \quad I, II та III
+\end{flushleft}}
+% Відповідь: В
+\ifshowsolutions\solution{\textbf{I}: найбільший кут прямокутного трикутника дорівнює $90^\circ$, а половина розгорнутого кута — $180^\circ:2=90^\circ$ (правильно). \textbf{II}: у рівносторонньому трикутнику всі кути по $60^\circ$, сума двох — $120^\circ$ (правильно). \textbf{III}: гострокутний трикутник може мати кут $\le60^\circ$ (напр. $50^\circ,60^\circ,70^\circ$), тож неправильно. Відповідь: \textbf{В} (лише I та II).}\fi
+
+% НМТ 2026, сесія 30.05, завдання №16 --- основна тема: Квадрат
+\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами (1--3) та їхніми значеннями (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.75, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (4,4);
+    \coordinate (D) at (4,0);
+    \coordinate (K) at (2,6);
+    \coordinate (Mid) at (4,2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K) -- (C);
+    \fill (Mid) circle (2pt);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+    \node[right] at (Mid) {$M$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Величина}\par\vspace{0.15cm}
+\textbf{1} \quad довжина сторони квадрата\\[0.25cm]
+\textbf{2} \quad відстань від точки $K$ до прямої $AD$\\[0.25cm]
+\textbf{3} \quad довжина відрізка $KM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення}\par\vspace{0.15cm}
+\textbf{А} \quad $12$\\[0.15cm]
+\textbf{Б} \quad $10$\\[0.15cm]
+\textbf{В} \quad $4\sqrt{3}$\\[0.15cm]
+\textbf{Г} \quad $4\sqrt{5}$\\[0.15cm]
+\textbf{Д} \quad $8$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1~--~Д, 2~--~А, 3~--~Г
+\ifshowsolutions\solution{Нехай сторона квадрата $a$. Ламана $BADM=BA+AD+DM=a+a+\dfrac a2=\dfrac{5a}{2}=20$, звідки $a=8$ (\textbf{1}~--~Д). Висота трикутника до $BC$ дорівнює $\dfrac a2=4$, тож відстань від $K$ до $AD$: $a+\dfrac a2=12$ (\textbf{2}~--~А). У координатах $K(4;12)$, $M(8;4)$: $KM=\sqrt{4^2+8^2}=\sqrt{80}=4\sqrt5$ (\textbf{3}~--~Г). Відповідь: \textbf{1~--~Д, 2~--~А, 3~--~Г}.}\fi
+
+% НМТ 2026, сесія 1.06, завдання №9
+\zadtask{У рівнобедреному трикутнику $ABC$ ($AB = BC$) $BK$~--- бісектриса кута $B$, точка $K$ належить стороні $AC$. Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}
+\vspace{0.2cm}
+\noindent
+\makebox[1.8em][l]{\textbf{I}}\, $AB + BC = AC$.\par\vspace{0.1cm}
+\makebox[1.8em][l]{\textbf{II}}\, $BK \perp AC$.\par\vspace{0.1cm}
+\makebox[1.8em][l]{\textbf{III}}\, $AK = KC$.}
+\answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+% Відповідь: Г
+\ifshowsolutions\solution{У рівнобедреному трикутнику бісектриса, проведена до основи, є також висотою й медіаною, тому $BK\perp AC$ (II) і $AK=KC$ (III). Рівність $AB+BC=AC$ (I) хибна (нерівність трикутника). Правильні II та III. Відповідь: \textbf{Г}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №4
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено клумбу у формі трикутника $ABC$, у якого $AB = BC$. Знайдіть градусну міру кута $B$, якщо він \textit{удвічі} більший за градусну міру кута $C$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (8,0);
+    \coordinate (B) at (4,4);
+    \draw[fill=mainGreen!15, draw=mainGreen!80!black, thick] (A) -- (B) -- (C) -- cycle;
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = C--A--B};
+    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = B--C--A};
+    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = A--B--C};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$60^\circ$}{$30^\circ$}{$45^\circ$}{$90^\circ$}{$120^\circ$}
+% Відповідь: Г
+\ifshowsolutions\solution{Оскільки $AB=BC$, кути при основі рівні: $\angle A=\angle C$. За умовою $\angle B=2\angle C$. Сума кутів: $\angle C+\angle C+2\angle C=180^\circ$, $4\angle C=180^\circ$, $\angle C=45^\circ$, тож $\angle B=90^\circ$. Відповідь: \textbf{Г}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №9
+\zadtask{Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*}, align=left, leftmargin=2.8em, labelsep=0.6em, itemsep=0.12cm, topsep=0.1cm]
+\item У правильному трикутнику всі медіани рівні.
+\item Медіана трикутника ділить його на два трикутники з рівними периметрами.
+\item Медіана трикутника ділить його на два трикутники з рівними площами.
+\end{enumerate}
+\vspace{0.15cm}}
+\answerTable{лише I}{лише II}{лише I та III}{лише II та III}{I, II та III}
+% Відповідь: В
+\ifshowsolutions\solution{I -- правильно (у правильному трикутнику всі медіани рівні). II -- хибне: медіана ділить лише сторону навпіл, периметри частин зазвичай різні. III -- правильно: медіана ділить трикутник на два рівновеликі (рівні за площею). Отже правильні I та III. Відповідь: \textbf{В}.}\fi
+
+% НМТ 2026, сесія 3.06, завдання №18 --- основна тема: Прямокутник
+\zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.17, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,16);
+    \coordinate (Cc) at (12,16);
+    \coordinate (D) at (12,0);
+    \coordinate (M) at (36,0);
+    \coordinate (K) at (24,32);
+    \draw[thick] (A) -- (B) -- (Cc) -- (D) -- cycle;
+    \draw[thick] (A) -- (M);
+    \draw[thick] (D) -- (K) -- (M);
+    \draw[thick] (A) -- (K);
+    \fill (K) circle (3pt); \node[above, font=\scriptsize] at (K) {$K$};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above left, font=\scriptsize] at (B) {$B$};
+    \node[above, font=\scriptsize] at (Cc) {$C$};
+    \node[below, font=\scriptsize] at (D) {$D$};
+    \node[below right, font=\scriptsize] at (M) {$M$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.46\textwidth}
+\textit{Початок речення}\par\vspace{0.2cm}
+\textbf{1} \quad Довжина відрізка $AM$ дорівнює\\[0.2cm]
+\textbf{2} \quad Відстань від точки $K$ до прямої $AM$ дорівнює\\[0.2cm]
+\textbf{3} \quad Довжина відрізка $CK$ дорівнює
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Закінчення}\par\vspace{0.2cm}
+\textbf{А} \quad $20$ см\\[0.15cm]
+\textbf{Б} \quad $24$ см\\[0.15cm]
+\textbf{В} \quad $32$ см\\[0.15cm]
+\textbf{Г} \quad $36$ см\\[0.15cm]
+\textbf{Д} \quad $48$ см
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.5cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+% Відповідь: 1~--~Г, 2~--~В, 3~--~А
+\ifshowsolutions\solution{$AM=AD+DM=12+2\cdot12=36$ см~--- \textbf{Г}. Нехай $H$~--- основа висоти рівнобедреного $\triangle DKM$ з вершини $K$; вона ділить $DM$ навпіл, тож $DH=12$, а $AH=AD+DH=24$. Оскільки $K$ лежить на прямій $AC$, прямокутні $\triangle ADC$ і $\triangle AHK$ подібні (спільний кут $A$, прямі кути при $D$ і $H$): $KH=CD\cdot\dfrac{AH}{AD}=16\cdot\dfrac{24}{12}=32$ см~--- \textbf{В}. З тієї самої подібності $AK=2\,AC$, де $AC=\sqrt{12^2+16^2}=20$, тож $CK=AK-AC=40-20=20$ см~--- \textbf{А}. Відповідь: \textbf{1~--~Г, 2~--~В, 3~--~А}.}\fi
+
+% НМТ 2026, сесія 4.06, завдання №9 --- основна тема: Коло, круг і їх елементи
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\par\noindent\hangindent=2.2em\textbf{I.}\ \ Коло, уписане в рівнобедрений трикутник, дотикається до середини його основи.
+\par\noindent\hangindent=2.2em\textbf{II.}\ \ Центр кола, описаного навколо тупокутного трикутника, лежить усередині трикутника.
+\par\noindent\hangindent=2.2em\textbf{III.}\ \ Коло, побудоване на гіпотенузі прямокутного трикутника як на діаметрі, проходить через вершину прямого кута.
+\vspace{0.15cm}
+\answerTable{лише I}{лише I та II}{I, II та III}{лише II та III}{лише I та III}}
+% Відповідь: Д
+\ifshowsolutions\solution{I~--- правильне (точка дотику вписаного кола з основою рівнобедреного трикутника збігається з її серединою). II~--- хибне: центр описаного кола тупокутного трикутника лежить \emph{поза} трикутником. III~--- правильне (вписаний кут, що спирається на діаметр, прямий). Правильні I та III. Відповідь: \textbf{В}.}\fi
+
+% НМТ 2026, сесія 4.06, завдання №18
+\zadtask{Прямокутні рівнобедрені трикутники $ABC$ і $KMN$ є рівними (див. рисунок). Точки $K$, $C$, $N$ і $A$ лежать на прямій $AK$, причому $AN = NC = CK$. $AC = 12$~см. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\begin{minipage}[t]{0.55\textwidth}
+\textit{Відрізок}\par\vspace{0.2cm}
+\textbf{1} \quad $AK$\\[0.25cm]
+\textbf{2} \quad $AB$\\[0.25cm]
+\textbf{3} \quad $BM$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Довжина відрізка}\par\vspace{0.2cm}
+\textbf{А} \quad $6\sqrt{2}$~см\\[0.15cm]
+\textbf{Б} \quad $6\sqrt{5}$~см\\[0.15cm]
+\textbf{В} \quad $12\sqrt{2}$~см\\[0.15cm]
+\textbf{Г} \quad $18$~см\\[0.15cm]
+\textbf{Д} \quad $24$~см
+\end{minipage}
+\par\vspace{0.3cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick]
+    \coordinate (K) at (-3,3);
+    \coordinate (M) at (1,3);
+    \coordinate (N) at (1,-1);
+    \coordinate (C) at (-1,1);
+    \coordinate (B) at (-1,-3);
+    \coordinate (A) at (3,-3);
+    \draw (K) -- (M) -- (N);
+    \draw (C) -- (B) -- (A);
+    \draw (K) -- (A);
+    \draw (M) ++(-0.4,0) -- ++(0,-0.4) -- ++(0.4,0);
+    \draw (B) ++(0,0.4) -- ++(0.4,0) -- ++(0,-0.4);
+    \draw (-2-0.15, 2-0.15) -- (-2+0.15, 2+0.15);
+    \draw (0-0.15, 0-0.15) -- (0+0.15, 0+0.15);
+    \draw (2-0.15, -2-0.15) -- (2+0.15, -2+0.15);
+    \fill (C) circle (2pt);
+    \fill (N) circle (2pt);
+    \node[above left] at (K) {$K$};
+    \node[above right] at (M) {$M$};
+    \node[left] at (-1.1, 0.9) {$C$};
+    \node[right] at (1.1, -0.9) {$N$};
+    \node[below left] at (B) {$B$};
+    \node[below right] at (A) {$A$};
+\end{tikzpicture}
+\end{minipage}
+}
+% Відповідь: 1~--~Г, 2~--~А, 3~--~Б
+\ifshowsolutions\solution{$AC$~--- гіпотенуза рівнобедреного прямокутного $\triangle ABC$, тож катети $AB=BC=\dfrac{AC}{\sqrt2}=\dfrac{12}{\sqrt2}=6\sqrt2$~см (А). Оскільки $AN=NC=CK=\dfrac{AC}{2}=6$, маємо $AK=AN+NC+CK=18$~см (Г). Точка $B$ лежить на відстані катета від $C$; $BN$ обчислюється з прямокутного трикутника $BCN$ ($BC=6\sqrt2$, $CN=6$): тоді й $BM=\sqrt{BC^2+CM^2}$ дає $6\sqrt5$~см (Б). Відповідь: \textbf{1~--~Г, 2~--~А, 3~--~Б}.}\fi
+
+% НМТ 2026, сесія 5.06, завдання №9
+\zadnum На сторонах $AB$ та $BC$ довільного трикутника $ABC$ вибрано точки $M$ та $N$ так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Чотирикутник $AMNC$ є трапецією.
+\item Трикутник $MBN$ рівнобедрений.
+\item Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.
+\end{enumerate}
+\vspace{0.1cm}
+\answerTable{лише II}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+% Відповідь: В
+\ifshowsolutions\solution{$MN$~--- середня лінія, тож $MN\parallel AC$ і $MN=\tfrac12 AC$: $AMNC$~--- трапеція (I правильне). Тричикутник $MBN$ рівнобедрений лише за умови $AB=BC$, тож для довільного трикутника твердження II хибне. Периметр $MBN=\tfrac12(AB+BC+AC)=\tfrac12 P_{ABC}$ (III правильне). Відповідь: \textbf{В}.}\fi
+
+% НМТ 2026, сесія 5.06, завдання №14 --- основна тема: Прямокутник
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутник $ABCD$ вписано прямокутний трикутник $AKM$ так, як зображено на рисунку. Обчисліть площу трикутника $AKM$, якщо $AK = 12$ см, $AB = 15$ см, $\angle KAD = 30^\circ$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.32, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,15);
+    \coordinate (C) at (11,15);
+    \coordinate (D) at (11,0);
+    \coordinate (K) at (11,6);
+    \coordinate (M) at (5.2,15);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K) -- (M) -- cycle;
+    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.7cm] {right angle = A--K--M};
+    \draw[thick] (K) -- (A) -- (D) -- cycle;
+    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.3cm] { angle = D--A--K};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above left, font=\scriptsize] at (B) {$B$};
+    \node[above, font=\scriptsize] at (M) {$M$};
+    \node[above right, font=\scriptsize] at (C) {$C$};
+    \node[right, font=\scriptsize] at (K) {$K$};
+    \node[below right, font=\scriptsize] at (D) {$D$};
+    \node[font=\tiny] at (1.9,0.5) {$30^\circ$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$36$ см$^2$}{$96$ см$^2$}{$72$ см$^2$}{$72\sqrt{3}$ см$^2$}{$36\sqrt{3}$ см$^2$}
+% Відповідь: Д
+\ifshowsolutions\solution{У прямокутному $\triangle ADK$ ($\angle ADK=90^\circ$): $DK=AK\sin30^\circ=6$, $AD=AK\cos30^\circ=6\sqrt3$. Точки $D,K,C$ лежать на правій стороні, тож $CK=CD-DK=AB-DK=15-6=9$. Кути при $K$: $\angle AKD=60^\circ$, $\angle AKM=90^\circ$, тому $\angle MKC=180^\circ-60^\circ-90^\circ=30^\circ$. У прямокутному $\triangle KCM$ ($\angle C=90^\circ$): $KM=\dfrac{CK}{\cos30^\circ}=\dfrac{9}{\sqrt3/2}=6\sqrt3$. Площа (прямий кут при $K$): $S=\tfrac12\cdot AK\cdot KM=\tfrac12\cdot12\cdot6\sqrt3=36\sqrt3$ см$^2$. Відповідь: \textbf{Д}.}\fi
+
+% НМТ 2026, сесія 5.06, завдання №18
+\zadnum На рисунку зображено правильний трикутник $ABC$ та прямокутні рівнобедрені трикутники $AKB$ і $BMC$. Установіть відповідність між кутом (1--3) та його градусною мірою (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=1.9, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (2,0);
+    \coordinate (B) at (1,1.732);
+    \coordinate (K) at (-0.366,1.366);
+    \coordinate (M) at (2.366,1.366);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (A) -- (K) -- (B);
+    \draw[thick] (B) -- (M) -- (C);
+    \draw[thick] (A) -- (M);
+    \draw[thick] (K) -- (B);
+    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = A--K--B};
+    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = B--M--C};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above, font=\scriptsize] at (B) {$B$};
+    \node[below right, font=\scriptsize] at (C) {$C$};
+    \node[left, font=\scriptsize] at (K) {$K$};
+    \node[right, font=\scriptsize] at (M) {$M$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Кут}\par\vspace{0.2cm}
+\textbf{1} \quad $\angle ACM$\\[0.25cm]
+\textbf{2} \quad $\angle KBM$\\[0.25cm]
+\textbf{3} \quad $\angle KAM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.34\textwidth}
+\textit{Градусна міра}\par\vspace{0.2cm}
+\textbf{А} \quad $75^\circ$\\[0.15cm]
+\textbf{Б} \quad $90^\circ$\\[0.15cm]
+\textbf{В} \quad $105^\circ$\\[0.15cm]
+\textbf{Г} \quad $135^\circ$\\[0.15cm]
+\textbf{Д} \quad $150^\circ$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.5cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+\par\vspace{0.5cm}
+% Відповідь: 1~--~В, 2~--~Д, 3~--~А
+\ifshowsolutions\solution{Кути правильного трикутника по $60^\circ$, а в прямокутних рівнобедрених трикутниках $AKB$, $BMC$ кути при основі по $45^\circ$. Тоді $1$: $\angle ACM=\angle ACB+\angle BCM=60^\circ+45^\circ=105^\circ$ (В); $2$: $\angle KBM=\angle KBA+\angle ABC+\angle CBM=45^\circ+60^\circ+45^\circ=150^\circ$ (Д); $3$: $\angle KAM=75^\circ$ (А). Відповідь: \textbf{1~--~В, 2~--~Д, 3~--~А}.}\fi
+
+% НМТ 2026, сесія 8.06, завдання №3 --- основна тема: Прямокутник
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum Ділянка складається з прямокутного трикутника та прямокутника (див. рисунок). За наведеними на рисунку розмірами сторін визначте периметр цієї ділянки. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.3, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (10,0);
+    \coordinate (C) at (10,7);
+    \coordinate (B) at (0,7);
+    \coordinate (Top) at (6.4, 11.8);
+    \draw (A) -- (D) -- (C) -- (Top) -- (B) -- cycle;
+    \draw[dashed] (B) -- (C);
+    \pic[draw, angle radius=0.3cm] {right angle = A--B--C};
+    \pic[draw, angle radius=0.3cm] {right angle = B--A--D};
+    \pic[draw, angle radius=0.3cm] {right angle = A--D--C};
+    \pic[draw, angle radius=0.3cm] {right angle = D--C--B};
+    \pic[draw, angle radius=0.3cm] {right angle = B--Top--C};
+    \node[left] at (0,3.5) {$7$ м};
+    \node[right] at (10,3.5) {$7$ м};
+    \node[above left] at (3.2, 9.4) {$8$ м};
+    \node[above right] at (8.2, 9.4) {$6$ м};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$28$~м}{$35$~м}{$48$~м}{$38$~м}{$94$~м}
+
+% НМТ 2026, сесія 8.06, завдання №9 --- основна тема: Коло, круг і їх елементи
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item У будь-який ромб можна вписати коло.
+\item У будь-яку прямокутну трапецію можна вписати коло.
+\item У будь-якому трикутнику бісектриси кутів проходять через центр вписаного в цей трикутник кола.
+\end{enumerate}
+\vspace{0.15cm}}
+\answerTable{лише III}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+
+% НМТ 2026, сесія 9.06, завдання №9 --- основна тема: Коло, круг і їх елементи
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Трикутник $ABC$ вписано в коло з центром у точці $O$, що належить стороні $AC$ (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=0.1cm]
+\item $\angle ABC$ є прямим.
+\item $\angle BAC$ вдвічі менший від $\angle BOC$.
+\item Довжина $AC$ вдвічі більша за довжину $BO$.
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=1, thick, line join=round]
+    \coordinate (O) at (0,0);
+    \draw (O) circle (2);
+    \coordinate (A) at (-1.732, -1);
+    \coordinate (C) at (1.732, 1);
+    \coordinate (B) at (-0.5, 1.936);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (A) -- (C);
+    \draw (B) -- (O);
+    \fill (O) circle (2pt) node[below right] {$O$};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+
+% НМТ 2026, сесія 9.06, завдання №14
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено рівнобедрений трикутник $ABC$, у якому $\angle ABC = 120^\circ$. Точки $K$ і $M$ є серединами сторін $AB$ та $AC$ відповідно. Визначте площу чотирикутника $KBCM$, якщо $AC = 24$ см. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    \coordinate (B) at (0,0);
+    \coordinate (C) at (6,0);
+    \coordinate (A) at (-3, 5.196);
+    \coordinate (K) at (-1.5, 2.598);
+    \coordinate (M) at (1.5, 2.598);
+
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (K) -- (M);
+
+    \node[above left] at (A) {$A$};
+    \node[below left] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[left] at (K) {$K$};
+    \node[above right] at (M) {$M$};
+
+    \pic[draw, angle radius=0.5cm, pic text={$120^\circ$}, angle eccentricity=1.5, font=\scriptsize] {angle = C--B--A};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$24$~см$^2$}{$24\sqrt{3}$~см$^2$}{$72$~см$^2$}{$72\sqrt{3}$~см$^2$}{$36\sqrt{3}$~см$^2$}
+
+% НМТ 2026, сесія 10.06, завдання №9
+\zadtask{Кути гострокутного трикутника $ABC$ задовольняють умову $\angle A < \angle B < \angle C$. Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=0.1cm]
+\item $AB$~--- найдовша сторона трикутника $ABC$.
+\item Трикутник $ABC$~--- рівнобедрений.
+\item Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише III}{лише I та III}{лише II та III}{I, II та III}
+
+% НМТ 2026, сесія 11.06, завдання №9
+\zadtask{Які з наведених тверджень правильні щодо трикутника зі сторонами $a$, $b$ і $c$? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=0.1cm]
+\item Якщо $a^2 + b^2 = c^2$, то трикутник прямокутний.
+\item Для будь-якого трикутника справджується нерівність $a + b > c$.
+\item Якщо $a + b = a + c$ й $a = c$, то трикутник правильний.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+
+% НМТ 2026, сесія 12.06, завдання №9
+\zadtask{На сторонах $AB$ та $BC$ трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які твердження є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item $AC \parallel MN$.
+\item Відрізок $MN$ є середньою лінією трикутника $ABC$.
+\item Площі трикутника $MBN$ та чотирикутника $AMNC$ рівні.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише II}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+
+% НМТ 2026, сесія 12.06, завдання №14 --- основна тема: Квадрат
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum Відпочинкова зона в Парку здоров'я складається з двох ділянок квадратної форми площею $144$~м$^2$ і $225$~м$^2$ і ділянки у формі прямокутного трикутника, гіпотенуза та катет якого є сторонами квадратів (див. рисунок). На ділянці трикутної форми розміщено фонтан, який на схемі зображений у формі кола, що дотикається до сторін трикутника. Визначте радіус цього кола. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{center}
+\begin{tikzpicture}[scale=0.75, line join=round, line cap=round]
+    % Лівий квадрат (225)
+    \draw[thick] (0,0) rectangle (-5,5);
+    \node at (-2.5, 2.5) {$225~м^2$};
+
+    % Трикутник
+    \draw[thick] (0,0) -- (2.4, 1.8) -- (0,5) -- cycle;
+
+    % Правий квадрат (144)
+    \draw[thick] (0,5) -- (3.2, 7.4) -- (5.6, 4.2) -- (2.4, 1.8) -- cycle;
+    \node at (2.8, 4.6) {$144~м^2$};
+
+    % Коло (фонтан)
+    \draw[thick] (1, 2) circle (1);
+    \node[scale=0.95] at (1, 2) {фонтан};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4{,}5$~м}{$9$~м}{$6$~м}{$3$~м}{$1{,}5$~м}
+
+% НМТ 2026, сесія 15.06, завдання №14
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum У рівнобедреному трикутнику $ABC$ з точки $K$, що лежить на бічній стороні $BC$, до бічної сторони $AB$ проведено перпендикуляр $KM$ (див. рисунок). Визначте площу трикутника $ABC$, якщо $KM = 6\sqrt{3}$~см, $AK : MB = 2 : 3$, $\angle B = 30^\circ$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.72, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (3.2,0);
+    \coordinate (B) at (1.05,4.2);
+    % M на AB, K на BC
+    \coordinate (M) at ($(A)!0.55!(B)$);
+    \coordinate (K) at ($(B)!0.55!(C)$);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (K) -- (M);
+    \draw (A) -- (K);
+    \pic[draw, angle radius=0.18cm] {right angle = K--M--A};
+    \pic[draw, angle radius=0.5cm, pic text={$30^\circ$}, angle eccentricity=1.55, font=\scriptsize] {angle = A--B--C};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[left] at (M) {$M$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$288\sqrt{3}$~см$^2$}{$144\sqrt{3}$~см$^2$}{$72\sqrt{3}$~см$^2$}{$288$~см$^2$}{$144$~см$^2$}
+% Відповідь: Д
+
+% НМТ 2026, сесія 17.06, завдання №18
+\zadtask{Установіть відповідність між трикутником $ABC$ (1--3) та його площею (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+
+\noindent
+\begin{minipage}[t]{0.56\textwidth}
+\textit{Трикутник $ABC$}\par\vspace{0.35cm}
+% 1
+\noindent\textbf{1}\hspace{0.3cm}\begin{tikzpicture}[baseline=0cm, scale=0.55, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (4.6,0);
+    \coordinate (B) at (2.9,0.9);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \pic[draw, angle radius=0.12cm, pic text={\tiny $150^\circ$}, angle eccentricity=1.9] {angle = A--B--C};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above, font=\scriptsize] at (B) {$B$};
+    \node[below right, font=\scriptsize] at (C) {$C$};
+    \node[right, font=\scriptsize] at (5.0,0.5) {$AB\cdot BC = 48,\ \angle B = 150^\circ$};
+\end{tikzpicture}
+\par\vspace{0.5cm}
+% 2
+\noindent\textbf{2}\hspace{0.3cm}\begin{tikzpicture}[baseline=0cm, scale=0.5, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (5,0);
+    \coordinate (H) at (2,0);
+    \coordinate (B) at (2,2.4);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (B) -- (H);
+    \pic[draw, angle radius=0.2cm] {right angle = B--H--C};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above, font=\scriptsize] at (B) {$B$};
+    \node[below right, font=\scriptsize] at (C) {$C$};
+    \node[below, font=\scriptsize] at (H) {$H$};
+    \node[right, font=\scriptsize] at (5.3,1.2) {$BH = 4,\ AC = 9$};
+\end{tikzpicture}
+\par\vspace{0.5cm}
+% 3
+\noindent\textbf{3}\hspace{0.3cm}\begin{tikzpicture}[baseline=0cm, scale=0.55, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (3.2,0);
+    \coordinate (B) at (0,3.2);
+    \coordinate (O) at (0,1.6);
+    \coordinate (K) at (1.6,1.6);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (O) -- (K);
+    \pic[draw, angle radius=0.2cm] {right angle = O--A--C};
+    \pic[draw, angle radius=0.2cm] {right angle = B--O--K};
+    \path (B) -- (K) node[midway, sloped, font=\tiny] {$|$};
+    \path (K) -- (C) node[midway, sloped, font=\tiny] {$|$};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above, font=\scriptsize] at (B) {$B$};
+    \node[below right, font=\scriptsize] at (C) {$C$};
+    \node[left, font=\scriptsize] at (O) {$O$};
+    \node[above right, font=\scriptsize] at (K) {$K$};
+    \node[right, font=\scriptsize] at (3.4,2.2) {$AO = 3,\ OK = 4$};
+\end{tikzpicture}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.24\textwidth}
+\textit{Площа $ABC$}\par\vspace{0.2cm}
+\textbf{А} \quad $12$\\[0.3cm]
+\textbf{Б} \quad $18$\\[0.3cm]
+\textbf{В} \quad $24$\\[0.3cm]
+\textbf{Г} \quad $36$\\[0.3cm]
+\textbf{Д} \quad $48$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.16\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+\par\vspace{0.2cm}}
+% Відповідь: 1--А, 2--Б, 3--В
+
+% НМТ 2026, сесія 18.06, завдання №14 --- також у темі: Коло, круг і їх елементи
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На катеті $CB$ прямокутного трикутника $ABC$ вибрано точку $O$ так, що півколо з центром у точці $O$ дотикається катета $AC$ в точці $C$, а гіпотенузи $AB$~--- у точці $K$. $OB = 6$~см, $\angle COK = 120^\circ$. Визначте довжину відрізка $AC$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.62, thick, line join=round]
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (6,0);
+    \coordinate (A) at (0,3.46);
+    \coordinate (O) at (2,0);
+    % K точка дотику на AB
+    \coordinate (K) at ($(A)!(O)!(B)$);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (O) -- (K);
+    \draw (2,0) ++(0:2) arc (0:180:2);
+    \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
+    \pic[draw, angle radius=0.4cm, pic text={\scriptsize $120^\circ$}, angle eccentricity=1.7] {angle = K--O--C};
+    \node[above left] at (A) {$A$};
+    \node[below left] at (C) {$C$};
+    \node[below right] at (B) {$B$};
+    \node[below] at (O) {$O$};
+    \node[above right] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$3$~см}{$3\sqrt{3}$~см}{$6\sqrt{3}$~см}{$9$~см}{$9\sqrt{3}$~см}
+% Відповідь: Б
+
+% НМТ 2026, сесія 18.06, завдання №18 --- також у темі: Основи планіметрії
+\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою (1--3) та її площею (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);
+    % точки: верхній ряд A,B,C; нижній ряд K,L,M
+    \coordinate (A) at (1,3);
+    \coordinate (B) at (3,3);
+    \coordinate (C) at (5,3);
+    \coordinate (K) at (0,0);
+    \coordinate (L) at (2,0);
+    \coordinate (M) at (4,0);
+    \foreach \p/\lab/\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {
+        \fill (\p) circle (2.5pt);
+        \node[\pos, font=\scriptsize] at (\p) {$\lab$};
+    }
+    \node[font=\scriptsize] at (6.5,3.5) {$1$~см$^2$};
+    \draw[gray!60] (6,3) rectangle (7,4);
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Фігура}\par\vspace{0.15cm}
+\textbf{1} \quad $ACM$\\[0.25cm]
+\textbf{2} \quad $ABLK$\\[0.25cm]
+\textbf{3} \quad $BCML$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Площа фігури}\par\vspace{0.15cm}
+\textbf{А} \quad $8$~см$^2$\\[0.15cm]
+\textbf{Б} \quad $10$~см$^2$\\[0.15cm]
+\textbf{В} \quad $12$~см$^2$\\[0.15cm]
+\textbf{Г} \quad $14$~см$^2$\\[0.15cm]
+\textbf{Д} \quad $16$~см$^2$\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
+
+% НМТ 2026, сесія 19.06, завдання №9 --- основна тема: Коло, круг і їх елементи
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.
+\item Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.
+\item У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише II}{лише III}{лише I та II}{лише I та III}{I, II та III}
+% Відповідь: Б
+
+% НМТ 2026, сесія 19.06, завдання №14 --- основна тема: Прямокутник
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що трикутник $AKD$ прямокутний (див. рисунок). Визначте довжину сторони $AD$, якщо $AB = 6\sqrt{3}$, а $\angle KAD = 60^\circ$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (10,4);
+    \coordinate (D) at (10,0);
+    \coordinate (K) at (2.4,4);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (K) -- (D);
+    \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
+    \pic[draw, angle radius=0.55cm, pic text={\scriptsize $60^\circ$}, angle eccentricity=1.6] {angle = D--A--K};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$12$}{$18$}{$12\sqrt{3}$}{$24$}{$24\sqrt{3}$}
+% Відповідь: Г
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{57.}~В \ {\scriptsize\color{gray}(23.05, №2)}\par
+\noindent\textbf{58.}~В \ {\scriptsize\color{gray}(30.05, №9)}\par
+\noindent\textbf{59.}~1~--~Д, 2~--~А, 3~--~Г \ {\scriptsize\color{gray}(30.05, №16)}\par
+\noindent\textbf{60.}~Г \ {\scriptsize\color{gray}(1.06, №9)}\par
+\noindent\textbf{61.}~Г \ {\scriptsize\color{gray}(2.06, №4)}\par
+\noindent\textbf{62.}~В \ {\scriptsize\color{gray}(2.06, №9)}\par
+\noindent\textbf{63.}~1~--~Г, 2~--~В, 3~--~А \ {\scriptsize\color{gray}(3.06, №18)}\par
+\noindent\textbf{64.}~Д \ {\scriptsize\color{gray}(4.06, №9)}\par
+\noindent\textbf{65.}~1~--~Г, 2~--~А, 3~--~Б \ {\scriptsize\color{gray}(4.06, №18)}\par
+\noindent\textbf{66.}~В \ {\scriptsize\color{gray}(5.06, №9)}\par
+\noindent\textbf{67.}~Д \ {\scriptsize\color{gray}(5.06, №14)}\par
+\noindent\textbf{68.}~1~--~В, 2~--~Д, 3~--~А \ {\scriptsize\color{gray}(5.06, №18)}\par
+\noindent\textbf{77.}~Д \ {\scriptsize\color{gray}(15.06, №14)}\par
+\noindent\textbf{78.}~1--А, 2--Б, 3--В \ {\scriptsize\color{gray}(17.06, №18)}\par
+\noindent\textbf{79.}~Б \ {\scriptsize\color{gray}(18.06, №14)}\par
+\noindent\textbf{80.}~1--Б,\ \ 2--А,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №18)}\par
+\noindent\textbf{81.}~Б \ {\scriptsize\color{gray}(19.06, №9)}\par
+\noindent\textbf{82.}~Г \ {\scriptsize\color{gray}(19.06, №14)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

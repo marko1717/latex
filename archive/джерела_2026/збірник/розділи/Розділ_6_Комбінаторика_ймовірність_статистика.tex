@@ -1,0 +1,1006 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+% --- ФІРМОВІ КОЛЬОРИ ---
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} сесії 23.05--5.06.2026}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+% --- ЗАГОЛОВОК РОЗДІЛУ ---
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+% --- МАКРОСИ З ГІПЕРПОСИЛАННЯМИ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+% --- ГІПЕРПОСИЛАННЯ В НОМЕРАХ ЗАВДАНЬ ---
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\hypertarget{zad\thezad}{}\hyperlink{ans\thezad}{\textbf{\thezad.}}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\hypertarget{zad\thezad}{}\hyperlink{ans\thezad}{\textbf{\thezad.}}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\hypertarget{ans\theans}{}\hyperlink{zad\theans}{\textbf{\theans.}}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.3cm}\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.15cm}}
+% --- ПРИХОВАНІ РОЗВ'ЯЗКИ З КЛІКАБЕЛЬНИМИ ПОСИЛАННЯМИ ---
+\newcounter{solctr}
+\makeatletter
+\newcommand{\solution}[1]{%
+\stepcounter{solctr}%
+\hypertarget{task:\thesolctr}{}%
+\par\nobreak\vspace{0.05cm}\hfill%
+\hyperlink{sol:\thesolctr}{\small\bfseries\color{mainGreen}\fbox{\strut\,розв'язок $\rightarrow$\,}}%
+\par\vspace{0.15cm}%
+\expandafter\xdef\csname ztasknum@\thesolctr\endcsname{\thezad}%
+\expandafter\gdef\csname zsol@\thesolctr\endcsname{#1}%
+}
+\newcommand{\printAllSolutions}{%
+\chapterTitle{РОЗВ'ЯЗКИ ОРИГІНАЛЬНИХ ЗАДАЧ}%
+\noindent\small Натисни на номер задачі ліворуч від рамки, щоб повернутися до умови.\par\vspace{0.3cm}%
+\newcounter{psctr}%
+\@whilenum\value{psctr}<\value{solctr}\do{%
+\stepcounter{psctr}%
+\par\noindent\hypertarget{sol:\thepsctr}{}%
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.5pt, arc=3pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt, breakable]
+\noindent\hyperlink{task:\thepsctr}{\bfseries\color{mainGreen}\fbox{\strut\,$\leftarrow$\,Задача №\csname ztasknum@\thepsctr\endcsname\,}}\quad
+\csname zsol@\thepsctr\endcsname
+\end{tcolorbox}\par\vspace{0.25cm}%
+}%
+}
+\makeatother
+% --- СТРУКТУРНІ ЗАГОЛОВКИ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\subTypeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsubsection}{\quad\quad #1}%
+\par\vspace{0.25cm}
+\noindent{\normalsize\bfseries\color{mainGreen}#1}\par\vspace{0.06cm}
+\noindent{\color{mainGreen!60}\rule{\linewidth}{0.3pt}}\par\vspace{0.15cm}}
+\begin{document}
+\chapterTitle{РОЗДІЛ 6. КОМБІНАТОРИКА, ЙМОВІРНІСТЬ, СТАТИСТИКА}
+\noindent У цьому розділі~--- $39$ задач із комбінаторики, теорії ймовірностей та статистики з усіх $7$ сесій НМТ-2026 (23.05--5.06). Задачі згруповано у три підтеми:
+\par\vspace{0.25cm}
+\noindent\textbullet\ \textit{Комбінаторика}~--- застосування правил суми та добутку, перестановки, сполучення, а також задачі на вибір із певними обмеженнями (з обов'язковим або виключеним елементом).
+\par\vspace{0.15cm}
+\noindent\textbullet\ \textit{Теорія ймовірностей}~--- використання класичного означення ймовірності для розв'язування текстових задач та обчислення ймовірностей на основі результатів анкетувань і діаграм.
+\par\vspace{0.15cm}
+\noindent\textbullet\ \textit{Статистика та аналіз даних}~--- читання, аналіз і обробка інформації, поданої у вигляді кругових і стовпчастих діаграм, а також лінійних графіків (знаходження різниці, відсотків, сумарної кількості).
+\par\vspace{0.25cm}
+\noindent Під кожною оригінальною задачею розміщено кнопку \hyperlink{sol:1}{\bfseries\color{mainGreen}\fbox{\strut\,\footnotesize розв'язок $\rightarrow$\,}}, що веде до коментаря в кінці розділу.
+\par
+\newpage
+\taskBlock{Комбінаторика за круговою діаграмою --- сесія 23.05, завдання №12}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На діаграмі подано інформацію про назви та кількість шкільних гуртків. Макар планує відвідувати два гуртки: один зі спортивних, інший~--- з решти. Скільки різних варіантів вибору має Макар? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick]
+    \def\R{1.7}
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (0:\R) arc (0:77.14:\R) -- cycle;
+    \filldraw[fill=cyan!30, draw=white] (0,0) -- (77.14:\R) arc (77.14:180:\R) -- cycle;
+    \filldraw[fill=mainGreen!30, draw=white] (0,0) -- (180:\R) arc (180:231.43:\R) -- cycle;
+    \filldraw[fill=purple!20, draw=white] (0,0) -- (231.43:\R) arc (231.43:257.14:\R) -- cycle;
+    \filldraw[fill=yellow!50, draw=white] (0,0) -- (257.14:\R) arc (257.14:360:\R) -- cycle;
+
+    \node at (38.57:1.0) {\small $3$};
+    \node at (141.43:1.0) {\small $4$};
+    \node at (193:0.9) {\small $1$};
+    \node at (244:1.0) {\small $2$};
+    \node at (315:1.0) {\small $4$};
+
+    \node at (38.57:2.1) {\scriptsize художні};
+    \node at (130:2.2) {\scriptsize танцювальні};
+    \node at (200:2.1) {\scriptsize музичні};
+    \node[below] at (244:2.0) {\scriptsize STEM};
+    \node at (320:2.2) {\scriptsize спортивні};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$36$}{$40$}{$24$}{$14$}{$13$}
+\solution{Спортивних гуртків~--- $4$, решти $3+4+1+2=10$. За правилом добутку кількість варіантів $4\cdot 10=40$. Відповідь: \textbf{Б}.}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На діаграмі подано інформацію про назви та кількість шкільних гуртків. Соломія планує відвідувати два гуртки: один зі спортивних, інший~--- з решти. Скільки різних варіантів вибору має Соломія?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick]
+    \def\R{1.7}
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (0:\R) arc (0:48:\R) -- cycle;
+    \filldraw[fill=cyan!30, draw=white] (0,0) -- (48:\R) arc (48:144:\R) -- cycle;
+    \filldraw[fill=mainGreen!30, draw=white] (0,0) -- (144:\R) arc (144:216:\R) -- cycle;
+    \filldraw[fill=purple!20, draw=white] (0,0) -- (216:\R) arc (216:240:\R) -- cycle;
+    \filldraw[fill=yellow!50, draw=white] (0,0) -- (240:\R) arc (240:360:\R) -- cycle;
+    \node at (24:1.0) {\small $2$};
+    \node at (96:1.0) {\small $4$};
+    \node at (180:1.0) {\small $3$};
+    \node at (228:1.0) {\small $1$};
+    \node at (300:1.0) {\small $5$};
+
+    \node at (24:2.2) {\scriptsize художні};
+    \node at (96:2.1) {\scriptsize танцювальні};
+    \node at (180:2.2) {\scriptsize музичні};
+    \node[below] at (228:1.9) {\scriptsize STEM};
+    \node at (300:2.2) {\scriptsize спортивні};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$45$}{$15$}{$50$}{$25$}{$10$}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На діаграмі подано інформацію про назви та кількість шкільних гуртків. Остап планує відвідувати два гуртки: один із художніх, а інший~--- зі спортивних. Скільки різних варіантів вибору має Остап?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick]
+    \def\R{1.7}
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (0:\R) arc (0:120:\R) -- cycle;
+    \filldraw[fill=cyan!30, draw=white] (0,0) -- (120:\R) arc (120:192:\R) -- cycle;
+    \filldraw[fill=mainGreen!30, draw=white] (0,0) -- (192:\R) arc (192:240:\R) -- cycle;
+    \filldraw[fill=purple!20, draw=white] (0,0) -- (240:\R) arc (240:288:\R) -- cycle;
+    \filldraw[fill=yellow!50, draw=white] (0,0) -- (288:\R) arc (288:360:\R) -- cycle;
+    \node at (60:1.0) {\small $5$};
+    \node at (156:1.0) {\small $3$};
+    \node at (216:1.0) {\small $2$};
+    \node at (264:1.0) {\small $2$};
+    \node at (324:1.0) {\small $3$};
+
+    \node at (60:2.2) {\scriptsize художні};
+    \node at (156:2.3) {\scriptsize танцювальні};
+    \node at (216:2.2) {\scriptsize музичні};
+    \node[below] at (264:1.9) {\scriptsize STEM};
+    \node at (324:2.3) {\scriptsize спортивні};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$12$}{$30$}{$15$}{$36$}{$24$}
+\vspace{0.3cm}
+% ---------------------------------------------------------------------
+\taskBlock{Найбільша різниця за графіками --- сесія 23.05, завдання №14}
+\noindent
+\begin{minipage}[c]{0.42\textwidth}
+\zadnum На рисунку зображено графіки залежності рівня шуму (дБ) від частоти (Гц) для двох джерел. За якої частоти різниця між рівнями шуму джерел є найбільшою? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.55\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=9cm, height=6cm,
+    xmode=log, log basis x=10,
+    xmin=15, xmax=7000,
+    ymin=0, ymax=85,
+    ytick={0,20,40,60,80},
+    xtick={20,100,200,300,500,1000,2000,5000},
+    xticklabels={20,100,200,300,500,1000,2000,5000},
+    xlabel={\small частота (Гц)},
+    ylabel={\small рівень шуму (дБ)},
+    xmajorgrids=true, ymajorgrids=true,
+    major grid style={dashed, gray!30},
+    axis x line*=bottom, axis y line*=left,
+    tick label style={font=\scriptsize},
+    log ticks with fixed point,
+]
+    \addplot[mark=*, thick, mainGreen, mark options={fill=white}] coordinates {
+        (20,60) (100,53) (200,62) (300,60) (500,57) (1000,62) (2000,65) (5000,67)
+    };
+    \addplot[mark=*, thick, yearOrange, mark options={fill=white}] coordinates {
+        (20,40) (100,30) (200,20) (300,12) (500,16) (1000,20) (2000,25) (5000,40)
+    };
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$1000$}{$5000$}{$200$}{$300$}{$2000$}
+\solution{Обчислимо різницю рівнів за кожної частоти: при $300$~Гц вона дорівнює $60-12=48$~дБ, що більше за різниці при інших частотах (напр., $200$: $42$; $1000$: $42$). Найбільша різниця~--- за $300$~Гц. Відповідь: \textbf{Г}.}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.42\textwidth}
+\zadnum На рисунку зображено графіки залежності рівня сигналу (дБ) від частоти (Гц) для двох антен. За якої частоти різниця між рівнями сигналу антен є найбільшою?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.55\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=9cm, height=6cm,
+    xmode=log, log basis x=10,
+    xmin=15, xmax=7000,
+    ymin=0, ymax=85,
+    ytick={0,20,40,60,80},
+    xtick={20,100,200,300,500,1000,2000,5000},
+    xticklabels={20,100,200,300,500,1000,2000,5000},
+    xlabel={\small частота (Гц)},
+    ylabel={\small рівень сигналу (дБ)},
+    xmajorgrids=true, ymajorgrids=true,
+    major grid style={dashed, gray!30},
+    axis x line*=bottom, axis y line*=left,
+    tick label style={font=\scriptsize},
+    log ticks with fixed point,
+]
+    \addplot[mark=*, thick, mainGreen, mark options={fill=white}] coordinates {
+        (20,55) (100,50) (200,58) (300,60) (500,62) (1000,64) (2000,60) (5000,58)
+    };
+    \addplot[mark=*, thick, yearOrange, mark options={fill=white}] coordinates {
+        (20,35) (100,28) (200,25) (300,22) (500,18) (1000,30) (2000,35) (5000,40)
+    };
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$200$}{$300$}{$500$}{$1000$}{$2000$}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.42\textwidth}
+\zadnum На рисунку зображено графіки залежності рівня гучності (дБ) від частоти (Гц) для двох динаміків. За якої частоти різниця між рівнями гучності динаміків є найменшою?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.55\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=9cm, height=6cm,
+    xmode=log, log basis x=10,
+    xmin=15, xmax=7000,
+    ymin=0, ymax=85,
+    ytick={0,20,40,60,80},
+    xtick={20,100,200,300,500,1000,2000,5000},
+    xticklabels={20,100,200,300,500,1000,2000,5000},
+    xlabel={\small частота (Гц)},
+    ylabel={\small рівень гучності (дБ)},
+    xmajorgrids=true, ymajorgrids=true,
+    major grid style={dashed, gray!30},
+    axis x line*=bottom, axis y line*=left,
+    tick label style={font=\scriptsize},
+    log ticks with fixed point,
+]
+    \addplot[mark=*, thick, mainGreen, mark options={fill=white}] coordinates {
+        (20,50) (100,55) (200,60) (300,58) (500,62) (1000,65) (2000,70) (5000,66)
+    };
+    \addplot[mark=*, thick, yearOrange, mark options={fill=white}] coordinates {
+        (20,30) (100,32) (200,35) (300,38) (500,45) (1000,58) (2000,40) (5000,42)
+    };
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$300$}{$500$}{$1000$}{$2000$}{$5000$}
+\newpage
+% ---------------------------------------------------------------------
+\taskBlock{Статистика: кругова діаграма --- сесія 30.05, завдання №4}
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На круговій діаграмі зображено розподіл туристів за країнами походження, що відвідали певний музей за рік. Визначте відсоток туристів, які прибули з \textit{Канади}.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.2, thick]
+    \def\R{1.7}
+    \filldraw[fill=mainGreen!40, draw=white] (0,0) -- (90:\R) arc (90:-90:\R) -- cycle;
+    \node at (0:0.9) {\scriptsize $50\,\%$};
+    \node[right] at (0:\R+0.1) {\scriptsize Європа};
+
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (-90:\R) arc (-90:-130.32:\R) -- cycle;
+    \node at (-110:1.0) { \scriptsize $11{,}2\,\%$};
+    \node[below] at (-110:\R+0.15) {\scriptsize США};
+
+    \filldraw[fill=mainGreen!20, draw=white] (0,0) -- (-130.32:\R) arc (-130.32:-147.6:\R) -- cycle;
+    \node[left] at (-139:\R+0.05) {\scriptsize $4{,}8\,\%$ Японія};
+
+    \filldraw[fill=yearOrange!20, draw=white] (0,0) -- (-147.6:\R) arc (-147.6:-160.2:\R) -- cycle;
+    \node[left] at (-154:\R+0.05) {\scriptsize $3{,}5\,\%$ Австралія};
+
+    \filldraw[fill=gray!20, draw=white] (0,0) -- (-160.2:\R) arc (-160.2:-270:\R) -- cycle;
+    \node at (145:1.0) {\scriptsize $?\,\%$};
+    \node[left] at (145:\R+0.05) {\scriptsize Канада};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$25\,\%$}{$28{,}5\,\%$}{$30{,}5\,\%$}{$33\,\%$}{$35\,\%$}
+\solution{Сума всіх відсотків дорівнює $100\,\%$. Канада: $100-(50+11{,}2+4{,}8+3{,}5)=100-69{,}5=30{,}5\,\%$. Відповідь: \textbf{В} ($30{,}5\,\%$).}
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На круговій діаграмі зображено розподіл книжок бібліотеки за жанрами. Визначте відсоток книжок \textit{дитячої} літератури.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.2, thick]
+    \def\R{1.7}
+    \filldraw[fill=mainGreen!40, draw=white] (0,0) -- (90:\R) arc (90:-72:\R) -- cycle;
+    \node at (9:0.9) {\scriptsize $45\,\%$};
+    \node[right] at (9:\R+0.1) {\scriptsize Проза};
+
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (-72:\R) arc (-72:-116.64:\R) -- cycle;
+    \node at (-94:1.0) {\scriptsize $12{,}4\,\%$};
+    \node[below] at (-94:\R+0.15) {\scriptsize Поезія};
+
+    \filldraw[fill=mainGreen!20, draw=white] (0,0) -- (-116.64:\R) arc (-116.64:-140.4:\R) -- cycle;
+    \node[left] at (-128:\R+0.05) {\scriptsize $6{,}6\,\%$ Фантастика};
+
+    \filldraw[fill=yearOrange!20, draw=white] (0,0) -- (-140.4:\R) arc (-140.4:-171:\R) -- cycle;
+    \node[left] at (-156:\R+0.05) {\scriptsize $8{,}5\,\%$ Наукова};
+
+    \filldraw[fill=gray!20, draw=white] (0,0) -- (-171:\R) arc (-171:-270:\R) -- cycle;
+    \node at (140:1.0) {\scriptsize $?\,\%$};
+    \node[left] at (140:\R+0.05) {\scriptsize Дитяча};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$24{,}5\,\%$}{$26\,\%$}{$27{,}5\,\%$}{$29\,\%$}{$32{,}5\,\%$}
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На круговій діаграмі зображено розподіл проданого в кафе морозива за смаками. Визначте \textit{градусну міру} центрального кута сектора, що відповідає смаку \textit{карамелі}.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.2, thick]
+    \def\R{1.7}
+    \filldraw[fill=mainGreen!40, draw=white] (0,0) -- (90:\R) arc (90:-54:\R) -- cycle;
+    \node at (18:0.9) {\scriptsize $40\,\%$};
+    \node[right] at (18:\R+0.1) {\scriptsize Ваніль};
+
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (-54:\R) arc (-54:-134.28:\R) -- cycle;
+    \node at (-94:1.0) {\scriptsize $22{,}3\,\%$};
+    \node[below] at (-94:\R+0.15) {\scriptsize Шоколад};
+
+    \filldraw[fill=mainGreen!20, draw=white] (0,0) -- (-134.28:\R) arc (-134.28:-167.4:\R) -- cycle;
+    \node[left] at (-151:\R+0.05) {\scriptsize $9{,}2\,\%$ Полуниця};
+
+    \filldraw[fill=yearOrange!20, draw=white] (0,0) -- (-167.4:\R) arc (-167.4:-187.2:\R) -- cycle;
+    \node[left] at (-177:\R+0.05) {\scriptsize $5{,}5\,\%$ Фісташка};
+
+    \filldraw[fill=gray!20, draw=white] (0,0) -- (-187.2:\R) arc (-187.2:-270:\R) -- cycle;
+    \node at (131:1.0) {\scriptsize $?\,\%$};
+    \node[left] at (131:\R+0.05) {\scriptsize Карамель};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$75{,}6^\circ$}{$80^\circ$}{$82{,}8^\circ$}{$90^\circ$}{$97{,}2^\circ$}
+\newpage
+% ---------------------------------------------------------------------
+\taskBlock{Комбінаторика: правило добутку --- сесія 30.05, завдання №7}
+\zadtask{У філателістичному магазині є $30$ різних марок з історичної серії та $40$ різних марок із серії <<краєвиди>>. Іван хоче придбати по одній марці з кожної серії. Скільки всього є варіантів такого вибору?}
+\answerTable{$70$}{$140$}{$600$}{$1200$}{$1400$}
+\solution{За правилом добутку кількість варіантів — добуток кількостей у кожній серії: $30\cdot40=1200$. Відповідь: \textbf{Г} ($1200$).}
+\zadtask{У чайній крамниці є $25$ різних сортів чаю та $16$ різних видів тістечок. Оксана хоче придбати один сорт чаю та одне тістечко. Скільки всього є варіантів такого вибору?}
+\answerTable{$41$}{$82$}{$200$}{$400$}{$800$}
+\zadtask{У майстерні є $12$ різних моделей рамок та $35$ різних постерів. Андрій хоче придбати лише \textit{один} предмет~--- \textit{або} одну рамку, \textit{або} один постер. Скільки всього є варіантів такого вибору?}
+\answerTable{$47$}{$94$}{$210$}{$420$}{$840$}
+% ---------------------------------------------------------------------
+\taskBlock{Комбінаторика, кількість способів вибору --- сесія 1.06, завдання №6}
+\zadtask{У магазині є $7$ видів подарункових наборів. Скільки всього існує варіантів вибору з них трьох \textit{різних} наборів?}
+\answerTable{$21$}{$35$}{$210$}{$343$}{$840$}
+\solution{Порядок не важливий, тож це сполучення: $C_7^3=\dfrac{7!}{3!\,4!}=\dfrac{7\cdot6\cdot5}{6}=35$. Відповідь: \textbf{Б}.}
+\zadtask{У кондитерській є $8$ видів тістечок. Скільки всього існує варіантів вибору з них трьох \textit{різних} тістечок?}
+\answerTable{$24$}{$28$}{$56$}{$336$}{$512$}
+\zadtask{У кав'ярні є $6$ сортів морозива. Скількома способами можна скласти стаканчик із трьох \textit{різних} сортів, якщо порядок викладання сортів \textit{має значення}?}
+\answerTable{$18$}{$20$}{$120$}{$216$}{$720$}
+\newpage
+% =====================================================================
+\taskBlock{Ймовірність за діаграмою опитування --- сесія 1.06, завдання №7}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На діаграмі відображено результати анкетування $100$ осіб, які навчаються в університеті, щодо відкриття неподалік нього піцерії. Анкетована особа мала вибрати лише одну з трьох відповідей: так, ні, байдуже. Яка ймовірність того, що навмання обрана особа, яку анкетували, підтримала відкриття піцерії?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[x=1.2cm, y=0.035cm, thick]
+    \draw (0,0) -- (0,100);
+    \node[rotate=90, font=\small, anchor=south,  yshift=1cm] at (0,50) {Кількість анкетованих осіб};
+    \foreach \y in {0,10,...,100} {
+        \draw[gray!40, thin] (0,\y) -- (3.5,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \filldraw[fill=cyan!60!blue, draw=none] (0.3,0) rectangle (0.7,80);
+    \filldraw[fill=purple!70!black, draw=none] (1.3,0) rectangle (1.7,5);
+    \filldraw[fill=mainGreen!80, draw=none] (2.3,0) rectangle (2.7,15);
+    \draw (0,0) -- (3.5,0);
+    \node[below, font=\small, yshift=-0.1cm] at (0.5,0) {так};
+    \node[below, font=\small, yshift=-0.1cm] at (1.5,0) {ні};
+    \node[below, font=\small, yshift=-0.1cm] at (2.5,0) {байдуже};
+    \node[below, font=\small, yshift=-0.7cm] at (1.5,0) {Варіанти відповідей};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTableTall{$\frac{8}{9}$}{$\frac{1}{5}$}{$\frac{3}{20}$}{$\frac{17}{20}$}{$\frac{4}{5}$}
+\solution{Відкриття піцерії підтримали (відповідь «так») $80$ зі $100$ осіб. Шукана ймовірність $P=\dfrac{80}{100}=\dfrac{4}{5}$. Відповідь: \textbf{Д}.}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На діаграмі відображено результати анкетування $200$ мешканців мікрорайону щодо облаштування нової велодоріжки. Анкетована особа мала вибрати лише одну з трьох відповідей: так, ні, байдуже. Яка ймовірність того, що навмання обрана особа відповіла \textit{«ні»}?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[x=1.2cm, y=0.025cm, thick]
+    \draw (0,0) -- (0,140);
+    \node[rotate=90, font=\small, anchor=south, yshift=1cm] at (0,70) {Кількість анкетованих осіб};
+    \foreach \y in {0,20,...,140} {
+        \draw[gray!40, thin] (0,\y) -- (3.5,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \filldraw[fill=cyan!60!blue, draw=none] (0.3,0) rectangle (0.7,130);
+    \filldraw[fill=purple!70!black, draw=none] (1.3,0) rectangle (1.7,50);
+    \filldraw[fill=mainGreen!80, draw=none] (2.3,0) rectangle (2.7,20);
+    \draw (0,0) -- (3.5,0);
+    \node[below, font=\small, yshift=-0.1cm] at (0.5,0) {так};
+    \node[below, font=\small, yshift=-0.1cm] at (1.5,0) {ні};
+    \node[below, font=\small, yshift=-0.1cm] at (2.5,0) {байдуже};
+    \node[below, font=\small, yshift=-0.7cm] at (1.5,0) {Варіанти відповідей};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTableTall{$\frac{1}{10}$}{$\frac{1}{4}$}{$\frac{1}{2}$}{$\frac{13}{20}$}{$\frac{3}{4}$}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На діаграмі відображено результати анкетування $50$ працівників офісу щодо відкриття поруч кав'ярні. Анкетована особа мала вибрати лише одну з трьох відповідей: так, ні, байдуже. Яка ймовірність того, що навмання обрана особа \textit{не підтримала} відкриття кав'ярні (тобто відповіла «ні» або «байдуже»)?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[x=1.2cm, y=0.12cm, thick]
+    \draw (0,0) -- (0,30);
+    \node[rotate=90, font=\small, anchor=south, yshift=1cm] at (0,15) {Кількість анкетованих осіб};
+    \foreach \y in {0,5,...,30} {
+        \draw[gray!40, thin] (0,\y) -- (3.5,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \filldraw[fill=cyan!60!blue, draw=none] (0.3,0) rectangle (0.7,20);
+    \filldraw[fill=purple!70!black, draw=none] (1.3,0) rectangle (1.7,25);
+    \filldraw[fill=mainGreen!80, draw=none] (2.3,0) rectangle (2.7,5);
+    \draw (0,0) -- (3.5,0);
+    \node[below, font=\small, yshift=-0.1cm] at (0.5,0) {так};
+    \node[below, font=\small, yshift=-0.1cm] at (1.5,0) {ні};
+    \node[below, font=\small, yshift=-0.1cm] at (2.5,0) {байдуже};
+    \node[below, font=\small, yshift=-0.7cm] at (1.5,0) {Варіанти відповідей};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTableTall{$\frac{1}{10}$}{$\frac{1}{2}$}{$\frac{3}{5}$}{$\frac{7}{10}$}{$\frac{9}{10}$}
+% =====================================================================
+\taskBlock{Читання стовпчастої діаграми --- сесія 2.06, завдання №6}
+\zadtask{На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте різницю між кількістю працівників віком від $20$ до $29$ років та кількістю працівників, яким від $40$ до $49$ років.
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, thick]
+    \draw[->, gray!60] (0,0) -- (0,4.8) node[above, font=\scriptsize, text=black] {Кількість};
+    \draw[->, gray!60] (0,0) -- (7.4,0) node[right, font=\scriptsize, text=black] {Вік};
+    \foreach \v in {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!20, very thin] (0,\y) -- (6.9,\y);
+    }
+    \foreach \v in {0,10,20,30,40} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.08,\y) -- (6.9,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (-0.05,\y) {\v};
+    }
+    \foreach \v in {2,4,6,8,12,14,16,18,22,24,26,28,32,34,36,38,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.06,\y) -- (0.06,\y);
+    }
+    \foreach \i/\h/\lab in {0/3.6/{20--29}, 1/4.0/{30--39}, 2/2.4/{40--49}, 3/1.6/{50--59}, 4/0.4/{60--70}} {
+        \filldraw[fill=cyan!60, draw=white] ({0.6+\i*1.3},0) rectangle ({1.4+\i*1.3},\h);
+        \node[below, font=\scriptsize] at ({1.0+\i*1.3},-0.05) {\lab};
+    }
+\end{tikzpicture}
+\end{center}
+\par\vspace{0.2cm}}
+\answerTable{$6$}{$10$}{$12$}{$16$}{$20$}
+\solution{За діаграмою у віці $20$--$29$ років -- $36$ працівників, у віці $40$--$49$ -- $24$. Різниця $36-24=12$. Відповідь: \textbf{В}.}
+\zadtask{На діаграмі відображено розподіл кількості працівників підприємства за віком. За даними діаграми визначте різницю між кількістю працівників віком від $20$ до $29$ років та кількістю працівників, яким від $40$ до $49$ років.
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, thick]
+    \draw[->, gray!60] (0,0) -- (0,4.8) node[above, font=\scriptsize, text=black] {Кількість};
+    \draw[->, gray!60] (0,0) -- (7.4,0) node[right, font=\scriptsize, text=black] {Вік};
+    \foreach \v in {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!20, very thin] (0,\y) -- (6.9,\y);
+    }
+    \foreach \v in {0,10,20,30,40} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.08,\y) -- (6.9,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (-0.05,\y) {\v};
+    }
+    \foreach \v in {2,4,6,8,12,14,16,18,22,24,26,28,32,34,36,38,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.06,\y) -- (0.06,\y);
+    }
+    \foreach \i/\h/\lab in {0/2.8/{20--29}, 1/3.8/{30--39}, 2/2.0/{40--49}, 3/1.4/{50--59}, 4/0.6/{60--70}} {
+        \filldraw[fill=cyan!60, draw=white] ({0.6+\i*1.3},0) rectangle ({1.4+\i*1.3},\h);
+        \node[below, font=\scriptsize] at ({1.0+\i*1.3},-0.05) {\lab};
+    }
+\end{tikzpicture}
+\end{center}
+\par\vspace{0.2cm}}
+\answerTable{$6$}{$8$}{$10$}{$12$}{$18$}
+\newpage
+\zadtask{На діаграмі відображено розподіл кількості працівників компанії за віком. За даними діаграми визначте сумарну кількість працівників, яким \textit{не менше} $40$ років.
+\vspace{0.2cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.9, thick]
+    \draw[->, gray!60] (0,0) -- (0,4.8) node[above, font=\scriptsize, text=black] {Кількість};
+    \draw[->, gray!60] (0,0) -- (7.4,0) node[right, font=\scriptsize, text=black] {Вік};
+    \foreach \v in {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!20, very thin] (0,\y) -- (6.9,\y);
+    }
+    \foreach \v in {0,10,20,30,40} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.08,\y) -- (6.9,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (-0.05,\y) {\v};
+    }
+    \foreach \v in {2,4,6,8,12,14,16,18,22,24,26,28,32,34,36,38,42,44} {
+        \pgfmathsetmacro\y{\v/10}
+        \draw[gray!40] (-0.06,\y) -- (0.06,\y);
+    }
+    \foreach \i/\h/\lab in {0/3.0/{20--29}, 1/4.2/{30--39}, 2/2.6/{40--49}, 3/1.8/{50--59}, 4/0.8/{60--70}} {
+        \filldraw[fill=cyan!60, draw=white] ({0.6+\i*1.3},0) rectangle ({1.4+\i*1.3},\h);
+        \node[below, font=\scriptsize] at ({1.0+\i*1.3},-0.05) {\lab};
+    }
+\end{tikzpicture}
+\end{center}
+\par\vspace{0.2cm}}
+\answerTable{$44$}{$48$}{$52$}{$60$}{$76$}
+% =====================================================================
+\taskBlock{Комбінаторика: вибір з обов'язковим елементом --- сесія 2.06, завдання №7}
+\zadtask{У магазині продають $8$ різних сортів малини, серед яких є сорт <<Альба>>. Покупниця хоче придбати $2$ різні сорти, причому один із них обов'язково має бути <<Альба>>. Скільки в неї є варіантів такого вибору?}
+\answerTable{$7$}{$8$}{$14$}{$16$}{$28$}
+\solution{Сорт <<Альба>> обов'язково входить, тож залишається вибрати $1$ сорт із решти $8-1=7$. Отже $7$ варіантів. Відповідь: \textbf{А}.}
+\zadtask{У розпліднику продають $10$ різних сортів яблунь, серед яких є сорт <<Голден>>. Садівник хоче придбати $2$ різні сорти, причому один із них обов'язково має бути <<Голден>>. Скільки в нього є варіантів такого вибору?}
+\answerTable{$9$}{$10$}{$18$}{$20$}{$45$}
+\zadtask{У квітковій крамниці продають $12$ різних сортів троянд, серед яких є сорт <<Аваланж>>. Покупець хоче придбати $2$ різні сорти, причому серед них \textit{не повинно бути} сорту <<Аваланж>>. Скільки в нього є варіантів такого вибору?}
+\answerTable{$11$}{$22$}{$55$}{$66$}{$110$}
+\newpage
+% =====================================================================
+\taskBlock{Статистика: читання діаграми --- сесія 3.06, завдання №2}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено інформацію щодо зміни маси (у кг) слона протягом шести місяців із січня до червня цього року в порівнянні з груднем минулого року. Якою стала маса слона в червні, якщо в грудні вона становила $4{,}235$ т?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
+    \foreach \y in {-60,-40,-20,0,20,40,60,80,100} {
+        \draw[gray!60, thin] (0,\y) -- (7,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \draw[gray!60, thin] (0,-65) rectangle (7,100);
+    \foreach \x in {0,1,...,6} {
+        \draw[gray!60, thin] (\x,-65) -- (\x,100);
+    }
+    \draw[thick] (0,0) -- (7,0);
+    \node[rotate=90, font=\small, yshift=0.8cm] at (0,20) {Зміна маси слона, кг};
+    \foreach \x/\mon in {0/грудень, 1/січень, 2/лютий, 3/березень, 4/квітень, 5/травень, 6/червень} {
+        \node[below, rotate=90, anchor=east, font=\small, xshift=-0.1cm] at (\x,-65) {\mon};
+    }
+    \node[below, font=\small, yshift=-2.2cm] at (3.5,-65) {Місяць};
+    \foreach \x/\y in {0/0, 1/-60, 2/-40, 3/0, 4/20, 5/80, 6/60} {
+        \filldraw[black] (\x,\y) circle (2pt);
+    }
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4305$ кг}{$4295$ кг}{$4235$ кг}{$4275$ кг}{$4215$ кг}
+\solution{Маса в грудні $4{,}235$ т $= 4235$ кг. За діаграмою зміна маси у червні порівняно з груднем дорівнює $+60$ кг. Отже маса в червні: $4235 + 60 = 4295$ кг. Відповідь: \textbf{Б}.}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено інформацію щодо зміни маси (у кг) носорога протягом шести місяців із січня до червня цього року в порівнянні з груднем минулого року. Якою стала маса носорога в червні, якщо в грудні вона становила $2{,}105$ т?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
+    \foreach \y in {-60,-40,-20,0,20,40,60,80,100} {
+        \draw[gray!60, thin] (0,\y) -- (7,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \draw[gray!60, thin] (0,-65) rectangle (7,100);
+    \foreach \x in {0,1,...,6} {
+        \draw[gray!60, thin] (\x,-65) -- (\x,100);
+    }
+    \draw[thick] (0,0) -- (7,0);
+    \node[rotate=90, font=\small, yshift=0.8cm] at (0,20) {Зміна маси носорога, кг};
+    \foreach \x/\mon in {0/грудень, 1/січень, 2/лютий, 3/березень, 4/квітень, 5/травень, 6/червень} {
+        \node[below, rotate=90, anchor=east, font=\small, xshift=-0.1cm] at (\x,-65) {\mon};
+    }
+    \node[below, font=\small, yshift=-2.2cm] at (3.5,-65) {Місяць};
+    \foreach \x/\y in {0/0, 1/-40, 2/-20, 3/0, 4/40, 5/80, 6/40} {
+        \filldraw[black] (\x,\y) circle (2pt);
+    }
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$2065$ кг}{$2105$ кг}{$2125$ кг}{$2145$ кг}{$2185$ кг}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено інформацію щодо зміни маси (у кг) бегемота протягом шести місяців із січня до червня цього року в порівнянні з груднем минулого року. Якою була \textit{найбільша} маса бегемота за цей період, якщо в грудні вона становила $1{,}760$ т?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
+    \foreach \y in {-60,-40,-20,0,20,40,60,80,100} {
+        \draw[gray!60, thin] (0,\y) -- (7,\y);
+        \node[left, font=\small] at (0,\y) {\y};
+    }
+    \draw[gray!60, thin] (0,-65) rectangle (7,100);
+    \foreach \x in {0,1,...,6} {
+        \draw[gray!60, thin] (\x,-65) -- (\x,100);
+    }
+    \draw[thick] (0,0) -- (7,0);
+    \node[rotate=90, font=\small, yshift=0.8cm] at (0,20) {Зміна маси бегемота, кг};
+    \foreach \x/\mon in {0/грудень, 1/січень, 2/лютий, 3/березень, 4/квітень, 5/травень, 6/червень} {
+        \node[below, rotate=90, anchor=east, font=\small, xshift=-0.1cm] at (\x,-65) {\mon};
+    }
+    \node[below, font=\small, yshift=-2.2cm] at (3.5,-65) {Місяць};
+    \foreach \x/\y in {0/0, 1/40, 2/80, 3/20, 4/0, 5/-40, 6/-20} {
+        \filldraw[black] (\x,\y) circle (2pt);
+    }
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$1840$ кг}{$1800$ кг}{$1760$ кг}{$1720$ кг}{$1780$ кг}
+\taskBlock{Читання діаграми (ціни) --- сесія 4.06, завдання №2}
+\noindent
+\begin{minipage}[t]{0.52\textwidth}
+\vspace{0pt}
+\zadnum На діаграмі відображено інформацію про ціну пакета цукерок «Чудасія», «Каштанчики», «Шокос», «Смакс» і «Няммі» в деякому магазині. Якщо в Катрусі є лише $200$~грн, то із зазначених цукерок вона може придбати
+\vspace{0.3cm}
+\par\noindent\textbf{А}\ \ лише «Каштанчики» або «Шокос»
+\par\noindent\textbf{Б}\ \ лише «Чудасія»
+\par\noindent\textbf{В}\ \ лише «Чудасія», «Смакс» або «Няммі»
+\par\noindent\textbf{Г}\ \ будь-який один пакет цукерок
+\par\noindent\textbf{Д}\ \ лише «Каштанчики», «Смакс» або «Няммі»
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\vspace{0pt}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[gray!60] (0,0) -- (6.5,0);
+    \draw[gray!60] (0,0) -- (0,4.0);
+    \node[rotate=90, font=\small] at (-1.2, 2.0) {Ціна (грн за пакет)};
+    \foreach \v/\y in {0/0, 50/0.5, 100/1.0, 150/1.5, 200/2.0, 250/2.5, 300/3.0, 350/3.5} {
+        \draw[gray!20, thin] (0,\y) -- (6.5,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (0,\y) {\v};
+    }
+    \filldraw[fill=yearOrange!70, draw=white] (0.4,0) rectangle (1.2, 1.75);
+    \filldraw[fill=mainGreen!80, draw=white] (1.6,0) rectangle (2.4, 2.5);
+    \filldraw[fill=brown!70, draw=white] (2.8,0) rectangle (3.6, 3.25);
+    \filldraw[fill=cyan!70, draw=white] (4.0,0) rectangle (4.8, 1.9);
+    \filldraw[fill=purple!60, draw=white] (5.2,0) rectangle (6.0, 2.0);
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (1.0, -0.1) {«Чудасія»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (2.2, -0.1) {«Каштанчики»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (3.4, -0.1) {«Шокос»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (4.6, -0.1) {«Смакс»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (5.8, -0.1) {«Няммі»};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.4cm}
+\solution{За діаграмою ціни: «Чудасія» $175$, «Каштанчики» $250$, «Шокос» $325$, «Смакс» $190$, «Няммі» $200$~грн. На $200$~грн вистачає лише на ті, що коштують не більше $200$: «Чудасія», «Смакс» або «Няммі». Відповідь: \textbf{В}.}
+\noindent
+\begin{minipage}[t]{0.52\textwidth}
+\vspace{0pt}
+\zadnum На діаграмі відображено інформацію про ціну зошитів «Альфа», «Бета», «Гама», «Дельта» і «Омега» в деякій крамниці. Якщо в Марійки є лише $150$~грн, то із зазначених зошитів вона може придбати
+\vspace{0.3cm}
+\par\noindent\textbf{А}\ \ лише «Бета» або «Дельта»
+\par\noindent\textbf{Б}\ \ лише «Гама»
+\par\noindent\textbf{В}\ \ будь-який один зошит
+\par\noindent\textbf{Г}\ \ лише «Альфа», «Гама» або «Омега»
+\par\noindent\textbf{Д}\ \ лише «Альфа», «Дельта» або «Омега»
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\vspace{0pt}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[gray!60] (0,0) -- (6.5,0);
+    \draw[gray!60] (0,0) -- (0,4.0);
+    \node[rotate=90, font=\small] at (-1.2, 2.0) {Ціна (грн за зошит)};
+    \foreach \v/\y in {0/0, 25/0.5, 50/1.0, 75/1.5, 100/2.0, 125/2.5, 150/3.0, 175/3.5} {
+        \draw[gray!20, thin] (0,\y) -- (6.5,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (0,\y) {\v};
+    }
+    \filldraw[fill=yearOrange!70, draw=white] (0.4,0) rectangle (1.2, 2.4);
+    \filldraw[fill=mainGreen!80, draw=white] (1.6,0) rectangle (2.4, 3.4);
+    \filldraw[fill=brown!70, draw=white] (2.8,0) rectangle (3.6, 1.8);
+    \filldraw[fill=cyan!70, draw=white] (4.0,0) rectangle (4.8, 3.1);
+    \filldraw[fill=purple!60, draw=white] (5.2,0) rectangle (6.0, 2.8);
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (1.0, -0.1) {«Альфа»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (2.2, -0.1) {«Бета»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (3.4, -0.1) {«Гама»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (4.6, -0.1) {«Дельта»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (5.8, -0.1) {«Омега»};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.4cm}
+\noindent
+\begin{minipage}[t]{0.52\textwidth}
+\vspace{0pt}
+\zadnum На діаграмі відображено інформацію про ціну пляшки соку «Яблучний», «Вишневий», «Томатний», «Апельсиновий» і «Мультифрукт» у деякому магазині. Тарас купив по одній пляшці найдешевшого та найдорожчого із зазначених соків. Скільки гривень він заплатив за дві пляшки?
+\vspace{0.3cm}
+\par\noindent\textbf{А}\ \ $105$~грн
+\par\noindent\textbf{Б}\ \ $110$~грн
+\par\noindent\textbf{В}\ \ $115$~грн
+\par\noindent\textbf{Г}\ \ $125$~грн
+\par\noindent\textbf{Д}\ \ $135$~грн
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\vspace{0pt}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[gray!60] (0,0) -- (6.5,0);
+    \draw[gray!60] (0,0) -- (0,4.0);
+    \node[rotate=90, font=\small] at (-1.2, 2.0) {Ціна (грн за пляшку)};
+    \foreach \v/\y in {0/0, 10/0.5, 20/1.0, 30/1.5, 40/2.0, 50/2.5, 60/3.0, 70/3.5} {
+        \draw[gray!20, thin] (0,\y) -- (6.5,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (0,\y) {\v};
+    }
+    \filldraw[fill=yearOrange!70, draw=white] (0.4,0) rectangle (1.2, 2.25);
+    \filldraw[fill=mainGreen!80, draw=white] (1.6,0) rectangle (2.4, 3.5);
+    \filldraw[fill=brown!70, draw=white] (2.8,0) rectangle (3.6, 2.75);
+    \filldraw[fill=cyan!70, draw=white] (4.0,0) rectangle (4.8, 3.25);
+    \filldraw[fill=purple!60, draw=white] (5.2,0) rectangle (6.0, 3.0);
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (1.0, -0.1) {«Яблучний»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (2.2, -0.1) {«Вишневий»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (3.4, -0.1) {«Томатний»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (4.6, -0.1) {«Апельсиновий»};
+    \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (5.8, -0.1) {«Мультифрукт»};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.4cm}
+\taskBlock{Комбінаторика (перестановки) --- сесія 4.06, завдання №11}
+\zadtask{Ді-джей складає трек-лист із $6$ різних музичних композицій. Кожен трек має прозвучати лише один раз. Укажіть вираз, за допомогою якого можна визначити загальну кількість можливих послідовностей звучання цих треків.
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ $6 + 5 + 4 + 3 + 2 + 1$
+\par\noindent\textbf{Б}\ \ $6$
+\par\noindent\textbf{В}\ \ $36$
+\par\noindent\textbf{Г}\ \ $6!$
+\par\noindent\textbf{Д}\ \ $6^6$
+\vspace{0.4cm}}
+\solution{Кількість послідовностей із $6$ різних треків (кожен по разу)~--- це число перестановок $P_6=6!$. Відповідь: \textbf{Г}.}
+\zadtask{Бібліотекарка розставляє на полиці $7$ різних книжок в один ряд. Укажіть вираз, за допомогою якого можна визначити загальну кількість можливих способів розташування цих книжок.
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ $7 + 6 + 5 + 4 + 3 + 2 + 1$
+\par\noindent\textbf{Б}\ \ $7^7$
+\par\noindent\textbf{В}\ \ $49$
+\par\noindent\textbf{Г}\ \ $7$
+\par\noindent\textbf{Д}\ \ $7!$
+\vspace{0.4cm}}
+\zadtask{До фіналу конкурсу пройшли $5$ танцювальних пар. Журі визначає, які $3$ з них виступлять у гала-концерті та в якому порядку (по черзі). Укажіть вираз, за допомогою якого можна визначити загальну кількість можливих варіантів такого виступу.
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ $5 \cdot 4 \cdot 3$
+\par\noindent\textbf{Б}\ \ $5!$
+\par\noindent\textbf{В}\ \ $5^3$
+\par\noindent\textbf{Г}\ \ $5 + 4 + 3$
+\par\noindent\textbf{Д}\ \ $5^2$
+\vspace{0.4cm}}
+\taskBlock{Читання діаграми (результати опитування) --- сесія 5.06, завдання №2}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На рисунку відображено результати опитування пасажирів щодо якості перевезень (у балах за шкалою $1$--$10$). Визначте кількість опитаних, які поставили оцінку, \textit{вищу за} $8$ балів.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.42, thick]
+    \draw[->, gray!60] (0,0) -- (0,9) node[above, font=\scriptsize] {};
+    \draw[->, gray!60] (0,0) -- (7.5,0) node[right, font=\scriptsize, text=black] {бали};
+    \foreach \v/\yy in {25/1,50/2,75/3,100/4,125/5,150/6,175/7,200/8,225/9} {
+        \draw[gray!20] (0,\yy) -- (7,\yy);
+    }
+    \foreach \v/\yy in {50/2,100/4,150/6,200/8} {\node[left,font=\tiny, text=gray!80!black] at (0,\yy){\v};}
+
+    \draw[mainGreen, thick] (1,3)--(2,4)--(3,4)--(4,8)--(5,7)--(6,3)--(7,1);
+    \foreach \xx/\yy in {1/3,2/4,3/4,4/8,5/7,6/3,7/1} {
+        \filldraw[fill=white, draw=mainGreen, thick] (\xx,\yy) circle (3.5pt);
+    }
+    \foreach \xx/\lab in {1/4,2/5,3/6,4/7,5/8,6/9,7/10} {\node[below,font=\tiny] at (\xx,0){\lab};}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$19$}{$100$}{$200$}{$275$}{$475$}
+\solution{Оцінка вища за $8$ балів~--- це $9$ і $10$ балів. За графіком їх поставили $75$ і $25$ опитаних. Разом $75+25=100$. Відповідь: \textbf{Б}.}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На рисунку відображено результати опитування відвідувачів кафе щодо якості обслуговування (у балах за шкалою $1$--$10$). Визначте кількість опитаних, які поставили оцінку, \textit{нижчу за} $6$ балів.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.42, thick]
+    \draw[->, gray!60] (0,0) -- (0,9) node[above, font=\scriptsize] {};
+    \draw[->, gray!60] (0,0) -- (7.5,0) node[right, font=\scriptsize, text=black] {бали};
+    \foreach \v/\yy in {25/1,50/2,75/3,100/4,125/5,150/6,175/7,200/8,225/9} {
+        \draw[gray!20] (0,\yy) -- (7,\yy);
+    }
+    \foreach \v/\yy in {50/2,100/4,150/6,200/8} {\node[left,font=\tiny, text=gray!80!black] at (0,\yy){\v};}
+
+    \draw[mainGreen, thick] (1,2)--(2,4)--(3,5)--(4,7)--(5,6)--(6,3)--(7,2);
+    \foreach \xx/\yy in {1/2,2/4,3/5,4/7,5/6,6/3,7/2} {
+        \filldraw[fill=white, draw=mainGreen, thick] (\xx,\yy) circle (3.5pt);
+    }
+    \foreach \xx/\lab in {1/4,2/5,3/6,4/7,5/8,6/9,7/10} {\node[below,font=\tiny] at (\xx,0){\lab};}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$50$}{$100$}{$150$}{$275$}{$425$}
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На рисунку відображено результати опитування користувачів застосунку щодо зручності сервісу (у балах за шкалою $1$--$10$). Визначте кількість опитаних, які поставили оцінку \textit{від $6$ до $8$ балів включно}.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.42, thick]
+    \draw[->, gray!60] (0,0) -- (0,9) node[above, font=\scriptsize] {};
+    \draw[->, gray!60] (0,0) -- (7.5,0) node[right, font=\scriptsize, text=black] {бали};
+    \foreach \v/\yy in {25/1,50/2,75/3,100/4,125/5,150/6,175/7,200/8,225/9} {
+        \draw[gray!20] (0,\yy) -- (7,\yy);
+    }
+    \foreach \v/\yy in {50/2,100/4,150/6,200/8} {\node[left,font=\tiny, text=gray!80!black] at (0,\yy){\v};}
+
+    \draw[mainGreen, thick] (1,1)--(2,3)--(3,6)--(4,8)--(5,5)--(6,3)--(7,2);
+    \foreach \xx/\yy in {1/1,2/3,3/6,4/8,5/5,6/3,7/2} {
+        \filldraw[fill=white, draw=mainGreen, thick] (\xx,\yy) circle (3.5pt);
+    }
+    \foreach \xx/\lab in {1/4,2/5,3/6,4/7,5/8,6/9,7/10} {\node[below,font=\tiny] at (\xx,0){\lab};}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$350$}{$475$}{$250$}{$700$}{$200$}
+\newpage
+% =====================================================================
+\taskBlock{Комбінаторика: правило добутку (заміна гравця)}
+\zadtask{Під час футбольного матчу тренер команди збирається замінити нападником одного із чотирьох захисників. Скільки всього варіантів такої заміни, якщо на лаві запасних два нападники?}
+\answerTable{$2$}{$4$}{$6$}{$8$}{$10$}
+\solution{Замінити можна будь-кого з $4$ захисників будь-ким із $2$ нападників. За правилом добутку: $4\cdot 2=8$. Відповідь: \textbf{Г}.}
+\zadtask{Під час баскетбольного матчу тренер збирається замінити центровим одного із п'яти польових гравців. Скільки всього варіантів такої заміни, якщо на лаві запасних три центрові?}
+\answerTable{$8$}{$15$}{$16$}{$30$}{$45$}
+\zadtask{Під час гандбольного матчу тренер збирається замінити воротарем одного із шести польових гравців. Скільки всього варіантів такої заміни, якщо на лаві запасних два воротарі?}
+\answerTable{$8$}{$10$}{$12$}{$24$}{$36$}
+% =====================================================================
+\taskBlock{Імовірність за списком класу}
+\zadtask{У десятому класі за списком $24$ учні. Імовірність того, що вік учня, прізвище якого навмання вибирають зі списку класу, буде меншим за $15$ років, дорівнює $\dfrac{1}{6}$. Скільки всього в класі учнів, вік яких менший за $15$ років?}
+\answerTable{$8$}{$4$}{$20$}{$3$}{$6$}
+\solution{Кількість учнів, молодших за $15$ років, дорівнює добутку загальної кількості на ймовірність: $24\cdot\dfrac{1}{6}=4$. Відповідь: \textbf{Б}.}
+\zadtask{У дев'ятому класі за списком $30$ учнів. Імовірність того, що зріст учня, прізвище якого навмання вибирають зі списку, буде понад $170$ см, дорівнює $\dfrac{1}{5}$. Скільки всього в класі учнів, зріст яких понад $170$ см?}
+\answerTable{$5$}{$6$}{$10$}{$15$}{$25$}
+\zadtask{У групі за списком $30$ студентів, серед яких $6$ навчаються на «відмінно». Яка ймовірність того, що навмання вибраний зі списку студент навчається на «відмінно»?}
+\answerTableTall{$\frac{1}{6}$}{$\frac{1}{5}$}{$\frac{1}{4}$}{$\frac{1}{3}$}{$\frac{1}{2}$}
+\printAllSolutions
+\chapterTitle{ВІДПОВІДІ}
+\noindent\small Відповіді наведено у тому ж порядку, що й завдання.\par\vspace{0.3cm}
+\ansType{Завдання з вибором однієї відповіді (А--Д)}
+\begin{multicols}{3}\noindent
+\ansitem{Б}
+\ansitem{В}
+\ansitem{В}
+\ansitem{Г}
+\ansitem{В}
+\ansitem{В}
+\ansitem{В}
+\ansitem{В}
+\ansitem{В}
+\ansitem{Г}
+\ansitem{Г}
+\ansitem{А}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{В}
+\ansitem{Д}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{В}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{А}
+\ansitem{А}
+\ansitem{В}
+\ansitem{Б}
+\ansitem{Г}
+\ansitem{А}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{Г}
+\ansitem{В}
+\ansitem{Г}
+\ansitem{Д}
+\ansitem{А}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{Б}
+\ansitem{Г}
+\ansitem{Б}
+\ansitem{В}
+\ansitem{Б}
+\ansitem{Б}
+\ansitem{Б}
+\end{multicols}
+\end{document}

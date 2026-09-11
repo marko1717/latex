@@ -1,0 +1,762 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} сесії 23.05--5.06.2026}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}% --- ДОДАТКОВІ МАКРОСИ (розв'язки, зміст) ---
+\tcbuselibrary{breakable}
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок (оригінал).}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+\newcommand{\solbtn}[1]{\hypertarget{task:#1}{}\par\vspace{0.05cm}\noindent\hyperlink{sol:#1}{\fbox{\footnotesize пояснення $\rightarrow$}}\par\vspace{0.2cm}}
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} ОРИГІНАЛЬНІ ЗАВДАННЯ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} РОЗДІЛ 5. СТЕРЕОМЕТРІЯ}\\[0.6cm]
+{\large Лише оригінали сесій 23.05--5.06.2026, без аналогів}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+\chapterTitle{РОЗДІЛ 5. СТЕРЕОМЕТРІЯ}
+\typeTitle{Просторові фігури та їх властивості}
+\taskBlock{Перетин площин у піраміді --- сесія 23.05, завдання №3}
+
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У чотирикутній піраміді $SABCD$ точка $M$ належить ребру $AB$. По якій прямій перетинаються площини $ABS$ і $MCS$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \coordinate (A) at (1.6,0);
+    \coordinate (B) at (-0.8,1.0);
+    \coordinate (C) at (1.6,1.0);
+    \coordinate (D) at (3.4,0.3);
+    \coordinate (S) at (1.1,3.2);
+    \coordinate (M) at ($(A)!0.55!(B)$);
+    \draw (A) -- (S) -- (D) -- cycle;
+    \draw (A) -- (D);
+    \draw (S) -- (C);
+    \draw (C) -- (D);
+    \draw[dashed] (B) -- (C);
+    \draw (B) -- (S);
+    \draw (A) -- (B);
+    \fill (M) circle (1.5pt);
+    \node[above] at (S) {$S$};
+    \node[left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[below left] at (M) {$M$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$MC$}{$AB$}{$SB$}{$BC$}{$SM$}
+\solbtn{1}
+\taskBlock{Апофеми піраміди --- сесія 30.05, завдання №2}
+
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено правильну трикутну піраміду $SABC$ з вершиною $S$. Скільки всього апофем можна провести в цій піраміді, якщо у неї $4$ грані? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick, line join=round]
+    \coordinate (S) at (1.2, 3);
+    \coordinate (A) at (1.5, 0);
+    \coordinate (B) at (3, 1);
+    \coordinate (C) at (0, 1);
+    \draw[thick] (A) -- (B) -- (S) -- cycle;
+    \draw[thick] (S) -- (A);
+    \draw[thick, dashed] (C) -- (B);
+    \draw[thick] (C) -- (A);
+    \draw[thick] (C) -- (S);
+    \node[above] at (S) {$S$};
+    \node[below] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\begin{flushleft}
+\textbf{А} \quad жодної \\[0.1cm]
+\textbf{Б} \quad лише одну \\[0.1cm]
+\textbf{В} \quad лише дві \\[0.1cm]
+\textbf{Г} \quad лише три \\[0.1cm]
+\textbf{Д} \quad більше трьох
+\end{flushleft}
+\solbtn{2}
+\taskBlock{Мимобіжні прямі у призмі --- сесія 1.06, завдання №2}
+
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У прямокутній чотирикутній призмі $ABCDA_1B_1C_1D_1$ проведено діагональ $B_1D$. Скільки ребер цієї призми \textit{мимобіжні} з прямою $B_1D$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (B) at (1,1.5);
+    \coordinate (C) at (4,1.5);
+    \coordinate (A1) at (0,4);
+    \coordinate (D1) at (3,4);
+    \coordinate (B1) at (1,5.5);
+    \coordinate (C1) at (4,5.5);
+    \draw[dashed] (A) -- (B);
+    \draw[dashed] (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+    \draw[mainGreen, line width=1.2pt] (B1) -- (D);
+    \node[left] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (A1) {$A_1$};
+    \node[right] at (D1) {$D_1$};
+    \node[left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4$}{$5$}{$6$}{$7$}{$8$}
+\solbtn{3}
+\taskBlock{Паралельні прямі в кубі --- сесія 2.06, завдання №5}
+
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Скільки всього є прямих, що проходять через дві вершини куба та є паралельними прямій $AB_1$? \nmtyear{2026}
+\vspace{0.2cm}
+\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=0.08cm, topsep=0.05cm]
+\item жодної
+\item лише одна
+\item лише дві
+\item лише три
+\item більше як три
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1,0.7);
+    \coordinate (C) at (3,0.7);
+    \coordinate (D) at (2,0);
+    \coordinate (A1) at (0,2.4);
+    \coordinate (B1) at (1,3.1);
+    \coordinate (C1) at (3,3.1);
+    \coordinate (D1) at (2,2.4);
+    \draw[dashed] (B) -- (A);
+    \draw[dashed] (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \draw[thick] (A) -- (D) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (B1) -- (C1);
+    \draw[thick] (D) -- (D1);
+    \draw[thick] (A) -- (A1);
+    \draw[mainGreen, line width=1.2pt] (A) -- (B1);
+    \node[below left] at (A) {$A$};
+    \node[below] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[left] at (A1) {$A_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[right] at (C1) {$C_1$};
+    \node[right] at (D1) {$D_1$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.3cm}
+\solbtn{4}
+\taskBlock{Стереометрія: тіла обертання --- сесія 3.06, завдання №6}
+
+\zadnum Конус утворений обертанням \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=0.06cm, topsep=0.04cm]
+\item рівнобедреного трикутника навколо його основи
+\item прямокутного трикутника навколо його гіпотенузи
+\item рівностороннього трикутника навколо його сторони
+\item прямокутного трикутника навколо його катета
+\item прямокутника навколо його сторони
+\end{enumerate}
+\par\vspace{0.25cm}
+\solbtn{5}
+\taskBlock{Властивості просторових фігур --- сесія 4.06, завдання №5}
+
+\zadtask{Укажіть просторову фігуру, яка не має основи. \nmtyear{2026}
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ призма
+\par\noindent\textbf{Б}\ \ конус
+\par\noindent\textbf{В}\ \ циліндр
+\par\noindent\textbf{Г}\ \ куля
+\par\noindent\textbf{Д}\ \ піраміда
+\vspace{0.3cm}}
+\solbtn{6}
+\typeTitle{Вектори і координати в просторі}
+\taskBlock{Сфера і дотична площина --- сесія 5.06, завдання №5}
+
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Площина $\beta$ дотикається сфери в точці $M$ (див. рисунок). Скільки можна провести площин, кожна з яких перпендикулярна до площини $\beta$ і має зі сферою \textit{лише одну} спільну точку? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=0.04cm, topsep=0.03cm]
+\item жодної
+\item лише одну
+\item лише дві
+\item лише три
+\item безліч
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[fill=yellow!30!orange!20, draw=black, line join=round]
+        (-2.5, -0.5) -- (2.5, -0.5) -- (3.8, 1.2) -- (-1.2, 1.2) -- cycle;
+    \node at (3.3, 0.9) {$\beta$};
+    \coordinate (O) at (0.5, 1.6);
+    \def\R{1.6}
+    \draw[fill=cyan!15, draw=blue!70!black] (O) circle (\R);
+    \draw[draw=blue!70!black, dashed] ($(O) + (-\R, 0)$) arc (180:0:\R cm and 0.4cm);
+    \draw[draw=blue!70!black] ($(O) + (-\R, 0)$) arc (180:360:\R cm and 0.4cm);
+    \coordinate (M) at (0.5, 0);
+    \fill (M) circle (2pt);
+    \node[left] at (0.35, 0.05) {$M$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\solbtn{7}
+\taskBlock{Модуль вектора у просторі --- сесія 23.05, завдання №8}
+
+\zadtask{Визначте довжину (модуль) вектора $\vec{a}(5;\, 2;\, -1)$. \nmtyear{2026}}
+\answerTable{$\sqrt{28}$}{$6$}{$\sqrt{30}$}{$\sqrt{32}$}{$15$}
+\solbtn{8}
+\taskBlock{Стереометрія: сфера в координатах --- сесія 30.05, завдання №10}
+
+\zadtask{У прямокутній системі координат у просторі задано сферу та дві точки $M(-4;\, 5;\, 0)$ і $N(4;\, -3;\, 4)$, які належать цій сфері, причому відстань між ними є \textit{найбільшою} серед усіх можливих відстаней між точками цієї сфери. Знайдіть радіус сфери. \nmtyear{2026}}
+\answerTable{$4$}{$6$}{$8$}{$12$}{$24$}
+\solbtn{9}
+\taskBlock{Відстань у просторі від початку координат --- сесія 1.06, завдання №15}
+
+\zadtask{У прямокутній системі координат у просторі задано точку $O(0;\,0;\,0)$. Укажіть з-поміж наведених точку, відстань від якої до точки $O$ \textit{не дорівнює} $10$. \nmtyear{2026}}
+\answerTable{$(0;\,6;\,8)$}{$(10;\,0;\,0)$}{$(9;\,1;\,0)$}{$(-6;\,0;\,8)$}{$(0;\,-8;\,-6)$}
+\solbtn{10}
+\taskBlock{Вектор у просторі: координати точки --- сесія 2.06, завдання №12}
+
+\zadtask{У прямокутній системі координат у просторі задано вектор $\vec{a}\,(5;\, -3;\, 8)$ та точки $K$ і $M(-7;\, 1;\, 4)$. Знайдіть координати точки $K$, якщо $\vec{a} = \overrightarrow{KM}$. \nmtyear{2026}}
+\answerTable{$(-2;\, -2;\, 12)$}{$(-12;\, 4;\, -4)$}{$(-2;\, 4;\, 4)$}{$(2;\, 2;\, -12)$}{$(12;\, -4;\, 4)$}
+\solbtn{11}
+\taskBlock{Стереометрія: вектори у просторі --- сесія 3.06, завдання №12}
+
+\zadtask{У прямокутній системі координат у просторі задано вектори $\vec{a}\,(-2;\, 2;\, 1)$ і $\vec{b}\,(4;\, -3;\, 0)$. Визначте модуль вектора $\vec{c} = \vec{a} + \vec{b}$. \nmtyear{2026}}
+\answerTable{$\sqrt{5}$}{$2$}{$\sqrt{62}$}{$\sqrt{6}$}{$14$}
+\solbtn{12}
+\taskBlock{Циліндр у прямокутній системі координат --- сесія 4.06, завдання №12}
+
+\zadtask{У прямокутній системі координат у просторі задано циліндр та точки $O_1(-3;\, 2;\, 1)$ і $O_2(3;\, 4;\, 4)$, що є центрами його основ. Визначте довжину твірної циліндра. \nmtyear{2026}}
+\answerTable{$7$}{$3\sqrt{5}$}{$\sqrt{13}$}{$\sqrt{61}$}{$3$}
+\solbtn{13}
+\taskBlock{Довжина вектора у просторі --- сесія 5.06, завдання №7}
+
+\zadtask{У прямокутній системі координат у просторі задано точки $A(1;\,2;\,3)$ і $B(3;\,1;\,1)$. Визначте довжину вектора $\overrightarrow{AB}$. \nmtyear{2026}}
+\answerTable{$3$}{$\sqrt{6}$}{$9$}{$\sqrt{14}$}{$2\sqrt{3}$}
+\solbtn{14}
+\taskBlock{Середина відрізка у просторі --- сесія 5.06, завдання №12}
+
+\zadtask{Визначте координати середини відрізка $AB$, якщо $A(1;\,2;\,3)$ і $B(3;\,1;\,1)$.}
+\answerTable{$(-2;\,-1;\,-2)$}{$(1;\,-0{,}5;\,-1)$}{$(2;\,1{,}5;\,2)$}{$(4;\,3;\,1)$}{$(-1;\,-0{,}5;\,-1)$}
+\solbtn{15}
+\typeTitle{Стереометричні розрахунки (коротка відповідь)}
+\taskBlock{Циліндр і конус зі спільною віссю --- сесія 23.05, завдання №19}
+
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено циліндр і конус, що мають спільну вісь. Радіус основи конуса вдвічі менший за радіус циліндра. Висота конуса дорівнює $15$~см, а твірна конуса~--- $17$~см. Знайдіть об'єм циліндра (у см$^3$), якщо площа його бічної поверхні дорівнює $640\pi$~см$^2$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    \draw[dashed] (-1.1,0) arc (180:0:1.1 and 0.35);
+    \draw (-1.1,0) arc (180:360:1.1 and 0.35);
+    \draw (-1.1,0) -- (-1.1,3.2);
+    \draw (1.1,0) -- (1.1,3.2);
+    \draw (0,3.2) ellipse (1.1 and 0.35);
+    \begin{scope}[shift={(3.7,0)}]
+        \draw[dashed] (-0.8,0) arc (180:0:0.8 and 0.25);
+        \draw (-0.8,0) arc (180:360:0.8 and 0.25);
+        \draw (-0.8,0) -- (0,3.5);
+        \draw (0.8,0) -- (0,3.5);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+\solbtn{16}
+\taskBlock{Стереометрія: призма і конус --- сесія 30.05, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum Пряма чотирикутна призма й конус мають рівні висоти. В основі призми лежить рівнобічна трапеція, у яку можна вписати коло. Висота трапеції дорівнює діаметру основи конуса. Бічна сторона трапеції дорівнює $26$ см, а площа основи призми~--- $624$ см$^2$. Твірна конуса дорівнює $20$ см. Визначте площу (у см$^2$) бічної поверхні призми. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (5,0);
+    \coordinate (C) at (4,1);
+    \coordinate (D) at (1,1);
+    \coordinate (A1) at (0,3);
+    \coordinate (B1) at (5,3);
+    \coordinate (C1) at (4,4);
+    \coordinate (D1) at (1,4);
+    \draw[thick] (A) -- (A1);
+    \draw[thick] (B) -- (B1);
+    \draw[thick] (C) -- (C1);
+    \draw[thick, dashed] (D) -- (D1);
+    \draw[thick] (A1) -- (B1) -- (C1) -- (D1) -- cycle;
+    \draw[thick] (A) -- (B);
+    \draw[thick] (B) -- (C);
+    \draw[thick, dashed] (C) -- (D);
+    \draw[thick, dashed] (D) -- (A);
+    \coordinate (V) at (9, 4);
+    \draw[thick, dashed] (7.2, 0) arc (180:0:1.8 and 0.5);
+    \draw[thick] (7.2, 0) arc (180:360:1.8 and 0.5);
+    \draw[thick] (V) -- (7.2, 0);
+    \draw[thick] (V) -- (10.8, 0);
+    \draw[thick, dashed] (V) -- (9, 0);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+\solbtn{17}
+\taskBlock{Конус і правильна трикутна піраміда, об'єм конуса --- сесія 1.06, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Конус і правильна трикутна піраміда мають \textit{рівні висоти}. Радіус основи конуса дорівнює радіусу кола, \textit{вписаного} в основу піраміди, і дорівнює $4\sqrt{3}$. Площа бічної поверхні піраміди дорівнює $288$. Знайдіть об'єм конуса. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.38);
+    \draw[thick] (-1.3,0) arc (180:360:1.3 and 0.38);
+    \coordinate (CV) at (0,3);
+    \draw[thick] (CV) -- (-1.3,0);
+    \draw[thick] (CV) -- (1.3,0);
+    \draw[thick, dashed] (CV) -- (0,0);
+    \draw[<-, >=stealth, gray] (0,0) -- (1.3,0);
+    \node[below, font=\scriptsize] at (0.7,-0.05) {$R$};
+    \coordinate (A) at (3.2,-0.35);
+    \coordinate (B) at (5.6,-0.35);
+    \coordinate (C) at (4.4,0.45);
+    \coordinate (S) at (4.4,3);
+    \draw[thick] (A) -- (B) -- (S) -- cycle;
+    \draw[thick] (A) -- (S);
+    \draw[thick, dashed] (A) -- (C) -- (B);
+    \draw[thick, dashed] (C) -- (S);
+\end{tikzpicture}
+\end{minipage}
+\nmtAnswerBox
+\solbtn{18}
+\taskBlock{Об'єми півсфери та конуса --- сесія 2.06, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Радіус основи й твірна конуса відносяться як $3 : 5$, а площа його бічної поверхні дорівнює $135\pi$. Площа повної поверхні півсфери дорівнює $243\pi$. У скільки разів об'єм півсфери більший за об'єм конуса? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.8, thick, line join=round]
+    \draw[thick, dashed] (-1.0,0) arc (180:0:1.0 and 0.28);
+    \draw[thick] (-1.0,0) arc (180:360:1.0 and 0.28);
+    \draw[thick] (-1.0,0) -- (0,2.4) -- (1.0,0);
+    \begin{scope}[shift={(3.4,0)}]
+        \draw[thick] (-1.1,0) arc (180:0:1.1 and 1.1);
+        \draw[thick] (-1.1,0) -- (1.1,0);
+        \draw[thick, dashed] (-1.1,0) arc (180:0:1.1 and 0.28);
+        \draw[thick] (-1.1,0) arc (180:360:1.1 and 0.28);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\nmtAnswerBox
+\solbtn{19}
+\taskBlock{Стереометрія: циліндр і паралелепіпед --- сесія 3.06, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum На рисунку зображено циліндр і прямокутний паралелепіпед. Діаметр основи циліндра дорівнює діагоналі основи паралелепіпеда. Довжина діагоналі паралелепіпеда дорівнює $39$ см, сторони основи~--- $9$ см і $12$ см. Висота циліндра відноситься до висоти паралелепіпеда як $2 : 3$. Визначте об'єм $V$ циліндра (у см$^3$). У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \draw[thick, dashed] (-0.9,0) arc (180:0:0.9 and 0.26);
+    \draw[thick] (-0.9,0) arc (180:360:0.9 and 0.26);
+    \draw[thick] (-0.9,0) -- (-0.9,4.0);
+    \draw[thick] (0.9,0) -- (0.9,4.0);
+    \draw[thick] (0,4.0) ellipse (0.9 and 0.26);
+    \begin{scope}[shift={(3.2,0)}]
+        \coordinate (A) at (0,0);
+        \coordinate (B) at (2,0);
+        \coordinate (C) at (2.7,0.7);
+        \coordinate (D) at (0.7,0.7);
+        \draw[thick] (A) -- (B) -- (C);
+        \draw[thick, dashed] (C) -- (D) -- (A);
+        \draw[thick] (A) -- (0,2.6);
+        \draw[thick] (B) -- (2,2.6);
+        \draw[thick] (C) -- (2.7,3.3);
+        \draw[thick, dashed] (D) -- (0.7,3.3);
+        \draw[thick] (0,2.6) -- (2,2.6) -- (2.7,3.3) -- (0.7,3.3) -- cycle;
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\nmtAnswerBox
+\solbtn{20}
+\taskBlock{Об'єм призми (призма і піраміда) --- сесія 4.06, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum На рисунку зображено правильну чотирикутну призму та правильну чотирикутну піраміду. Сторона основи піраміди вдвічі менша від діагоналі основи призми. Усі ребра піраміди рівні й дорівнюють $3\sqrt{2}$~см. Знайдіть об'єм (у см$^3$) призми, якщо сума довжин висот призми та піраміди дорівнює $13$~см. \nmtyear{2026}
+\par\vspace{0.4cm}
+\nmtAnswerBox
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.65, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.8,0);
+    \coordinate (C) at (2.6, 0.7);
+    \coordinate (D) at (0.8, 0.7);
+    \coordinate (A1) at (0,3.8);
+    \coordinate (B1) at (1.8,3.8);
+    \coordinate (C1) at (2.6, 4.5);
+    \coordinate (D1) at (0.8, 4.5);
+    \draw (A) -- (B) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw (B) -- (B1) -- (C1);
+    \draw (A1) -- (B1);
+    \draw[dashed] (A) -- (D) -- (C);
+    \draw[dashed] (D) -- (D1);
+    \begin{scope}[shift={(3.8,0)}]
+        \coordinate (P_A) at (0,0);
+        \coordinate (P_B) at (2.2,0);
+        \coordinate (P_C) at (3.2, 0.9);
+        \coordinate (P_D) at (1.0, 0.9);
+        \coordinate (P_S) at (1.6, 4.0);
+        \draw (P_A) -- (P_B) -- (P_C) -- (P_S) -- cycle;
+        \draw (P_B) -- (P_S);
+        \draw[dashed] (P_A) -- (P_D) -- (P_C);
+        \draw[dashed] (P_D) -- (P_S);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.3cm}
+\solbtn{21}
+\taskBlock{Призма з ромбом в основі та конус --- сесія 5.06, завдання №21}
+
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum На рисунку зображено пряму чотирикутну призму та конус. В основі призми лежить ромб, площа якого дорівнює $216$ см$^2$, а сторона~--- $15$ см. Радіус основи конуса дорівнює половині \textit{висоти} ромба. Висота призми дорівнює твірній конуса. Визначте площу \textit{повної} поверхні призми (у см$^2$), якщо площа бічної поверхні конуса дорівнює $144\pi$ см$^2$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.8,0);
+    \coordinate (C) at (2.6,0.7);
+    \coordinate (D) at (0.8,0.7);
+    \coordinate (A1) at (0,3.4);
+    \coordinate (B1) at (1.8,3.4);
+    \coordinate (C1) at (2.6,4.1);
+    \coordinate (D1) at (0.8,4.1);
+    \draw (A) -- (B) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw (B) -- (B1) -- (C1);
+    \draw (A1) -- (B1);
+    \draw[dashed] (A) -- (D) -- (C);
+    \draw[dashed] (D) -- (D1);
+    \begin{scope}[shift={(4.0,0)}]
+        \draw[thick, dashed] (-0.7,0) arc (180:0:0.7 and 0.2);
+        \draw[thick] (-0.7,0) arc (180:360:0.7 and 0.2);
+        \draw[thick] (-0.7,0) -- (0,2.6) -- (0.7,0);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\nmtAnswerBox
+\solbtn{22}
+\chapterTitle{ПОЯСНЕННЯ ДО ЗАДАЧ}
+\noindent\small Стислі пояснення до всіх оригінальних задач. Натискайте \fbox{\footnotesize $\leftarrow$ Задача №$N$}, щоб повернутися.\par\vspace{0.4cm}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:1}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №1.}\quad Спільними точками площин $ABS$ і $MCS$ є $S$ (вершина) та $M$ (бо $M\in AB\subset ABS$ і $M\in MCS$). Через дві спільні точки площини перетинаються по прямій $SM$. Відповідь: \textbf{Д}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:1}{\fbox{\footnotesize $\leftarrow$ Задача №1}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:2}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №2.}\quad Апофема~--- це висота бічної грані, проведена з вершини $S$. Правильна трикутна піраміда має $3$ бічні грані, отже $3$ апофеми. Відповідь: \textbf{Г} (лише три).
+\par\vspace{0.1cm}\hfill\hyperlink{task:2}{\fbox{\footnotesize $\leftarrow$ Задача №2}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:3}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №3.}\quad Призма має $12$ ребер. Із прямою $B_1D$ перетинаються по $3$ ребра біля кожної з вершин $B_1$ і $D$ (разом $6$); решта $6$ ребер не мають із $B_1D$ спільних точок і не паралельні їй, тобто мимобіжні. Відповідь: \textbf{В}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:3}{\fbox{\footnotesize $\leftarrow$ Задача №3}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:4}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №4.}\quad $AB_1$ --- діагональ бічної грані. Паралельна їй пряма через дві вершини куба лише одна --- це діагональ протилежної грані $DC_1$. Відповідь: \textbf{Б}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:4}{\fbox{\footnotesize $\leftarrow$ Задача №4}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:5}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №5.}\quad Конус дістаємо обертанням прямокутного трикутника навколо одного з його катетів: цей катет стає віссю (висотою), другий катет~--- радіусом основи, гіпотенуза~--- твірною. Відповідь: \textbf{Г}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:5}{\fbox{\footnotesize $\leftarrow$ Задача №5}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:6}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №6.}\quad Призма, конус, циліндр і піраміда мають основу (основи). Куля основи не має. Відповідь: \textbf{Г}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:6}{\fbox{\footnotesize $\leftarrow$ Задача №6}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:7}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №7.}\quad Площина має зі сферою лише одну спільну точку тоді й тільки тоді, коли вона дотична до сфери. Через точку дотику $M$ можна провести безліч площин, перпендикулярних до $\beta$, і кожна з них дотикається сфери в $M$. Отже, таких площин безліч. Відповідь: \textbf{Д}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:7}{\fbox{\footnotesize $\leftarrow$ Задача №7}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:8}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №8.}\quad $|\vec{a}|=\sqrt{5^2+2^2+(-1)^2}=\sqrt{25+4+1}=\sqrt{30}$. Відповідь: \textbf{В}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:8}{\fbox{\footnotesize $\leftarrow$ Задача №8}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:9}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №9.}\quad Найбільша відстань між точками сфери~--- це діаметр, тож $MN$ є діаметром. $MN=\sqrt{(4-(-4))^2+(-3-5)^2+(4-0)^2}=\sqrt{64+64+16}=\sqrt{144}=12$. Радіус $R=\dfrac{12}{2}=6$. Відповідь: \textbf{Б} ($6$).
+\par\vspace{0.1cm}\hfill\hyperlink{task:9}{\fbox{\footnotesize $\leftarrow$ Задача №9}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:10}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №10.}\quad Відстань від $O$ до $(x;y;z)$ дорівнює $\sqrt{x^2+y^2+z^2}$. Для чотирьох точок маємо $\sqrt{100}=10$, а для $(9;1;0)$: $\sqrt{81+1}=\sqrt{82}\approx 9{,}06\neq 10$. Відповідь: \textbf{В}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:10}{\fbox{\footnotesize $\leftarrow$ Задача №10}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:11}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №11.}\quad Оскільки $\vec{a}=\overrightarrow{KM}=M-K$, маємо $K=M-\vec{a}=(-7-5;\,1-(-3);\,4-8)=(-12;\,4;\,-4)$. Відповідь: \textbf{Б}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:11}{\fbox{\footnotesize $\leftarrow$ Задача №11}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:12}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №12.}\quad $\vec{c} = \vec{a} + \vec{b} = (-2+4;\, 2-3;\, 1+0) = (2;\, -1;\, 1)$. Тоді $|\vec{c}| = \sqrt{2^2 + (-1)^2 + 1^2} = \sqrt{6}$. Відповідь: \textbf{Г} ($\sqrt6$).
+\par\vspace{0.1cm}\hfill\hyperlink{task:12}{\fbox{\footnotesize $\leftarrow$ Задача №12}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:13}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №13.}\quad Твірна дорівнює відстані між центрами основ: $O_1O_2=\sqrt{(3+3)^2+(4-2)^2+(4-1)^2}=\sqrt{36+4+9}=\sqrt{49}=7$. Відповідь: \textbf{А}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:13}{\fbox{\footnotesize $\leftarrow$ Задача №13}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:14}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №14.}\quad $\overrightarrow{AB}=(3-1;\,1-2;\,1-3)=(2;\,-1;\,-2)$. $|\overrightarrow{AB}|=\sqrt{2^2+(-1)^2+(-2)^2}=\sqrt{9}=3$. Відповідь: \textbf{А}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:14}{\fbox{\footnotesize $\leftarrow$ Задача №14}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:15}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №15.}\quad Координати середини~--- середні арифметичні: $\left(\dfrac{1+3}{2};\,\dfrac{2+1}{2};\,\dfrac{3+1}{2}\right)=(2;\,1{,}5;\,2)$. Відповідь: \textbf{В}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:15}{\fbox{\footnotesize $\leftarrow$ Задача №15}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:16}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №16.}\quad Радіус конуса $r=\sqrt{17^2-15^2}=\sqrt{64}=8$ см, тож радіус циліндра $R=2r=16$ см. З бічної поверхні $2\pi R h=640\pi$ маємо $h=\dfrac{640}{2\cdot 16}=20$ см. Об'єм $V=\pi R^2 h=\pi\cdot 256\cdot 20=5120\pi$, тож $\dfrac{V}{\pi}=5120$. Відповідь: \textbf{5120}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:16}{\fbox{\footnotesize $\leftarrow$ Задача №16}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:17}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №17.}\quad У трапецію з вписаним колом сума основ дорівнює сумі бічних сторін: $a+b=2\cdot26=52$. Площа основи $\dfrac{a+b}{2}\cdot h_{\text{тр}}=624\Rightarrow 26\,h_{\text{тр}}=624\Rightarrow h_{\text{тр}}=24$~--- це діаметр основи конуса, тож $r=12$. Висота конуса (= висота призми) $h=\sqrt{20^2-12^2}=\sqrt{256}=16$. Периметр трапеції $P=(a+b)+2\cdot26=52+52=104$. Бічна поверхня призми $P\cdot h=104\cdot16=1664$. Відповідь: $1664$.
+\par\vspace{0.1cm}\hfill\hyperlink{task:17}{\fbox{\footnotesize $\leftarrow$ Задача №17}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:18}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №18.}\quad Для основи піраміди $r=\dfrac{a}{2\sqrt3}=4\sqrt3$, звідки сторона $a=24$. Площа бічної поверхні $S=\dfrac12\cdot 3a\cdot l=288$, тож $l=\dfrac{288}{36}=8$ (апофема). З $l^2=h^2+r^2$: $h^2=64-48=16$, $h=4$. Тоді висота й радіус конуса: $h=4$, $R=4\sqrt3$, а $V=\dfrac13\pi R^2 h=\dfrac13\pi\cdot48\cdot4=64\pi$. Отже $\dfrac{V}{\pi}=64$. Відповідь: \textbf{$64$}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:18}{\fbox{\footnotesize $\leftarrow$ Задача №18}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:19}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №19.}\quad Конус: $r:l=3:5$, $S_{\text{бік}}=\pi rl=135\pi$. Із $l=\dfrac{5r}{3}$: $\pi r\cdot\dfrac{5r}{3}=135\pi$, тож $r^2=81$, $r=9$, $l=15$, висота $h=\sqrt{l^2-r^2}=\sqrt{225-81}=12$, $V_{\text{кон}}=\dfrac13\pi r^2h=\dfrac13\pi\cdot81\cdot12=324\pi$. Півсфера: $3\pi R^2=243\pi$, $R=9$, $V_{\text{півсф}}=\dfrac23\pi R^3=\dfrac23\pi\cdot729=486\pi$. Відношення $\dfrac{486\pi}{324\pi}=1{,}5$.
+\par\vspace{0.1cm}\hfill\hyperlink{task:19}{\fbox{\footnotesize $\leftarrow$ Задача №19}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:20}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №20.}\quad Діагональ основи паралелепіпеда $d = \sqrt{9^2+12^2} = \sqrt{225} = 15$ см~--- це діаметр циліндра, тож $r = 7{,}5$ см. Висота паралелепіпеда $H = \sqrt{39^2 - 15^2} = \sqrt{1296} = 36$ см, а висота циліндра $h = \dfrac23 H = 24$ см. Об'єм $V = \pi r^2 h = \pi\cdot 7{,}5^2\cdot 24 = 1350\pi$, тож $\dfrac{V}{\pi} = 1350$. Відповідь: \textbf{$1350$}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:20}{\fbox{\footnotesize $\leftarrow$ Задача №20}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:21}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №21.}\quad Усі ребра піраміди $=3\sqrt2$, тож сторона її основи $a_p=3\sqrt2$, а діагональ основи $a_p\sqrt2=6$. Висота піраміди $h_2=\sqrt{(3\sqrt2)^2-3^2}=\sqrt{18-9}=3$. Сторона основи піраміди вдвічі менша від діагоналі основи призми, тож діагональ призми $=6\sqrt2$, а її сторона $a=\dfrac{6\sqrt2}{\sqrt2}=6$, площа основи $S=36$. Висота призми $h_1=13-3=10$, об'єм $V=36\cdot10=360$~см$^3$. Відповідь: \textbf{360}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:21}{\fbox{\footnotesize $\leftarrow$ Задача №21}}
+\end{tcolorbox}
+\par\vspace{0.3cm}\noindent\hypertarget{sol:22}{}
+\begin{tcolorbox}[colback=titleBg!40, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable]
+\noindent\small\textbf{Задача №22.}\quad Висота ромба: $S=a\cdot h\Rightarrow h=\dfrac{216}{15}=14{,}4$. Радіус конуса $r=\dfrac{h}{2}=7{,}2$. З $\pi r l=144\pi$ маємо $l=\dfrac{144}{7{,}2}=20$~--- це й висота призми $H$. Повна поверхня призми $=2S+P\cdot H=2\cdot216+(4\cdot15)\cdot20=432+1200=1632$ см$^2$. Відповідь: \textbf{$1632$}.
+\par\vspace{0.1cm}\hfill\hyperlink{task:22}{\fbox{\footnotesize $\leftarrow$ Задача №22}}
+\end{tcolorbox}
+\chapterTitle{ВІДПОВІДІ}
+\begin{multicols}{3}\noindent
+\textbf{1.}~Д\\
+\textbf{2.}~Г\\
+\textbf{3.}~В\\
+\textbf{4.}~Б\\
+\textbf{5.}~Г\\
+\textbf{6.}~Г\\
+\textbf{7.}~Д\\
+\textbf{8.}~В\\
+\textbf{9.}~Б\\
+\textbf{10.}~В\\
+\textbf{11.}~Г\\
+\textbf{12.}~Г\\
+\textbf{13.}~А\\
+\textbf{14.}~А\\
+\textbf{15.}~В\\
+\textbf{16.}~$5120$\\
+\textbf{17.}~$1664$\\
+\textbf{18.}~$64$\\
+\textbf{19.}~$1{,}5$\\
+\textbf{20.}~$1350$\\
+\textbf{21.}~$360$\\
+\textbf{22.}~$1632$\\
+\end{multicols}
+\end{document}

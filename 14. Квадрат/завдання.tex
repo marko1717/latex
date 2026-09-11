@@ -1,78 +1,163 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.16}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Підключаємо бібліотеки для зручних кутів та розрахунків
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
 
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{multirow}
-
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 14}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Таблиця для відповідей із дробами (збільшена висота клітинок)
-\newcommand{\answerTableTall}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.9cm]{0pt}{2.0cm}#1 & 
-\rule[-0.9cm]{0pt}{2.0cm}#2 & 
-\rule[-0.9cm]{0pt}{2.0cm}#3 & 
-\rule[-0.9cm]{0pt}{2.0cm}#4 & 
-\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Таблиця відповідей (заголовки зовні)
-\newcommand{\answerGrid}{
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
     \begingroup
-    \renewcommand{\arraystretch}{1.3} 
-    \setlength{\tabcolsep}{7pt} 
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
     \begin{tabular}{r|c|c|c|c|c|}
          \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
          \textbf{2} & & & & & \\ \cline{2-6}
          \textbf{3} & & & & & \\ \cline{2-6}
     \end{tabular}
     \endgroup
 }
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
-% Макет для завдань на відповідність
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\matchingLayout}[3]{
     \noindent
     \begin{minipage}[t]{0.40\textwidth}
@@ -90,8 +175,6 @@
         \end{flushright}
     \end{minipage}
 }
-
-% Стандартна таблиця відповідей (для тестів)
 \newcommand{\answerTableSmall}[5]{
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
 \hline
@@ -106,36 +189,68 @@
 \end{tabular}
 }
 
-% Таблиця для вибору одного варіанту
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\definecolor{gold}{RGB}{240, 190, 40}
+\definecolor{silver}{RGB}{170, 170, 175}
+\definecolor{bronze}{RGB}{190, 120, 70}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}
-\end{center}
-}
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+\chapterTitle{Тема 14. Квадрат}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 25 (НМТ 2023~--- 5, 2024~--- 5, 2025~--- 7, 2026~--- 8).}\par\vspace{0.2cm}
 
-\begin{document}
+\typeTitle{НМТ 2023}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Квадрат}}
-\end{center}
-
-\vspace{0.5cm}
-
-% === ЗАВДАННЯ 1 ===
-\noindent\textbf{1.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Площа зафарбованої частини квадрата (див. рисунок) дорівнює $12$ \textit{см}$^2$. Визначте площу квадрата. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -173,10 +288,7 @@
 \vspace{0.3cm}
 \answerTable{$72$ \textit{см}$^2$}{$108$ \textit{см}$^2$}{$48$ \textit{см}$^2$}{$144$ \textit{см}$^2$}{$96$ \textit{см}$^2$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 2 ===
-\noindent\textbf{2.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено квадрат $ABCD$. На сторонах $AD$ і $BC$ вибрано точки $K$ і $M$ так, що $AK = 4$ \textit{см}, $MC = 10$ \textit{см}, $KM = DM$. До кожної величини (1--3) доберіть її значення (А--Д). \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -234,13 +346,10 @@
     \textbf{Д} & 26 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 3 ===
-\noindent\textbf{3.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $BC$ квадрата $ABCD$ вибрано точку $K$ так, що $BK : KC = 3 : 1$ (див. рисунок). Знайдіть довжину відрізка $AK$, якщо сторона квадрата дорівнює $12$ \textit{см}. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -272,10 +381,7 @@
 \vspace{0.3cm}
 \answerTable{$20$ \textit{см}}{$9$ \textit{см}}{$15$ \textit{см}}{$18$ \textit{см}}{$16$ \textit{см}}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 4 ===
-\noindent\textbf{4.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Коло радіуса $6$ вписано в квадрат (див. рисунок). Визначте периметр квадрата. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -292,14 +398,7 @@
 \vspace{0.3cm}
 \answerTable{$36$}{$48$}{$24$}{$60$}{$12$}
 
-\vspace{0.7cm}
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
-\end{center}
-
-% === ЗАВДАННЯ 5 ===
-\noindent\textbf{5.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -348,14 +447,12 @@
     \textbf{Д} & 10 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
+\typeTitle{НМТ 2024}
 
-\vspace{0.5cm}
-
-
-\noindent\textbf{6.} \begin{minipage}[t]{0.95\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
 На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $24$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру (1--3) з її площею (А--Д).\nmtyear{2024}
 \end{minipage}
 
@@ -465,13 +562,10 @@
     \textbf{Д} & 45 \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-
-
-% === ЗАВДАННЯ 6 ===
-\noindent\textbf{7.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено квадрат $ABCD$, площа якого $144$ \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка (1--3) доберіть його довжину (А--Д). \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -528,21 +622,15 @@
     \textbf{Д} & $9\sqrt{2}$ \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 7 ===
-\noindent\makebox[1.5em][l]{\textbf{8.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Сума двох паралельних сторін квадрата дорівнює $16$ \textit{см}. Знайдіть площу цього квадрата. \nmtyear{2024}}
+\zadtask{Сума двох паралельних сторін квадрата дорівнює $16$ \textit{см}. Знайдіть площу цього квадрата. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \answerTable{$16$ \textit{см}$^2$}{$32$ \textit{см}$^2$}{$8$ \textit{см}$^2$}{$64$ \textit{см}$^2$}{$256$ \textit{см}$^2$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 8 ===
-\noindent\makebox[1.5em][l]{\textbf{9.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2024}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -554,10 +642,7 @@ III. & Діагоналі будь-якого квадрата перпенди�
 \vspace{0.3cm}
 \answerTable{лише III}{лише II та III}{лише I та III}{лише I та II}{лише I}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 9 ===
-\noindent\textbf{10.} \begin{minipage}[t]{0.95\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
 Установіть відповідність між геометричною фігурою (1--3) та радіусом кола (А--Д), вписаного в цю фігуру. \nmtyear{2024}
 \end{minipage}
 
@@ -578,16 +663,12 @@ III. & Діагоналі будь-якого квадрата перпенди�
     \textbf{Д} & 2 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{1cm}
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
-\end{center}
+\typeTitle{НМТ 2025}
 
-% === ЗАВДАННЯ 10 ===
-\noindent\textbf{11.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено квадрат $ABCD$. На стороні $BC$ вибрано точку $K$, так що $KC = 4$ \textit{см}. Точка $M$ --- середина відрізка $AK$. Пряма, що проходить через точку $M$, паралельна стороні $BC$, і перетинає $AB$ та $CD$ в точках $N$ і $P$ відповідно. $NM = 6$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -655,13 +736,10 @@ III. & Діагоналі будь-якого квадрата перпенди�
     \textbf{Д} & 20 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 11 ===
-\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній трапеції $ABCD$ проведено висоту $CK$. $ABCK$ --- квадрат з діагоналлю $12\sqrt{2}$ \textit{см}. $CD = 13$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -710,13 +788,10 @@ III. & Діагоналі будь-якого квадрата перпенди�
     \textbf{Д} & 29 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 12 ===
-\noindent\makebox[1.5em][l]{\textbf{13.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Які з наведених тверджень є правильними? \nmtyear{2025}}
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
@@ -728,10 +803,7 @@ III. & Діагональ квадрата ділить його на два р�
 \vspace{0.3cm}
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I}{лише I та III}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 13 ===
-\noindent\textbf{14.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На стороні $BC$ квадрата $ABCD$ вибрано точку $K$ так, що $BK = KC$. Діагональ $BD$ квадрата і відрізок $AK$ перетинаються в точці $M$. Периметр квадрата $ABCD$ дорівнює $120$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -787,13 +859,10 @@ III. & Діагональ квадрата ділить його на два р�
     \textbf{Д} & $30\sqrt{2}$ \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 14 ===
-\noindent\textbf{15.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено квадрат $ABCD$ зі стороною $24$ \textit{см}. На сторонах $BC$ і $AD$ квадрата вибрано відповідно точки $K$ і $M$ так, що $AM : MD = 1 : 2$, $KC = 6$ \textit{см}. Знайдіть довжину відрізка $KM$. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -830,9 +899,8 @@ III. & Діагональ квадрата ділить його на два р�
 \vspace{0.3cm}
 \answerTable{$32$ \textit{см}}{$26$ \textit{см}}{$25$ \textit{см}}{$34$ \textit{см}}{$27$ \textit{см}}
 
-
-\noindent\textbf{16.} \begin{minipage}[t]{0.55\textwidth}
-Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д).
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Прямокутник $ABKM$ складається з квадрата $ABCD$ та прямокутника $DCKM$ (див. рисунок). Периметр квадрата $ABCD$ дорівнює $40$ \textit{см}, $CM = 26$ \textit{см}. Узгодьте відрізок (1--3) із його довжиною (А--Д). \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -882,12 +950,10 @@ III. & Діагональ квадрата ділить його на два р�
     \textbf{Д} & 24 \textit{см} \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
-\vspace{0.2cm}
 
-% === ЗАВДАННЯ 17 ===
-\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Діагональ квадрата $ABCD$ дорівнює $12$ \textit{см}. На стороні $BC$ квадрата вибрано точку $K$ так, що $\angle KAB = 30^\circ$ (див. рисунок). Визначте площу трикутника $ABK$. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -929,4 +995,280 @@ III. & Діагональ квадрата ділить його на два р�
 \vspace{0.3cm}
 \answerTable{$12\sqrt{3}$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$18$ \textit{см}$^2$}{$36$ \textit{см}$^2$}{$36\sqrt{3}$ \textit{см}$^2$}
 
+\typeTitle{НМТ 2026}
+
+% НМТ 2026, сесія 23.05, завдання №13 --- основна тема: Прямокутник
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum Для виготовлення картонної моделі трафарету $ABCDEG$ Андрійко наклеїв квадрат зі стороною $6$~см на прямокутник зі сторонами $4$ і $9$~см (див. рисунок). Спільною частиною квадрата та прямокутника є рівнобедрений трикутник, дві вершини якого збігаються з вершинами прямокутника. Обчисліть площу трафарету $ABCDEG$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.45, thick]
+    \coordinate (A) at (-3,0);
+    \coordinate (B) at (0,3);
+    \coordinate (Rt) at (3,0);
+    \coordinate (G) at (0,-3);
+    \coordinate (C) at (1,2);
+    \coordinate (K) at (1,-2);
+    \coordinate (D) at (7,2);
+    \coordinate (E) at (7,-2);
+    \fill[gray!35] (C) -- (Rt) -- (K) -- cycle;
+    \draw (A) -- (B) -- (Rt) -- (G) -- cycle;
+    \draw (C) -- (D) -- (E) -- (K);
+    \draw (C) -- (K);
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[above right] at (D) {$D$};
+    \node[below right] at (E) {$E$};
+    \node[below] at (G) {$G$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$68$ см$^2$}{$64$ см$^2$}{$72$ см$^2$}{$70$ см$^2$}{$76$ см$^2$}
+% Відповідь: А
+\ifshowsolutions\solution{Площа квадрата $6\cdot 6=36$ см$^2$, площа прямокутника $4\cdot 9=36$ см$^2$. Спільний рівнобедрений трикутник має основу, рівну стороні прямокутника $4$ см, і висоту $2$ см, тож його площа $\dfrac{1}{2}\cdot 4\cdot 2=4$ см$^2$. Площа трафарету $=36+36-4=68$ см$^2$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 30.05, завдання №16 --- також у темі: Трикутники
+\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами (1--3) та їхніми значеннями (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.75, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (4,4);
+    \coordinate (D) at (4,0);
+    \coordinate (K) at (2,6);
+    \coordinate (Mid) at (4,2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K) -- (C);
+    \fill (Mid) circle (2pt);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+    \node[right] at (Mid) {$M$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Величина}\par\vspace{0.15cm}
+\textbf{1} \quad довжина сторони квадрата\\[0.25cm]
+\textbf{2} \quad відстань від точки $K$ до прямої $AD$\\[0.25cm]
+\textbf{3} \quad довжина відрізка $KM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення}\par\vspace{0.15cm}
+\textbf{А} \quad $12$\\[0.15cm]
+\textbf{Б} \quad $10$\\[0.15cm]
+\textbf{В} \quad $4\sqrt{3}$\\[0.15cm]
+\textbf{Г} \quad $4\sqrt{5}$\\[0.15cm]
+\textbf{Д} \quad $8$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1~--~Д, 2~--~А, 3~--~Г
+\ifshowsolutions\solution{Нехай сторона квадрата $a$. Ламана $BADM=BA+AD+DM=a+a+\dfrac a2=\dfrac{5a}{2}=20$, звідки $a=8$ (\textbf{1}~--~Д). Висота трикутника до $BC$ дорівнює $\dfrac a2=4$, тож відстань від $K$ до $AD$: $a+\dfrac a2=12$ (\textbf{2}~--~А). У координатах $K(4;12)$, $M(8;4)$: $KM=\sqrt{4^2+8^2}=\sqrt{80}=4\sqrt5$ (\textbf{3}~--~Г). Відповідь: \textbf{1~--~Д, 2~--~А, 3~--~Г}.}\fi
+
+% НМТ 2026, сесія 1.06, завдання №10 --- також у темі: Коло, круг і їх елементи
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено квадрат $ABCD$. На стороні $AD$ вибрано точку $K$ так, що $\angle BKD = 120^\circ$. Визначте радіус кола, описаного навколо цього квадрата, якщо $BK = 12$ см. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (C) at (3,3);
+    \coordinate (B) at (0,3);
+    \coordinate (K) at (1.7,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K);
+    \fill (K) circle (1.8pt);
+    \pic[draw=yearOrange, line width=0.8pt, "$120^\circ$", angle radius=0.3cm,
+         angle eccentricity=1.85, font=\scriptsize] {angle = D--K--B};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$6\sqrt{2}$ см}{$3\sqrt{3}$ см}{$6\sqrt{3}$ см}{$3\sqrt{2}$ см}{$3\sqrt{6}$ см}
+% Відповідь: Д
+\ifshowsolutions\solution{$\angle BKA=180^\circ-120^\circ=60^\circ$. У прямокутному трикутнику $ABK$ ($\angle A=90^\circ$): $AB=BK\sin 60^\circ=12\cdot\dfrac{\sqrt3}{2}=6\sqrt3$ --- сторона квадрата. Радіус описаного кола $R=\dfrac{a\sqrt2}{2}=\dfrac{6\sqrt3\cdot\sqrt2}{2}=3\sqrt6$ см. Відповідь: \textbf{Д}.}\fi
+
+% НМТ 2026, сесія 9.06, завдання №18
+\zadtask{На рисунку зображено квадрат $ABCD$, діагональ якого дорівнює $8\sqrt{2}$~см. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (4,4);
+    \coordinate (D) at (4,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.50\textwidth}
+\textit{Відрізок}\par\vspace{0.15cm}
+\textbf{1} \quad відстань між серединами сторін $AB$ і $AD$\\[0.25cm]
+\textbf{2} \quad радіус кола, уписаного в квадрат $ABCD$\\[0.25cm]
+\textbf{3} \quad медіана трикутника $ABC$, проведена з вершини $A$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Довжина відрізка}\par\vspace{0.15cm}
+\textbf{А} \quad $2\sqrt{2}$~см\\[0.15cm]
+\textbf{Б} \quad $4$~см\\[0.15cm]
+\textbf{В} \quad $4\sqrt{2}$~см\\[0.15cm]
+\textbf{Г} \quad $8$~см\\[0.15cm]
+\textbf{Д} \quad $4\sqrt{5}$~см
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% НМТ 2026, сесія 12.06, завдання №8 --- основна тема: Координати і вектори на площині і в просторі. Рівняння кола
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У прямокутній системі координат $xy$ зображено квадрат $KLMN$, $K(-1; 0)$, $L(-1; 2)$, $M(1; 2)$, $N(1; 0)$ (див. рисунок). Скільки спільних точок з квадратом $KLMN$ має графік рівняння $x^2 + y^2 = 4$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
+    \draw[->] (-2.3,0) -- (2.3,0) node[right] {$x$};
+    \draw[->] (0,-1.3) -- (0,3.3) node[above] {$y$};
+    \node[below right, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (-1,0) {$-1$};
+    \node[below right, font=\scriptsize] at (1,0) {$1$};
+    \node[above left, font=\scriptsize] at (0,1) {$1$};
+    \node[above left, font=\scriptsize] at (0,2) {$2$};
+    \draw[mainGreen, very thick] (-1,0) rectangle (1,2);
+    \node[below left, font=\scriptsize] at (-1,0) {$K$};
+    \node[above left, font=\scriptsize] at (-1,2) {$L$};
+    \node[above right, font=\scriptsize] at (1,2) {$M$};
+    \node[below right, font=\scriptsize] at (1,0) {$N$};
+
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{жодної}{лише одну}{лише дві}{лише три}{більше трьох}
+
+% НМТ 2026, сесія 12.06, завдання №14 --- також у темі: Трикутники
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum Відпочинкова зона в Парку здоров'я складається з двох ділянок квадратної форми площею $144$~м$^2$ і $225$~м$^2$ і ділянки у формі прямокутного трикутника, гіпотенуза та катет якого є сторонами квадратів (див. рисунок). На ділянці трикутної форми розміщено фонтан, який на схемі зображений у формі кола, що дотикається до сторін трикутника. Визначте радіус цього кола. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{center}
+\begin{tikzpicture}[scale=0.75, line join=round, line cap=round]
+    % Лівий квадрат (225)
+    \draw[thick] (0,0) rectangle (-5,5);
+    \node at (-2.5, 2.5) {$225~м^2$};
+
+    % Трикутник
+    \draw[thick] (0,0) -- (2.4, 1.8) -- (0,5) -- cycle;
+
+    % Правий квадрат (144)
+    \draw[thick] (0,5) -- (3.2, 7.4) -- (5.6, 4.2) -- (2.4, 1.8) -- cycle;
+    \node at (2.8, 4.6) {$144~м^2$};
+
+    % Коло (фонтан)
+    \draw[thick] (1, 2) circle (1);
+    \node[scale=0.95] at (1, 2) {фонтан};
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4{,}5$~м}{$9$~м}{$6$~м}{$3$~м}{$1{,}5$~м}
+
+% НМТ 2026, сесія 15.06, завдання №4
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum Розгляньте схематичне зображення стелажа для книг і декору. Зображення складається з восьми рівних квадратів. Визначте площу одного такого квадрата, якщо висота й ширина стелажа дорівнюють $160$~см і $80$~см відповідно. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    % стелаж: 2 стовпці x 4 ряди квадратів (сторона 40 -> W=80, H=160)
+    \draw (0,0) rectangle (2,8);
+    \draw (1,0) -- (1,8);
+    \foreach \y in {2,4,6} {\draw (0,\y) -- (2,\y);}
+    \node[below, font=\scriptsize] at (1,0) {$80$~см};
+    \node[left, font=\scriptsize, rotate=90, anchor=south] at (0,4) {$160$~см};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$800$~см$^2$}{$1200$~см$^2$}{$2000$~см$^2$}{$160$~см$^2$}{$1600$~см$^2$}
+% Відповідь: Д
+
+% НМТ 2026, сесія 18.06, завдання №3
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum Підлога кімнати має форму квадрата $ABCD$. На ній лежить квадратний килим $AKLM$, периметр якого дорівнює $36$~см. Визначте довжину $AB$, якщо $BK = 2$~см. Наявністю плінтусів на підлозі знехтуйте. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,5.5);
+    \coordinate (C) at (5.5,5.5);
+    \coordinate (D) at (5.5,0);
+    \coordinate (K) at (0,4.5);
+    \coordinate (L) at (4.5,4.5);
+    \coordinate (M) at (4.5,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \filldraw[fill=violet!25, draw=violet!70!black] (A) -- (K) -- (L) -- (M) -- cycle;
+    \pic[draw, angle radius=0.2cm] {right angle = A--K--L};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[left] at (K) {$K$};
+    \node[above right] at (L) {$L$};
+    \node[below right] at (M) {$M$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$8$~см}{$9$~см}{$11$~см}{$12$~см}{$14$~см}
+% Відповідь: В
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{18.}~А \ {\scriptsize\color{gray}(23.05, №13)}\par
+\noindent\textbf{19.}~1~--~Д, 2~--~А, 3~--~Г \ {\scriptsize\color{gray}(30.05, №16)}\par
+\noindent\textbf{20.}~Д \ {\scriptsize\color{gray}(1.06, №10)}\par
+\noindent\textbf{24.}~Д \ {\scriptsize\color{gray}(15.06, №4)}\par
+\noindent\textbf{25.}~В \ {\scriptsize\color{gray}(18.06, №3)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

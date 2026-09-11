@@ -1,271 +1,350 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,shapes.symbols, decorations.pathreplacing}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{multirow}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
 
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 35}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% 1. ТАБЛИЦЯ ДЛЯ ВИСОКИХ ВІДПОВІДЕЙ (дроби, інтеграли)
-% Висота клітинки збільшена до 2.0 см за допомогою команди \rule
-\newcommand{\answerTableTall}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
-\hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.9cm]{0pt}{2.0cm}#1 & 
-\rule[-0.9cm]{0pt}{2.0cm}#2 & 
-\rule[-0.9cm]{0pt}{2.0cm}#3 & 
-\rule[-0.9cm]{0pt}{2.0cm}#4 & 
-\rule[-0.9cm]{0pt}{2.0cm}#5 \\
-\hline
-\end{tabular}
-\end{center}
-}
-
-% Таблиця для відповідей (5 варіантів: А, Б, В, Г, Д)
-\newcommand{\answerTable}[5]{
-\begin{center}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Поле для вводу відповіді
-\newcommand{\answerBox}{
-    \noindent
-    \textbf{Відповідь:} \quad
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
     \begingroup
-    \setlength{\fboxsep}{8pt}
-    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
-    \textbf{,}
-    \framebox{\phantom{0}}\,\framebox{\phantom{0}}\,\framebox{\phantom{0}}
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
     \endgroup
 }
-
-% Рік
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\definecolor{bar1}{RGB}{200, 120, 20}
+\definecolor{bar2}{RGB}{255, 220, 0}
+\definecolor{bar3}{RGB}{220, 30, 30}
+\definecolor{bar4}{RGB}{128, 0, 128}
+\definecolor{bar5}{RGB}{0, 160, 220}
+\definecolor{bar6}{RGB}{120, 180, 50}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
 
-\vspace{1cm}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
+\chapterTitle{Тема 35. Комбінаторика}
+\noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 38 (НМТ 2023~--- 20, 2024~--- 2, 2025~--- 6, 2026~--- 10).}\par\vspace{0.2cm}
 
-\begin{center}
-{\large Тема: \textbf{Комбінаторика}}
-\end{center}
+\typeTitle{НМТ 2023}
 
 % === ЗАВДАННЯ 1 (Електроніка) ===
-\noindent\textbf{1.} У магазині електроніки можна придбати оптичні диски 20 різних брендів. Юлія планує купити в цьому магазині по одному диску трьох різних брендів. Скільки всього є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum У магазині електроніки можна придбати оптичні диски 20 різних брендів. Юлія планує купити в цьому магазині по одному диску трьох різних брендів. Скільки всього є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 2 (Будівельники) ===
-\noindent\textbf{2.} У штаті фірми з надання будівельних послуг 22 майстри: 5 електриків, 8 плиточників, решта – маляри. На один об'єкт потрібно підрядити бригаду з одного електрика, одного плиточника та двох малярів. Скільки всього є способів вибору майстрів таких професій із штату фірми цієї бригади? \nmtyear{2023}
+\noindent\zadnum У штаті фірми з надання будівельних послуг 22 майстри: 5 електриків, 8 плиточників, решта – маляри. На один об'єкт потрібно підрядити бригаду з одного електрика, одного плиточника та двох малярів. Скільки всього є способів вибору майстрів таких професій із штату фірми цієї бригади? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 3 (Квіти) ===
-\noindent\textbf{3.} У квітковому магазині є 12 білих і 25 червоних троянд. Покупець вибирає у цьому магазині дві білі й одну червону троянди. Скільки всього є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum У квітковому магазині є 12 білих і 25 червоних троянд. Покупець вибирає у цьому магазині дві білі й одну червону троянди. Скільки всього є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 4 (Посткросинг) ===
-\noindent\textbf{4.} Віталіна бере участь у посткросингу, надсилаючи адресатам у різні країни листівки. Вона має 12 різних листівок: 6 – із гербами українських міст і 6 – із краєвидами. Віталіна вибирає для кожного з двох адресатів у Європі по одній листівці з гербом і для кожного з трьох адресатів в Австралії – по одній листівці з краєвидом. Скільки всього варіантів такого вибору є у Віталіни? \nmtyear{2023}
+\noindent\zadnum Віталіна бере участь у посткросингу, надсилаючи адресатам у різні країни листівки. Вона має 12 різних листівок: 6 – із гербами українських міст і 6 – із краєвидами. Віталіна вибирає для кожного з двох адресатів у Європі по одній листівці з гербом і для кожного з трьох адресатів в Австралії – по одній листівці з краєвидом. Скільки всього варіантів такого вибору є у Віталіни? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 5 (Цукерки) ===
-\noindent\textbf{5.} На столі п'ять тарілок: у першій – шоколадні, у другій – вафельні, у третій – желейні цукерки, у четвертій – карамельки, а у п'ятій – батончики. У кожній із тарілок усі цукерки однакові. Скільки всього можна утворити різних наборів із двох цукерок різних видів? \nmtyear{2023}
+\noindent\zadnum На столі п'ять тарілок: у першій – шоколадні, у другій – вафельні, у третій – желейні цукерки, у четвертій – карамельки, а у п'ятій – батончики. У кожній із тарілок усі цукерки однакові. Скільки всього можна утворити різних наборів із двох цукерок різних видів? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 6 (Співаки та групи) ===
-\noindent\textbf{6.} У фінал творчого конкурсу вийшли 5 співаків і 12 музичних груп. Для участі у благодійному конкурсі планують залучити 1 співака і 2 музичні групи із фіналістів конкурсу. Скільки всього є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum У фінал творчого конкурсу вийшли 5 співаків і 12 музичних груп. Для участі у благодійному конкурсі планують залучити 1 співака і 2 музичні групи із фіналістів конкурсу. Скільки всього є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 7 (Коди книжок) ===
-\noindent\textbf{7.} У бібліотеці всі книжки кодують чотирма символами за таким правилом: перший символ є буквою латинського алфавіту, а наступні три – цифрами. У кожної книжки є унікальний особистий код. Яку найбільшу кількість книжок можна так закодувати, якщо в латинському алфавіті 26 букв? \nmtyear{2023}
+\noindent\zadnum У бібліотеці всі книжки кодують чотирма символами за таким правилом: перший символ є буквою латинського алфавіту, а наступні три – цифрами. У кожної книжки є унікальний особистий код. Яку найбільшу кількість книжок можна так закодувати, якщо в латинському алфавіті 26 букв? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 8 (Автоколона) ===
-\noindent\textbf{8.} П'ять сімей рушають у туристичну мандрівку на п'яти автомобілях – трьох джипах та двох седанах. Скільки всього існує варіантів сформувати із цих автомобілів колону для руху, якщо попереду й позаду колони будуть седани, а всередині неї – джипи? \nmtyear{2023}
+\noindent\zadnum П'ять сімей рушають у туристичну мандрівку на п'яти автомобілях – трьох джипах та двох седанах. Скільки всього існує варіантів сформувати із цих автомобілів колону для руху, якщо попереду й позаду колони будуть седани, а всередині неї – джипи? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 9 (Парковка) ===
-\noindent\textbf{9.} На порожній паркувальний майданчик, де 10 паркомісць, заїжджають три автомобіля: Peugeot, Ford і Volkswagen. Скільки всього є варіантів вибору паркомісць для цих автомобілів? \nmtyear{2023}
+\noindent\zadnum На порожній паркувальний майданчик, де 10 паркомісць, заїжджають три автомобіля: Peugeot, Ford і Volkswagen. Скільки всього є варіантів вибору паркомісць для цих автомобілів? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 10 (Автобуси) ===
-\noindent\textbf{10.} Для перевезення учасників симпозіуму потрібно замовити один автобус і два мікроавтобуси. Скільки всього існує варіантів вибору машин за таким замовленням, якщо у виконавця замовлення є 8 автобусів і 6 мікроавтобусів? \nmtyear{2023}
+\noindent\zadnum Для перевезення учасників симпозіуму потрібно замовити один автобус і два мікроавтобуси. Скільки всього існує варіантів вибору машин за таким замовленням, якщо у виконавця замовлення є 8 автобусів і 6 мікроавтобусів? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 11 (Кафе: або/або) ===
-\noindent\textbf{11.} У кафе на сніданок пропонують 10 видів сендвічів, 8 різних салатів та 6 видів напоїв. Відвідувач вибирає на сніданок у цьому кафе або сендвіч і напій, або салат і напій. Скільки всього є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum У кафе на сніданок пропонують 10 видів сендвічів, 8 різних салатів та 6 видів напоїв. Відвідувач вибирає на сніданок у цьому кафе або сендвіч і напій, або салат і напій. Скільки всього є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 12 (Кафе: два сендвічі) ===
-\noindent\textbf{12.} У кафе на сніданок пропонують 10 видів сендвічів, 8 різних салатів та 6 видів напоїв. Відвідувач вибирає на сніданок у цьому кафе два різні сендвічі, салат і напій. Скільки всього варіантів такого вибору є у відвідувача? \nmtyear{2023}
+\noindent\zadnum У кафе на сніданок пропонують 10 видів сендвічів, 8 різних салатів та 6 видів напоїв. Відвідувач вибирає на сніданок у цьому кафе два різні сендвічі, салат і напій. Скільки всього варіантів такого вибору є у відвідувача? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 13 (Олег і справи) ===
-\noindent\textbf{13.} Олег збирався протягом вихідного дня купити продукти, прибрати, відвідати спортзал, підготувати доповідь та відповісти на лист. Згодом він вирішив вибрати лише три справи із цих п’яти, але обов’язково прибрати в кімнаті. Скільки всього в Олега є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum Олег збирався протягом вихідного дня купити продукти, прибрати, відвідати спортзал, підготувати доповідь та відповісти на лист. Згодом він вирішив вибрати лише три справи із цих п’яти, але обов’язково прибрати в кімнаті. Скільки всього в Олега є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 14 (Книги олімпіада) ===
-\noindent\textbf{14.} Переможцю олімпіади заплановано подарувати комплект із 5 різних книг, у якому 2 збірники олімпіадних задач та 3 науково-популярні книги. Скільки всього є варіантів формування такого комплекту, якщо в наявності є 8 різних збірників та 10 різних науково-популярних книг? \nmtyear{2023}
+\noindent\zadnum Переможцю олімпіади заплановано подарувати комплект із 5 різних книг, у якому 2 збірники олімпіадних задач та 3 науково-популярні книги. Скільки всього є варіантів формування такого комплекту, якщо в наявності є 8 різних збірників та 10 різних науково-популярних книг? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 15 (Флешки) ===
-\noindent\textbf{15.} В інтернет-магазині можна придбати флешки об’ємом пам’яті 32 Гб (12 видів) і об’ємом пам’яті 64 Гб (10 видів). Микола планує в цьому магазині купити 3 різні флешки: 2 – об’ємом 32 Гб і 1 – об’ємом 64 Гб. Скільки всього в Миколи є варіантів замовлення для купівлі флешок із заданими параметрами пам’яті? \nmtyear{2023}
+\noindent\zadnum В інтернет-магазині можна придбати флешки об’ємом пам’яті 32 Гб (12 видів) і об’ємом пам’яті 64 Гб (10 видів). Микола планує в цьому магазині купити 3 різні флешки: 2 – об’ємом 32 Гб і 1 – об’ємом 64 Гб. Скільки всього в Миколи є варіантів замовлення для купівлі флешок із заданими параметрами пам’яті? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 16 (Симпозіум: автобус або мікроавтобуси) ===
-\noindent\textbf{16.} Для перевезення учасників симпозіуму потрібно замовити один автобус або два мікроавтобуси. Скільки всього існує варіантів вибору машин за таким замовленням, якщо у виконавця замовлення є 8 автобусів і 6 мікроавтобусів? \nmtyear{2023}
+\noindent\zadnum Для перевезення учасників симпозіуму потрібно замовити один автобус або два мікроавтобуси. Скільки всього існує варіантів вибору машин за таким замовленням, якщо у виконавця замовлення є 8 автобусів і 6 мікроавтобусів? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 17 (Перехрестя) ===
-\noindent\textbf{17.} Автомобіль на своєму шляху має 5 перехресть. Перед кожним перехрестям автомобіль або зупиняється, або ж проїжджає перехрестя без зупинки. Скільки всього є варіантів проїжджання перехресть цим автомобілем? \nmtyear{2023}
+\noindent\zadnum Автомобіль на своєму шляху має 5 перехресть. Перед кожним перехрестям автомобіль або зупиняється, або ж проїжджає перехрестя без зупинки. Скільки всього є варіантів проїжджання перехресть цим автомобілем? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 18 (Ксенія і листівки) ===
-\noindent\textbf{18.} Ксенія бере участь у посткросингу, надсилаючи адресатам у різні країни листівки із зображеннями українських міст та краєвидів. Вона має 10 різних листівок такої тематики. Для кожного із чотирьох адресатів Ксенія вибирає по одній листівці та конверт жовтого або синього кольору. Скільки всього у Ксенії є способів такого вибору, якщо вона надсилатиме всі листівки в конвертах одного кольору? \nmtyear{2023}
+\noindent\zadnum Ксенія бере участь у посткросингу, надсилаючи адресатам у різні країни листівки із зображеннями українських міст та краєвидів. Вона має 10 різних листівок такої тематики. Для кожного із чотирьох адресатів Ксенія вибирає по одній листівці та конверт жовтого або синього кольору. Скільки всього у Ксенії є способів такого вибору, якщо вона надсилатиме всі листівки в конвертах одного кольору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 19 (Квартет) ===
-\noindent\textbf{19.} З трьох хлопців та трьох дівчат добирають чотирьох учасників до музичного квартету. Скільки всього є варіантів такого вибору? \nmtyear{2023}
+\noindent\zadnum З трьох хлопців та трьох дівчат добирають чотирьох учасників до музичного квартету. Скільки всього є варіантів такого вибору? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 20 (Меблі) ===
-\noindent\textbf{20.} На сайті магазину меблів пропонують дивани 10 видів і крісла 15 видів українського виробництва, а також 8 видів імпортних готових комплектів дивана та 2 однакових крісел. Скільки всього є варіантів вибору в цьому магазині дивана та 2 крісел одного виду, якщо меблі з комплекту не можна продавати окремо? \nmtyear{2023}
+\noindent\zadnum На сайті магазину меблів пропонують дивани 10 видів і крісла 15 видів українського виробництва, а також 8 видів імпортних готових комплектів дивана та 2 однакових крісел. Скільки всього є варіантів вибору в цьому магазині дивана та 2 крісел одного виду, якщо меблі з комплекту не можна продавати окремо? \nmtyear{2023}
 
 \vspace{0.5cm}
-\answerBox
+\nmtAnswerBox
 
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Комбінаторика}}
-\end{center}
+\typeTitle{НМТ 2024}
 
 % === ЗАВДАННЯ 21 (Фермер і дерева - ОНОВЛЕНИЙ РИСУНОК) ===
-\noindent\textbf{21.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Фермер вирішив посадити 2 види плодових дерев (груша та яблуня) і 4 види кістянок (абрикос, слива, вишня та персик) в 6 рядів, де в кожному ряду мають бути однакові дерева. У першому та останньому ряду мають бути плодові дерева, а всередині – по 1 ряду кожного виду кістянок (див. рисунок). Скільки всього варіантів оформлення саду в нього є? \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -333,58 +412,42 @@
 \end{minipage}
 
 \vspace{0.5cm}
-\answerBox
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 22 (Розклад уроків) ===
-\noindent\textbf{22.} Заступник директора школи складає розклад уроків для 10-го класу. Він запланував на понеділок шість уроків з таких предметів: геометрія, біологія, англійська мова, хімія, фізична культура, географія. Скільки всього існує різних варіантів розкладу уроків на цей день, якщо урок фізичної культури має бути першим або останнім у розкладі? \nmtyear{2024}
+\noindent\zadnum Заступник директора школи складає розклад уроків для 10-го класу. Він запланував на понеділок шість уроків з таких предметів: геометрія, біологія, англійська мова, хімія, фізична культура, географія. Скільки всього існує різних варіантів розкладу уроків на цей день, якщо урок фізичної культури має бути першим або останнім у розкладі? \nmtyear{2024}
 
 \vspace{0.5cm}
-\answerBox
+\nmtAnswerBox
 
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Комбінаторика}}
-\end{center}
+\typeTitle{НМТ 2025}
 
 % === ЗАВДАННЯ 23 (Принтери) ===
-\noindent\textbf{23.} Підприємство планує закупити два різні кольорові й три різні монохромні принтери. На ринку є 10 моделей кольорових й 8 моделей монохромних принтерів із відповідними характеристиками. Скільки всього є варіантів такого вибору? \nmtyear{2025}
+\noindent\zadnum Підприємство планує закупити два різні кольорові й три різні монохромні принтери. На ринку є 10 моделей кольорових й 8 моделей монохромних принтерів із відповідними характеристиками. Скільки всього є варіантів такого вибору? \nmtyear{2025}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 24 (Фермер і саджанці - 6 рядів) ===
-\noindent\textbf{24.} Фермер планує висадити 6 рядів саджанців: 4 ряди – кісточкові (абрикос, персик, вишня, слива) та 2 ряди – плодові (яблуня та груша). У кожному ряду мають бути однакові саджанці. Скільки всього варіантів оформлення саду в нього є, якщо 4 ряди кісточкових саджанців мають бути поруч? \nmtyear{2025}
+\noindent\zadnum Фермер планує висадити 6 рядів саджанців: 4 ряди – кісточкові (абрикос, персик, вишня, слива) та 2 ряди – плодові (яблуня та груша). У кожному ряду мають бути однакові саджанці. Скільки всього варіантів оформлення саду в нього є, якщо 4 ряди кісточкових саджанців мають бути поруч? \nmtyear{2025}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.0cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 25 (Кав'ярня або) ===
-\noindent\textbf{25.} У кав’ярні пропонують відвідувачам 12 видів кави і 10 видів десерту. Скільки всього є варіантів вибору однієї кави \textit{або} одного десерту? \nmtyear{2025}
+\noindent\zadnum У кав’ярні пропонують відвідувачам 12 видів кави і 10 видів десерту. Скільки всього є варіантів вибору однієї кави \textit{або} одного десерту? \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTable{45}{120}{66}{22}{231}
 
-\vspace{1.0cm}
-
 % === ЗАВДАННЯ 26 (Дарина посткросинг) ===
-\noindent\textbf{26.} Дарина бере участь у посткросингу, надсилаючи адресатам у різні країни листівки із зображеннями українських міст і краєвидів. Вона має 4 різні листівки такої тематики й конверти жовтого й синього кольорів. Для кожного із чотирьох адресатів Дарина вибирає по одній листівці та конверт жовтого або синього кольору. Скільки всього в Дарини є варіантів такого вибору? \nmtyear{2025}
+\noindent\zadnum Дарина бере участь у посткросингу, надсилаючи адресатам у різні країни листівки із зображеннями українських міст і краєвидів. Вона має 4 різні листівки такої тематики й конверти жовтого й синього кольорів. Для кожного із чотирьох адресатів Дарина вибирає по одній листівці та конверт жовтого або синього кольору. Скільки всього в Дарини є варіантів такого вибору? \nmtyear{2025}
 
 \vspace{0.5cm}
-\answerBox
-
-\vspace{1.5cm}
+\nmtAnswerBox
 
 % === ЗАВДАННЯ 27 (Літак - СХЕМАТИЧНИЙ РИСУНОК) ===
-\noindent\textbf{27.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Місця в літаку розташовані у 20 рядів, у кожному ряді є по 3 місця, розділені проходом, ліворуч і праворуч від проходу (див. рисунок). Комп’ютерна програма випадковим чином обирає місце для пасажира. Визначте \textbf{ймовірність} того, що пасажиру дістанеться перший або останній ряд. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -448,7 +511,7 @@
 \answerTableTall{$\dfrac{1}{5}$}{$\dfrac{1}{4}$}{$\dfrac{1}{10}$}{$\dfrac{1}{20}$}{$\dfrac{1}{2}$}
 
 % === ЗАВДАННЯ 28 (Паркан - ГЕОМЕТРІЯ) ===
-\noindent\textbf{28.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено елемент декору паркану, що складається з п’яти довгих і чотирьох коротких стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома довгими сусідніми стрілками. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -511,5 +574,157 @@
 \vspace{0.3cm}
 \answerTableTall{$20^\circ$}{$30^\circ$}{$36^\circ$}{$18^\circ$}{$40^\circ$}
 
+\typeTitle{НМТ 2026}
 
+% НМТ 2026, сесія 23.05, завдання №12
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На діаграмі подано інформацію про назви та кількість шкільних гуртків. Макар планує відвідувати два гуртки: один зі спортивних, інший~--- з решти. Скільки різних варіантів вибору має Макар? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick]
+    \def\R{1.7}
+    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (0:\R) arc (0:77.14:\R) -- cycle;
+    \filldraw[fill=cyan!30, draw=white] (0,0) -- (77.14:\R) arc (77.14:180:\R) -- cycle;
+    \filldraw[fill=mainGreen!30, draw=white] (0,0) -- (180:\R) arc (180:231.43:\R) -- cycle;
+    \filldraw[fill=purple!20, draw=white] (0,0) -- (231.43:\R) arc (231.43:257.14:\R) -- cycle;
+    \filldraw[fill=yellow!50, draw=white] (0,0) -- (257.14:\R) arc (257.14:360:\R) -- cycle;
+
+    \node at (38.57:1.0) {\small $3$};
+    \node at (141.43:1.0) {\small $4$};
+    \node at (193:0.9) {\small $1$};
+    \node at (244:1.0) {\small $2$};
+    \node at (315:1.0) {\small $4$};
+
+    \node at (38.57:2.1) {\scriptsize художні};
+    \node at (130:2.2) {\scriptsize танцювальні};
+    \node at (200:2.1) {\scriptsize музичні};
+    \node[below] at (244:2.0) {\scriptsize STEM};
+    \node at (320:2.2) {\scriptsize спортивні};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$36$}{$40$}{$24$}{$14$}{$13$}
+% Відповідь: Б
+\ifshowsolutions\solution{Спортивних гуртків~--- $4$, решти $3+4+1+2=10$. За правилом добутку кількість варіантів $4\cdot 10=40$. Відповідь: \textbf{Б}.}\fi
+
+% НМТ 2026, сесія 30.05, завдання №7
+\zadtask{У філателістичному магазині є $30$ різних марок з історичної серії та $40$ різних марок із серії <<краєвиди>>. Іван хоче придбати по одній марці з кожної серії. Скільки всього є варіантів такого вибору? \nmtyear{2026}}
+\answerTable{$70$}{$140$}{$600$}{$1200$}{$1400$}
+% Відповідь: Г
+\ifshowsolutions\solution{За правилом добутку кількість варіантів — добуток кількостей у кожній серії: $30\cdot40=1200$. Відповідь: \textbf{Г} ($1200$).}\fi
+
+% НМТ 2026, сесія 1.06, завдання №6
+\zadtask{У магазині є $7$ видів подарункових наборів. Скільки всього існує варіантів вибору з них трьох \textit{різних} наборів? \nmtyear{2026}}
+\answerTable{$21$}{$35$}{$210$}{$343$}{$840$}
+% Відповідь: Б
+\ifshowsolutions\solution{Порядок не важливий, тож це сполучення: $C_7^3=\dfrac{7!}{3!\,4!}=\dfrac{7\cdot6\cdot5}{6}=35$. Відповідь: \textbf{Б}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №7
+\zadtask{У магазині продають $8$ різних сортів малини, серед яких є сорт <<Альба>>. Покупниця хоче придбати $2$ різні сорти, причому один із них обов'язково має бути <<Альба>>. Скільки в неї є варіантів такого вибору? \nmtyear{2026}}
+\answerTable{$7$}{$8$}{$14$}{$16$}{$28$}
+% Відповідь: А
+\ifshowsolutions\solution{Сорт <<Альба>> обов'язково входить, тож залишається вибрати $1$ сорт із решти $8-1=7$. Отже $7$ варіантів. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 4.06, завдання №11
+\zadtask{Ді-джей складає трек-лист із $6$ різних музичних композицій. Кожен трек має прозвучати лише один раз. Укажіть вираз, за допомогою якого можна визначити загальну кількість можливих послідовностей звучання цих треків. \nmtyear{2026}
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ $6 + 5 + 4 + 3 + 2 + 1$
+\par\noindent\textbf{Б}\ \ $6$
+\par\noindent\textbf{В}\ \ $36$
+\par\noindent\textbf{Г}\ \ $6!$
+\par\noindent\textbf{Д}\ \ $6^6$
+\vspace{0.4cm}}
+% Відповідь: Г
+\ifshowsolutions\solution{Кількість послідовностей із $6$ різних треків (кожен по разу)~--- це число перестановок $P_6=6!$. Відповідь: \textbf{Г}.}\fi
+
+% НМТ 2026, сесія 10.06, завдання №11
+\zadtask{На парковку, де вільними є десять паркомісць, заїжджають два автомобілі. Скільки всього є різних варіантів розміщення цих автомобілів на вільних паркомісцях? \nmtyear{2026}}
+\answerTable{$20$}{$19$}{$45$}{$90$}{$100$}
+
+% НМТ 2026, сесія 11.06, завдання №11
+\zadtask{В автосалоні продають сім моделей автомобілів однієї марки. Кожна модель представлена в чотирьох кольорах. Під час придбання автомобіля покупець обов'язково оформлює поліс страхування, який може надати одна з трьох страхових компаній. Скільки всього існує різних варіантів вибору моделі й кольору автомобіля для купівлі та страхової компанії для оформлення поліса страхування? \nmtyear{2026}}
+\answerTable{$14$}{$31$}{$33$}{$84$}{$28$}
+
+% НМТ 2026, сесія 16.06, завдання №11
+\noindent
+\begin{minipage}[c]{0.50\textwidth}
+\zadnum Біля супермаркету в один ряд вирішили встановити чотири контейнери для сортування сміття (див. рисунок). Скількома різними способами можна розставити ці контейнери в ряд, якщо контейнер «Пластик» обов'язково повинен стояти лівіше від усіх інших? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick, line join=round, font=\sffamily]
+    % Кольори смуг та кришок
+    \definecolor{bin1}{RGB}{255, 255, 255} % Білий (Пластик)
+    \definecolor{bin2}{RGB}{250, 230, 100} % Жовтий (Папір)
+    \definecolor{bin3}{RGB}{100, 180, 230} % Блакитний (Скло)
+    \definecolor{bin4}{RGB}{210, 120, 90}  % Оранжевий (Різне)
+
+    \foreach \x/\col/\txt in {0/bin1/ПЛАСТИК, 2.2/bin2/ПАПІР, 4.4/bin3/СКЛО, 6.6/bin4/РІЗНЕ} {
+        % Нижня основа (чорна)
+        \fill[black!85] (\x, -0.3) rectangle (\x+2, 0);
+
+        % Основний корпус (сірий)
+        \fill[gray!45] (\x, 0) rectangle (\x+2, 4);
+
+        % Перспектива боковини
+        \fill[gray!65] (\x+2, -0.3) -- (\x+2.4, 0.1) -- (\x+2.4, 4.4) -- (\x+2, 4) -- cycle;
+        \draw[black] (\x+2, -0.3) -- (\x+2.4, 0.1) -- (\x+2.4, 4.4) -- (\x+2, 4);
+
+        % Кришка (кольорова)
+        \fill[\col] (\x, 4) rectangle (\x+2, 4.5);
+        \draw[black] (\x, 4) rectangle (\x+2, 4.5);
+        \fill[\col!80!black] (\x, 4.5) -- (\x+0.4, 4.9) -- (\x+2.4, 4.9) -- (\x+2, 4.5) -- cycle;
+        \draw[black] (\x, 4.5) -- (\x+0.4, 4.9) -- (\x+2.4, 4.9) -- (\x+2, 4.5) -- cycle;
+
+        % Обведення корпусу та основи
+        \draw[black] (\x, -0.3) rectangle (\x+2, 0);
+        \draw[black] (\x, 0) rectangle (\x+2, 4);
+
+        % Отвір для сміття
+        \fill[darkgray] (\x+0.3, 3) rectangle (\x+1.7, 3.6);
+        \fill[darkgray!60!black] (\x+0.3, 3) -- (\x+0.5, 3.2) -- (\x+1.5, 3.2) -- (\x+1.7, 3) -- cycle;
+
+        % Кольорова вертикальна смуга
+        \fill[\col] (\x+0.5, 0.3) rectangle (\x+1.5, 2.7);
+        \draw[black!50] (\x+0.5, 0.3) rectangle (\x+1.5, 2.7);
+
+        % Текст на смузі
+        \node[rotate=90, text=black, font=\bfseries] at (\x+1, 1.5) {\txt};
+    }
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.3cm}
+
+\answerTable{$6$}{$12$}{$48$}{$24$}{$3$}
+% Відповідь: А
+
+% НМТ 2026, сесія 17.06, завдання №11
+\zadtask{Дмитро хоче придбати на офіційному сайті «Укрпошти» один екземпляр колекційної марки. У наявності інтернет-магазину є $10$ марок серії «Міста-герої», $20$ марок серії «Славетна Україна» та $14$ марок серії «Культурна спадщина». Скільки всього є варіантів вибору однієї марки у Дмитра, якщо всі наявні марки є різними? \nmtyear{2026}}
+\answerTable{$34$}{$44$}{$280$}{$2400$}{$2800$}
+% Відповідь: Б
+
+% НМТ 2026, сесія 19.06, завдання №11
+\zadtask{Ірині на день народження друзі подарували чотири книжки. Вона пообіцяла якомога швидше їх прочитати. Скільки всього в Ірини є варіантів послідовності прочитання книг? \nmtyear{2026}}
+\answerTable{$4$}{$6$}{$12$}{$24$}{$256$}
+% Відповідь: Г
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{29.}~Б \ {\scriptsize\color{gray}(23.05, №12)}\par
+\noindent\textbf{30.}~Г \ {\scriptsize\color{gray}(30.05, №7)}\par
+\noindent\textbf{31.}~Б \ {\scriptsize\color{gray}(1.06, №6)}\par
+\noindent\textbf{32.}~А \ {\scriptsize\color{gray}(2.06, №7)}\par
+\noindent\textbf{33.}~Г \ {\scriptsize\color{gray}(4.06, №11)}\par
+\noindent\textbf{36.}~А \ {\scriptsize\color{gray}(16.06, №11)}\par
+\noindent\textbf{37.}~Б \ {\scriptsize\color{gray}(17.06, №11)}\par
+\noindent\textbf{38.}~Г \ {\scriptsize\color{gray}(19.06, №11)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

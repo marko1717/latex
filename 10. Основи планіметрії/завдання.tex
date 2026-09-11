@@ -1,56 +1,163 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=2cm,bottom=2.5cm,top=2.5cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.16}
-\usetikzlibrary{calc,patterns,angles,quotes}
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 10}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Стандартна таблиця відповідей
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
-% Маленька таблиця відповідей (для завдань з рисунком збоку)
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\answerTableSmall}[5]{
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.1cm}|}}
 \hline
@@ -61,36 +168,79 @@
 \end{tabular}
 }
 
-% Команда для завдань з правильним відступом
-\newcommand{\task}[2]{\noindent\makebox[1.5em][l]{\textbf{#1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{#2}}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\definecolor{bar1}{RGB}{200, 120, 20}
+\definecolor{bar2}{RGB}{255, 220, 0}
+\definecolor{bar3}{RGB}{220, 30, 30}
+\definecolor{bar4}{RGB}{128, 0, 128}
+\definecolor{bar5}{RGB}{0, 160, 220}
+\definecolor{bar6}{RGB}{120, 180, 50}
+\definecolor{hexcol}{RGB}{200,110,60}
+\newcommand{\hexthree}[2]{%
+    \draw[hexcol, line width=1.1pt]
+        ($(#1,#2)+(0:30)$) -- ($(#1,#2)+(60:30)$) -- ($(#1,#2)+(120:30)$) --
+        ($(#1,#2)+(180:30)$) -- ($(#1,#2)+(240:30)$) -- ($(#1,#2)+(300:30)$) -- cycle;
+}
 
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-\begin{document}
+\graphicspath{{./}{10. Основи планіметрії/}}
+\chapterTitle{Тема 10. Основи планіметрії}
+\noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 33 (НМТ 2023~--- 7, 2024~--- 9, 2025~--- 8, 2026~--- 9).}\par\vspace{0.2cm}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023--2025}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Основи планіметрії}}
-\end{center}
-
-\vspace{0.5cm}
-
-%======================================================================
-% БЛОК 1: НМТ 2023
-%======================================================================
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2023}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2023}
 
 % Завдання 1
-\task{1}{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань між серединами відрізків $AM$ і $MB$, якщо $AM = 12$ \textit{см}, $MB = 2AM$. \nmtyear{2023}}
+\zadtask{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань між серединами відрізків $AM$ і $MB$, якщо $AM = 12$ \textit{см}, $MB = 2AM$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{center}
@@ -111,16 +261,12 @@
 
 \answerTable{16 \textit{см}}{18 \textit{см}}{24 \textit{см}}{9 \textit{см}}{12 \textit{см}}
 
-\vspace{0.5cm}
-
 % Завдання 2
-\task{2}{На відрізку $AB$ вибрано точку $C$ так, що $AC : CB = 2 : 3$. Визначте довжину відрізка $AC$, якщо $CB = 12$ \textit{см}. \nmtyear{2023}}
+\zadtask{На відрізку $AB$ вибрано точку $C$ так, що $AC : CB = 2 : 3$. Визначте довжину відрізка $AC$, якщо $CB = 12$ \textit{см}. \nmtyear{2023}}
 \answerTable{4 \textit{см}}{12 \textit{см}}{8 \textit{см}}{18 \textit{см}}{6 \textit{см}}
 
-\vspace{0.5cm}
-
 % Завдання 3
-\task{3}{З вершини розгорнутого кута $AOB$, зображеного на рисунку, проведено два промені $OK$ і $OM$ так, що $\angle KOB = 110°$, $\angle MOB = 30°$. Обчисліть градусну міру кута $KOM$. \nmtyear{2023}}
+\zadtask{З вершини розгорнутого кута $AOB$, зображеного на рисунку, проведено два промені $OK$ і $OM$ так, що $\angle KOB = 110°$, $\angle MOB = 30°$. Обчисліть градусну міру кута $KOM$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -152,10 +298,8 @@
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 4
-\task{4}{На рисунку зображено прямі, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha = 25°$. \nmtyear{2023}}
+\zadtask{На рисунку зображено прямі, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha = 25°$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -201,7 +345,7 @@
 \end{minipage}
 
 % Завдання 5
-\task{5}{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань від середини відрізка $AM$ до точки $B$, якщо $AB = 26$ \textit{см}, $AM = 8$ \textit{см}. \nmtyear{2023}}
+\zadtask{На відрізку $AB$ вибрано точку $M$ (див. рисунок). Визначте відстань від середини відрізка $AM$ до точки $B$, якщо $AB = 26$ \textit{см}, $AM = 8$ \textit{см}. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{center}
@@ -222,10 +366,8 @@
 
 \answerTable{18 \textit{см}}{17 \textit{см}}{20 \textit{см}}{22 \textit{см}}{24 \textit{см}}
 
-\vspace{0.5cm}
-
 % Завдання 6
-\task{6}{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2023}}
+\zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -277,7 +419,7 @@
 \end{minipage}
 
 % Завдання 7
-\task{7}{Із точки $O$, яка лежить на прямій $AB$, проведено промені $OM$ і $OK$ (див. рисунок). Відомо, що $\angle BOM = 30°$, $\angle MOK = 80°$. Визначте градусну міру кута $AOK$. Уважайте, що промені $OK$, $OM$ і пряма $AB$ лежать в одній площині. \nmtyear{2023}}
+\zadtask{Із точки $O$, яка лежить на прямій $AB$, проведено промені $OM$ і $OK$ (див. рисунок). Відомо, що $\angle BOM = 30°$, $\angle MOK = 80°$. Визначте градусну міру кута $AOK$. Уважайте, що промені $OK$, $OM$ і пряма $AB$ лежать в одній площині. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -309,16 +451,10 @@
 \end{flushright}
 \end{minipage}
 
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2024}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2024}
 
 % Завдання 8
-\task{8}{Кут між орбітою та віссю обертання Землі дорівнює $66{,}5°$ (див. рисунок). Визначте кут нахилу осі обертання Землі до осі, перпендикулярної до земної орбіти. \nmtyear{2024}}
+\zadtask{Кут між орбітою та віссю обертання Землі дорівнює $66{,}5°$ (див. рисунок). Визначте кут нахилу осі обертання Землі до осі, перпендикулярної до земної орбіти. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -332,7 +468,7 @@
 \end{minipage}
 
 % Завдання 1
-\task{9}{На рисунку зображено прямі $m$ і $n$, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha + \beta + \gamma = 230°$. \nmtyear{2024}}
+\zadtask{На рисунку зображено прямі $m$ і $n$, що перетинаються. Визначте градусну міру кута $\beta$, якщо $\alpha + \beta + \gamma = 230°$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -377,10 +513,8 @@
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 2
-\task{10}{На рисунку зображено план парку, де в точці $O$ розташовано фонтан, а від нього проведено доріжки $OA$, $OB$ і $OC$ так, що $OA \perp OB$, $\angle COA = \angle COB = \alpha$. Визначте градусну міру кута $\alpha$. \nmtyear{2024}}
+\zadtask{На рисунку зображено план парку, де в точці $O$ розташовано фонтан, а від нього проведено доріжки $OA$, $OB$ і $OC$ так, що $OA \perp OB$, $\angle COA = \angle COB = \alpha$. Визначте градусну міру кута $\alpha$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -421,10 +555,8 @@
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 3
-\task{11}{У прямокутній системі координат $xy$ зображено Пізанську вежу $OA$, яка утворює з віссю $y$ кут $4°$. Визначте кут, який утворює ця вежа з віссю $x$. \nmtyear{2024}}
+\zadtask{У прямокутній системі координат $xy$ зображено Пізанську вежу $OA$, яка утворює з віссю $y$ кут $4°$. Визначте кут, який утворює ця вежа з віссю $x$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -459,15 +591,11 @@
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 4
-\task{12}{Кут $\alpha$ дорівнює шостій частині розгорнутого кута. Знайдіть градусну міру кута $\beta$, що суміжний із кутом $\alpha$. \nmtyear{2024}}
+\zadtask{Кут $\alpha$ дорівнює шостій частині розгорнутого кута. Знайдіть градусну міру кута $\beta$, що суміжний із кутом $\alpha$. \nmtyear{2024}}
 \answerTable{$120°$}{$150°$}{$30°$}{$140°$}{$60°$}
 
-\vspace{0.5cm}
-
-\task{13}{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут $\alpha$ потрібно повернути цій групі, щоб вони рухалися в напрямку <<захід>>? \nmtyear{2024}}
+\zadtask{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут $\alpha$ потрібно повернути цій групі, щоб вони рухалися в напрямку <<захід>>? \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -481,7 +609,7 @@
 \end{minipage}
 
 % Завдання 6
-\task{13}{На рисунку прямі $AB$, $AC$ і $CB$ лежать в одній площині, $\angle CAB = 30°$, $\angle ACB = 100°$. Які з наведених тверджень є правильним? \nmtyear{2024}}
+\zadtask{На рисунку прямі $AB$, $AC$ і $CB$ лежать в одній площині, $\angle CAB = 30°$, $\angle ACB = 100°$. Які з наведених тверджень є правильним? \nmtyear{2024}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -537,10 +665,8 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 7
-\task{14}{Драбина $BC$ приставлена до вертикальної стіни $AB$ й спирається на горизонтальну поверхню $AC$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $BCA$ нахилу драбини до поверхні $AC$. \nmtyear{2024}}
+\zadtask{Драбина $BC$ приставлена до вертикальної стіни $AB$ й спирається на горизонтальну поверхню $AC$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $BCA$ нахилу драбини до поверхні $AC$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -554,7 +680,7 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{minipage}
 
 % Завдання 8
-\task{15}{У прямокутній системі координат $xy$ відрізок $OA$ утворює з віссю $y$ кут $15°$, $O$ --- початок координат. Точка $B$ належить осі $y$. Визначте градусну міру кута $AOB$. \nmtyear{2024}}
+\zadtask{У прямокутній системі координат $xy$ відрізок $OA$ утворює з віссю $y$ кут $15°$, $O$ --- початок координат. Точка $B$ належить осі $y$. Визначте градусну міру кута $AOB$. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -593,20 +719,10 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-%======================================================================
-% БЛОК 3: НМТ 2025
-%======================================================================
-
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2025}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2025}
 
 % Завдання 16
-\task{16}{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут потрібно повернути цій групі, щоб вони рухалися в напрямку <<південний схід>>? \nmtyear{2025}}
+\zadtask{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут потрібно повернути цій групі, щоб вони рухалися в напрямку <<південний схід>>? \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -619,10 +735,8 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 17
-\task{17}{На рисунку зображено елемент декору паркану, що складається з дев'яти стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома сусідніми стрілками. \nmtyear{2025}}
+\zadtask{На рисунку зображено елемент декору паркану, що складається з дев'яти стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома сусідніми стрілками. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -635,10 +749,8 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 18
-\task{18}{На рисунку зображено елемент декору паркану, що складається з п'яти довгих і чотирьох коротких стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома довгими сусідніми стрілками. \nmtyear{2025}}
+\zadtask{На рисунку зображено елемент декору паркану, що складається з п'яти довгих і чотирьох коротких стрілок, які виходять з вершини розгорнутого кута та поділяють його на рівні частини. Знайдіть градусну міру кута між двома довгими сусідніми стрілками. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -651,10 +763,8 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 19
-\task{19}{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\beta$, якщо $\alpha = 35°$. \nmtyear{2025}}
+\zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\beta$, якщо $\alpha = 35°$. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -707,10 +817,8 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 20
-\task{20}{Пряма $n$ перетинає паралельні прямі $m$ і $l$ (див. рисунок). Які з наведених тверджень є правильними для кутів 1, 2, 3, 4, 5? \nmtyear{2025}}
+\zadtask{Пряма $n$ перетинає паралельні прямі $m$ і $l$ (див. рисунок). Які з наведених тверджень є правильними для кутів 1, 2, 3, 4, 5? \nmtyear{2025}}
 
 \vspace{0.2cm}
 \begin{tabular}{rl}
@@ -754,10 +862,8 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 21
-\task{21}{Смартфон $AC$ приставлено до вертикальної підставки $BD$ й спирається на горизонтальну поверхню $AD$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $CAD$ нахилу смартфона до поверхні $AD$. \nmtyear{2025}}
+\zadtask{Смартфон $AC$ приставлено до вертикальної підставки $BD$ й спирається на горизонтальну поверхню $AD$ (див. рисунок). За наведеними на рисунку даними визначте градусну міру кута $CAD$ нахилу смартфона до поверхні $AD$. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -770,10 +876,8 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 22
-\task{22}{Продуктивність сонячної панелі $OA$ є максимальною, якщо панель перпендикулярна до напрямку $CD$ падіння сонячних променів (див. рисунок). Визначте градусну міру кута $\alpha$ між панеллю й горизонтальною поверхнею $OD$, якщо в заданий час кут падіння сонячних променів дорівнює $51°$. Уважайте, що прямі $OA$, $CD$ та $OD$ лежать в одній площині. \nmtyear{2025}}
+\zadtask{Продуктивність сонячної панелі $OA$ є максимальною, якщо панель перпендикулярна до напрямку $CD$ падіння сонячних променів (див. рисунок). Визначте градусну міру кута $\alpha$ між панеллю й горизонтальною поверхнею $OD$, якщо в заданий час кут падіння сонячних променів дорівнює $51°$. Уважайте, що прямі $OA$, $CD$ та $OD$ лежать в одній площині. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.42\textwidth}
@@ -790,7 +894,7 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 
 % Завдання 23
 
-\task{23}{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2025}}
+\zadtask{Пряма $l$ перетинає паралельні прямі $m$ і $n$ (див. рисунок). Визначте градусну міру кута $\alpha$, якщо $\alpha + \beta = 74°$. \nmtyear{2025}}
 \vspace{0.3cm}
 \begin{minipage}{0.34\textwidth}
 \answerTableSmall{$42°$}{$53°$}{$37°$}{$32°$}{$33°$}
@@ -840,4 +944,253 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{flushright}
 \end{minipage}
 
+\typeTitle{НМТ 2026}
+
+% НМТ 2026, сесія 3.06, завдання №4
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum На рисунку схематично зображено підставку для планшета, що стоїть на горизонтальній поверхні (пряма $AD$). Точки $A$, $B$, $C$ і $K$ лежать на одній прямій. Визначте градусну міру кута $BAD$, якщо $\angle BKD = 128^\circ$, $\angle ADK = 68^\circ$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.4,0);
+    \coordinate (B) at (1.7,3.0);
+    \coordinate (K) at (1.25,2.2);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (D) -- (K);
+    \draw[thick] (A) -- (D);
+    \node[above] at (B) {\scriptsize $B$};
+    \node[below left] at (A) {\scriptsize $A$};
+    \node[below right] at (D) {\scriptsize $D$};
+    \node[left] at (K) {\scriptsize $K$};
+    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.4cm] {angle = D--K--B};
+    \pic[draw=mainGreen, line width=0.6pt, angle radius=0.45cm] {angle = K--D--A};
+    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.4cm] {angle = D--A--B};
+    \node[font=\tiny] at (2.2,2.05) {$128^\circ$};
+    \node[font=\tiny] at (1.95,0.27) {$68^\circ$};
+    \node[font=\tiny] at (0.52,0.18) {$?$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$66^\circ$}{$62^\circ$}{$52^\circ$}{$60^\circ$}{$50^\circ$}
+% Відповідь: Г
+\ifshowsolutions\solution{Точки $A$, $B$, $K$ лежать на одній прямій, тому $\angle DKA = 180^\circ - \angle BKD = 180^\circ - 128^\circ = 52^\circ$. У трикутнику $AKD$: $\angle BAD = 180^\circ - \angle ADK - \angle DKA = 180^\circ - 68^\circ - 52^\circ = 60^\circ$. Відповідь: \textbf{Г} ($60^\circ$).}\fi
+
+% НМТ 2026, сесія 4.06, завдання №3
+\zadtask{На відрізку $AB$ вибрано точку $K$ так, що відрізок $AK$ на $5$~\textit{см} більший за відрізок $BK$. Знайдіть довжину відрізка $AK$, якщо $AB = 21$~\textit{см}. \nmtyear{2026}}
+\answerTable{$16$~\textit{см}}{$14$~\textit{см}}{$3$~\textit{см}}{$8$~\textit{см}}{$13$~\textit{см}}
+% Відповідь: Д
+\ifshowsolutions\solution{Нехай $BK=x$, тоді $AK=x+5$, а $AK+BK=AB$: $x+5+x=21$, $2x=16$, $x=8$. Отже $AK=8+5=13$~см. Відповідь: \textbf{Д}.}\fi
+
+% НМТ 2026, сесія 10.06, завдання №3
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку схематично зображено стелаж для книг і декору. Кожен ярус стелажа розділено на дві частини, причому ширина $AB$ більшої частини вдвічі більша за ширину $BC$ меншої частини. Визначте ширину $AB$, якщо ширина $AC$ всього стелажа дорівнює $147$~см. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    % три яруси
+    \filldraw[fill=orange!60, draw=black] (0,2.4) rectangle (4,3.4);
+    \filldraw[fill=orange!25, draw=black] (4,2.4) rectangle (6,3.4);
+    \filldraw[fill=orange!25, draw=black] (0,1.2) rectangle (2,2.2);
+    \filldraw[fill=orange!60, draw=black] (2,1.2) rectangle (6,2.2);
+    \filldraw[fill=orange!60, draw=black] (0,0) rectangle (4,1);
+    \filldraw[fill=orange!25, draw=black] (4,0) rectangle (6,1);
+    % мітки
+    \node[above] at (0,3.4) {$A$};
+    \node[above] at (4,3.4) {$B$};
+    \node[above] at (6,3.4) {$C$};
+    % розмірна лінія
+    \draw[<->, >=stealth, thin] (0,-0.6) -- (6,-0.6);
+    \node[below, font=\small] at (3,-0.65) {$147$~см};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$98$~см}{$49$~см}{$97$~см}{$108$~см}{$88$~см}
+
+% НМТ 2026, сесія 15.06, завдання №9
+\zadtask{Які твердження щодо кутів на площині є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Якщо два прямі кути мають спільну сторону, то інші сторони цих кутів лежать на одній прямій.
+\item Якщо два кути мають спільну вершину, то вони вертикальні.
+\item Якщо два кути мають спільну сторону, то вони суміжні.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише II}{лише III}{лише I та II}{лише II та III}
+% Відповідь: А
+
+% НМТ 2026, сесія 16.06, завдання №3
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Група туристів рухається в напрямку, що утворює з північним напрямком кут $15^\circ$ (див. рисунок). Знайдіть кут $\alpha$ між напрямком руху туристів та західним напрямком. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \draw[<->, >=latex] (-3,0) node[below, text=cyan!80!black] {Захід} -- (3,0) node[below, text=cyan!80!black] {Схід};
+    \draw[<->, >=latex] (0,-2.5) node[below, text=cyan!80!black] {Південь} -- (0,3) node[above, text=cyan!80!black] {Північ};
+
+    \draw[->, >=latex] (0,0) -- (75:3.2);
+    \draw[<-, >=latex, mainGreen] (180:1.8) arc (180:75:1.8) node[midway, above left, text=black] {$\alpha$};
+
+    \draw (90:1.2) arc (90:75:1.2);
+    \draw (90:1.35) arc (90:75:1.35);
+    \node[above right, font=\small] at (75:1.0) {$15^\circ$};
+\end{tikzpicture}
+\end{minipage}
+
+\par\vspace{0.2cm}
+\answerTable{$75^\circ$}{$105^\circ$}{$115^\circ$}{$125^\circ$}{$95^\circ$}
+% Відповідь: Б
+
+% НМТ 2026, сесія 17.06, завдання №3
+\noindent
+\begin{minipage}[c]{0.52\textwidth}
+\zadnum На рисунку зображено настінну полицю, що складається з трьох однакових полиць у формі правильних шестикутників. Визначте загальну ширину $AB$ цієї конструкції, якщо сторона кожного шестикутника дорівнює $30$~см. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.46\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.05, line join=round]
+    \hexthree{0}{0}
+    \hexthree{90}{0}
+    \hexthree{45}{-25.98}
+    \coordinate (A) at (-30,0);
+    \coordinate (B) at (120,0);
+    \node[left, font=\small] at (A) {$A$};
+    \node[right, font=\small] at (B) {$B$};
+    \draw[<->] (-30,-54) -- (120,-54);
+    \draw[thin, gray] (-30,0) -- (-30,-54);
+    \draw[thin, gray] (120,0) -- (120,-54);
+    \node[below, font=\small] at (45,-54) {?};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$60$~см}{$90$~см}{$120$~см}{$150$~см}{$180$~см}
+% Відповідь: Г
+
+% НМТ 2026, сесія 18.06, завдання №9
+\zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Доповняльні промені мають спільний початок і лежать на одній прямій.
+\item Суміжні кути мають спільну сторону.
+\item Якщо два кути рівні, то вони обов'язково є вертикальними.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише II}{лише I та II}{лише II та III}{I, II та III}
+% Відповідь: В
+
+% НМТ 2026, сесія 18.06, завдання №18 --- основна тема: Трикутники
+\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою (1--3) та її площею (А--Д). \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);
+    % точки: верхній ряд A,B,C; нижній ряд K,L,M
+    \coordinate (A) at (1,3);
+    \coordinate (B) at (3,3);
+    \coordinate (C) at (5,3);
+    \coordinate (K) at (0,0);
+    \coordinate (L) at (2,0);
+    \coordinate (M) at (4,0);
+    \foreach \p/\lab/\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {
+        \fill (\p) circle (2.5pt);
+        \node[\pos, font=\scriptsize] at (\p) {$\lab$};
+    }
+    \node[font=\scriptsize] at (6.5,3.5) {$1$~см$^2$};
+    \draw[gray!60] (6,3) rectangle (7,4);
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Фігура}\par\vspace{0.15cm}
+\textbf{1} \quad $ACM$\\[0.25cm]
+\textbf{2} \quad $ABLK$\\[0.25cm]
+\textbf{3} \quad $BCML$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Площа фігури}\par\vspace{0.15cm}
+\textbf{А} \quad $8$~см$^2$\\[0.15cm]
+\textbf{Б} \quad $10$~см$^2$\\[0.15cm]
+\textbf{В} \quad $12$~см$^2$\\[0.15cm]
+\textbf{Г} \quad $14$~см$^2$\\[0.15cm]
+\textbf{Д} \quad $16$~см$^2$\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
+
+% НМТ 2026, сесія 19.06, завдання №3
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum Вісь Землі (пряма $OA$) утворює кут $66{,}5^\circ$ із площиною її орбіти (див. рисунок). Визначте кут між віссю Землі $OA$ та перпендикуляром $OB$ до площини її орбіти. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.82, thick, line join=round]
+    % сіре тло-квадрат
+    \fill[gray!22] (-2.6,-2.6) rectangle (2.6,2.6);
+    % Земля (майже на весь квадрат)
+    \shade[ball color=blue!18] (0,0) circle (2.4);
+    \draw[gray!55, thin] (0,0) circle (2.4);
+    % схематичні материки
+    \begin{scope}
+        \clip (0,0) circle (2.4);
+        \fill[green!35!olive!60, opacity=0.55] (-1.6,0.9) .. controls (-0.9,1.5) and (-0.2,0.9) .. (-0.5,0.3) .. controls (-1.1,0.0) and (-1.9,0.3) .. (-1.6,0.9);
+        \fill[green!35!olive!60, opacity=0.55] (0.3,-0.4) .. controls (1.0,-0.2) and (1.3,-1.1) .. (0.7,-1.6) .. controls (0.1,-1.4) and (-0.1,-0.8) .. (0.3,-0.4);
+        \fill[green!35!olive!60, opacity=0.55] (0.6,1.4) .. controls (1.3,1.7) and (1.7,0.9) .. (1.2,0.6) .. controls (0.7,0.7) and (0.4,1.1) .. (0.6,1.4);
+    \end{scope}
+    % площина орбіти (горизонталь через центр)
+    \draw[red!75, thick] (-3.4,0) -- (3.0,0);
+    \node[right, font=\scriptsize, align=left] at (2.6,0.0) {\textit{площина}\\ \textit{орбіти}};
+    % перпендикуляр OB (вертикаль, пунктир)
+    \draw[dashed] (0,-2.9) -- (0,3.0);
+    \node[above, font=\small] at (-0.05,3.0) {$B$};
+    % вісь OA (нахилена)
+    \draw (-1.15,-2.65) -- (1.15,2.65);
+    \node[above, font=\small] at (1.2,2.65) {$A$};
+    % центр O
+    \node[below right, font=\small] at (0.05,-0.05) {$O$};
+    % прямий кут між площиною орбіти і OB
+    \draw (-0.32,0) -- (-0.32,0.32) -- (0,0.32);
+    % кут 66,5 між віссю OA і площиною орбіти
+    \draw (0.9,0) arc (0:66.5:0.9);
+    \node[font=\small] at (1.5,0.55) {$66{,}5^\circ$};
+    % еліпс обертання біля A
+    \draw[blue!70, thick] (1.0,2.5) ellipse (0.42 and 0.14);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$22{,}5^\circ$}{$23{,}5^\circ$}{$32{,}5^\circ$}{$33{,}5^\circ$}{$113{,}5^\circ$}
+% Відповідь: Б
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{25.}~Г \ {\scriptsize\color{gray}(3.06, №4)}\par
+\noindent\textbf{26.}~Д \ {\scriptsize\color{gray}(4.06, №3)}\par
+\noindent\textbf{28.}~А \ {\scriptsize\color{gray}(15.06, №9)}\par
+\noindent\textbf{29.}~Б \ {\scriptsize\color{gray}(16.06, №3)}\par
+\noindent\textbf{30.}~Г \ {\scriptsize\color{gray}(17.06, №3)}\par
+\noindent\textbf{31.}~В \ {\scriptsize\color{gray}(18.06, №9)}\par
+\noindent\textbf{32.}~1--Б,\ \ 2--А,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №18)}\par
+\noindent\textbf{33.}~Б \ {\scriptsize\color{gray}(19.06, №3)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

@@ -1,0 +1,401 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} Варіант за 11 червня}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt, halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}\par\vspace{0.3cm}}
+\newcommand{\chapterTitle}[1]{\clearpage\sectionTitle{#1}}
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}}
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\par\vspace{0.3cm}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ }
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} РЕАЛЬНИЙ ВАРІАНТ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} ВАРІАНТ ЗА 11 ЧЕРВНЯ}\\[0.6cm]
+{\large Real Test Notebook з усіма геометричними рисунками}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+\chapterTitle{ТЕСТОВИЙ ЗОШИТ (11 ЧЕРВНЯ)}
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише один правильний. Виберіть правильний варіант відповіді.}
+% ===== №1 =====
+\zadtask{Іван продає кулькові ручки або по $5$~грн за одну ручку, або по $10$~грн за комплект із трьох ручок. Яку найменшу суму може заробити Іван, продавши $80$ ручок?}
+\answerTable{$400$~грн}{$260$~грн}{$300$~грн}{$350$~грн}{$270$~грн}
+% ===== №2 =====
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+\zadnum На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Визначте різницю (у $^\circ$C) найбільшого і найменшого зафіксованих значень температури повітря.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.52\textwidth}
+\centering
+\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
+    \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
+    \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
+    \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
+    \node[below left, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (2,0) {$2$};
+    \node[below, font=\scriptsize] at (6,0) {$6$};
+    \node[below, font=\scriptsize] at (10,0) {$10$};
+    \node[below, font=\scriptsize] at (16,0) {$16$};
+    \node[below, font=\scriptsize] at (24,0) {$24$};
+    \node[left, font=\scriptsize] at (0,2) {$2$};
+    \draw[magenta!80!black, thick, smooth] plot coordinates {(0,2) (2,1) (4,-1) (6,-2) (8,-1) (10,1) (13,4) (16,6) (20,4) (24,3)};
+    \fill (0,2) circle (2.5pt);
+    \fill (16,6) circle (2.5pt);
+    \fill (24,3) circle (2.5pt);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4$}{$6$}{$8$}{$10$}{$24$}
+% ===== №3 =====
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено піцу у формі круга з центром у точці $O$. Дуга $BmK$ становить половину довжини цього кола. Градусна міра дуги $AmB$ дорівнює $220^\circ$. Визначте градусну міру кута $AOK$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.05, thick, line join=round]
+    \coordinate (O) at (0,0);
+    \coordinate (B) at (90:1.6);
+    \coordinate (K) at (270:1.6);
+    \coordinate (A) at (310:1.6);
+    % зафарбований сектор BmK (половина)
+    \filldraw[fill=orange!80, draw=black] (O) -- (B) arc (90:270:1.6) -- cycle;
+    \draw (O) circle (1.6);
+    \draw (O) -- (A);
+    \draw[dashed] (O) -- (K);
+    \pic[draw, angle radius=0.45cm, pic text={$?$}, angle eccentricity=1.6, font=\scriptsize] {angle = K--O--A};
+    \fill (O) circle (1.2pt);
+    \node[above] at (B) {$B$};
+    \node[below] at (K) {$K$};
+    \node[below right] at (A) {$A$};
+    \node[left] at (180:1.75) {$m$};
+    \node[above right, xshift=-0.05cm] at (O) {$O$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$10^\circ$}{$20^\circ$}{$30^\circ$}{$40^\circ$}{$45^\circ$}
+% ===== №4 =====
+\zadtask{Розв'яжіть систему нерівностей $\begin{cases}x \geqslant -4,\\ x < 2{,}5.\end{cases}$}
+\answerTable{$[-4;\,+\infty)$}{$(2{,}5;\,+\infty)$}{$[-4;\,2{,}5)$}{$(-\infty;\,-4]$}{$(-\infty;\,2{,}5)$}
+% ===== №5 =====
+\zadtask{У якій просторовій фігурі можна провести апофему?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=0.1cm]
+    \item у правильній піраміді
+    \item у конусі
+    \item у циліндрі
+    \item у призмі
+    \item у будь-якій піраміді
+\end{enumerate}
+\vspace{0.1cm}}
+% ===== №6 =====
+\zadtask{Якщо $\dfrac{2{,}5}{x} = \dfrac{y}{2}$, то $xy =$}
+\answerTable{$0{,}8$}{$5$}{$1{,}25$}{$6{,}25$}{$4{,}5$}
+% ===== №7 =====
+\zadtask{Якому проміжку належить корінь рівняння $\log_{0{,}5}(x - 2) = -2$?}
+\answerTable{$[1; 3)$}{$[3; 5)$}{$[5; 7)$}{$[7; 9)$}{$[9; +\infty)$}
+% ===== №8 =====
+\zadtask{Укажіть точку, яка належить графіку функції $y = \sin x$.}
+\answerTableTall{$\left(\dfrac{\pi}{2};\ 1\right)$}{$(\pi;\ -1)$}{$(0;\ 1)$}{$(\pi;\ 1)$}{$\left(\dfrac{\pi}{2};\ 0\right)$}
+% ===== №9 =====
+\zadtask{Які з наведених тверджень правильні щодо трикутника зі сторонами $a$, $b$ і $c$?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=0.1cm]
+\item Якщо $a^2 + b^2 = c^2$, то трикутник прямокутний.
+\item Для будь-якого трикутника справджується нерівність $a + b > c$.
+\item Якщо $a + b = a + c$ й $a = c$, то трикутник правильний.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
+% ===== №10 =====
+\zadtask{Скільки всього не цілих членів має геометрична прогресія $(b_n)$, у якої $b_1 = \dfrac{5}{27}$, а знаменник $q = 3$?}
+\answerTable{один}{два}{три}{чотири}{п'ять}
+% ===== №11 =====
+\zadtask{В автосалоні продають сім моделей автомобілів однієї марки. Кожна модель представлена в чотирьох кольорах. Під час придбання автомобіля покупець обов'язково оформлює поліс страхування, який може надати одна з трьох страхових компаній. Скільки всього існує різних варіантів вибору моделі й кольору автомобіля для купівлі та страхової компанії для оформлення поліса страхування?}
+\answerTable{$14$}{$31$}{$33$}{$84$}{$28$}
+% ===== №12 =====
+\zadtask{Визначте точку, симетричну точці $A(2;\, -3;\, 7)$ відносно координатної площини $yz$.}
+\answerTable{$(2; 3; -7)$}{$(-2; -3; 7)$}{$(2; -3; -7)$}{$(2; 3; 7)$}{$(-2; 3; -7)$}
+% ===== №13 =====
+\zadtask{Спростіть вираз $\dfrac{(a^2 - 1)(a + 1)}{a^2 + 2a + 1}$.}
+\answerTableTall{$a - 1$}{$\dfrac{a+1}{a-1}$}{$a + 1$}{$\dfrac{a-1}{2}$}{$1 - a$}
+% ===== №14 =====
+\zadtask{У ромб $ABCD$ вписано коло із центром $O$, відрізок $OK$~--- радіус цього кола, відрізок $BD$~--- діагональ ромба (див. рисунок). Визначте площу ромба $ABCD$, якщо $OK = 6$~см, а $\angle CDB = 75^\circ$.
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=1.1, thick, line join=round]
+    \coordinate (O) at (0,0);
+    \coordinate (A) at (-3.36,0);
+    \coordinate (C) at (3.36,0);
+    \coordinate (B) at (0,0.9);
+    \coordinate (D) at (0,-0.9);
+    \coordinate (K) at (-0.225,-0.84);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (B) -- (D);
+    \draw (O) -- (K);
+    \pic[draw, angle radius=0.18cm] {right angle = O--K--A};
+    \pic[draw, angle radius=0.32cm, pic text={$75^\circ$}, angle eccentricity=2.1, font=\scriptsize] {angle = C--D--B};
+    \fill (O) circle (1.2pt);
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above left, yshift=0.05cm] at (O) {$O$};
+    \node[below left] at (K) {$K$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.1cm}}
+\answerTable{$144\sqrt{3}$~см$^2$}{$144$~см$^2$}{$96\sqrt{3}$~см$^2$}{$288$~см$^2$}{$288\sqrt{3}$~см$^2$}
+% ===== №15 =====
+\zadtask{Розв'яжіть рівняння $|1 - 2x| = 8$. Якщо рівняння має єдиний корінь, то позначте його. Якщо рівняння має більш як один корінь, то визначте їхню \textit{суму}.}
+\answerTable{$-1$}{$7$}{$1$}{$-4{,}5$}{$-3{,}5$}
+\newpage
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний варіант, позначений буквою.}
+% ===== №16 =====
+\zadtask{Узгодьте вираз (1--3) із його значенням (А--Д).\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\left|\dfrac{2}{5} - \dfrac{12}{3}\right|$\\[0.3cm]
+\textbf{2} \quad $\dfrac{\sqrt{24}}{\sqrt{6}}$\\[0.3cm]
+\textbf{3} \quad $5^3 \cdot 0{,}2^4$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення виразу}\par\vspace{0.15cm}
+\textbf{А} \quad $0{,}2$\\[0.15cm]
+\textbf{Б} \quad $2$\\[0.15cm]
+\textbf{В} \quad $3{,}6$\\[0.15cm]
+\textbf{Г} \quad $4$\\[0.15cm]
+\textbf{Д} \quad $5$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% ===== №17 =====
+\zadtask{У прямокутній системі координат на площині $xy$ зображено відрізок $AB$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з відрізком $AB$.
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
+    \draw[->] (-2.5,0) -- (2.5,0) node[right] {$x$};
+    \draw[->] (0,-1.5) -- (0,3.5) node[above] {$y$};
+    \node[below right, font=\small] at (0,0) {$0$};
+    \node[below, font=\small] at (-1,0) {$-1$};
+    \node[below, font=\small] at (1,0) {$1$};
+    \node[right, font=\small, xshift=0.05cm] at (0,1) {$1$};
+    \node[right, font=\small, xshift=0.05cm] at (0,2) {$2$};
+    \draw[dashed, mainGreen!70] (-1,2) -- (-1,0);
+    \draw[dashed, mainGreen!70] (-1,2) -- (0,2);
+    \draw[very thick] (-1,2) -- (0,1);
+    \fill (-1,2) circle (2.5pt);
+    \fill (0,1) circle (2.5pt);
+    \node[left, font=\small] at (-1,2) {$B$};
+    \node[above right, font=\small, xshift=-0.07cm] at (0,1) {$A$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = 0{,}5^{\,x}$\\[0.25cm]
+\textbf{2} \quad $y = \cos x$\\[0.25cm]
+\textbf{3} \quad $y = 1 - x$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.66\textwidth}
+\textit{Кількість спільних точок}\par\vspace{0.2cm}
+\textbf{А} \quad жодної\\[0.15cm]
+\textbf{Б} \quad лише одна\\[0.15cm]
+\textbf{В} \quad лише дві\\[0.15cm]
+\textbf{Г} \quad лише три\\[0.15cm]
+\textbf{Д} \quad безліч
+\end{minipage}}
+% ===== №18 =====
+\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка (1--3) його довжину (А--Д).
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.42, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,6);
+    \coordinate (C) at (8,6);
+    \coordinate (D) at (8,0);
+    \draw[gray!60] (A) circle (6);
+    \draw[gray!60] (D) circle (2);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill (A) circle (4pt);
+    \fill (D) circle (4pt);
+    \fill (6,0) circle (3pt);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right, xshift=0.1cm] at (D) {$D$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.50\textwidth}
+\textit{Відрізок}\par\vspace{0.15cm}
+\textbf{1} \quad $BC$\\[0.25cm]
+\textbf{2} \quad $BD$\\[0.25cm]
+\textbf{3} \quad відстань від точки $C$ до відрізка $BD$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Довжина відрізка}\par\vspace{0.15cm}
+\textbf{А} \quad $4{,}8$~см\\[0.15cm]
+\textbf{Б} \quad $5$~см\\[0.15cm]
+\textbf{В} \quad $8$~см\\[0.15cm]
+\textbf{Г} \quad $10$~см\\[0.15cm]
+\textbf{Д} \quad $14$~см\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\newpage
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у спеціально відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+% ===== №19 =====
+\zadtask{Дотична, проведена до графіка функції $y = 2x^2 - 5x - 11$ в точці з абсцисою $x_0$, нахилена до додатного напряму осі $x$ під кутом $45^\circ$. Визначте $y(x_0)$.}
+\nmtAnswerBox
+% ===== №20 =====
+\zadtask{Базова ціна оренди однієї байдарки становить $900$~грн за добу. Перші три доби оренди ця ціна залишається незмінною. Починаючи з четвертої доби, надається знижка на оренду байдарки від базової вартості: на четверту добу~--- знижка $10\,\%$, а на п'яту та кожну наступну добу~--- знижка $15\,\%$. Скільки всього \textit{гривень} сплатить клієнт за оренду байдарки протягом $6$ днів?}
+\nmtAnswerBox
+% ===== №21 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Задано циліндр та конус, що мають рівні основи (див. рисунок). Радіус основи конуса дорівнює $5$~см, а його твірна дорівнює $13$~см. Визначте, у скільки разів об'єм циліндра більший за об'єм конуса, якщо площа бічної поверхні циліндра дорівнює $150\pi$~см$^2$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % циліндр
+    \draw (0,4.4) ellipse (1.2 and 0.35);
+    \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+    \draw (-1.2,0) arc (180:360:1.2 and 0.35);
+    \draw (-1.2,0) -- (-1.2,4.4);
+    \draw (1.2,0) -- (1.2,4.4);
+    % конус
+    \begin{scope}[shift={(4.2,0)}]
+        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
+        \draw (-1.2,0) -- (0,3.6);
+        \draw (1.2,0) -- (0,3.6);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+% ===== №22 =====
+\zadtask{За якого \textit{найбільшого} значення $a$ рівняння
+\[
+\dfrac{\left(2^{x} - \dfrac{1}{8}\right)\left(2^{x} - \sqrt[4]{2^{\,2a-5}}\right)}{x^2 - 6x + 9} = 0
+\]
+має єдиний корінь?}
+\nmtAnswerBox
+\end{document}

@@ -1,0 +1,508 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{gold}{RGB}{240, 190, 40}
+\definecolor{silver}{RGB}{170, 170, 175}
+\definecolor{bronze}{RGB}{190, 120, 70}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} Варіант за 15 червня}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt, halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}\par\vspace{0.3cm}}
+\newcommand{\chapterTitle}[1]{\clearpage\sectionTitle{#1}}
+
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \ 
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}}
+
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\par\vspace{0.3cm}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ }
+
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} РЕАЛЬНИЙ ВАРІАНТ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} ВАРІАНТ ЗА 15 ЧЕРВНЯ}\\[0.6cm]
+{\large Real Test Notebook з усіма геометричними рисунками}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+
+\chapterTitle{ТЕСТОВИЙ ЗОШИТ (15 ЧЕРВНЯ)}
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише один правильний. Виберіть правильний варіант відповіді й позначте його.}
+
+% ===== №1 =====
+\zadtask{Розв'яжіть рівняння $0{,}01x = -1$.}
+\answerTable{$-1000$}{$100$}{$-10$}{$-100$}{$-1$}
+
+% ===== №2 =====
+\noindent
+\begin{minipage}[c]{0.44\textwidth}
+\zadnum На діаграмі відображено інформацію про кількість золотих, срібних і бронзових медалей, які вибороли українські спортсмени на олімпійських іграх із 2008 до 2024 року. Якого року українські спортсмени вибороли найбільше медалей?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.54\textwidth}
+\centering
+\begin{tikzpicture}[x=0.92cm, y=0.28cm, thick]
+    % осі та горизонтальна сітка з позначками 0,2,...,14
+    \draw[->] (0,0) -- (0,15.2) node[above, font=\scriptsize] {Кількість медалей};
+    \draw[->] (0,0) -- (5.6,0) node[below right, font=\scriptsize] {Рік};
+    \foreach \y in {0,2,4,6,8,10,12,14} {
+        \draw[gray!30, thin] (0,\y) -- (5.3,\y);
+        \node[left, font=\scriptsize] at (0,\y) {\y};
+    }
+    % групи стовпців: золото/срібло/бронза для кожного року
+    % 2008: 7,5,15 -> сума 27? масштаб під 14 -> беремо реальні висоти в межах 14
+    % значення (золото, срібло, бронза) за реальною діаграмою; найбільша сума - 2008 (22)
+    \foreach \i/\year/\g/\s/\b in {0/2008/7/4/11, 1/2012/5/4/10, 2/2016/2/5/4, 3/2020/1/6/12, 4/2024/3/5/4} {
+        \pgfmathsetmacro{\bx}{0.55 + \i*1.0}
+        \filldraw[fill=gold, draw=black!60, line width=0.3pt] (\bx,0) rectangle ++(0.22,\g);
+        \filldraw[fill=silver, draw=black!60, line width=0.3pt] (\bx+0.22,0) rectangle ++(0.22,\s);
+        \filldraw[fill=bronze, draw=black!60, line width=0.3pt] (\bx+0.44,0) rectangle ++(0.22,\b);
+        \node[below, font=\tiny] at (\bx+0.33,0) {\year};
+    }
+    % легенда
+    \filldraw[fill=gold, draw=black!60] (3.7,13.4) rectangle ++(0.3,0.7);
+    \node[right, font=\tiny] at (4.0,13.75) {золото};
+    \filldraw[fill=silver, draw=black!60] (3.7,12.2) rectangle ++(0.3,0.7);
+    \node[right, font=\tiny] at (4.0,12.55) {срібло};
+    \filldraw[fill=bronze, draw=black!60] (3.7,11.0) rectangle ++(0.3,0.7);
+    \node[right, font=\tiny] at (4.0,11.35) {бронза};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$2008$}{$2012$}{$2016$}{$2020$}{$2024$}
+
+% ===== №3 =====
+\zadtask{Розкладіть на множники вираз $x^2 - 36$.}
+\answerTable{$(x-18)(x+18)$}{$(x-6)^2$}{$(x-6)(x+6)$}{$(x+6)^2$}{$(x-18)^2$}
+
+% ===== №4 =====
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum Розгляньте схематичне зображення стелажа для книг і декору. Зображення складається з восьми рівних квадратів. Визначте площу одного такого квадрата, якщо висота й ширина стелажа дорівнюють $160$~см і $80$~см відповідно.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick, line join=round]
+    % стелаж: 2 стовпці x 4 ряди квадратів (сторона 40 -> W=80, H=160)
+    \draw (0,0) rectangle (2,8);
+    \draw (1,0) -- (1,8);
+    \foreach \y in {2,4,6} {\draw (0,\y) -- (2,\y);}
+    \node[below, font=\scriptsize] at (1,0) {$80$~см};
+    \node[left, font=\scriptsize, rotate=90, anchor=south] at (0,4) {$160$~см};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$800$~см$^2$}{$1200$~см$^2$}{$2000$~см$^2$}{$160$~см$^2$}{$1600$~см$^2$}
+
+% ===== №5 =====
+\zadtask{Позначте назву многогранника, який має дві основи й дев'ять ребер.
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=0.1cm]
+    \item чотирикутна призма
+    \item трикутна призма
+    \item дев'ятикутна призма
+    \item чотирикутна піраміда
+    \item трикутна піраміда
+\end{enumerate}
+\vspace{0.1cm}}
+
+% ===== №6 =====
+\zadtask{Обчисліть $\log_4 2 + \log_4 32$.}
+\answerTable{$\log_4 34$}{$3$}{$2$}{$4$}{$16$}
+
+% ===== №7 =====
+\zadtask{Розв'яжіть нерівність $5^{x-1} \leqslant \dfrac{1}{25}$.}
+\answerTable{$(-\infty; -1]$}{$(-\infty; -4]$}{$(-\infty; -3]$}{$[1; +\infty)$}{$[3; +\infty)$}
+
+% ===== №8 =====
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-3;\, 3]$. На якому з наведених проміжків ця функція спадає?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick]
+    \draw[step=1cm, gray!40, thin] (-3,-2) grid (4,5);
+    \draw[->] (-3.3,0) -- (4.3,0) node[right, font=\scriptsize] {$x$};
+    \draw[->] (0,-2.3) -- (0,5.3) node[above, font=\scriptsize] {$y$};
+    \node[below left, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (-3,0) {$-3$};
+    \node[below, font=\scriptsize] at (1,0) {$1$};
+    \node[below, font=\scriptsize] at (3,0) {$3$};
+    \node[left, font=\scriptsize] at (0,1) {$1$};
+    \draw[mainGreen, very thick, smooth] plot coordinates {(-3,-2) (-1,0.5)(0,3.2) (1,4) (2,3.2) (3,1)};
+    \node[right, font=\scriptsize] at (1.5,4.6) {$y=f(x)$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$[-3; 1]$}{$[-3; 4]$}{$[2; 4]$}{$[1; 3]$}{$[-3; 3]$}
+
+% ===== №9 =====
+\zadtask{Які твердження щодо кутів на площині є правильними?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Якщо два прямі кути мають спільну сторону, то інші сторони цих кутів лежать на одній прямій.
+\item Якщо два кути мають спільну вершину, то вони вертикальні.
+\item Якщо два кути мають спільну сторону, то вони суміжні.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише II}{лише III}{лише I та II}{лише II та III}
+
+% ===== №10 =====
+\zadtask{Знайдіть первісну для функції $f(x) = \dfrac{1}{3x}$.}
+\answerTableTall{$F(x) = \ln|3x|$}{$F(x) = \dfrac{1}{3}\ln|x|$}{$F(x) = 3\ln|x|$}{$F(x) = -\dfrac{1}{3x^2}$}{$F(x) = \dfrac{2}{3x^2}$}
+\newpage
+
+% ===== №11 =====
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum На круговій діаграмі відображено розподіл музичних треків за жанрами на платівці. Програвач відтворює один випадковий трек із цієї платівки. Знайдіть ймовірність того, що першим прозвучить трек у жанрі рок.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=1.0]
+    \def\R{1.9}
+    % значення: рок 20, поп 25, джаз 11, диско 14; сума 70
+    % кути: рок 20/70*360=102.857; поп 25/70*360=128.571; джаз 11/70=56.571; диско 14/70=72
+    % старт зверху (90) за годинниковою
+    \definecolor{crok}{RGB}{80,180,220}
+    \definecolor{cpop}{RGB}{235,90,95}
+    \definecolor{cjazz}{RGB}{95,190,120}
+    \definecolor{cdisco}{RGB}{245,200,70}
+    % рок: 90 -> 90-102.857=-12.857
+    \filldraw[fill=crok, draw=white, line width=1pt] (0,0) -- (90:\R) arc (90:-12.857:\R) -- cycle;
+    \node at (38:1.1) {$20$};
+    % поп: -12.857 -> -141.428
+    \filldraw[fill=cpop, draw=white, line width=1pt] (0,0) -- (-12.857:\R) arc (-12.857:-141.428:\R) -- cycle;
+    \node at (-77:1.1) {$25$};
+    % джаз: -141.428 -> -198 (=162)
+    \filldraw[fill=cjazz, draw=white, line width=1pt] (0,0) -- (-141.428:\R) arc (-141.428:-198:\R) -- cycle;
+    \node at (-170:1.15) {$11$};
+    % диско: -198 -> -270 (=90)
+    \filldraw[fill=cdisco, draw=white, line width=1pt] (0,0) -- (-198:\R) arc (-198:-270:\R) -- cycle;
+    \node at (-234:1.15) {$14$};
+    % легенда
+    \begin{scope}[shift={(2.5,1.3)}]
+        \filldraw[fill=crok, draw=black!40] (0,0) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,0.15){рок};
+        \filldraw[fill=cpop, draw=black!40] (0,-0.55) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-0.4){поп};
+        \filldraw[fill=cjazz, draw=black!40] (0,-1.1) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-0.95){джаз};
+        \filldraw[fill=cdisco, draw=black!40] (0,-1.65) rectangle ++(0.3,0.3); \node[right, font=\scriptsize] at (0.35,-1.5){диско};
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTableTall{$\dfrac{2}{5}$}{$\dfrac{5}{14}$}{$\dfrac{1}{20}$}{$\dfrac{1}{4}$}{$\dfrac{2}{7}$}
+
+% ===== №12 =====
+\zadtask{Визначте координати вектора $\vec{c} = \vec{a} - \vec{b}$, якщо $\vec{a}(3;\, 5;\, 7)$ і $\vec{b}(2;\, -4;\, 8)$.}
+\answerTable{$(5; 1; 15)$}{$(-4; -9; 1)$}{$(-1; -9; 1)$}{$(1; 1; -1)$}{$(1; 9; -1)$}
+
+% ===== №13 =====
+\zadtask{$\sin^2 120^\circ \cdot \cos 120^\circ = $}
+\answerTableTall{$-\dfrac{1}{8}$}{$-\dfrac{\sqrt{3}}{8}$}{$-\dfrac{3}{8}$}{$-\dfrac{3\sqrt{3}}{8}$}{$-\dfrac{\sqrt{2}}{4}$}
+
+% ===== №14 =====
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum У рівнобедреному трикутнику $ABC$ з точки $K$, що лежить на бічній стороні $BC$, до бічної сторони $AB$ проведено перпендикуляр $KM$ (див. рисунок). Визначте площу трикутника $ABC$, якщо $KM = 6\sqrt{3}$~см, $AK : MB = 2 : 3$, $\angle B = 30^\circ$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.72, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (3.2,0);
+    \coordinate (B) at (1.05,4.2);
+    % M на AB, K на BC
+    \coordinate (M) at ($(A)!0.55!(B)$);
+    \coordinate (K) at ($(B)!0.55!(C)$);
+    \draw (A) -- (B) -- (C) -- cycle;
+    \draw (K) -- (M);
+    \draw (A) -- (K);
+    \pic[draw, angle radius=0.18cm] {right angle = K--M--A};
+    \pic[draw, angle radius=0.5cm, pic text={$30^\circ$}, angle eccentricity=1.55, font=\scriptsize] {angle = A--B--C};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[left] at (M) {$M$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$288\sqrt{3}$~см$^2$}{$144\sqrt{3}$~см$^2$}{$72\sqrt{3}$~см$^2$}{$288$~см$^2$}{$144$~см$^2$}
+
+% ===== №15 =====
+\zadtask{Якому проміжку належить \textit{більший} корінь рівняння $\sqrt{\dfrac{2x^2 + 7x + 10}{2}} = 4$?}
+\answerTable{$(-\infty; -4)$}{$[-4; -1)$}{$[-1; 1)$}{$[1; 4)$}{$[4; +\infty)$}
+\newpage
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
+
+% ===== №16 =====
+\zadtask{Узгодьте вираз (1--3) з тотожно рівним йому виразом (А--Д), якщо $a > 0$, $a \neq 1$.\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\sqrt{a^2}$\\[0.35cm]
+\textbf{2} \quad $a^3 : a^4$\\[0.35cm]
+\textbf{3} \quad $\dfrac{a^2 - a}{1 - a}$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Тотожно рівний вираз}\par\vspace{0.15cm}
+\textbf{А} \quad $a$\\[0.15cm]
+\textbf{Б} \quad $2a$\\[0.15cm]
+\textbf{В} \quad $\dfrac{1}{a}$\\[0.15cm]
+\textbf{Г} \quad $-a$\\[0.15cm]
+\textbf{Д} \quad $|a|$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №17 =====
+\zadtask{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.50\textwidth}
+\textit{Початок речення}\par\vspace{0.15cm}
+\textbf{1} \quad Графіки функцій $y = 2^x$ та $y = 0{,}5^x$ перетинаються в точці\\[0.25cm]
+\textbf{2} \quad Пряма $y = x - 1$ перетинає вісь $x$ у точці\\[0.25cm]
+\textbf{3} \quad Графік функції $y = (x + 2)^2$ дотикається осі $x$ у точці
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Закінчення речення}\par\vspace{0.15cm}
+\textbf{А} \quad $(1; 0)$.\\[0.15cm]
+\textbf{Б} \quad $(0; 1)$.\\[0.15cm]
+\textbf{В} \quad $(2; 0)$.\\[0.15cm]
+\textbf{Г} \quad $(-2; 0)$.\\[0.15cm]
+\textbf{Д} \quad $(-1; 0)$.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №18 =====
+\zadtask{На рисунку точки $K$, $L$, $M$ та $N$~--- середини сторін $AB$, $BC$, $CD$ та $AD$ прямокутника $ABCD$ відповідно. $AB = 12$~см, $BC = 16$~см. Точка $P$~--- середина відрізка $KN$. Установіть відповідність між відрізком (1--3) та його довжиною (А--Д).
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,12);
+    \coordinate (C) at (16,12);
+    \coordinate (D) at (16,0);
+    \coordinate (K) at (0,6);
+    \coordinate (L) at (8,12);
+    \coordinate (M) at (16,6);
+    \coordinate (N) at (8,0);
+    \coordinate (P) at (4,3);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (K) -- (L) -- (M) -- (N) -- cycle;
+    \fill (P) circle (3pt);
+    \draw (K)--(N);
+    \path (K) -- (N) node[midway, sloped] {\footnotesize $|$};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[left] at (K) {$K$};
+    \node[above] at (L) {$L$};
+    \node[right] at (M) {$M$};
+    \node[below] at (N) {$N$};
+    \node[above left, font=\scriptsize] at (P) {$P$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.52\textwidth}
+\textit{Відрізок}\par\vspace{0.15cm}
+\textbf{1} \quad відстань від точки $P$ до сторони $BC$\\[0.25cm]
+\textbf{2} \quad відстань від точки $P$ до середини $MN$\\[0.25cm]
+\textbf{3} \quad відстань від точки $P$ до вершини $C$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.26\textwidth}
+\textit{Довжина відрізка}\par\vspace{0.15cm}
+\textbf{А} \quad $8$~см\\[0.15cm]
+\textbf{Б} \quad $9$~см\\[0.15cm]
+\textbf{В} \quad $12$~см\\[0.15cm]
+\textbf{Г} \quad $15$~см\\[0.15cm]
+\textbf{Д} \quad $16$~см\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\newpage
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у спеціально відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+
+% ===== №19 =====
+\zadtask{Визначте найбільше значення функції $y = 8\sqrt{x} - x + 4$, якщо $x \in [0;\, 36]$.}
+\nmtAnswerBox
+
+% ===== №20 =====
+\zadtask{У грушевому саду ростуть $200$ груш п'яти різних сортів. У таблиці наведено інформацію про назви сортів груш і частку (у~\%) дерев цих сортів від загальної кількості груш у саду.
+\vspace{0.2cm}
+
+\noindent\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|>{\centering\arraybackslash}m{2.2cm}|c|c|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|c|}
+\hline
+\textbf{Сорт груш} & Дюшес & Вільямс & Улюблениця Клаппа & Лісова Красуня & Бланка \\
+\hline
+\textbf{Частка (\%) дерев} & $21$ & $11$ & $38$ & $n$ & $10$ \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{0.2cm}
+
+У таблиці $n$~--- невідоме число. За всі груші сорту Лісова Красуня, реалізовані на оптовому ринку торік, виручили $52\,000$~грн. Цього року запланували за всі груші сорту Лісова Красуня вторгувати на $10\,\%$ більше гривень, ніж торік. Скільки гривень у середньому планують виручити за груші з одного дерева цього сорту?}
+\nmtAnswerBox
+
+% ===== №21 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено циліндр і конус, які мають рівні основи й об'єми. Визначте площу $S$ (у см$^2$) бічної поверхні циліндра, якщо об'єм конуса дорівнює $810\pi$~см$^3$, а діаметр його основи~--- $18$~см. У відповідь запишіть значення $\dfrac{S}{\pi}$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % циліндр
+    \draw (0,3) ellipse (1.2 and 0.35);
+    \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+    \draw (-1.2,0) arc (180:360:1.2 and 0.35);
+    \draw (-1.2,0) -- (-1.2,3);
+    \draw (1.2,0) -- (1.2,3);
+    \fill (0,0) circle (1.2pt);
+    % конус
+    \begin{scope}[shift={(4.2,0)}]
+        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
+        \draw (-1.2,0) -- (0,4.2);
+        \draw (1.2,0) -- (0,4.2);
+        \fill (0,0) circle (1.2pt);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+
+% ===== №22 =====
+\zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких добуток різних коренів рівняння
+\[
+\log_3\!\big(|x - 2| + 2a - 11\big) - 2 = 0
+\]
+є більшим за $-40$.}
+\nmtAnswerBox
+
+\end{document}

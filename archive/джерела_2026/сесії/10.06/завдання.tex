@@ -1,0 +1,516 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} Варіант за 10 червня}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt, halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}\par\vspace{0.3cm}}
+\newcommand{\chapterTitle}[1]{\clearpage\sectionTitle{#1}}
+
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \ 
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}}
+
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\par\vspace{0.3cm}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ }
+
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} РЕАЛЬНИЙ ВАРІАНТ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} ВАРІАНТ ЗА 10 ЧЕРВНЯ}\\[0.6cm]
+{\large Real Test Notebook з усіма геометричними рисунками}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+
+\chapterTitle{ТЕСТОВИЙ ЗОШИТ (10 ЧЕРВНЯ)}
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише один правильний. Виберіть правильний варіант відповіді.}
+
+% ===== №1 =====
+\zadtask{Комп'ютерна графіка використовує RGB-кодування, яке дозволяє відтворити $16{,}7$~мільйонів кольорів. Позначте запис цього числа в стандартному вигляді.}
+\answerTable{$1{,}67 \cdot 10^{8}$}{$167 \cdot 10^{5}$}{$1{,}67 \cdot 10^{6}$}{$16{,}7 \cdot 10^{6}$}{$1{,}67 \cdot 10^{7}$}
+
+% ===== №2 =====
+\noindent
+\begin{minipage}[c]{0.42\textwidth}
+\zadnum У музичній школі опитали $100$ учнів щодо улюбленого жанру музики. Результати опитування наведено на діаграмі (див. рисунок). За діаграмою визначте різницю між кількістю шанувальників попмузики і класичної.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.56\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.9, thick, line join=round]
+    \draw[->, gray!80] (0,0) -- (0,5.2) node[above, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.5cm, text=gray!80!black, font=\scriptsize] {Кількість учнів};
+    \draw[->, gray!80] (0,0) -- (7.5,0) node[below, text=gray!80!black, font=\scriptsize, xshift=-3.5cm, yshift=-0.6cm] {Жанри музики};
+
+    \foreach \y/\val in {0.7/5, 1.4/10, 2.1/15, 2.8/20, 3.5/25, 4.2/30, 4.9/35} {
+        \draw[gray!30, thin] (0,\y) -- (7,\y);
+        \node[left, font=\scriptsize, text=gray!80!black] at (0,\y) {\val};
+    }
+    \node[left, font=\scriptsize, text=gray!80!black] at (0,0) {0};
+
+    \filldraw[fill=cyan!60!blue, draw=none] (0.5,0) rectangle (1.2, 2.1);
+    \filldraw[fill=cyan!60!blue, draw=none] (1.9,0) rectangle (2.6, 2.8);
+    \filldraw[fill=cyan!60!blue, draw=none] (3.3,0) rectangle (4.0, 4.62);
+    \filldraw[fill=cyan!60!blue, draw=none] (4.7,0) rectangle (5.4, 3.5);
+    \filldraw[fill=cyan!60!blue, draw=none] (6.1,0) rectangle (6.8, 0.98);
+
+    \node[below, font=\scriptsize] at (0.85,0) {Класична};
+    \node[below, font=\scriptsize] at (2.25,0) {Джаз і блюз};
+    \node[below, font=\scriptsize] at (3.65,0) {Рок};
+    \node[below, font=\scriptsize] at (5.05,0) {Попмузика};
+    \node[below, font=\scriptsize] at (6.45,0) {Інші};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$5$}{$10$}{$15$}{$20$}{$40$}
+
+% ===== №3 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку схематично зображено стелаж для книг і декору. Кожен ярус стелажа розділено на дві частини, причому ширина $AB$ більшої частини вдвічі більша за ширину $BC$ меншої частини. Визначте ширину $AB$, якщо ширина $AC$ всього стелажа дорівнює $147$~см.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    % три яруси
+    \filldraw[fill=orange!60, draw=black] (0,2.4) rectangle (4,3.4);
+    \filldraw[fill=orange!25, draw=black] (4,2.4) rectangle (6,3.4);
+    \filldraw[fill=orange!25, draw=black] (0,1.2) rectangle (2,2.2);
+    \filldraw[fill=orange!60, draw=black] (2,1.2) rectangle (6,2.2);
+    \filldraw[fill=orange!60, draw=black] (0,0) rectangle (4,1);
+    \filldraw[fill=orange!25, draw=black] (4,0) rectangle (6,1);
+    % мітки
+    \node[above] at (0,3.4) {$A$};
+    \node[above] at (4,3.4) {$B$};
+    \node[above] at (6,3.4) {$C$};
+    % розмірна лінія
+    \draw[<->, >=stealth, thin] (0,-0.6) -- (6,-0.6);
+    \node[below, font=\small] at (3,-0.65) {$147$~см};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$98$~см}{$49$~см}{$97$~см}{$108$~см}{$88$~см}
+
+% ===== №4 =====
+\zadtask{Розв'яжіть нерівність $7 - x < 2$.}
+\answerTable{$(-\infty;\,-5)$}{$(-\infty;\,9)$}{$(-5;\,+\infty)$}{$(-\infty;\,5)$}{$(5;\,+\infty)$}
+
+% ===== №5 =====
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено куб $ABCDA_1B_1C_1D_1$. Скільки всього є прямих, кожна з яких проходить через дві вершини грані $A_1B_1C_1D_1$ і паралельна площині грані $ABCD$?
+\vspace{0.2cm}
+\par\noindent\textbf{А}\ \ жодної
+\par\noindent\textbf{Б}\ \ дві
+\par\noindent\textbf{В}\ \ чотири
+\par\noindent\textbf{Г}\ \ шість
+\par\noindent\textbf{Д}\ \ більше шести
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.8,0);
+    \coordinate (B) at (1,1);
+    \coordinate (C) at (3.8,1);
+    \coordinate (A1) at (0,2.8);
+    \coordinate (D1) at (2.8,2.8);
+    \coordinate (B1) at (1,3.8);
+    \coordinate (C1) at (3.8,3.8);
+    \draw (A) -- (D) -- (D1) -- (A1) -- cycle;
+    \draw (D) -- (C) -- (C1) -- (D1);
+    \draw (A1) -- (B1) -- (C1);
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (B) -- (B1);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[left] at (A1) {$A_1$};
+    \node[above left] at (B1) {$B_1$};
+    \node[above right] at (C1) {$C_1$};
+    \node[right] at (D1) {$D_1$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.3cm}
+
+% ===== №6 =====
+\zadtask{Спростіть вираз $\dfrac{a^3 a^5}{a^4}$, де $a \neq 0$.}
+\answerTable{$a^{4}$}{$a^{12}$}{$a^{2}$}{$a^{11}$}{$a^{3{,}75}$}
+
+% ===== №7 =====
+\zadtask{Позначте проміжок, якому належить корінь рівняння $\left(\dfrac{1}{3}\right)^{2x-1} = 9$.}
+\answerTable{$(-3; -2)$}{$(-2; -1)$}{$(-1; 0)$}{$(0; 1)$}{$(1; 2)$}
+
+% ===== №8 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty;\, +\infty)$. Скористайтеся рисунком і визначте нулі цієї функції.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.45, thick]
+    \draw[step=1cm, gray!40, thin] (-1,-2) grid (6,9);
+    \draw[->] (-1.5,0) -- (6.5,0) node[right] {$x$};
+    \draw[->] (0,-2.5) -- (0,9.5) node[above] {$y$};
+    \node[below left, font=\small] at (0,0) {$0$};
+    \node[below right, font=\small] at (1,0) {$1$};
+    \node[above left, font=\small] at (0,1) {$1$};
+    \node[left, font=\small] at (0,8) {$8$};
+    \node[below, font=\small] at (4,0) {$4$};
+    \node[below, font=\small] at (2,0) {$2$};
+    \draw[domain=-0.35:6.35, smooth, samples=80, variable=\x, black, thick] plot ({\x}, {\x*\x-6*\x+8});
+    \node[above right, font=\small] at (4.5,5) {$y=f(x)$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$0;\ 8$}{$0$}{$5$}{$2;\ 4$}{$8$}
+
+% ===== №9 =====
+\zadtask{Кути гострокутного трикутника $ABC$ задовольняють умову $\angle A < \angle B < \angle C$. Які з наведених тверджень є правильними?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=0.1cm]
+\item $AB$~--- найдовша сторона трикутника $ABC$.
+\item Трикутник $ABC$~--- рівнобедрений.
+\item Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише I}{лише III}{лише I та III}{лише II та III}{I, II та III}
+
+% ===== №10 =====
+\zadtask{В арифметичній прогресії $(a_n)$ справджується рівність $a_5 - a_3 = 4{,}8$. Тоді $a_6 - a_3 =$}
+\answerTable{$7{,}2$}{$2{,}4$}{$6{,}4$}{$1{,}6$}{$9{,}6$}
+
+% ===== №11 =====
+\zadtask{На парковку, де вільними є десять паркомісць, заїжджають два автомобілі. Скільки всього є різних варіантів розміщення цих автомобілів на вільних паркомісцях?}
+\answerTable{$20$}{$19$}{$45$}{$90$}{$100$}
+
+% ===== №12 =====
+\zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-3;\, 1;\, 5)$, яка дотикається до координатної площини $xy$ у точці $N$. Визначте координати точки $N$.}
+\answerTable{$(-3; 1; -5)$}{$(-3; 1; 0)$}{$(0; 0; 5)$}{$(-3; 0; 5)$}{$(0; 1; 5)$}
+
+% ===== №13 =====
+\zadtask{Якщо числа $x$ і $y$ задовольняють умови $5x - y = 4$ і $5x + y \neq 0$, то $\dfrac{5x + y}{25x^2 - y^2} =$}
+\answerTable{$0{,}25$}{$-4$}{$1$}{$4$}{$-0{,}25$}
+
+% ===== №14 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У паралелограмі $ABCD$ проведено діагональ $BD$ й перпендикуляр $BK$ до сторони $AD$ (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $BD = 24$~см, $\angle ADB = 30^\circ$, а радіус кола, описаного навколо трикутника $AKB$, дорівнює $3\sqrt{7}$~см.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (7,0);
+    \coordinate (B) at (1.4,2.6);
+    \coordinate (C) at (8.4,2.6);
+    \coordinate (K) at (1.4,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (B) -- (D);
+    \draw (B) -- (K);
+    \draw (K) rectangle ++(0.25,0.25);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=1.6, font=\scriptsize] {angle = B--D--K};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$144$~см$^2$}{$288$~см$^2$}{$108\sqrt{3}$~см$^2$}{$216\sqrt{3}$~см$^2$}{$144\sqrt{3}$~см$^2$}
+
+% ===== №15 =====
+\zadtask{Розв'яжіть систему рівнянь
+\[
+\begin{cases} \log_2 x + \log_2 y = 2, \\[2pt] x + \dfrac{1}{y} = 10. \end{cases}
+\]
+Якщо $(x_0; y_0)$~--- розв'язок системи, то $x_0 + 2y_0 =$}
+\answerTable{$2$}{$8{,}5$}{$9$}{$10$}{$8$}
+\newpage
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний варіант, позначений буквою.}
+
+% ===== №16 =====
+\zadtask{Установіть відповідність між виразом (1--3), де $\pi$~--- відома математична константа, та його значенням (А--Д).
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\cos\left(-\dfrac{\pi}{3}\right)$\\[0.3cm]
+\textbf{2} \quad $\log_\pi \dfrac{1}{\pi}$\\[0.3cm]
+\textbf{3} \quad $|1 - \pi| - |\pi - 1|$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення виразу}\par\vspace{0.15cm}
+\textbf{А} \quad $-1$\\[0.15cm]
+\textbf{Б} \quad $-0{,}5$\\[0.15cm]
+\textbf{В} \quad $0$\\[0.15cm]
+\textbf{Г} \quad $0{,}5$\\[0.15cm]
+\textbf{Д} \quad $2\pi$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №17 =====
+\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку (1--3) речення доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick]
+    \draw[step=1cm, gray!40, thin] (-3,-4) grid (5,6);
+    \draw[->] (-3.5,0) -- (5.5,0) node[right] {$x$};
+    \draw[->] (0,-4.5) -- (0,6.5) node[above] {$y$};
+    \node[below left, font=\small] at (0,0) {$0$};
+    \node[below right, font=\small] at (1,0) {$1$};
+    \node[above left, font=\small] at (0,1) {$1$};
+    \node[left, font=\small] at (0,5) {$5$};
+    \node[below, font=\small] at (-2,0) {$-2$};
+    \node[below, font=\small] at (4,0) {$4$};
+    \node[right, font=\small] at (0.15,-3) {$-3$};
+    \draw[magenta!80!black, thick, smooth] plot coordinates {(-2,-3) (-1.3,0.3) (-0.6,1.7) (0,2) (0.7,1.5) (1.4,1.1) (2,1) (2.7,1.6) (3.3,3) (4,5)};
+    \fill (-2,-3) circle (3pt);
+    \fill (4,5) circle (3pt);
+    \node[right, font=\small] at (1.7,3.6) {$y=f(x)$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.50\textwidth}
+\textit{Початок речення}\par\vspace{0.15cm}
+\textbf{1} \quad Найбільше значення функції $y=f(x)$ на проміжку $[-2;\, 4]$ дорівнює\\[0.25cm]
+\textbf{2} \quad Функція набуває від'ємного значення, якщо $x =$\\[0.25cm]
+\textbf{3} \quad $f'(x) = 0$, якщо $x =$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.26\textwidth}
+\textit{Закінчення речення}\par\vspace{0.15cm}
+\textbf{А} \quad $-2$.\\[0.15cm]
+\textbf{Б} \quad $-1$.\\[0.15cm]
+\textbf{В} \quad $2$.\\[0.15cm]
+\textbf{Г} \quad $4$.\\[0.15cm]
+\textbf{Д} \quad $5$.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №18 =====
+\zadtask{На рисунку зображено ромб $ABCD$ й рівнобедрений трикутник $AKD$, які лежать в одній площині. $\angle BAD = 50^\circ$, $\angle AKD = 40^\circ$. Узгодьте кут (1--3) з його градусною мірою (А--Д).
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3.5,0);
+    \coordinate (B) at (2.25,2.68);
+    \coordinate (C) at (5.75,2.68);
+    \coordinate (K) at (1.75,-4.8);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (D);
+    \draw (A) -- (K) -- (D);
+    % мітки рівності бічних сторін
+    \draw ($(A)!0.5!(K)$) ++(-0.12,-0.04) -- ++(0.24,0.08);
+    \draw ($(D)!0.5!(K)$) ++(-0.12,0.04) -- ++(0.24,-0.08);
+    \pic[draw, angle radius=0.55cm, pic text={$50^\circ$}, angle eccentricity=1.7, font=\scriptsize] {angle = D--A--B};
+    \pic[draw, angle radius=0.8cm, pic text={$40^\circ$}, angle eccentricity=1.45, font=\scriptsize] {angle = D--K--A};
+    \node[left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+\textit{Кут}\par\vspace{0.15cm}
+\textbf{1} \quad $\angle KAB$\\[0.25cm]
+\textbf{2} \quad $\angle ABC$\\[0.25cm]
+\textbf{3} \quad $\angle KDC$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Градусна міра кута}\par\vspace{0.15cm}
+\textbf{А} \quad $110^\circ$\\[0.15cm]
+\textbf{Б} \quad $120^\circ$\\[0.15cm]
+\textbf{В} \quad $130^\circ$\\[0.15cm]
+\textbf{Г} \quad $150^\circ$\\[0.15cm]
+\textbf{Д} \quad $160^\circ$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\newpage
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у спеціально відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+
+% ===== №19 =====
+\zadtask{Обчисліть інтеграл $\displaystyle\int\limits_{1}^{4} x(6x-1)\,dx$.}
+\nmtAnswerBox
+
+% ===== №20 =====
+\zadtask{У таблиці наведено дані крокоміра про кількість (у тис.) кроків Олени за тиждень.
+\par\vspace{0.25cm}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{День тижня} & Пн & Вт & Ср & Чт & Пт & Сб & Нд \\
+\hline
+\textbf{Кількість кроків, тис.} & $6{,}4$ & $5{,}6$ & $7$ & $5{,}8$ & $6{,}2$ & $6{,}4$ & $6$ \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{0.25cm}
+Наступного тижня вона планує збільшити середню кількість кроків за день на $20\,\%$ порівняно із середньою кількістю кроків, зафіксованих цього тижня. Скільки в середньому (у тис.) кроків за день протягом наступного тижня має робити Олена?}
+\nmtAnswerBox
+
+% ===== №21 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено циліндр і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Висоти циліндра й піраміди рівні. Визначте об'єм (у см$^3$) $V$ піраміди, якщо площа основи циліндра дорівнює площі його бічної поверхні та становить $108\pi$~см$^2$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % циліндр
+    \draw (0,3.6) ellipse (1.4 and 0.4);
+    \draw[dashed] (-1.4,0) arc (180:0:1.4 and 0.4);
+    \draw (-1.4,0) arc (180:360:1.4 and 0.4);
+    \draw (-1.4,0) -- (-1.4,3.6);
+    \draw (1.4,0) -- (1.4,3.6);
+    % піраміда
+    \begin{scope}[shift={(4.4,0)}]
+        \coordinate (P1) at (-1.3,-0.1);
+        \coordinate (P2) at (1.5,0);
+        \coordinate (P3) at (0.4,0.75);
+        \coordinate (T) at (0.2,3.7);
+        \draw (P1) -- (P2) -- (T) -- cycle;
+        \draw[dashed] (P1) -- (P3) -- (P2);
+        \draw[dashed] (P3) -- (T);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+
+% ===== №22 =====
+\zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння
+\[
+\dfrac{\sqrt{x}\cdot\left(5^{x^2-(2a-8)x} - 1\right)}{\sqrt{10-x}} = 0
+\]
+має два різні корені.}
+\nmtAnswerBox
+
+\end{document}

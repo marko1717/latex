@@ -1,89 +1,163 @@
-
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Підключаємо бібліотеки для зручних кутів
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
-\usetikzlibrary{3d}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
 
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{multirow}
-
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 21}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Таблиця для відповідей із дробами (збільшена висота клітинок)
-% Оновлена таблиця: підпорка додана до КОЖНОЇ клітинки
-\newcommand{\answerTableTall}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-% Тепер rule є перед кожним аргументом (#1..#5)
-\rule[-0.9cm]{0pt}{2.0cm}#1 & 
-\rule[-0.9cm]{0pt}{2.0cm}#2 & 
-\rule[-0.9cm]{0pt}{2.0cm}#3 & 
-\rule[-0.9cm]{0pt}{2.0cm}#4 & 
-\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Оновлена таблиця відповідей (заголовки зовні)
-\newcommand{\answerGrid}{
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
     \begingroup
-    % Збільшуємо висоту рядків для квадратних клітинок
-    \renewcommand{\arraystretch}{1.3} 
-    % Відступ всередині клітинок
-    \setlength{\tabcolsep}{7pt} 
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
     \begin{tabular}{r|c|c|c|c|c|}
-         % Перший рядок: порожня клітинка зліва + букви без рамок (multicolumn прибирає |)
          \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         % Наступні рядки: номер зліва (r) + клітинки з рамками (|c|)
-         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
          \textbf{2} & & & & & \\ \cline{2-6}
          \textbf{3} & & & & & \\ \cline{2-6}
     \end{tabular}
     \endgroup
 }
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
-% Макет для завдань на відповідність
-% #1 - Умови (1-3)
-% #2 - Варіанти (А-Д)
-% #3 - Табличка
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\matchingLayout}[3]{
     \noindent
     \begin{minipage}[t]{0.40\textwidth}
@@ -103,8 +177,6 @@
         \end{flushright}
     \end{minipage}
 }
-
-% Стандартна таблиця відповідей (для тестів)
 \newcommand{\answerTableSmall}[5]{
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
 \hline
@@ -120,39 +192,65 @@
 \end{tabular}
 }
 
-% Таблиця для вибору одного варіанту (Task 7)
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
-\end{tabular}
-\end{center}
-}
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+\chapterTitle{Тема 21. Графіки елементарних функцій, їх побудова та перетворення}
+\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 108 (НМТ 2023~--- 29, 2024~--- 33, 2025~--- 28, 2026~--- 18).}\par\vspace{0.2cm}
 
-\begin{document}
+\typeTitle{НМТ 2023}
 
-
-
-
-\vspace{0.5cm}
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Графіки функцій та їх перетворення}}
-\end{center}
-
-% === ЗАВДАННЯ 1 ===
-\noindent\textbf{1.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. У яких чвертях розташований графік функції $y=f(x) + 3$? \nmtyear{2023}
 
 \vspace{0.3cm}
@@ -200,10 +298,7 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 2 ===
-\noindent\textbf{2.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. У яких чвертях розташований графік функції $y=f(x+3)$? \nmtyear{2023}
 
 \vspace{0.3cm}
@@ -251,10 +346,7 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 3 ===
-\noindent\textbf{3.} Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=1$. \nmtyear{2023}
+\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=1$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -266,9 +358,9 @@
     \textbf{2} & $y=x^2-2x+2$ \\[0.3cm]
     \textbf{3} & $y=1+\dfrac{2}{x}$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -293,10 +385,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 4 ===
-\noindent\textbf{4.} Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -308,9 +397,9 @@
     \textbf{2} & $y=-\dfrac{7}{x}$ \\[0.3cm]
     \textbf{3} & $y=\log_{0{,}5}(x-4)$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -335,10 +424,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 5 ===
-\noindent\textbf{5.} Установіть відповідність між функцією (1–3) та її найменшим значенням (А – Д) на відрізку $[0; 4]$. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її найменшим значенням (А – Д) на відрізку $[0; 4]$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -350,9 +436,9 @@
     \textbf{2} & $y=-0{,}5x+5$ \\[0.3cm]
     \textbf{3} & $y=2^x$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -377,10 +463,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 6 ===
-\noindent\textbf{6.} Установіть відповідність між функцією (1–3) та властивістю (А – Д) її графіка. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю (А – Д) її графіка. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -392,9 +475,9 @@
     \textbf{2} & $y=\sin x$ \\[0.3cm]
     \textbf{3} & $y=\log_2 x$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -419,10 +502,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 4 (Чверті 1) ===
-\noindent\textbf{7.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Функція $y=f(x)$ визначена на проміжку $(-\infty; +\infty)$ і набуває лише додатних значень. Укажіть \textit{усі} координатні чверті (див. рисунок), у яких розташований графік цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -451,10 +532,8 @@
 \hline
 \end{tabular}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 5 (Чверті 2) ===
-\noindent\textbf{8.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Функція $y=f(x)$ визначена на проміжку $(0; +\infty)$ і набуває лише додатних значень. Укажіть \textit{усі} координатні чверті (див. рисунок), у яких розташований графік цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -483,10 +562,8 @@
 \hline
 \end{tabular}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 6 (Чверті 3) ===
-\noindent\textbf{9.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Функція $y=f(x)$ визначена на проміжку $(-\infty; +\infty)$ і набуває лише від’ємних значень. Укажіть \textit{усі} координатні чверті (див. рисунок), у яких розташований графік цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -515,11 +592,7 @@
 \hline
 \end{tabular}
 
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 10 ===
-\noindent\textbf{10.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній системі координат на площині зображено коло $x^2+y^2=4$. Установіть відповідність між функцією (1–3) та кількістю (А – Д) спільних точок, які має графік цієї функції із заданим колом. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -552,9 +625,9 @@
     \textbf{2} & $y=x^2-2$ \\[0.3cm]
     \textbf{3} & $y=4^x$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -579,10 +652,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 11 ===
-\noindent\textbf{11.} Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=-x$. \nmtyear{2023}
+\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=-x$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -594,9 +664,9 @@
     \textbf{2} & $y=\left(\dfrac{1}{2}\right)^x$ \\[0.5cm]
     \textbf{3} & $y=2x+2$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -621,10 +691,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 12 ===
-\noindent\textbf{12.} \begin{minipage}[t]{0.65\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. На якому з наведених проміжків ця функція зростає? \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -664,18 +731,13 @@
 \end{minipage}
 \vspace{0.7cm}
 
-
 \hfill
 \answerTable{$[1; 3]$}{$[-2; 3]$}{$[-2; 4]$}{$[-3; 1]$}{$[-3; 3]$}
 
-\end{minipage}
+
 \hfill
 
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 13 ===
-\noindent\textbf{13.} Установіть відповідність між функцією (1–3) та її найбільшим значенням (А – Д) на відрізку $[-1; 3]$. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її найбільшим значенням (А – Д) на відрізку $[-1; 3]$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -687,9 +749,9 @@
     \textbf{2} & $y=-x$ \\[0.3cm]
     \textbf{3} & $y=5^{-x}$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -714,10 +776,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 14 ===
-\noindent\textbf{14.} Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=x+3$. \nmtyear{2023}
+\noindent\zadnum Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з прямою $y=x+3$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -729,9 +788,9 @@
     \textbf{2} & $y=2^{-x}$ \\[0.3cm]
     \textbf{3} & $y=\dfrac{1}{x}$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -756,18 +815,12 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 15 ===
-\noindent\textbf{15.} Графік функції $y=\dfrac{1}{x}$ паралельно перенесли на $4$ одиниці праворуч уздовж осі $x$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2023}
+\noindent\zadnum Графік функції $y=\dfrac{1}{x}$ паралельно перенесли на $4$ одиниці праворуч уздовж осі $x$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2023}
 
 \vspace{0.3cm}
 \answerTableTall{$y=\dfrac{1}{x-4}$}{$y=\dfrac{1}{x}-4$}{$y=\dfrac{1}{x+4}$}{$y=\dfrac{4}{x}$}{$y=\dfrac{1}{x}+4$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 16 ===
-\noindent\textbf{16.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній системі координат на площині зображено ламану $ABCDA$ (див. рисунок). Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з ламаною $ABCDA$. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -819,9 +872,9 @@
     \textbf{2} & $y=\cos x$ \\[0.3cm]
     \textbf{3} & $y=x^2+1$ \\
     \end{tabular}
-    
+
     \vspace{0.5cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -845,10 +898,8 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 \end{minipage}
-\vspace{0.7cm}
 
-% === ЗАВДАННЯ 15 ===
-\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Точка $(x_0; -2)$ належить графіку цієї функції. Визначте абсцису $x_0$ цієї точки. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -884,11 +935,7 @@
 \vspace{0.3cm}
 \answerTableTall{$3$}{$0$}{$-3$}{$2$}{$-2$}
 
-\vspace{0.7cm}
-
-
-% === ЗАВДАННЯ 14 ===
-\noindent\textbf{18.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-2; 4]$. Цей графік перетинає вісь $x$ в одній із зазначених точок. Укажіть цю точку. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -924,9 +971,7 @@
 \vspace{0.3cm}
 \answerTableTall{$(0; 4)$}{$(4; 0)$}{$(0; 3)$}{$(3; 0)$}{$(3; 4)$}
 
-
-% === ЗАВДАННЯ 13 ===
-\noindent\textbf{19.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Функція $y=f(x)$ визначена на проміжку $(-\infty; 0)$ і набуває лише від’ємних значень. Укажіть \textit{усі} координатні чверті (див. рисунок), у яких розташований графік цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -949,13 +994,7 @@
 \vspace{0.3cm}
 \answerTableTall{лише в III}{лише в III та IV}{лише в II}{лише в IV}{лише в II та III}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 18 ===
-
-
-% === ЗАВДАННЯ 9 ===
-\noindent\textbf{20.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-2; 4]$. Укажіть значення $x_0$, за якого $f(x_0) > 0$. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -994,12 +1033,7 @@
 \vspace{0.3cm}
 \answerTable{$x_0 = 2$}{$x_0 = 1$}{$x_0 = 3$}{$x_0 = 4$}{$x_0 = -1$}
 
-\vspace{0.7cm}
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 20 ===
-\noindent\textbf{21.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній системі координат на площині зображено замкнену ламану $ABCDA$, де $A(0; -1)$, $B(0; 1)$, $C(2\pi; 1)$, $D(2\pi; -1)$. Увідповідніть функцію (1–3) із кількістю (А – Д) спільних точок її графіка з ламаною $ABCDA$. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -1057,13 +1091,10 @@
     \textbf{Д} & чотири \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 21 ===
-\noindent\textbf{22.} Установіть відповідність між функцією (1–3) та властивістю (А – Д) її графіка. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та властивістю (А – Д) її графіка. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -1089,12 +1120,9 @@
 \end{minipage}
 
 \vspace{0.3cm}
-\answerGrid
+\matchingGrid
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 22 ===
-\noindent\textbf{23.} Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -1120,11 +1148,9 @@
 \end{minipage}
 
 \vspace{0.3cm}
-\answerGrid
+\matchingGrid
 
-\vspace{0.7cm}
-% === ЗАВДАННЯ 23 ===
-\noindent\textbf{24.} Установіть відповідність між твердженням (1–3) та функцією (А – Д), для якої це твердження є правильним. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А – Д), для якої це твердження є правильним. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -1136,9 +1162,9 @@
     \textbf{2} & графік функції проходить через точку $(0; 1)$ \\
     \textbf{3} & функція має точку локального екстремуму на проміжку $[1; 3]$ \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -1152,10 +1178,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 24 ===
-\noindent\textbf{25.} Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та її властивістю (А – Д). \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -1181,11 +1204,9 @@
 \end{minipage}
 
 \vspace{0.3cm}
-\answerGrid
+\matchingGrid
 
-\vspace{0.7cm}
-% === ЗАВДАННЯ 25 ===
-\noindent\textbf{26.} Установіть відповідність між твердженням (1–3) та функцією (А – Д), для якої це твердження є правильним. \nmtyear{2023}
+\noindent\zadnum Установіть відповідність між твердженням (1–3) та функцією (А – Д), для якої це твердження є правильним. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -1197,9 +1218,9 @@
     \textbf{2} & графік функції симетричний відносно осі $y$ \\
     \textbf{3} & найменше значення на відрізку $[1; 4]$ функція набуває в точці $x=4$ \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -1213,10 +1234,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 7 ===
-\noindent\textbf{27.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. На якому з наведених проміжків ця функція зростає? \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -1252,10 +1270,7 @@
 \vspace{0.3cm}
 \answerTable{$[1; 3]$}{$[-2; 4]$}{$[-3; 3]$}{$[-2; 3]$}{$[-3; 1]$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 8 ===
-\noindent\textbf{28.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Укажіть нуль цієї функції. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -1290,10 +1305,7 @@
 \vspace{0.3cm}
 \answerTable{$3$}{$4$}{$-2$}{$0$}{$-3$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 14 ===
-\noindent\textbf{29.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-2; 4]$. Цей графік перетинає вісь $x$ в одній із зазначених точок. Укажіть цю точку. \nmtyear{2023}
 \end{minipage}
 \hfill
@@ -1329,18 +1341,9 @@
 \vspace{0.3cm}
 \answerTableTall{$(3; 4)$}{$(3; 0)$}{$(0; 4)$}{$(0; 3)$}{$(4; 0)$}
 
-\vspace{0.7cm}
+\typeTitle{НМТ 2024}
 
-
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
-\end{center}
-
-
-
-% === ЗАВДАННЯ 18 ===
-\noindent\textbf{30.} Установіть відповідність між функцією (1--3) та її властивістю (А--Д). \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між функцією (1--3) та її властивістю (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1350,9 +1353,9 @@
     \textbf{1} \quad $y = 4 - x^2$ \\[0.2cm]
     \textbf{2} \quad $y = -x^3$ \\[0.2cm]
     \textbf{3} \quad $y = 4^x$
-    
+
     \vspace{0.5cm}
-    
+
     % Табличка
     \begingroup
     \setlength{\tabcolsep}{4pt}
@@ -1378,10 +1381,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 19 ===
-\noindent\textbf{31.} Укажіть графік непарної функції. \nmtyear{2024}
+\noindent\zadnum Укажіть графік непарної функції. \nmtyear{2024}
 
 \vspace{0.3cm}
 \begin{center}
@@ -1424,10 +1424,7 @@
 \end{tabular}
 \end{center}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 22 ===
-\noindent\textbf{32.} Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1439,9 +1436,9 @@
     \textbf{2} & на відрізку $[-1; 3]$ функція набуває від'ємних значень \\
     \textbf{3} & найменше значення функції на відрізку $[-1; 3]$ дорівнює $0{,}5$ \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
-    
+
     % Табличка
     \begingroup
     \setlength{\tabcolsep}{4pt}
@@ -1467,10 +1464,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 20 ===
-\noindent\textbf{33.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Укажіть різницю між найбільшим і найменшим значенням функції $f(x)$ на цьому проміжку. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1502,10 +1496,8 @@
 \vspace{0.3cm}
 \answerTableTall{$10$}{$5$}{$6$}{$7$}{$3$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 40 (Ламана ABC) ===
-\noindent\textbf{40.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній системі координат на площині зображено ламану $ABC$, де $A(-2; 0)$, $B(0; 1)$, $C(2; 1)$ (див. рисунок). Установіть відповідність між функцією (1–3) та кількістю (А – Д) спільних точок її графіка з ламаною $ABC$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1556,13 +1548,11 @@
     \textbf{Д} & більше трьох \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 41 (Перетин з віссю y) ===
-\noindent\textbf{41.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-2; 4]$. Укажіть точку перетину графіка функції $y=f(x+1)$ з віссю $y$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1599,10 +1589,8 @@
 \vspace{0.3cm}
 \answerTableTall{$(0; -3)$}{$(1; 0)$}{$(3; 0)$}{$(0; -4)$}{$(0; -1)$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 42 (К-сть точок з прямою y=-1) ===
-\noindent\textbf{42.} Установіть відповідність між функцією (1–3) та кількістю спільних точок (А – Д) її графіка з прямою $y=-1$. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між функцією (1–3) та кількістю спільних точок (А – Д) її графіка з прямою $y=-1$. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1623,13 +1611,11 @@
     \textbf{Д} & більше трьох \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 43 (Чверті зсув) ===
-\noindent\textbf{43.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. У яких координатних чвертях розташований графік функції $y=f(x-4)$? \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1678,10 +1664,8 @@
     \textbf{Д} & в усіх чвертях \\
 \end{tabular}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 44 (Точки корінь) ===
-\noindent\textbf{44.} \begin{minipage}[t]{0.60\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат $xy$ зображено п'ять точок: $K, L, M, N$ та $P$. Укажіть точку, через яку \textit{може} проходити графік функції $y=\sqrt{x}$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1707,10 +1691,8 @@
 \vspace{0.3cm}
 \answerTableTall{$N$}{$K$}{$L$}{$M$}{$P$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 45 (Графік гіперболи) ===
-\noindent\textbf{45.} На якому з наведених рисунків зображено ескіз графіка функції $y = -\dfrac{2}{x}$? \nmtyear{2024}
+\noindent\zadnum На якому з наведених рисунків зображено ескіз графіка функції $y = -\dfrac{2}{x}$? \nmtyear{2024}
 
 \vspace{0.3cm}
 \begin{center}
@@ -1760,10 +1742,8 @@
 \endgroup
 \end{center}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 46 (Чверті параболи) ===
-\noindent\textbf{46.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У яких координатних чвертях розташований графік функції $y = (x - 1)^2$? Положення координатних чвертей зображено на рисунку. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1790,10 +1770,8 @@
     \textbf{Д} & в усіх чвертях \\
 \end{tabular}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 47 (Точка M) ===
-\noindent\textbf{47.} \begin{minipage}[t]{0.60\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
 У прямокутній системі координат $xy$ зображено точку $M$. Укажіть функцію, графік якої проходить через початок координат і точку $M$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1826,10 +1804,7 @@
 % Використовуємо \answerTableTall, бо у варіанті Д є дріб
 \answerTableTall{$y = 2x$}{$y = 8 + 2x$}{$y = -\dfrac{x}{2}$}{$y = 4 - 2x$}{$y = -2x$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 23 ===
-\noindent\textbf{48.} На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1897,9 +1872,8 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
 % === ЗАВДАННЯ 49 (Ламана ABCA і функції) ===
-\noindent\textbf{49.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 У прямокутній декартовій системі координат на площині зображено замкнену ламану $ABCA$, де $A(-1; 0)$, $B(0; 1)$, $C(1; 0)$. Узгодьте функцію (1–3) з кількістю (А – Д) спільних точок її графіка та ламаної $ABCA$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -1947,12 +1921,10 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-
-% === ЗАВДАННЯ 21 ===
-\noindent\textbf{50.} На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2026,11 +1998,8 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 51 ===
-\noindent\textbf{51.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено точку $A$, через яку проходить графік функції $y=f(x)$. Укажіть функцію $f(x)$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено точку $A$, через яку проходить графік функції $y=f(x)$. Укажіть функцію $f(x)$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2062,10 +2031,7 @@
     \textbf{Д} & $f(x) = x+2$ \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 52 ===
-\noindent\textbf{52.} Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д).
+\noindent\zadnum Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2079,7 +2045,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2093,9 +2059,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-% === ЗАВДАННЯ 53 ===
-\noindent\textbf{53.} На кожному з рисунків (1--3) зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок (1--3) з твердженням (А--Д) щодо функції $y=f(x)$, графік якої зображено на цьому рисунку.
+\noindent\zadnum На кожному з рисунків (1--3) зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок (1--3) з твердженням (А--Д) щодо функції $y=f(x)$, графік якої зображено на цьому рисунку. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2186,14 +2150,11 @@
 \hfill
 \begin{minipage}[t]{0.25\textwidth}
     \vspace{0.5cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 54 ===
-\noindent\textbf{54.} \begin{minipage}[t]{0.55\textwidth}
-Укажіть з-поміж наведених функцію, ескіз графіка якої зображено на рисунку.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Укажіть з-поміж наведених функцію, ескіз графіка якої зображено на рисунку. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2220,11 +2181,8 @@
     \textbf{Д} & $y = x^2 + 2$ \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 55 ===
-\noindent\textbf{55.} \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат $xy$ зображено п'ять точок: $O, K, L, M$ та $P$. Укажіть точку, через яку \textit{може} проходити графік функції $y = -\dfrac{3}{x}$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат $xy$ зображено п'ять точок: $O, K, L, M$ та $P$. Укажіть точку, через яку \textit{може} проходити графік функції $y = -\dfrac{3}{x}$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2249,8 +2207,7 @@
 \vspace{0.3cm}
 \answerTableTall{$P$}{$O$}{$M$}{$L$}{$K$}
 
-% === ЗАВДАННЯ 24 ===
-\noindent\textbf{56.} На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[1; 9]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[1; 9]$. Установіть відповідність між початком речення (1--3) та його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2317,10 +2274,7 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 57 ===
-\noindent\textbf{57.} Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д).
+\noindent\zadnum Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2334,7 +2288,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2348,10 +2302,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 58 ===
-\noindent\textbf{58.} Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д).
+\noindent\zadnum Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2365,7 +2316,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2379,10 +2330,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 59 ===
-\noindent\textbf{59.} Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=x$.
+\noindent\zadnum Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=x$. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2396,7 +2344,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2410,11 +2358,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 60 ===
-\noindent\textbf{60.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть з-поміж наведених координати точки, що належить цьому графіку.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть з-поміж наведених координати точки, що належить цьому графіку. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2444,10 +2389,7 @@
 \vspace{0.3cm}
 \answerTable{$(-2; 3)$}{$(-4; 3)$}{$(-1; 4)$}{$(-3; 2)$}{$(2; -2)$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 61 ===
-\noindent\textbf{61.} Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д).
+\noindent\zadnum Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2461,7 +2403,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2475,11 +2417,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 62 ===
-\noindent\textbf{62.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 3]$. Укажіть множину значень функції $y=f(x)+2$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 3]$. Укажіть множину значень функції $y=f(x)+2$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2509,8 +2448,7 @@
 \vspace{0.3cm}
 \answerTable{$[-3; 0]$}{$[1; 4]$}{$[-4; 3]$}{$[0; 4]$}{$[-2; 5]$}
 
-% === ЗАВДАННЯ 27 ===
-\noindent\textbf{63.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 4]$. Скільки точок перетину з осями координат має ця функція на заданому проміжку? \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -2541,12 +2479,8 @@
 \vspace{0.3cm}
 \answerTableTall{$4$}{$6$}{$5$}{$3$}{$2$}
 
-\vspace{0.7cm}
-
-
-% === ЗАВДАННЯ 63 ===
-\noindent\textbf{63.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. У яких координатних чвертях розташований графік функції $y=-f(x)$?
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. У яких координатних чвертях розташований графік функції $y=-f(x)$? \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2588,10 +2522,7 @@
     \textbf{Д} & в усіх чвертях \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 64 ===
-\noindent\textbf{64.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2605,7 +2536,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -2619,10 +2550,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 65 ===
-\noindent\textbf{65.} Доберіть до початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження.
+\noindent\zadnum Доберіть до початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2636,7 +2564,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -2650,10 +2578,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 66 ===
-\noindent\textbf{66.} Установіть відповідність між твердженням (1--3) та прямою, зображеною на рисунку (А--Д), для якої це твердження є правильним.
+\noindent\zadnum Установіть відповідність між твердженням (1--3) та прямою, зображеною на рисунку (А--Д), для якої це твердження є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -2669,7 +2594,7 @@
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
     \vspace{0.5cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}
 
 \vspace{0.5cm}
@@ -2728,8 +2653,7 @@
 \endgroup
 \end{center}
 
-% === ЗАВДАННЯ 28 ===
-\noindent\textbf{67.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть різницю між найбільшим і найменшим значенням функції $f(x)$ на проміжку $[0; 5]$. \nmtyear{2024}
 \end{minipage}
 \hfill
@@ -2762,13 +2686,9 @@
 \vspace{0.3cm}
 \answerTable{$10$}{$8$}{$6$}{$3$}{$7$}
 
+\typeTitle{НМТ 2025}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2025}}
-\end{center}
-
-
-\noindent\textbf{68.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на відрізку $[-5; 5]$. Позначте властивість, яку має ця функція. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -2809,13 +2729,7 @@
     \textbf{Д} & зростає на всій області визначення \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-\vspace{0.7cm}
-
-
-% === ЗАВДАННЯ 66 ===
-\noindent\textbf{69.} Установіть відповідність між твердженням (1--3) та прямою, зображеною на рисунку (А--Д), для якої це твердження є правильним.
+\noindent\zadnum Установіть відповідність між твердженням (1--3) та прямою, зображеною на рисунку (А--Д), для якої це твердження є правильним. \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -2831,7 +2745,7 @@
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
     \vspace{0.5cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}
 
 \vspace{0.5cm}
@@ -2890,9 +2804,8 @@
 \endgroup
 \end{center}
 
-% === ЗАВДАННЯ 62 ===
-\noindent\textbf{70.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 3]$. Укажіть множину значень функції $y=f(x)-2$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 3]$. Укажіть множину значень функції $y=f(x)-2$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -2922,12 +2835,7 @@
 \vspace{0.3cm}
 \answerTable{$[-1; 2]$}{$[1; 4]$}{$[-4; -1]$}{$[-2; 5]$}{$[-3; 0]$}
 
-
-\vspace{1cm}
-
-
-% === ЗАВДАННЯ 71 ===
-\noindent\textbf{71.} Укажіть рисунок, на якому зображено графік функції $y = \dfrac{1}{x-5}$.
+\noindent\zadnum Укажіть рисунок, на якому зображено графік функції $y = \dfrac{1}{x-5}$. \nmtyear{2025}
 
 \vspace{0.3cm}
 \begin{center}
@@ -3020,15 +2928,9 @@
 \endgroup
 \end{center}
 
-\vspace{0.7cm}
+\noindent\zadnum Функція $y=f(x)$ є прямою пропорційністю на проміжку $(-\infty; +\infty)$. Знайдіть значення функції $g(x) = 3f(x) + \dfrac{|x|}{8}$ у точці з абсцисою $x_0 = -2$, якщо графік функції $y=f(x)$ проходить через точку $(2; 7)$. \nmtyear{2025}
 
-% === ЗАВДАННЯ 72 ===
-\noindent\textbf{72.} Функція $y=f(x)$ є прямою пропорційністю на проміжку $(-\infty; +\infty)$. Знайдіть значення функції $g(x) = 3f(x) + \dfrac{|x|}{8}$ у точці з абсцисою $x_0 = -2$, якщо графік функції $y=f(x)$ проходить через точку $(2; 7)$.
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 73 ===
-\noindent\textbf{73.} Узгодьте функцію (1--3) із її властивістю (А--Д).
+\noindent\zadnum Узгодьте функцію (1--3) із її властивістю (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3042,7 +2944,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3056,11 +2958,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 74 ===
-\noindent\textbf{74.} \begin{minipage}[t]{0.60\textwidth}
-На рисунку 1 зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. На рисунку 2 зображено графік функції, отриманий унаслідок паралельного перенесення графіка функції $y=f(x)$ вздовж осі $x$. Графік якої функції отримали внаслідок цього перенесення?
+\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
+На рисунку 1 зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. На рисунку 2 зображено графік функції, отриманий унаслідок паралельного перенесення графіка функції $y=f(x)$ вздовж осі $x$. Графік якої функції отримали внаслідок цього перенесення? \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.35\textwidth}
@@ -3094,10 +2993,7 @@
 \vspace{0.3cm}
 \answerTable{$y=f(x)+2$}{$y=f(x+2)$}{$y=f(x)-2$}{$y=f(x-2)$}{$y=2f(x)$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 75 ===
-\noindent\textbf{75.} Доберіть до функції (1--3) координатні чверті (А--Д), у яких лежить графік цієї функції (координатні чверті показано на рисунку).
+\noindent\zadnum Доберіть до функції (1--3) координатні чверті (А--Д), у яких лежить графік цієї функції (координатні чверті показано на рисунку). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3111,7 +3007,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
@@ -3138,10 +3034,7 @@
     \end{tikzpicture}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 76 ===
-\noindent\textbf{76.} Узгодьте функцію (1--3) із кількістю (А--Д) спільних точок її графіка з прямою $y=-x$.
+\noindent\zadnum Узгодьте функцію (1--3) із кількістю (А--Д) спільних точок її графіка з прямою $y=-x$. \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3155,7 +3048,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3169,11 +3062,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 77 ===
-\noindent\textbf{77.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть \textit{ординату} точки перетину графіка функції з віссю $y$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть \textit{ординату} точки перетину графіка функції з віссю $y$. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -3204,10 +3094,7 @@
 \vspace{0.3cm}
 \answerTable{$1$}{$6$}{$3$}{$-4$}{$0$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 78 ===
-\noindent\textbf{78.} Узгодьте функцію (1--3) із її властивістю (А--Д).
+\noindent\zadnum Узгодьте функцію (1--3) із її властивістю (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3221,7 +3108,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3235,11 +3122,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 79 ===
-\noindent\textbf{79.} \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Узгодьте проміжок (1--3) із функцією (А--Д), що описує графік функції $y=f(x)$ на цьому проміжку.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Узгодьте проміжок (1--3) із функцією (А--Д), що описує графік функції $y=f(x)$ на цьому проміжку. \nmtyear{2025}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -3286,7 +3170,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3300,23 +3184,14 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 80 ===
-\noindent\textbf{80.} Графік функції $y=3^x$ паралельно перенесли на 2 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення.
+\noindent\zadnum Графік функції $y=3^x$ паралельно перенесли на 2 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTableTall{$y=3^x-2$}{$y=3^x+2$}{$y=\dfrac{3^x}{2}$}{$y=3^{x+2}$}{$y=3^{x-2}$}
 
-\vspace{0.7cm}
+\noindent\zadnum Функція $f(x)$ набуває значення $3$ для всіх додатних значень $x$ і значення $1$ -- для всіх від'ємних значень $x$. Функція $y=g(x)$ є прямою пропорційністю, а її графік проходить через точку $(1; 0{,}5)$. Обчисліть значення виразу $\dfrac{5g(-1)+3f(2)}{f(-1)}$. \nmtyear{2025}
 
-% === ЗАВДАННЯ 81 ===
-\noindent\textbf{81.} Функція $f(x)$ набуває значення $3$ для всіх додатних значень $x$ і значення $1$ -- для всіх від'ємних значень $x$. Функція $y=g(x)$ є прямою пропорційністю, а її графік проходить через точку $(1; 0{,}5)$. Обчисліть значення виразу $\dfrac{5g(-1)+3f(2)}{f(-1)}$.
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 82 ===
-\noindent\textbf{82.} Доберіть до функції (1--3) її властивість (А--Д).
+\noindent\zadnum Доберіть до функції (1--3) її властивість (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3330,7 +3205,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3344,17 +3219,12 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 83 ===
-\noindent\textbf{83.} Графік функції $y=x^3$ паралельно перенесли на 4 одиниці ліворуч уздовж осі $x$. Укажіть функцію, графік якої отримали в результаті цього перетворення.
+\noindent\zadnum Графік функції $y=x^3$ паралельно перенесли на 4 одиниці ліворуч уздовж осі $x$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTableTall{$y=x^3+4$}{$y=x^3-4$}{$y=4x^3$}{$y=(x-4)^3$}{$y=(x+4)^3$}
 
-
-% === ЗАВДАННЯ 84 ===
-\noindent\textbf{84.} Укажіть з-поміж наведених ескіз графіка функції $y = 2x - 3$. \nmtyear{2025}
+\noindent\zadnum Укажіть з-поміж наведених ескіз графіка функції $y = 2x - 3$. \nmtyear{2025}
 
 \vspace{0.3cm}
 \begin{center}
@@ -3404,10 +3274,7 @@
 \endgroup
 \end{center}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 85 ===
-\noindent\textbf{85.} На кожному з рисунків (1--3) зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок (1--3) з твердженням (А--Д) щодо функції $y=f(x)$, графік якої зображено на цьому рисунку. \nmtyear{2025}
+\noindent\zadnum На кожному з рисунків (1--3) зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок (1--3) з твердженням (А--Д) щодо функції $y=f(x)$, графік якої зображено на цьому рисунку. \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3485,9 +3352,9 @@
     \textbf{1} \quad Рис. 1 \\[0.3cm]
     \textbf{2} \quad Рис. 2 \\[0.3cm]
     \textbf{3} \quad Рис. 3
-    
+
     \vspace{0.5cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.70\textwidth}
@@ -3501,10 +3368,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 86 ===
-\noindent\textbf{86.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-2; 4]$. Укажіть значення аргумента $x$, за якого функція набуває додатних значень. \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -3535,10 +3399,7 @@
 \vspace{0.3cm}
 \answerTable{$2$}{$3$}{$0$}{$1$}{$4$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 87 ===
-\noindent\textbf{87.} Доберіть до функції (1--3) властивість її графіка (А--Д). \nmtyear{2025}
+\noindent\zadnum Доберіть до функції (1--3) властивість її графіка (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3552,7 +3413,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3566,18 +3427,12 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 88 ===
-\noindent\textbf{88.} Графік функції $y=x^3$ паралельно перенесли на 4 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}
+\noindent\zadnum Графік функції $y=x^3$ паралельно перенесли на 4 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTableTall{$y=4x^3$}{$y=x^3-4$}{$y=(x+4)^3$}{$y=x^3+4$}{$y=(x-4)^3$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 89 ===
-\noindent\textbf{89.} Увідповідніть функцію (1--3) та її властивість (А--Д). \nmtyear{2025}
+\noindent\zadnum Увідповідніть функцію (1--3) та її властивість (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -3591,7 +3446,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -3605,10 +3460,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 89 ===
-\noindent\textbf{89.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Укажіть рисунок, на якому зображено графік функції $y = \dfrac{3}{2}x - 1$? \nmtyear{2025}
 \end{minipage}
 
@@ -3678,10 +3530,7 @@
 \endgroup
 \end{center}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 90 ===
-\noindent\textbf{90.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 Графік якої функції зображено на рисунку? \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -3714,10 +3563,7 @@
     \textbf{Д} & $y = \log_{\frac{1}{3}} x$ \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 91 ===
-\noindent\textbf{91.} Укажіть із-поміж наведених рисунок, на якому \textit{може} бути зображено графік функції $y = kx + b$, якщо $k = 0$. \nmtyear{2025}
+\noindent\zadnum Укажіть із-поміж наведених рисунок, на якому \textit{може} бути зображено графік функції $y = kx + b$, якщо $k = 0$. \nmtyear{2025}
 
 \vspace{0.3cm}
 \begin{center}
@@ -3767,10 +3613,7 @@
 \endgroup
 \end{center}
 
-
-
-% === ЗАВДАННЯ 40 ===
-\noindent\textbf{92.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено графік функції $y=f(x)$, визначеної на відрізку $[-5; 5]$. На якому з наведених проміжків функція має нуль? \nmtyear{2025}
 \end{minipage}
 \hfill
@@ -3811,10 +3654,7 @@
     \textbf{Д} & $[3; 5]$ \\
 \end{tabular}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 41 ===
-\noindent\textbf{93.} На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Узгодьте проміжок (1–3) з властивістю (А – Д), яку має функція на цьому проміжку. \nmtyear{2025}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Узгодьте проміжок (1–3) з властивістю (А – Д), яку має функція на цьому проміжку. \nmtyear{2025}
 
 \vspace{0.2cm}
 
@@ -3827,7 +3667,7 @@
     \textbf{2} & $[-2; 2]$ \\[0.3cm]
     \textbf{3} & $[2; 5]$ \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
     \textit{Властивість функції} \par \vspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{7cm}@{}}
@@ -3837,9 +3677,9 @@
     \textbf{Г} & графік функції є фрагментом графіка функції $y=1-x^2$ \\[0.2cm]
     \textbf{Д} & функція набуває лише додатних значень \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -3876,11 +3716,7 @@
     \end{flushright}
 \end{minipage}
 
-\vspace{0.7cm}
-
-
-% === ЗАВДАННЯ 43 ===
-\noindent\textbf{94.} На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Узгодьте проміжок (1–3) з властивістю (А – Д), яку має функція на цьому проміжку. \nmtyear{2025}
+\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Узгодьте проміжок (1–3) з властивістю (А – Д), яку має функція на цьому проміжку. \nmtyear{2025}
 
 \vspace{0.2cm}
 
@@ -3893,7 +3729,7 @@
     \textbf{2} & $[-2; 2]$ \\[0.3cm]
     \textbf{3} & $[2; 5]$ \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
     \textit{Властивість функції} \par \vspace{0.2cm}
     \begin{tabular}{@{}p{0.5cm} p{7cm}@{}}
@@ -3903,9 +3739,9 @@
     \textbf{Г} & для кожної точки $(x_0; y_0)$, що належить графіку функції, добуток $x_0 \cdot y_0 < 0$ \\[0.2cm]
     \textbf{Д} & функція набуває лише додатних значень \\
     \end{tabular}
-    
+
     \vspace{0.3cm}
-    
+
     \begingroup
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.2}
@@ -3942,8 +3778,505 @@
     \end{flushright}
 \end{minipage}
 
+\typeTitle{НМТ 2026}
 
-\vspace{0.7cm}
+% НМТ 2026, сесія 23.05, завдання №4
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На рисунку зображено графік функції $y = f(x)$. У яких координатних чвертях розміщений графік функції $y = f(x) + 3$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.55, thick]
+    \draw[->] (-4,0) -- (4.5,0) node[right] {$x$};
+    \draw[->] (0,-3) -- (0,5) node[above] {$y$};
+    \node[below] at (-3,-0.1) {\scriptsize $-3$};
+    \node[below] at (1,-0.1) {\scriptsize $1$};
+    \node[below] at (3,-0.1) {\scriptsize $3$};
+    \node[left] at (-0.1,4) {\scriptsize $4$};
+    \node[left] at (-0.1,-2) {\scriptsize $-2$};
+    \draw[domain=-3:3, smooth, variable=\x, thick]
+        plot ({\x},{4 - 0.49*(\x - 0.5)*(\x - 0.5)});
+    \fill (-3,-2) circle (2pt);
+    \fill (3,0.94) circle (2pt);
+    \draw[dashed] (-3,-2) -- (-3,0);
+    \draw[dashed] (-3,-2) -- (0,-2);
+    \draw[dashed] (3,0.94) -- (3,0);
+    \node[above right] at (1.6,2.5) {\scriptsize $f(x)$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.3cm}
+\noindent
+\textbf{А)} \ лише у I та II \\[0.15cm]
+\textbf{Б)} \ лише у III та IV \\[0.15cm]
+\textbf{В)} \ лише у I та III \\[0.15cm]
+\textbf{Г)} \ лише у II та IV \\[0.15cm]
+\textbf{Д)} \ в усіх чотирьох
+% Відповідь: А
+\ifshowsolutions\solution{Графік $y=f(x)$ має значення від $-2$ до $4$. Зсув на $+3$ угору дає значення від $1$ до $7$~--- усі додатні. Оскільки $x$ набуває як від'ємних, так і додатних значень, графік лежить лише в I та II чвертях. Відповідь: \textbf{А}.}\fi
 
+% НМТ 2026, сесія 30.05, завдання №8
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На рисунку зображено графік функції $y = -2x$. Графік якої з наведених функцій паралельний графіку цієї функції? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.43\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.45, thick]
+    \draw[gray!30, very thin] (-4.5,-4.5) grid (4.5,4.5);
+    \draw[->, thick] (-4.7,0) -- (4.7,0) node[right] {\small $x$};
+    \draw[->, thick] (0,-4.7) -- (0,4.7) node[above] {\small $y$};
+    \foreach \x in {-4,-3,-2,-1,1,2,3,4} {
+        \draw[thick] (\x,-0.1) -- (\x,0.1);
+        \node[below] at (\x,-0.1) {\scriptsize $\x$};
+    }
+    \foreach \y in {-4,-3,-2,-1,1,2,3,4} {
+        \draw[thick] (-0.1,\y) -- (0.1,\y);
+        \node[left] at (-0.1,\y) {\scriptsize $\y$};
+    }
+    \node[below left] at (0,0) {\scriptsize $0$};
+    \draw[thick, mainGreen, line width=1.2pt] (-2.2,4.4) -- (2.2,-4.4);
+    \node[mainGreen, fill=white, inner sep=1pt] at (2.6,-3.5) {\scriptsize $y = -2x$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTableTall{$y = 2x + 1$}{$y = 1 - 2x$}{$y = -x - 2$}{$y = \dfrac{x}{2} - 1$}{$y = -\dfrac{1}{2}x$}
+% Відповідь: Б
+\ifshowsolutions\solution{Прямі паралельні, коли кутові коефіцієнти рівні. У $y=-2x$ маємо $k=-2$, тож шукаємо функцію з $k=-2$: це $y=1-2x$. Відповідь: \textbf{Б}.}\fi
 
+% НМТ 2026, сесія 1.06, завдання №8
+\zadtask{Графік якої з наведених функцій зображено на рисунку? \nmtyear{2026}
+
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\noindent
+\textbf{А} \quad $y = (x+1)^2$\\[0.1cm]
+\textbf{Б} \quad $y = -(x-1)^2$\\[0.1cm]
+\textbf{В} \quad $y = -x^2 + 1$\\[0.1cm]
+\textbf{Г} \quad $y = x^2 - 1$\\[0.1cm]
+\textbf{Д} \quad $y = -x^2 - 1$
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.7, thick]
+    \draw[->] (-2.3,0) -- (2.3,0) node[right] {\small $x$};
+    \draw[->] (0,-2.6) -- (0,1.6) node[above] {\small $y$};
+    \draw (1,-0.08) -- (1,0.08) node[above=1pt] {\scriptsize $1$};
+    \draw (-0.08,1) -- (0.08,1) node[right=1pt] {\scriptsize $1$};
+    \node[below left] at (0,0) {\scriptsize $0$};
+    \draw[mainGreen, line width=1.2pt, domain=-1.55:1.55, samples=80] plot (\x, {-(\x)^2 - 1});
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+}
+% Відповідь: Д
+\ifshowsolutions\solution{Парабола вітками вниз (старший коефіцієнт від'ємний) з вершиною в точці $(0;-1)$. Цьому відповідає $y=-x^2-1$. Відповідь: \textbf{Д}.}\fi
+
+% НМТ 2026, сесія 1.06, завдання №17 --- також у темі: Функція та її властивості
+\zadtask{Увідповідніть початок речення (1--3) із його закінченням (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2026}
+
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Початок речення}\par\vspace{0.2cm}
+\textbf{1} \quad Графік функції $y = \dfrac{2}{x} + 3$\\[0.4cm]
+\textbf{2} \quad Графік функції $y = 4^x$\\[0.3cm]
+\textbf{3} \quad Графік функції $y = \mathrm{tg}\,x$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Закінчення речення}\par\vspace{0.2cm}
+\textbf{А} \quad симетричний відносно початку координат.\\[0.15cm]
+\textbf{Б} \quad симетричний відносно осі $y$.\\[0.15cm]
+\textbf{В} \quad перетинає лише вісь $x$.\\[0.15cm]
+\textbf{Г} \quad перетинає лише вісь $y$.\\[0.15cm]
+\textbf{Д} \quad перетинає графік функції $y = x$ лише в одній точці.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.14\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+}
+% Відповідь: 1~--~В, 2~--~Г, 3~--~А
+\ifshowsolutions\solution{\textbf{1)} $y=\dfrac{2}{x}+3$ ($x\ne0$): осі $y$ не перетинає, а вісь $x$ перетинає при $x=-\dfrac{2}{3}$ --- лише вісь $x$ (В); \textbf{2)} $y=4^x>0$: перетинає лише вісь $y$ у точці $(0;1)$ (Г); \textbf{3)} $y=\mathrm{tg}\,x$ --- непарна, симетрична відносно початку координат (А). Відповідь: \textbf{1\,--\,В, 2\,--\,Г, 3\,--\,А}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №17
+\zadtask{Установіть відповідність між функцією (1--3) та координатними чвертями (А--Д), у яких розташований її графік. \nmtyear{2026}
+
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.4\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = -x - 1$\\[0.4cm]
+\textbf{2} \quad $y = \dfrac{1}{x+2}$\\[0.5cm]
+\textbf{3} \quad $y = \log_3 x$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Чверті}\par\vspace{0.2cm}
+\textbf{А} \quad I і IV\\[0.15cm]
+\textbf{Б} \quad I, II і III\\[0.15cm]
+\textbf{В} \quad II, III і IV\\[0.15cm]
+\textbf{Г} \quad I і III\\[0.15cm]
+\textbf{Д} \quad II і IV
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.5cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+}
+% Відповідь: 1~--~В, 2~--~Б, 3~--~А
+\ifshowsolutions\solution{$y=-x-1$ -- спадна пряма з від'ємним зсувом, проходить через II, III і IV чверті -- \textbf{В}; $y=\dfrac{1}{x+2}$ -- гіпербола, зміщена ліворуч, її гілки лежать у I, II і III чвертях -- \textbf{Б}; $y=\log_3 x$ зростає при $x>0$, графік у I і IV чвертях -- \textbf{А}. Відповідь: \textbf{1--В, 2--Б, 3--А}.}\fi
+
+% НМТ 2026, сесія 3.06, завдання №8 --- основна тема: Функція та її властивості
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат зображено фрагмент графіка \textit{непарної} функції $y = f(x)$ та точки $K$, $L$, $M$, $N$, $P$. Через яку з цих точок проходить графік функції $y = f(x)$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick]
+    \draw[gray!35, very thin] (-3.3,-3.3) grid (3.3,3.3);
+    \draw[->] (-3.5,0) -- (3.5,0) node[right, font=\scriptsize] {$x$};
+    \draw[->] (0,-3.5) -- (0,3.5) node[above, font=\scriptsize] {$y$};
+    \node[below left, font=\tiny] at (0,0) {$0$};
+    \node[font=\tiny] at (1,-0.35) {$1$};
+    \node[font=\tiny] at (-0.35,1) {$1$};
+    % фрагмент у I чверті: відрізок від (1,1) до (2,3) приблизно
+    \draw[mainGreen, line width=1.2pt] (1,1) -- (2,3);
+    % точки
+    \fill (-3,2) circle (2.4pt); \node[left, font=\tiny] at (-3,2) {$L$};
+    \fill (-2.6,1.4) circle (2.4pt); \node[left, font=\tiny] at (-2.6,1.4) {$K$};
+    \fill (-2,-3) circle (2.4pt); \node[left, font=\tiny] at (-2,-3) {$M$};
+    \fill (2,-2.4) circle (2.4pt); \node[right, font=\tiny] at (2,-2.4) {$N$};
+    \fill (-3,-3.1) circle (2.4pt); \node[left, font=\tiny] at (-3,-3.1) {$P$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$K$}{$L$}{$M$}{$N$}{$P$}
+% Відповідь: В
+\ifshowsolutions\solution{Графік непарної функції симетричний відносно початку координат. Точка, симетрична до точки $(2;\,3)$ цього фрагмента,~--- це $(-2;\,-3)$, тобто точка $M$. Відповідь: \textbf{В} ($M$).}\fi
+
+% НМТ 2026, сесія 3.06, завдання №17
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2026}
+
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Початок речення}\par\vspace{0.2cm}
+\textbf{1} \quad Графіки функцій $y = 2x - 3$ та $y = x + 1$\\[0.3cm]
+\textbf{2} \quad Графіки функцій $y = x^2$ та $y = x^2 - 2$\\[0.3cm]
+\textbf{3} \quad Графік функції $y = \dfrac{2}{x}$ та графік рівняння $x^2 + y^2 = 4$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Закінчення речення}\par\vspace{0.2cm}
+\textbf{А} \quad не мають жодної спільної точки.\\[0.15cm]
+\textbf{Б} \quad мають єдину спільну точку.\\[0.15cm]
+\textbf{В} \quad мають лише дві спільні точки.\\[0.15cm]
+\textbf{Г} \quad мають лише три спільні точки.\\[0.15cm]
+\textbf{Д} \quad мають чотири спільні точки.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.14\textwidth}
+\vspace{0.5cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}
+% Відповідь: 1~--~Б, 2~--~А, 3~--~В
+\ifshowsolutions\solution{\textbf{1}: прямі $y=2x-3$ і $y=x+1$ мають різні кутові коефіцієнти~--- одна спільна точка (Б). \textbf{2}: параболи $y=x^2$ і $y=x^2-2$ зсунуті по вертикалі~--- спільних точок немає (А). \textbf{3}: гіпербола $y=\dfrac{2}{x}$ і коло $x^2+y^2=4$ перетинаються у двох точках (В). Відповідь: \textbf{1~--~Б, 2~--~А, 3~--~В}.}\fi
+
+% НМТ 2026, сесія 5.06, завдання №8 --- також у темі: Функція та її властивості
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-5;\,5]$. Визначте точку екстремуму функції $y = f(x - 3)$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.45, thick]
+    \draw[gray!30, very thin] (-5.3,-2.3) grid (5.3,4.3);
+    \draw[->] (-5.5,0) -- (5.6,0) node[right, font=\scriptsize] {$x$};
+    \draw[->] (0,-2.5) -- (0,4.5) node[above, font=\scriptsize] {$y$};
+    \node[below left, font=\tiny] at (0,0) {$0$};
+    \node[font=\tiny] at (1,-0.4) {$1$}; \node[font=\tiny] at (-5,-0.4) {$-5$}; \node[font=\tiny] at (5,-0.4) {$5$};
+    \draw[mainGreen, line width=1.2pt]
+        (-5,-2) .. controls (-3,0) and (0,3.5) .. (2,4)
+        .. controls (3.5,4) and (4.5,2) .. (5,1.5);
+    \node[font=\tiny, mainGreen] at (3.5,4) {$y=f(x)$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$5$}{$1$}{$-1$}{$2$}{$-5$}
+% Відповідь: А
+\ifshowsolutions\solution{Графік $y=f(x)$ має екстремум (максимум) у точці $x=2$. Заміна $x\to x-3$ зсуває графік праворуч на $3$, тож точка екстремуму $x=2+3=5$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 8.06, завдання №8
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У прямокутній системі координат на площині зображено точки $K$, $L$, $M$, $N$ і $P$. Через яку із цих точок проходить графік функції $y=3$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick]
+    \draw[step=1cm, gray!40, thin] (-4,-3) grid (5,5);
+    \draw[->, thick] (-4.5,0) -- (5.5,0) node[right] {$x$};
+    \draw[->, thick] (0,-3.5) -- (0,5.5) node[above] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[below right] at (1,0) {$1$};
+    \node[above left] at (0,1) {$1$};
+
+    \fill (-3,2) circle (3pt) node[above left] {$M$};
+    \fill (1,3) circle (3pt) node[above left] {$N$};
+    \fill (4,2) circle (3pt) node[above left] {$L$};
+    \fill (0,-2) circle (3pt) node[below left] {$K$};
+    \fill (3,-3) circle (3pt) node[above right] {$P$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$N$}{$K$}{$L$}{$M$}{$P$}
+
+% НМТ 2026, сесія 11.06, завдання №8 --- також у темі: Тригонометричні вирази
+\zadtask{Укажіть точку, яка належить графіку функції $y = \sin x$. \nmtyear{2026}}
+\answerTableTall{$\left(\dfrac{\pi}{2};\ 1\right)$}{$(\pi;\ -1)$}{$(0;\ 1)$}{$(\pi;\ 1)$}{$\left(\dfrac{\pi}{2};\ 0\right)$}
+
+% НМТ 2026, сесія 11.06, завдання №17
+\zadtask{У прямокутній системі координат на площині $xy$ зображено відрізок $AB$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з відрізком $AB$. \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.85, thick]
+    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
+    \draw[->] (-2.5,0) -- (2.5,0) node[right] {$x$};
+    \draw[->] (0,-1.5) -- (0,3.5) node[above] {$y$};
+    \node[below right, font=\small] at (0,0) {$0$};
+    \node[below, font=\small] at (-1,0) {$-1$};
+    \node[below, font=\small] at (1,0) {$1$};
+    \node[right, font=\small, xshift=0.05cm] at (0,1) {$1$};
+    \node[right, font=\small, xshift=0.05cm] at (0,2) {$2$};
+    \draw[dashed, mainGreen!70] (-1,2) -- (-1,0);
+    \draw[dashed, mainGreen!70] (-1,2) -- (0,2);
+    \draw[very thick] (-1,2) -- (0,1);
+    \fill (-1,2) circle (2.5pt);
+    \fill (0,1) circle (2.5pt);
+    \node[left, font=\small] at (-1,2) {$B$};
+    \node[above right, font=\small, xshift=-0.07cm] at (0,1) {$A$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = 0{,}5^{\,x}$\\[0.25cm]
+\textbf{2} \quad $y = \cos x$\\[0.25cm]
+\textbf{3} \quad $y = 1 - x$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.66\textwidth}
+\textit{Кількість спільних точок}\par\vspace{0.2cm}
+\textbf{А} \quad жодної\\[0.15cm]
+\textbf{Б} \quad лише одна\\[0.15cm]
+\textbf{В} \quad лише дві\\[0.15cm]
+\textbf{Г} \quad лише три\\[0.15cm]
+\textbf{Д} \quad безліч
+\end{minipage}}
+
+% НМТ 2026, сесія 12.06, завдання №10
+\zadtask{Визначте лінійну функцію, графік якої утворює з додатним напрямом осі $x$ кут $45^\circ$. \nmtyear{2026}}
+\answerTableTall{$y = 1 - x$}{$y = \dfrac{\sqrt{2}}{2}x - 1$}{$y = \dfrac{1}{\sqrt{3}}x + 1$}{$y = 1 - \sqrt{3}x$}{$y = x - 1$}
+
+% НМТ 2026, сесія 15.06, завдання №17
+\zadtask{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.\par \nmtyear{2026}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.50\textwidth}
+\textit{Початок речення}\par\vspace{0.15cm}
+\textbf{1} \quad Графіки функцій $y = 2^x$ та $y = 0{,}5^x$ перетинаються в точці\\[0.25cm]
+\textbf{2} \quad Пряма $y = x - 1$ перетинає вісь $x$ у точці\\[0.25cm]
+\textbf{3} \quad Графік функції $y = (x + 2)^2$ дотикається осі $x$ у точці
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\textit{Закінчення речення}\par\vspace{0.15cm}
+\textbf{А} \quad $(1; 0)$.\\[0.15cm]
+\textbf{Б} \quad $(0; 1)$.\\[0.15cm]
+\textbf{В} \quad $(2; 0)$.\\[0.15cm]
+\textbf{Г} \quad $(-2; 0)$.\\[0.15cm]
+\textbf{Д} \quad $(-1; 0)$.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.18\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--Б, 2--А, 3--Г
+
+% НМТ 2026, сесія 16.06, завдання №17 --- також у темі: Функція та її властивості
+\zadtask{Доберіть до функції (1--3) властивість її графіка (А--Д).\par \nmtyear{2026}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = \sqrt{x-2} + 1$\\[0.25cm]
+\textbf{2} \quad $y = -5^x$\\[0.25cm]
+\textbf{3} \quad $y = x^3$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.66\textwidth}
+\textit{Властивість графіка функції}\par\vspace{0.2cm}
+\textbf{А} \quad симетричний відносно початку координат\\[0.15cm]
+\textbf{Б} \quad симетричний відносно осі $y$\\[0.15cm]
+\textbf{В} \quad розміщений лише в ІІІ та IV координатних чвертях\\[0.15cm]
+\textbf{Г} \quad розміщений лише в І координатній чверті\\[0.15cm]
+\textbf{Д} \quad проходить через точку $(0; 1)$
+\end{minipage}}
+% Відповідь: 1--Г; 2--В; 3--А
+
+% НМТ 2026, сесія 17.06, завдання №17
+\zadtask{Доберіть до функції (1--3) властивість її графіка (А--Д).\par \nmtyear{2026}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{1} \quad $y = 2 - x$\\[0.35cm]
+\textbf{2} \quad $y = \dfrac{1}{x} - 2$\\[0.35cm]
+\textbf{3} \quad $y = \log_{0{,}5} x$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.64\textwidth}
+\textit{Властивість графіка функції}\par\vspace{0.2cm}
+\textbf{А} \quad перетинає вісь $y$ з додатною ординатою, а вісь $x$ не перетинає\\[0.15cm]
+\textbf{Б} \quad не перетинає ані вісь $x$, ані вісь $y$\\[0.15cm]
+\textbf{В} \quad розміщений лише в I, II та IV координатних чвертях\\[0.15cm]
+\textbf{Г} \quad перетинає вісь $y$ з від'ємною ординатою, а вісь $x$ не перетинає\\[0.15cm]
+\textbf{Д} \quad перетинає вісь $x$, а вісь $y$ не перетинає
+\end{minipage}}
+% Відповідь: 1--В, 2--Г, 3--Д
+
+% НМТ 2026, сесія 18.06, завдання №8
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-4;\, 4]$. Укажіть точку перетину графіка функції $y = f(x) + 2$ з віссю $x$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.42, thick]
+    \draw[step=1cm, gray!40, thin] (-4,-4) grid (4,4);
+    \draw[->] (-4.3,0) -- (4.5,0) node[right, font=\scriptsize] {$x$};
+    \draw[->] (0,-4.3) -- (0,4.5) node[above, font=\scriptsize] {$y$};
+    \node[below right, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (-4,0) {$-4$};
+    \node[below, font=\scriptsize] at (1,0) {$1$};
+    \node[below, font=\scriptsize] at (4,0) {$4$};
+    \node[left, font=\scriptsize] at (0,1) {$1$};
+    % графік f(x): проходить (−4,1) вгору до (0,3) плато, спадає до (3,−2)... щоб f(x)+2=0 у x=3 -> f(3)=−2
+    \draw[cyan!70!blue, very thick, smooth] plot coordinates {(-4,1) (-2,2.5) (0,3) (1,2.5) (2,1) (3,-2) (4,-3.5)};
+    \node[right, font=\scriptsize] at (1.5,1.8) {$y=f(x)$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$(0; 4)$}{$(3; 0)$}{$(0; 0)$}{$(4; 0)$}{$(-1; 0)$}
+% Відповідь: Г
+
+% НМТ 2026, сесія 18.06, завдання №17
+\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $(-\infty;\, +\infty)$. Узгодьте проміжок (1--3) із функцією (А--Д), що описує графік функції $y = f(x)$ на цьому проміжку. \nmtyear{2026}
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.55, thick]
+    \draw[step=1cm, gray!40, thin] (-5,-3) grid (6,4);
+    \draw[->] (-5.3,0) -- (6.3,0) node[right, font=\scriptsize] {$x$};
+    \draw[->] (0,-3.3) -- (0,4.3) node[above, font=\scriptsize] {$y$};
+    \node[below right, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (1,0) {$1$};
+    \node[left, font=\scriptsize] at (0,1) {$1$};
+    % (-inf;-1): y=-2/x (спадає, гілка згори)
+    \draw[cyan!70!blue, very thick, domain=-5:-1, samples=40] plot (\x, {-2/\x});
+    % [-1;0]: y=-2x (пряма від (-1,2) до (0,0))
+    \draw[cyan!70!blue, very thick] (-1,2) -- (0,0);
+    % (0;+inf): y=sin x
+    \draw[cyan!70!blue, very thick, domain=0:6, samples=80] plot (\x, {sin(deg(\x))*2});
+    \node[right, font=\scriptsize] at (2,2.3) {$y=f(x)$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\textit{Проміжок}\par\vspace{0.2cm}
+\textbf{1} \quad $(-\infty;\, -1)$\\[0.25cm]
+\textbf{2} \quad $[-1;\, 0]$\\[0.25cm]
+\textbf{3} \quad $(0;\, +\infty)$
+\par\vspace{0.4cm}
+\matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\textit{Функція}\par\vspace{0.2cm}
+\textbf{А} \quad $y = \cos x$\\[0.15cm]
+\textbf{Б} \quad $y = 2^x$\\[0.15cm]
+\textbf{В} \quad $y = -\dfrac{2}{x}$\\[0.2cm]
+\textbf{Г} \quad $y = \sin x$\\[0.15cm]
+\textbf{Д} \quad $y = -2x$
+\end{minipage}}
+% Відповідь: 1--В,\ \ 2--Д,\ \ 3--Г
+
+% НМТ 2026, сесія 19.06, завдання №17
+\zadtask{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.\par \nmtyear{2026}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.46\textwidth}
+\textit{Початок речення}\par\vspace{0.15cm}
+\textbf{1} \quad Графіки функцій $y = 3 - x$ та $y = 1 - x$\\[0.25cm]
+\textbf{2} \quad Графіки функцій $y = \dfrac{1}{x}$ та $y = x^2 - 4$\\[0.25cm]
+\textbf{3} \quad Графік функції $y = 3$ та графік рівняння $x^2 + y^2 = 9$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.34\textwidth}
+\textit{Закінчення речення}\par\vspace{0.15cm}
+\textbf{А} \quad не мають спільних точок.\\[0.15cm]
+\textbf{Б} \quad мають єдину спільну точку.\\[0.15cm]
+\textbf{В} \quad мають лише дві спільні точки.\\[0.15cm]
+\textbf{Г} \quad мають лише три спільні точки.\\[0.15cm]
+\textbf{Д} \quad мають чотири спільні точки.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.14\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--А,\ \ 2--Г,\ \ 3--Б
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{91.}~А \ {\scriptsize\color{gray}(23.05, №4)}\par
+\noindent\textbf{92.}~Б \ {\scriptsize\color{gray}(30.05, №8)}\par
+\noindent\textbf{93.}~Д \ {\scriptsize\color{gray}(1.06, №8)}\par
+\noindent\textbf{94.}~1~--~В, 2~--~Г, 3~--~А \ {\scriptsize\color{gray}(1.06, №17)}\par
+\noindent\textbf{95.}~1~--~В, 2~--~Б, 3~--~А \ {\scriptsize\color{gray}(2.06, №17)}\par
+\noindent\textbf{96.}~В \ {\scriptsize\color{gray}(3.06, №8)}\par
+\noindent\textbf{97.}~1~--~Б, 2~--~А, 3~--~В \ {\scriptsize\color{gray}(3.06, №17)}\par
+\noindent\textbf{98.}~А \ {\scriptsize\color{gray}(5.06, №8)}\par
+\noindent\textbf{103.}~1--Б, 2--А, 3--Г \ {\scriptsize\color{gray}(15.06, №17)}\par
+\noindent\textbf{104.}~1--Г; 2--В; 3--А \ {\scriptsize\color{gray}(16.06, №17)}\par
+\noindent\textbf{105.}~1--В, 2--Г, 3--Д \ {\scriptsize\color{gray}(17.06, №17)}\par
+\noindent\textbf{106.}~Г \ {\scriptsize\color{gray}(18.06, №8)}\par
+\noindent\textbf{107.}~1--В,\ \ 2--Д,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №17)}\par
+\noindent\textbf{108.}~1--А,\ \ 2--Г,\ \ 3--Б \ {\scriptsize\color{gray}(19.06, №17)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

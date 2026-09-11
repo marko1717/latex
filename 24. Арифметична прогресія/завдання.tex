@@ -1,125 +1,252 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.16}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
-\usetikzlibrary{3d}
-% Визначення кольорів дерева
-\definecolor{woodinner}{RGB}{222, 184, 135} % Burlywood
-\definecolor{woodouter}{RGB}{139, 69, 19}   % SaddleBrown
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{multirow}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
 
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 24}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Таблиця відповідей (стандартна)
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Поле для короткої відповіді
-\newcommand{\shortAnswer}{
-\vspace{0.3cm}
-\noindent\hspace{1cm}Відповідь: \framebox(18,18){}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}{,}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}
-\vspace{0.5cm}
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
 }
-
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
+\definecolor{woodinner}{RGB}{222, 184, 135}
+\definecolor{woodouter}{RGB}{139, 69, 19}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-\begin{center}
-{\large Тема: \textbf{Арифметична прогресія}}
-\end{center}
+\chapterTitle{Тема 24. Арифметична прогресія}
+\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 29 (НМТ 2023~--- 13, 2024~--- 5, 2025~--- 5, 2026~--- 6).}\par\vspace{0.2cm}
 
-\vspace{0.5cm}
+\typeTitle{НМТ 2023}
 
 % Завдання 1
-\noindent\makebox[1.5em][l]{\textbf{1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Визначте восьмий член $a_8$ арифметичної прогресії $(a_n)$, у якої $a_7 = 11$, $a_9 = 18$. \nmtyear{2023}}
+\zadtask{Визначте восьмий член $a_8$ арифметичної прогресії $(a_n)$, у якої $a_7 = 11$, $a_9 = 18$. \nmtyear{2023}}
 
 \answerTable{$29$}{$14{,}5$}{$3{,}5$}{$7$}{$15$}
 
-\vspace{0.5cm}
-
 % Завдання 2
-\noindent\makebox[1.5em][l]{\textbf{2.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$: $a_1 = 4$, $a_3 = 9$. Визначте різницю $d$ прогресії. \nmtyear{2023}}
+\zadtask{В арифметичній прогресії $(a_n)$: $a_1 = 4$, $a_3 = 9$. Визначте різницю $d$ прогресії. \nmtyear{2023}}
 
 \answerTable{$d = 6{,}5$}{$d = -2{,}5$}{$d = 2{,}5$}{$d = -5$}{$d = 5$}
 
-\vspace{0.5cm}
-
 % Завдання 3
-\noindent\makebox[1.5em][l]{\textbf{3.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ різниця $d = 0{,}5$, п'ятнадцятий член $a_{15} = 12$. Визначте перший член $a_1$ прогресії. \nmtyear{2023}}
+\zadtask{В арифметичній прогресії $(a_n)$ різниця $d = 0{,}5$, п'ятнадцятий член $a_{15} = 12$. Визначте перший член $a_1$ прогресії. \nmtyear{2023}}
 
 \answerTable{$4{,}5$}{$6$}{$5$}{$24$}{$12{,}5$}
 
-\vspace{0.5cm}
-
 % Завдання 4
-\noindent\makebox[1.5em][l]{\textbf{4.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Протягом першого тижня після реєстрації свої сторінки в соціальній мережі Оленка отримала 7 запрошень стати другом. Кожного наступного тижня вона отримувала на 3 запрошення більше, ніж попереднього. Скільки всього запрошень стати другом отримала Оленка протягом перших десяти тижнів після реєстрації? \nmtyear{2023}}
+\zadtask{Протягом першого тижня після реєстрації свої сторінки в соціальній мережі Оленка отримала 7 запрошень стати другом. Кожного наступного тижня вона отримувала на 3 запрошення більше, ніж попереднього. Скільки всього запрошень стати другом отримала Оленка протягом перших десяти тижнів після реєстрації? \nmtyear{2023}}
 
-\shortAnswer
+\nmtAnswerBox
 
 % Завдання 5
-\noindent\makebox[1.5em][l]{\textbf{5.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Різниця арифметичної прогресії $(a_n)$ дорівнює 4. Обчисліть значення виразу $a_5 - a_3$. \nmtyear{2023}}
+\zadtask{Різниця арифметичної прогресії $(a_n)$ дорівнює 4. Обчисліть значення виразу $a_5 - a_3$. \nmtyear{2023}}
 
 \answerTable{$0$}{$8$}{$4$}{$-4$}{$-8$}
 
-\vspace{0.5cm}
-
 % Завдання 6
-\noindent\makebox[1.5em][l]{\textbf{6.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ відомо, що $a_1 = 2{,}9$, $a_2 = 2{,}2$. Визначте найменший додатній член цієї прогресії. \nmtyear{2023}}
+\zadtask{В арифметичній прогресії $(a_n)$ відомо, що $a_1 = 2{,}9$, $a_2 = 2{,}2$. Визначте найменший додатній член цієї прогресії. \nmtyear{2023}}
 
 \answerTable{$0{,}3$}{$0{,}1$}{$0{,}2$}{$0{,}5$}{$0{,}4$}
 
-\vspace{0.5cm}
-
 % === ЗАДАЧА ПРО КОЛОДИ ===
-\noindent\textbf{7.} \begin{minipage}[t]{0.55\textwidth}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
 На рисунку зображено фрагмент частини поперечного перерізу стосу дерев’яних колод. У нижньому ряду стосу 13 колод, а у верхньому — одна. Визначте загальну кількість колод у цьому стосі.\nmtyear{2023}
 
 \vspace{1cm}
@@ -174,89 +301,120 @@
     \end{tikzpicture}
     \end{flushright}
 \end{minipage}
-\vspace{1cm}
 
 % Завдання 8
-\noindent\makebox[1.5em][l]{\textbf{8.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$: $a_1 = 4$, $a_3 = 9$. Визначте різницю $d$ прогресії. \nmtyear{2023}}
+\zadtask{В арифметичній прогресії $(a_n)$: $a_1 = 4$, $a_3 = 9$. Визначте різницю $d$ прогресії. \nmtyear{2023}}
 
 \answerTable{$d = -2{,}5$}{$d = 6{,}5$}{$d = -5$}{$d = 5$}{$d = 2{,}5$}
 
-\vspace{0.5cm}
-
 % Завдання 9
-\noindent\makebox[1.5em][l]{\textbf{9.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Число 27 є членом арифметичної прогресії з різницею $d = 5$. Визначте числа з проміжку $(60; 75)$, що є членами цієї прогресії. У відповіді запишіть \textit{суму} цих чисел. \nmtyear{2023}}
+\zadtask{Число 27 є членом арифметичної прогресії з різницею $d = 5$. Визначте числа з проміжку $(60; 75)$, що є членами цієї прогресії. У відповіді запишіть \textit{суму} цих чисел. \nmtyear{2023}}
 
-\shortAnswer
+\nmtAnswerBox
 
 % Завдання 10
-\noindent\makebox[1.5em][l]{\textbf{10.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Число 27 є членом арифметичної прогресії з різницею $d = 5$. Серед наведених чисел укажіть число, що може бути членом цієї прогресії. \nmtyear{2023}}
+\zadtask{Число 27 є членом арифметичної прогресії з різницею $d = 5$. Серед наведених чисел укажіть число, що може бути членом цієї прогресії. \nmtyear{2023}}
 
 \answerTable{$51$}{$53$}{$52$}{$50$}{$49$}
 
-\vspace{0.5cm}
-
 % Завдання 11
-\noindent\makebox[1.5em][l]{\textbf{11.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Позичальник має віддати кредит протягом 24 місяців. Перший місяць він віддає 540 \textit{грн}, а кожен наступний місяць на 10 \textit{грн} менше від попереднього. Скільки всього \textit{гривень} повинен сплатити позичальник за 24 місяці? \nmtyear{2023}}
+\zadtask{Позичальник має віддати кредит протягом 24 місяців. Перший місяць він віддає 540 \textit{грн}, а кожен наступний місяць на 10 \textit{грн} менше від попереднього. Скільки всього \textit{гривень} повинен сплатити позичальник за 24 місяці? \nmtyear{2023}}
 
-\shortAnswer
+\nmtAnswerBox
 
 % Завдання 12
-\noindent\makebox[1.5em][l]{\textbf{12.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Студент вивчав японську мову за такою методикою: у перший день він запам'ятав 6 ієрогліфів, а кожного наступного дня --- на 2 ієрогліфи більше, ніж попереднього. Скільки всього ієрогліфів запам'ятав цей студент за 25 днів від першого дня вивчення японської мови? \nmtyear{2023}}
+\zadtask{Студент вивчав японську мову за такою методикою: у перший день він запам'ятав 6 ієрогліфів, а кожного наступного дня --- на 2 ієрогліфи більше, ніж попереднього. Скільки всього ієрогліфів запам'ятав цей студент за 25 днів від першого дня вивчення японської мови? \nmtyear{2023}}
 
-\shortAnswer
+\nmtAnswerBox
 
 % Завдання 13
-\noindent\makebox[1.5em][l]{\textbf{13.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Арифметичну прогресію $(a_n)$ задано формулою $n$-го члена $a_n = 18 - 1{,}5n$. Визначте номер члена, значення якого дорівнює $-30$. \nmtyear{2023}}
+\zadtask{Арифметичну прогресію $(a_n)$ задано формулою $n$-го члена $a_n = 18 - 1{,}5n$. Визначте номер члена, значення якого дорівнює $-30$. \nmtyear{2023}}
 
 \answerTable{$72$}{$36$}{$8$}{$32$}{$18$}
 
-\noindent\makebox[1.5em][l]{\textbf{14.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ перший член $a_1 = 18{,}5$, різниця $d = -2{,}5$. Скільки всього \textit{додатних} членів має ця прогресія? \nmtyear{2024}}
+\typeTitle{НМТ 2024}
+
+\zadtask{В арифметичній прогресії $(a_n)$ перший член $a_1 = 18{,}5$, різниця $d = -2{,}5$. Скільки всього \textit{додатних} членів має ця прогресія? \nmtyear{2024}}
 \answerTable{7}{6}{10}{9}{8}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{15.}}\parbox[t]{\dimexpr\textwidth-1.5em}{У залі для глядачів цирку встановлено 16 рядів крісел: у першому ряду 54 крісла, а в кожному наступному ряду кількість крісел на те саме число більше, ніж у попередньому. Визначте кількість крісел у \textit{третьому} ряду, якщо в останньому ряду 204 крісла. \nmtyear{2024}}
+\zadtask{У залі для глядачів цирку встановлено 16 рядів крісел: у першому ряду 54 крісла, а в кожному наступному ряду кількість крісел на те саме число більше, ніж у попередньому. Визначте кількість крісел у \textit{третьому} ряду, якщо в останньому ряду 204 крісла. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \hspace{1cm}Відповідь: \framebox(18,18){}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}{,}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}
-\vspace{0.5cm}
 
-\noindent\makebox[1.5em][l]{\textbf{16.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_6 - a_4$. \nmtyear{2024}}
+\zadtask{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_6 - a_4$. \nmtyear{2024}}
 \answerTable{$-15$}{$-10$}{10}{$-12$}{15}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{17.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ перший член $a_1 = -16{,}5$, різниця $d = 1{,}5$. Скільки всього \textit{від'ємних} членів має ця прогресія? \nmtyear{2024}}
+\zadtask{В арифметичній прогресії $(a_n)$ перший член $a_1 = -16{,}5$, різниця $d = 1{,}5$. Скільки всього \textit{від'ємних} членів має ця прогресія? \nmtyear{2024}}
 \answerTable{13}{11}{12}{14}{10}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{18.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ перший член $a_1 = -9{,}4$, різниця $d = 1{,}5$. Укажіть член цієї прогресії, що належить проміжку $(2; 4)$. \nmtyear{2024}}
+\zadtask{В арифметичній прогресії $(a_n)$ перший член $a_1 = -9{,}4$, різниця $d = 1{,}5$. Укажіть член цієї прогресії, що належить проміжку $(2; 4)$. \nmtyear{2024}}
 \answerTable{$2{,}4$}{$2{,}6$}{$3{,}1$}{$3{,}6$}{$2{,}9$}
 
-\noindent\makebox[1.5em][l]{\textbf{19.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_1 - a_3$. \nmtyear{2025}}
+\typeTitle{НМТ 2025}
+
+\zadtask{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_1 - a_3$. \nmtyear{2025}}
 \answerTable{$6$}{$-12$}{$-6$}{$30$}{$12$}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{20.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Знайдіть суму перших десяти членів арифметичної прогресії $2$; $1{,}4$; $0{,}8$; \ldots \nmtyear{2025}}
+\zadtask{Знайдіть суму перших десяти членів арифметичної прогресії $2$; $1{,}4$; $0{,}8$; \ldots \nmtyear{2025}}
 \answerTable{$-7$}{$47$}{$-10$}{$-11$}{$-3{,}6$}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{21.}}\parbox[t]{\dimexpr\textwidth-1.5em}{Обчисліть суму перших десяти членів арифметичної прогресії $(a_n)$, якщо $a_1 + a_{10} = -12$. \nmtyear{2025}}
+\zadtask{Обчисліть суму перших десяти членів арифметичної прогресії $(a_n)$, якщо $a_1 + a_{10} = -12$. \nmtyear{2025}}
 \answerTable{$-60$}{$120$}{$-240$}{$-12$}{$-120$}
 
-\vspace{0.5cm}
-
-\noindent\makebox[1.5em][l]{\textbf{22.}}\parbox[t]{\dimexpr\textwidth-1.5em}{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_1 - a_3$. \nmtyear{2025}}
+\zadtask{В арифметичній прогресії $(a_n)$ відомо, що $a_6 - a_1 = -30$. Знайдіть значення виразу $a_1 - a_3$. \nmtyear{2025}}
 \answerTable{$6$}{$-6$}{$30$}{$-12$}{$12$}
 
-\noindent\makebox[1.5em][l]{\textbf{23.}}\parbox[t]{\dimexpr\textwidth-1.5em}{За умовами договору позичальник повинен повернути кредит протягом 12 місяців. Першого місяця він має повернути 1300 \textit{грн}, а кожного наступного місяця --- на 50 \textit{грн} менше, ніж попереднього. Визначте загальну суму (у \textit{грн}), яку повинен позичальник повернути протягом 12 місяців. \nmtyear{2025}}
+\zadtask{За умовами договору позичальник повинен повернути кредит протягом 12 місяців. Першого місяця він має повернути 1300 \textit{грн}, а кожного наступного місяця --- на 50 \textit{грн} менше, ніж попереднього. Визначте загальну суму (у \textit{грн}), яку повинен позичальник повернути протягом 12 місяців. \nmtyear{2025}}
 
 \vspace{0.3cm}
 \hspace{1cm}Відповідь: \framebox(18,18){}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}{,}\framebox(18,18){}\framebox(18,18){}\framebox(18,18){}
-\vspace{0.5cm}
 
+\typeTitle{НМТ 2026}
 
+% НМТ 2026, сесія 23.05, завдання №6
+\zadtask{Послідовність задано формулою $a_n = (-2)^n - 7$. Визначте її четвертий член. \nmtyear{2026}}
+\answerTable{$-23$}{$23$}{$9$}{$-15$}{$1$}
+% Відповідь: В
+\ifshowsolutions\solution{Підставимо $n=4$: $a_4=(-2)^4-7=16-7=9$. Відповідь: \textbf{В}.}\fi
+
+% НМТ 2026, сесія 1.06, завдання №5
+\zadtask{В арифметичній прогресії один із членів дорівнює $27$, а різниця прогресії дорівнює $5$. Яке з наведених чисел може бути членом цієї прогресії? \nmtyear{2026}}
+\answerTable{$49$}{$50$}{$51$}{$52$}{$53$}
+% Відповідь: Г
+\ifshowsolutions\solution{Члени прогресії відрізняються від $27$ на кратне $5$, тобто дають остачу $2$ при діленні на $5$. Серед варіантів лише $52=27+5\cdot 5$. Відповідь: \textbf{Г}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №11
+\zadtask{Задано арифметичну прогресію $(a_n)$: $-2;\ -1{,}6;\ -1{,}2;\ \ldots$\ Знайдіть суму перших $21$ членів цієї прогресії. \nmtyear{2026}}
+\answerTable{$42$}{$-42$}{$21$}{$84$}{$4{,}2$}
+% Відповідь: А
+\ifshowsolutions\solution{$a_1=-2$, $d=0{,}4$, тож $a_{21}=-2+20\cdot0{,}4=6$. Сума $S_{21}=\dfrac{a_1+a_{21}}{2}\cdot21=\dfrac{-2+6}{2}\cdot21=42$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 5.06, завдання №15
+\zadtask{В арифметичній прогресії $(a_n)$ відомо, що $a_1 + a_2 = 11{,}2$, а $a_1 + a_4 = 8{,}8$. Визначте різницю $d$ цієї прогресії. \nmtyear{2026}}
+\answerTable{$-1{,}2$}{$1{,}2$}{$-2{,}4$}{$2{,}4$}{$-0{,}6$}
+% Відповідь: А
+\ifshowsolutions\solution{$a_1+a_2=2a_1+d=11{,}2$, $a_1+a_4=2a_1+3d=8{,}8$. Віднявши перше від другого: $2d=-2{,}4$, тож $d=-1{,}2$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 10.06, завдання №10
+\zadtask{В арифметичній прогресії $(a_n)$ справджується рівність $a_5 - a_3 = 4{,}8$. Тоді $a_6 - a_3 =$ \nmtyear{2026}}
+\answerTable{$7{,}2$}{$2{,}4$}{$6{,}4$}{$1{,}6$}{$9{,}6$}
+
+% НМТ 2026, сесія 16.06, завдання №10
+\zadtask{Послідовність $(a_n)$ задано формулою $n$-го члена $a_n = 2n^2 - 3$. Визначте четвертий член цієї послідовності. \nmtyear{2026}}
+\answerTable{$5$}{$7$}{$14$}{$2$}{$18$}
+% Відповідь: Д
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{24.}~В \ {\scriptsize\color{gray}(23.05, №6)}\par
+\noindent\textbf{25.}~Г \ {\scriptsize\color{gray}(1.06, №5)}\par
+\noindent\textbf{26.}~А \ {\scriptsize\color{gray}(2.06, №11)}\par
+\noindent\textbf{27.}~А \ {\scriptsize\color{gray}(5.06, №15)}\par
+\noindent\textbf{29.}~Д \ {\scriptsize\color{gray}(16.06, №10)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

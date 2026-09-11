@@ -1,110 +1,218 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=2cm,bottom=2.5cm,top=2.5cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 5}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Стандартна таблиця відповідей
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Таблиця відповідей для завдань з великими виразами (дроби)
-\newcommand{\answerTableBig}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
 \hline
-\rule[-0.6cm]{0pt}{1.4cm}#1 & \rule[-0.6cm]{0pt}{1.4cm}#2 & \rule[-0.6cm]{0pt}{1.4cm}#3 & \rule[-0.6cm]{0pt}{1.4cm}#4 & \rule[-0.6cm]{0pt}{1.4cm}#5 \\
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Таблиця для завдань на відповідність (3 рядки)
-\newcommand{\matchTable}{
-\begin{tabular}{|>{\centering\arraybackslash}p{0.3cm}|*{5}{>{\centering\arraybackslash}p{0.3cm}|}}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
 \hline
-& \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\textbf{1} & \rule{0pt}{0.3cm} & & & & \\
-\hline
-\textbf{2} & \rule{0pt}{0.3cm} & & & & \\
-\hline
-\textbf{3} & \rule{0pt}{0.3cm} & & & & \\
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
 \hline
 \end{tabular}
+\par\vspace{0.3cm}
 }
-
-% Команда для завдань з правильним відступом
-\newcommand{\task}[2]{\noindent\makebox[1.5em][l]{\textbf{#1.}}\parbox[t]{\dimexpr\textwidth-1.5em}{#2}}
-
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
+\begingroup\setcounter{zad}{0}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ}}
-\end{center}
+\chapterTitle{Тема 5. Дробові раціональні вирази і перетворення}
+\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 45 (НМТ 2023~--- 17, 2024~--- 9, 2025~--- 9, 2026~--- 10).}\par\vspace{0.2cm}
 
-\begin{center}
-{\large Тема: \textbf{Дробові раціональні вирази та їх перетворення}}
-\end{center}
-
-\vspace{0.5cm}
-
-%======================================================================
-% БЛОК: НМТ 2023
-%======================================================================
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2023}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2023}
 
 % Завдання 1 (на відповідність)
-\task{1}{До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq 8$. \nmtyear{2023}}
+\zadtask{До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq 8$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.35\textwidth}
@@ -140,55 +248,39 @@
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 2
-\task{2}{Спростіть вираз $\dfrac{(a^2 - 1)(a + 1)}{a^2 + 2a + 1}$. \nmtyear{2023}}
-\answerTableBig{$\dfrac{a - 1}{2}$}{$a + 1$}{$\dfrac{a + 1}{a - 1}$}{$a - 1$}{$1 - a$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{(a^2 - 1)(a + 1)}{a^2 + 2a + 1}$. \nmtyear{2023}}
+\answerTableTall{$\dfrac{a - 1}{2}$}{$a + 1$}{$\dfrac{a + 1}{a - 1}$}{$a - 1$}{$1 - a$}
 
 % Завдання 3
-\task{3}{Спростіть вираз $\dfrac{27a^3b - 12ab}{9a^3b^2 - 6a^2b^2}$. \nmtyear{2023}}
-\answerTableBig{$\dfrac{3a - 2}{ab}$}{$ab$}{$\dfrac{1}{ab}$}{$\dfrac{3a + 2}{ab}$}{$\dfrac{2}{ab}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{27a^3b - 12ab}{9a^3b^2 - 6a^2b^2}$. \nmtyear{2023}}
+\answerTableTall{$\dfrac{3a - 2}{ab}$}{$ab$}{$\dfrac{1}{ab}$}{$\dfrac{3a + 2}{ab}$}{$\dfrac{2}{ab}$}
 
 % Завдання 4
-\task{4}{Скоротіть дріб $\dfrac{4b^2 + 20b}{25 + 10b + b^2}$. \nmtyear{2023}}
-\answerTableBig{$\dfrac{4}{5 + b}$}{$4b$}{$4b(5 + b)$}{$\dfrac{6}{25}$}{$\dfrac{4b}{5 + b}$}
-
-\vspace{0.5cm}
+\zadtask{Скоротіть дріб $\dfrac{4b^2 + 20b}{25 + 10b + b^2}$. \nmtyear{2023}}
+\answerTableTall{$\dfrac{4}{5 + b}$}{$4b$}{$4b(5 + b)$}{$\dfrac{6}{25}$}{$\dfrac{4b}{5 + b}$}
 
 % Завдання 5
-\task{5}{Обчисліть значення виразу $8y - 6x$, якщо $3x - 4y = 2$. \nmtyear{2023}}
+\zadtask{Обчисліть значення виразу $8y - 6x$, якщо $3x - 4y = 2$. \nmtyear{2023}}
 \answerTable{$4$}{$-4$}{$2$}{$0{,}5$}{$-2$}
 
-\vspace{0.5cm}
-
 % Завдання 6
-\task{6}{$\dfrac{a^2 - 25b^2}{10b + 2a} =$ \nmtyear{2023}}
-\answerTableBig{$\dfrac{a - 5b}{2}$}{$2a + 10b$}{$2a - 10b$}{$\dfrac{a + 5b}{2}$}{$\dfrac{a - 5b}{4}$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{a^2 - 25b^2}{10b + 2a} =$ \nmtyear{2023}}
+\answerTableTall{$\dfrac{a - 5b}{2}$}{$2a + 10b$}{$2a - 10b$}{$\dfrac{a + 5b}{2}$}{$\dfrac{a - 5b}{4}$}
 
 % Завдання 7
-\task{7}{$\dfrac{4x^2 - 25}{(2x - 5)^2} =$ \nmtyear{2023}}
-\answerTableBig{$\dfrac{2x + 5}{2x - 5}$}{$-\dfrac{1}{10x}$}{$-\dfrac{1}{20x}$}{$\dfrac{2x - 5}{2x + 5}$}{$1$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{4x^2 - 25}{(2x - 5)^2} =$ \nmtyear{2023}}
+\answerTableTall{$\dfrac{2x + 5}{2x - 5}$}{$-\dfrac{1}{10x}$}{$-\dfrac{1}{20x}$}{$\dfrac{2x - 5}{2x + 5}$}{$1$}
 
 % Завдання 8
-\task{8}{Спростіть вираз $\dfrac{9 - x^2}{x^2 + 6x + 9}$. \nmtyear{2023}}
-\answerTableBig{$\dfrac{3 - x}{x + 3}$}{$\dfrac{x - 3}{x + 3}$}{$3 - x$}{$\dfrac{x + 3}{3 - x}$}{$\dfrac{x + 3}{x - 3}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{9 - x^2}{x^2 + 6x + 9}$. \nmtyear{2023}}
+\answerTableTall{$\dfrac{3 - x}{x + 3}$}{$\dfrac{x - 3}{x + 3}$}{$3 - x$}{$\dfrac{x + 3}{3 - x}$}{$\dfrac{x + 3}{x - 3}$}
 
 % Завдання 9 (на відповідність)
-\task{9}{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}}
+\zadtask{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.5\textwidth}
@@ -224,55 +316,39 @@
 \end{minipage}
 \hfill
 \begin{minipage}{0.15\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 10
-\task{10}{$\dfrac{3a - b}{18a^2 - 2b^2} =$ \nmtyear{2023}}
-\answerTableBig{$\dfrac{1}{6a + 2b}$}{$\dfrac{1}{6a - 2b}$}{$\dfrac{1}{2}$}{$6a + 2b$}{$6a - 2b$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{3a - b}{18a^2 - 2b^2} =$ \nmtyear{2023}}
+\answerTableTall{$\dfrac{1}{6a + 2b}$}{$\dfrac{1}{6a - 2b}$}{$\dfrac{1}{2}$}{$6a + 2b$}{$6a - 2b$}
 
 % Завдання 11
-\task{11}{Спростіть вираз $\dfrac{a^2 + ab}{(a + b)^2} - \dfrac{2a + b}{a + b}$. \nmtyear{2023}}
-\answerTableBig{$1$}{$\dfrac{b - a}{a + b}$}{$\dfrac{3a + b}{a + b}$}{$-1$}{$\dfrac{a - b}{a + b}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{a^2 + ab}{(a + b)^2} - \dfrac{2a + b}{a + b}$. \nmtyear{2023}}
+\answerTableTall{$1$}{$\dfrac{b - a}{a + b}$}{$\dfrac{3a + b}{a + b}$}{$-1$}{$\dfrac{a - b}{a + b}$}
 
 % Завдання 12
-\task{12}{Спростіть вираз $\dfrac{(2x - 3)^2 - 9}{x}$. \nmtyear{2023}}
+\zadtask{Спростіть вираз $\dfrac{(2x - 3)^2 - 9}{x}$. \nmtyear{2023}}
 \answerTable{$2x - 6$}{$4x - 6$}{$4x$}{$4x - 12$}{$2x - 12$}
 
-\vspace{0.5cm}
-
 % Завдання 13
-\task{13}{Спростіть вираз $\dfrac{3x + 12}{x^2 - 16}$. \nmtyear{2023}}
-\answerTableBig{$\dfrac{3}{x + 4}$}{$\dfrac{3}{4 - x}$}{$-\dfrac{3}{x + 4}$}{$\dfrac{3}{x - 4}$}{$\dfrac{1}{x - 4}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{3x + 12}{x^2 - 16}$. \nmtyear{2023}}
+\answerTableTall{$\dfrac{3}{x + 4}$}{$\dfrac{3}{4 - x}$}{$-\dfrac{3}{x + 4}$}{$\dfrac{3}{x - 4}$}{$\dfrac{1}{x - 4}$}
 
 % Завдання 14
-\task{14}{$\dfrac{2x^2y}{8xy^5} =$ \nmtyear{2023}}
-\answerTableBig{$\dfrac{xy^4}{4}$}{$\dfrac{x^3}{2y^4}$}{$\dfrac{4x}{y^4}$}{$16x^3y^6$}{$\dfrac{x}{4y^4}$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{2x^2y}{8xy^5} =$ \nmtyear{2023}}
+\answerTableTall{$\dfrac{xy^4}{4}$}{$\dfrac{x^3}{2y^4}$}{$\dfrac{4x}{y^4}$}{$16x^3y^6$}{$\dfrac{x}{4y^4}$}
 
 % Завдання 15
-\task{15}{$\dfrac{a^2 - 4b^2}{3a + 6b} =$ \nmtyear{2023}}
-\answerTableBig{$\dfrac{3}{a + 2b}$}{$3a - 6b$}{$\dfrac{3}{a - 2b}$}{$\dfrac{a + 2b}{3}$}{$\dfrac{a - 2b}{3}$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{a^2 - 4b^2}{3a + 6b} =$ \nmtyear{2023}}
+\answerTableTall{$\dfrac{3}{a + 2b}$}{$3a - 6b$}{$\dfrac{3}{a - 2b}$}{$\dfrac{a + 2b}{3}$}{$\dfrac{a - 2b}{3}$}
 
 % Завдання 16
-\task{16}{Спростіть вираз $\dfrac{25 + 10b + b^2}{5b^2 + 25b}$. \nmtyear{2023}}
-\answerTableBig{$2$}{$5b(b + 5)$}{$5b$}{$\dfrac{1}{5b}$}{$\dfrac{b + 5}{5b}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{25 + 10b + b^2}{5b^2 + 25b}$. \nmtyear{2023}}
+\answerTableTall{$2$}{$5b(b + 5)$}{$5b$}{$\dfrac{1}{5b}$}{$\dfrac{b + 5}{5b}$}
 
 % Завдання 17 (на відповідність)
-\task{17}{До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq \sqrt{2}$. \nmtyear{2023}}
+\zadtask{До кожного виразу (1--3) доберіть тотожно рівний йому вираз (А--Д), якщо $a \neq \sqrt{2}$. \nmtyear{2023}}
 
 \vspace{0.3cm}
 \begin{minipage}{0.4\textwidth}
@@ -308,41 +384,25 @@
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
-%======================================================================
-% БЛОК: НМТ 2024
-%======================================================================
-
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2024}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2024}
 
 % Завдання 18
-\task{18}{Спростіть вираз $\dfrac{6x + 12}{3}$. \nmtyear{2024}}
+\zadtask{Спростіть вираз $\dfrac{6x + 12}{3}$. \nmtyear{2024}}
 \answerTable{$3x + 12$}{$6x + 4$}{$2x + 12$}{$3x + 4$}{$2x + 4$}
 
-\vspace{0.5cm}
-
 % Завдання 19
-\task{19}{Спростіть вираз $\dfrac{x^2 - 4xy + 4y^2}{x - 2y} : (2y - x)$. \nmtyear{2024}}
+\zadtask{Спростіть вираз $\dfrac{x^2 - 4xy + 4y^2}{x - 2y} : (2y - x)$. \nmtyear{2024}}
 \answerTable{$-x^2 + 4xy - y^2$}{$-1$}{$x^2 - 4xy + y^2$}{$1$}{$2y - x$}
 
-\vspace{0.5cm}
-
 % Завдання 20
-\task{20}{Спростіть вираз $\dfrac{x^2 - y^2}{x - y} : (2x + 2y)$. \nmtyear{2024}}
-\answerTableBig{$2$}{$\dfrac{1}{2x + 2y}$}{$\dfrac{x - y}{2x + 2y}$}{$2(x + y)^2$}{$\dfrac{1}{2}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{x^2 - y^2}{x - y} : (2x + 2y)$. \nmtyear{2024}}
+\answerTableTall{$2$}{$\dfrac{1}{2x + 2y}$}{$\dfrac{x - y}{2x + 2y}$}{$2(x + y)^2$}{$\dfrac{1}{2}$}
 
 % Завдання 21 (на відповідність з числовою прямою)
-\task{21}{Установіть відповідність між виразом (1--3) та точкою (А--Д) на координатній прямій (див. рисунок), координатою якою є значення цього виразу. \nmtyear{2024}}
+\zadtask{Установіть відповідність між виразом (1--3) та точкою (А--Д) на координатній прямій (див. рисунок), координатою якою є значення цього виразу. \nmtyear{2024}}
 
 \vspace{0.3cm}
 \begin{center}
@@ -392,103 +452,153 @@
 \end{minipage}
 \hfill
 \begin{minipage}{0.2\textwidth}
-\matchTable
+\matchingGrid
 \end{minipage}
 
-\vspace{0.7cm}
-
 % Завдання 22
-\task{22}{Спростіть вираз $(a^2 - b^2)(a - b)^{-1}$. \nmtyear{2024}}
-\answerTableBig{$a + b$}{$a - b$}{$\dfrac{1}{(a - b)}$}{$\dfrac{1}{(a + b)}$}{$\dfrac{a + b}{(a - b)^2}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $(a^2 - b^2)(a - b)^{-1}$. \nmtyear{2024}}
+\answerTableTall{$a + b$}{$a - b$}{$\dfrac{1}{(a - b)}$}{$\dfrac{1}{(a + b)}$}{$\dfrac{a + b}{(a - b)^2}$}
 
 % Завдання 23
-\task{23}{$(a + b)^{-2} =$ \nmtyear{2024}}
-\answerTableBig{$\dfrac{1}{a^2 + b^2}$}{$-a^2 - 2ab - b^2$}{$\dfrac{a^2 + b^2}{a^2b^2}$}{$-a^2 - b^2$}{$\dfrac{1}{a^2 + 2ab + b^2}$}
-
-\vspace{0.5cm}
+\zadtask{$(a + b)^{-2} =$ \nmtyear{2024}}
+\answerTableTall{$\dfrac{1}{a^2 + b^2}$}{$-a^2 - 2ab - b^2$}{$\dfrac{a^2 + b^2}{a^2b^2}$}{$-a^2 - b^2$}{$\dfrac{1}{a^2 + 2ab + b^2}$}
 
 % Завдання 24
-\task{24}{$\dfrac{3x - 6}{2 - x} =$ \nmtyear{2024}}
+\zadtask{$\dfrac{3x - 6}{2 - x} =$ \nmtyear{2024}}
 \answerTable{$-3$}{$3$}{$1{,}5$}{$-1{,}5$}{$0$}
 
-\vspace{0.5cm}
-
 % Завдання 25
-\task{25}{$\dfrac{x - 9}{2\sqrt{x} - 6} =$ \nmtyear{2024}}
-\answerTableBig{$1{,}5$}{$\dfrac{\sqrt{x} + 3}{2}$}{$\dfrac{\sqrt{x} - 3}{2}$}{$\dfrac{2}{\sqrt{x} + 3}$}{$\dfrac{2}{\sqrt{x} - 3}$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{x - 9}{2\sqrt{x} - 6} =$ \nmtyear{2024}}
+\answerTableTall{$1{,}5$}{$\dfrac{\sqrt{x} + 3}{2}$}{$\dfrac{\sqrt{x} - 3}{2}$}{$\dfrac{2}{\sqrt{x} + 3}$}{$\dfrac{2}{\sqrt{x} - 3}$}
 
 % Завдання 26
-\task{26}{$\dfrac{4y^2 - x^2}{3x^2 - 6xy - 5x + 10y} =$ \nmtyear{2024}}
-\answerTableBig{$\dfrac{2y + x}{3x - 5}$}{$\dfrac{2y - x}{3x + 5}$}{$\dfrac{2y + x}{3x + 5}$}{$\dfrac{2y - x}{3x - 5}$}{$\dfrac{2y + x}{5 - 3x}$}
+\zadtask{$\dfrac{4y^2 - x^2}{3x^2 - 6xy - 5x + 10y} =$ \nmtyear{2024}}
+\answerTableTall{$\dfrac{2y + x}{3x - 5}$}{$\dfrac{2y - x}{3x + 5}$}{$\dfrac{2y + x}{3x + 5}$}{$\dfrac{2y - x}{3x - 5}$}{$\dfrac{2y + x}{5 - 3x}$}
 
-
-%======================================================================
-% БЛОК: НМТ 2025
-%======================================================================
-
-\newpage
-
-\begin{center}
-{\Large\textbf{\color{headerblue}НМТ 2025}}
-\end{center}
-
-\vspace{0.5cm}
+\typeTitle{НМТ 2025}
 
 % Завдання 27
-\task{27}{Спростіть вираз $\dfrac{6x + 12}{3}$. \nmtyear{2025}}
+\zadtask{Спростіть вираз $\dfrac{6x + 12}{3}$. \nmtyear{2025}}
 \answerTable{$2x + 12$}{$6x + 4$}{$3x + 4$}{$2x + 4$}{$3x + 12$}
 
-\vspace{0.5cm}
-
 % Завдання 28
-\task{28}{Спростіть вираз $\dfrac{2a^2 - 50b^2}{5b + a}$. \nmtyear{2025}}
-\answerTableBig{$2a - 10b$}{$\dfrac{2}{a - 5b}$}{$\dfrac{2}{5b - a}$}{$2a + 10b$}{$\dfrac{2}{a + 5b}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{2a^2 - 50b^2}{5b + a}$. \nmtyear{2025}}
+\answerTableTall{$2a - 10b$}{$\dfrac{2}{a - 5b}$}{$\dfrac{2}{5b - a}$}{$2a + 10b$}{$\dfrac{2}{a + 5b}$}
 
 % Завдання 29
-\task{29}{$\dfrac{25 - x^2}{x^2 + 5x} =$ \nmtyear{2025}}
-\answerTableBig{$\dfrac{5 + x}{x}$}{$\dfrac{5 - x}{x}$}{$\dfrac{5}{x}$}{$\dfrac{5 - x}{5 + x}$}{$\dfrac{5 - x}{5}$}
-
-\vspace{0.5cm}
+\zadtask{$\dfrac{25 - x^2}{x^2 + 5x} =$ \nmtyear{2025}}
+\answerTableTall{$\dfrac{5 + x}{x}$}{$\dfrac{5 - x}{x}$}{$\dfrac{5}{x}$}{$\dfrac{5 - x}{5 + x}$}{$\dfrac{5 - x}{5}$}
 
 % Завдання 30
-\task{30}{$\left|\dfrac{2{,}5^2 - 7{,}5^2}{3{,}5 + 6{,}5}\right| =$ \nmtyear{2025}}
+\zadtask{$\left|\dfrac{2{,}5^2 - 7{,}5^2}{3{,}5 + 6{,}5}\right| =$ \nmtyear{2025}}
 \answerTable{$0{,}5$}{$-1$}{$-5$}{$1$}{$5$}
 
-\vspace{0.5cm}
-
 % Завдання 31
-\task{31}{Потенціальну енергію зарядженого плоского конденсатора $W$ визначають за формулою $W = \dfrac{q^2}{2C}$, де $q$ --- заряд конденсатора, $C$ --- електрична ємність. Виразіть із цієї формули електричну ємність $C$. \nmtyear{2025}}
-\answerTableBig{$C = \dfrac{2}{q^2 W}$}{$C = \dfrac{q^2 W}{2}$}{$C = \dfrac{2W}{q^2}$}{$C = 2Wq^2$}{$C = \dfrac{q^2}{2W}$}
-
-\vspace{0.5cm}
+\zadtask{Потенціальну енергію зарядженого плоского конденсатора $W$ визначають за формулою $W = \dfrac{q^2}{2C}$, де $q$ --- заряд конденсатора, $C$ --- електрична ємність. Виразіть із цієї формули електричну ємність $C$. \nmtyear{2025}}
+\answerTableTall{$C = \dfrac{2}{q^2 W}$}{$C = \dfrac{q^2 W}{2}$}{$C = \dfrac{2W}{q^2}$}{$C = 2Wq^2$}{$C = \dfrac{q^2}{2W}$}
 
 % Завдання 32
-\task{32}{Якщо $3x + y = 6$, то $x =$ \nmtyear{2025}}
-\answerTableBig{$\dfrac{6 - y}{3}$}{$\dfrac{y - 6}{3}$}{$\dfrac{y + 6}{3}$}{$3y - 18$}{$18 - 3y$}
-
-\vspace{0.5cm}
+\zadtask{Якщо $3x + y = 6$, то $x =$ \nmtyear{2025}}
+\answerTableTall{$\dfrac{6 - y}{3}$}{$\dfrac{y - 6}{3}$}{$\dfrac{y + 6}{3}$}{$3y - 18$}{$18 - 3y$}
 
 % Завдання 33
-\task{33}{Якщо $a = \dfrac{(b + c) \cdot d}{2}$, то $c =$ \nmtyear{2025}}
-\answerTableBig{$\dfrac{2a - b}{d}$}{$2ad - bd$}{$\dfrac{2a + b}{d}$}{$\dfrac{2a}{d} + b$}{$\dfrac{2a}{d} - b$}
-
-\vspace{0.5cm}
+\zadtask{Якщо $a = \dfrac{(b + c) \cdot d}{2}$, то $c =$ \nmtyear{2025}}
+\answerTableTall{$\dfrac{2a - b}{d}$}{$2ad - bd$}{$\dfrac{2a + b}{d}$}{$\dfrac{2a}{d} + b$}{$\dfrac{2a}{d} - b$}
 
 % Завдання 34
-\task{34}{Спростіть вираз $\dfrac{a^2 + 2a}{2a + 4}$. \nmtyear{2025}}
-\answerTableBig{$2a$}{$\dfrac{a}{4}$}{$4a^2$}{$\dfrac{a^2}{4}$}{$\dfrac{a}{2}$}
-
-\vspace{0.5cm}
+\zadtask{Спростіть вираз $\dfrac{a^2 + 2a}{2a + 4}$. \nmtyear{2025}}
+\answerTableTall{$2a$}{$\dfrac{a}{4}$}{$4a^2$}{$\dfrac{a^2}{4}$}{$\dfrac{a}{2}$}
 
 % Завдання 35
-\task{35}{$\dfrac{9 - y^2}{3 - y} - 3 =$ \nmtyear{2025}}
-\answerTableBig{$y$}{$\dfrac{-y^2 - 3y}{3 - y}$}{$1 - y$}{$-y$}{$\dfrac{-y^2 - y}{3 - y}$}
+\zadtask{$\dfrac{9 - y^2}{3 - y} - 3 =$ \nmtyear{2025}}
+\answerTableTall{$y$}{$\dfrac{-y^2 - 3y}{3 - y}$}{$1 - y$}{$-y$}{$\dfrac{-y^2 - y}{3 - y}$}
 
+\typeTitle{НМТ 2026}
 
+% НМТ 2026, сесія 23.05, завдання №7
+\zadtask{Спростіть вираз $\dfrac{(2x - 3)^2 - 9}{x}$. \nmtyear{2026}}
+\answerTable{$4x - 12$}{$4x - 6$}{$4x$}{$2x - 6$}{$2x - 12$}
+% Відповідь: А
+\ifshowsolutions\solution{За формулою $(a-b)^2$: $(2x-3)^2-9=4x^2-12x+9-9=4x^2-12x=4x(x-3)$. Поділивши на $x$, дістаємо $4x-12$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 30.05, завдання №6
+\zadtask{Спростіть вираз $\dfrac{9 - x^2}{x^2 + 6x + 9}$. \nmtyear{2026}}
+\answerTableTall{$\dfrac{3-x}{x+3}$}{$\dfrac{x-3}{x+3}$}{$\dfrac{3+x}{x-3}$}{$-\dfrac{x+3}{x-3}$}{$\dfrac{1}{x+3}$}
+% Відповідь: А
+\ifshowsolutions\solution{Чисельник $9-x^2=(3-x)(3+x)$, знаменник $x^2+6x+9=(x+3)^2$. Тоді $\dfrac{(3-x)(3+x)}{(x+3)^2}=\dfrac{3-x}{x+3}$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 2.06, завдання №15
+\zadtask{Спростіть вираз $\dfrac{x^2 - 4xy + 4y^2}{x - 2y} : (2y - x)$. \nmtyear{2026}}
+\answerTable{$-1$}{$-x^2 + 4xy - y^2$}{$2y - x$}{$1$}{$x^2 - 4xy + y^2$}
+% Відповідь: А
+\ifshowsolutions\solution{Чисельник $x^2-4xy+4y^2=(x-2y)^2$, тож дріб дорівнює $x-2y$. Ділення на $(2y-x)=-(x-2y)$ дає $\dfrac{x-2y}{-(x-2y)}=-1$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 4.06, завдання №6
+\zadtask{$\dfrac{a^2 - 25b^2}{10b + 2a} =$ \nmtyear{2026}}
+\answerTableTall{$\dfrac{a - 5b}{2}$}{$2a - 10b$}{$\dfrac{a + 5b}{2}$}{$2a + 10b$}{$\dfrac{a - 5b}{4}$}
+% Відповідь: А
+\ifshowsolutions\solution{Чисельник $a^2-25b^2=(a-5b)(a+5b)$, знаменник $10b+2a=2(a+5b)$. Скорочуємо на $(a+5b)$: $\dfrac{(a-5b)(a+5b)}{2(a+5b)}=\dfrac{a-5b}{2}$. Відповідь: \textbf{А}.}\fi
+
+% НМТ 2026, сесія 8.06, завдання №6
+\zadtask{$\dfrac{a^2-4b^2}{3a+6b} =$ \nmtyear{2026}}
+\answerTableTall{$\dfrac{a+2b}{2}$}{$\dfrac{a-2b}{3}$}{$3a-6b$}{$\dfrac{3}{a-2b}$}{$3(a+2b)$}
+
+% НМТ 2026, сесія 10.06, завдання №13 --- також у темі: Многочлени. Формули скороченого множення
+\zadtask{Якщо числа $x$ і $y$ задовольняють умови $5x - y = 4$ і $5x + y \neq 0$, то $\dfrac{5x + y}{25x^2 - y^2} =$ \nmtyear{2026}}
+\answerTable{$0{,}25$}{$-4$}{$1$}{$4$}{$-0{,}25$}
+
+% НМТ 2026, сесія 11.06, завдання №13
+\zadtask{Спростіть вираз $\dfrac{(a^2 - 1)(a + 1)}{a^2 + 2a + 1}$. \nmtyear{2026}}
+\answerTableTall{$a - 1$}{$\dfrac{a+1}{a-1}$}{$a + 1$}{$\dfrac{a-1}{2}$}{$1 - a$}
+
+% НМТ 2026, сесія 15.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Узгодьте вираз (1--3) з тотожно рівним йому виразом (А--Д), якщо $a > 0$, $a \neq 1$.\par \nmtyear{2026}
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\sqrt{a^2}$\\[0.35cm]
+\textbf{2} \quad $a^3 : a^4$\\[0.35cm]
+\textbf{3} \quad $\dfrac{a^2 - a}{1 - a}$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Тотожно рівний вираз}\par\vspace{0.15cm}
+\textbf{А} \quad $a$\\[0.15cm]
+\textbf{Б} \quad $2a$\\[0.15cm]
+\textbf{В} \quad $\dfrac{1}{a}$\\[0.15cm]
+\textbf{Г} \quad $-a$\\[0.15cm]
+\textbf{Д} \quad $|a|$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+% Відповідь: 1--Д, 2--В, 3--Г
+
+% НМТ 2026, сесія 16.06, завдання №6
+\zadtask{Скоротіть дріб $\dfrac{4b^2 + 20b}{25 + 10b + b^2}$. \nmtyear{2026}}
+\answerTableTall{$\dfrac{4}{5+b}$}{$\dfrac{4b}{5}$}{$\dfrac{6}{25}$}{$4b(5+b)$}{$\dfrac{4b}{5+b}$}
+% Відповідь: Д
+
+% НМТ 2026, сесія 17.06, завдання №6
+\zadtask{$\dfrac{3a - b}{18a^2 - 2b^2} = $ \nmtyear{2026}}
+\answerTableTall{$6a + 2b$}{$6a - 2b$}{$\dfrac{1}{6a + 2b}$}{$\dfrac{1}{2}$}{$\dfrac{1}{6a - 2b}$}
+% Відповідь: В
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{36.}~А \ {\scriptsize\color{gray}(23.05, №7)}\par
+\noindent\textbf{37.}~А \ {\scriptsize\color{gray}(30.05, №6)}\par
+\noindent\textbf{38.}~А \ {\scriptsize\color{gray}(2.06, №15)}\par
+\noindent\textbf{39.}~А \ {\scriptsize\color{gray}(4.06, №6)}\par
+\noindent\textbf{43.}~1--Д, 2--В, 3--Г \ {\scriptsize\color{gray}(15.06, №16)}\par
+\noindent\textbf{44.}~Д \ {\scriptsize\color{gray}(16.06, №6)}\par
+\noindent\textbf{45.}~В \ {\scriptsize\color{gray}(17.06, №6)}\par
+\end{multicols}
+\fi
+
+\endgroup
 \end{document}

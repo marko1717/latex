@@ -1,88 +1,163 @@
-\documentclass[14pt]{extarticle}
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{ukrainian}
-
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{Liberation Serif}
-\setsansfont{Liberation Sans}
-\setmonofont{Liberation Mono}
-
-\usepackage[a4paper,margin=1.5cm,bottom=2cm,top=2cm]{geometry}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
 \usepackage{amsmath,amssymb}
-\usepackage{enumitem}
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
 
-% Підключаємо бібліотеки для зручних кутів
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel}
-\usetikzlibrary{3d}
+% Заборона розриву інлайн-формул
+\binoppenalty=10000
+\relpenalty=10000
 
-\usepackage{xcolor}
-\usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{multirow}
-
-% Кольори
-\definecolor{headerblue}{RGB}{0, 102, 204}
-\definecolor{yearcolor}{RGB}{128, 0, 128}
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
 
 \pagestyle{fancy}
 \fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} База завдань НМТ 2023--2026 \textendash{} Тема 26}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
 
-\setlength{\headheight}{15pt}
-\setlength{\headsep}{10pt}
-\setlength{\footskip}{25pt}
-
-\widowpenalty=10000
-\clubpenalty=10000
-
-% === КОМАНДИ ===
-
-% Таблиця для відповідей із дробами (збільшена висота клітинок)
-% Оновлена таблиця: підпорка додана до КОЖНОЇ клітинки
-\newcommand{\answerTableTall}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
 \hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
 \hline
-% Тепер rule є перед кожним аргументом (#1..#5)
-\rule[-0.9cm]{0pt}{2.0cm}#1 & 
-\rule[-0.9cm]{0pt}{2.0cm}#2 & 
-\rule[-0.9cm]{0pt}{2.0cm}#3 & 
-\rule[-0.9cm]{0pt}{2.0cm}#4 & 
-\rule[-0.9cm]{0pt}{2.0cm}#5 \\
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
 \hline
 \end{tabular}
-\end{center}
+\par\vspace{0.25cm}
 }
-
-% Оновлена таблиця відповідей (заголовки зовні)
-\newcommand{\answerGrid}{
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newcommand{\matchingGrid}{%
     \begingroup
-    % Збільшуємо висоту рядків для квадратних клітинок
-    \renewcommand{\arraystretch}{1.3} 
-    % Відступ всередині клітинок
-    \setlength{\tabcolsep}{7pt} 
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
     \begin{tabular}{r|c|c|c|c|c|}
-         % Перший рядок: порожня клітинка зліва + букви без рамок (multicolumn прибирає |)
          \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         % Наступні рядки: номер зліва (r) + клітинки з рамками (|c|)
-         \textbf{1} & & & & & \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
          \textbf{2} & & & & & \\ \cline{2-6}
          \textbf{3} & & & & & \\ \cline{2-6}
     \end{tabular}
     \endgroup
 }
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+\newcommand{\nmtyear}[1]{\hfill{\small\color{yearOrange}(НМТ #1)}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\vspace{0.2cm}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
-% Макет для завдань на відповідність
-% #1 - Умови (1-3)
-% #2 - Варіанти (А-Д)
-% #3 - Табличка
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
 \newcommand{\matchingLayout}[3]{
     \noindent
     \begin{minipage}[t]{0.40\textwidth}
@@ -102,8 +177,6 @@
         \end{flushright}
     \end{minipage}
 }
-
-% Стандартна таблиця відповідей (для тестів)
 \newcommand{\answerTableSmall}[5]{
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
 \hline
@@ -118,48 +191,70 @@
 \hline
 \end{tabular}
 }
-
-% Таблиця для вибору одного варіанту (Task 7)
-\newcommand{\answerTable}[5]{
-\begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
-\hline
-\rule[-0.3cm]{0pt}{0.8cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.4cm]{0pt}{1.0cm}#1 & \rule[-0.4cm]{0pt}{1.0cm}#2 & \rule[-0.4cm]{0pt}{1.0cm}#3 & \rule[-0.4cm]{0pt}{1.0cm}#4 & \rule[-0.4cm]{0pt}{1.0cm}#5 \\
-\hline
-\end{tabular}
-\end{center}
-}
-
-% Команда для року
-\newcommand{\nmtyear}[1]{\hfill{\small\color{yearcolor}(НМТ #1)}}
-
-\begin{document}
-
-\vspace{1cm}
-
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2023}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Тригонометрія}}
-\end{center}
-
-% Команда для стилізації (тільки жирний)
 \newcommand{\trigStyle}[1]{\textbf{#1}}
 
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{\textbf{#1}}
+\providecommand{\answerTableSmall}[5]{%
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{1.65cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.40\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.28\textwidth}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+
+\chapterTitle{Тема 26. Тригонометричні вирази}
+\noindent{\small\color{gray!80} Розділ 1. Числа і вирази \quad\textbullet\quad Усього завдань: 69 (НМТ 2023~--- 16, 2024~--- 32, 2025~--- 10, 2026~--- 11).}\par\vspace{0.2cm}
+
+\typeTitle{НМТ 2023}
+
 % === ЗАВДАННЯ 1 (Тест) ===
-\noindent\textbf{1.} Укажіть радіанну міру кута $\beta$, якщо суміжний з ним кут $\alpha = \dfrac{\pi}{5}$.
+\noindent\zadnum Укажіть радіанну міру кута $\beta$, якщо суміжний з ним кут $\alpha = \dfrac{\pi}{5}$. \nmtyear{2023}
 
 \vspace{0.3cm}
 \answerTableTall{$\dfrac{\pi}{5}$}{$\dfrac{9\pi}{5}$}{$\dfrac{4\pi}{5}$}{$\dfrac{7\pi}{10}$}{$\dfrac{3\pi}{10}$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 2 (Відповідність) ===
-\noindent\textbf{2.} Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу.
+\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -173,7 +268,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -187,18 +282,14 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 3 (Тест) ===
-\noindent\textbf{3.} $\dfrac{\sin 2\alpha}{2\sin^2 \alpha} = $
+\noindent\zadnum $\dfrac{\sin 2\alpha}{2\sin^2 \alpha} = $ \nmtyear{2023}
 
 \vspace{0.3cm}
 \answerTableTall{$\operatorname{tg} \alpha$}{$\dfrac{1}{\sin \alpha}$}{$\dfrac{1}{\operatorname{tg} \alpha}$}{$\dfrac{\operatorname{tg} \alpha}{2}$}{$\dfrac{1}{2}$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 4 (Відповідність) ===
-\noindent\textbf{4.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -212,7 +303,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -226,10 +317,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 5 (Відповідність) ===
-\noindent\textbf{5.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральні числа, $n>1$, $m>1$.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральні числа, $n>1$, $m>1$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -243,7 +332,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
@@ -257,10 +346,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 6 (Відповідність) ===
-\noindent\textbf{6.} Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з прямою $y=1$.
+\noindent\zadnum Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з прямою $y=1$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -274,7 +361,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -288,10 +375,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 7 (Відповідність) ===
-\noindent\textbf{7.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $n$ -- натуральне число, $n>1$.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $n$ -- натуральне число, $n>1$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -305,7 +390,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
@@ -319,18 +404,14 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 8 (Тест) ===
-\noindent\textbf{8.} Визначте $\sin(180^\circ + \alpha)$, якщо $\sin \alpha = 0{,}8$.
+\noindent\zadnum Визначте $\sin(180^\circ + \alpha)$, якщо $\sin \alpha = 0{,}8$. \nmtyear{2023}
 
 \vspace{0.3cm}
 \answerTable{$0{,}6$}{$0{,}2$}{$-0{,}8$}{$0{,}8$}{$-0{,}6$}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 9 (Відповідність) ===
-\noindent\textbf{9.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральні числа, $n>1, m>1$.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральні числа, $n>1, m>1$. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -344,7 +425,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
@@ -358,10 +439,8 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
 % === ЗАВДАННЯ 10 (Відповідність) ===
-\noindent\textbf{10.} Установіть відповідність між функцією (1--3) та властивістю (А--Д) її графіка.
+\noindent\zadnum Установіть відповідність між функцією (1--3) та властивістю (А--Д) її графіка. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -375,7 +454,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -389,9 +468,8 @@
     \end{tabular}
 \end{minipage}
 
-% === ЗАВДАННЯ 11 ===
-\noindent\textbf{11.} \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині зображено ламану $ABCDA$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з ламаною $ABCDA$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат на площині зображено ламану $ABCDA$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з ламаною $ABCDA$. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -447,14 +525,11 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 12 ===
-\noindent\textbf{12.} \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині зображено замкнену ламану $ABCDA$, $A(0; -1)$, $B(0; 1)$, $C(2\pi; 1)$, $D(2\pi; -1)$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з ламаною $ABCDA$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат на площині зображено замкнену ламану $ABCDA$, $A(0; -1)$, $B(0; 1)$, $C(2\pi; 1)$, $D(2\pi; -1)$ (див. рисунок). Увідповідніть функцію (1--3) із кількістю (А--Д) спільних точок її графіка з ламаною $ABCDA$. \nmtyear{2023}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -505,13 +580,10 @@
     \textbf{Д} & чотири \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 13 ===
-\noindent\textbf{13.} Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу.
+\noindent\zadnum Установіть відповідність між виразом (1--3) і проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -532,13 +604,10 @@
     \textbf{Д} & $[2; 3)$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 14 ===
-\noindent\textbf{14.} Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним.
+\noindent\zadnum Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -550,9 +619,9 @@
     \textbf{2} & графік функції проходить через точку $(0; 1)$ \\
     \textbf{3} & функція має точку локального екстремуму на проміжку $[1; 3]$ \\
     \end{tabular}
-    
+
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.45\textwidth}
@@ -566,11 +635,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 15 ===
-% === ЗАВДАННЯ 15 ===
-\noindent\textbf{15.} Укажіть вираз, тотожно рівний виразу $(\cos x - \sin x)^2$.
+\noindent\zadnum Укажіть вираз, тотожно рівний виразу $(\cos x - \sin x)^2$. \nmtyear{2023}
 
 \vspace{0.3cm}
 \noindent
@@ -579,10 +644,8 @@
 \textbf{В} \quad $\cos 2x - \sin 2x$ \\[0.3cm]
 \textbf{Г} \quad $\cos 2x - 1$ \\[0.3cm]
 \textbf{Д} \quad $1 - \sin 2x$
-\vspace{0.7cm}
 
-% === ЗАВДАННЯ 16 ===
-\noindent\textbf{16.} Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д).
+\noindent\zadnum Установіть відповідність між функцією (1--3) та властивістю її графіка (А--Д). \nmtyear{2023}
 
 \vspace{0.3cm}
 
@@ -596,7 +659,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -610,19 +673,10 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{1cm}
+\typeTitle{НМТ 2024}
 
-\begin{center}
-{\Large\textbf{\color{headerblue}БАЗА ЗАВДАНЬ НМТ 2024}}
-\end{center}
-
-\begin{center}
-{\large Тема: \textbf{Тригонометрія}}
-\end{center}
-
-% === ЗАВДАННЯ 17 ===
-\noindent\textbf{17.} \begin{minipage}[t]{0.55\textwidth}
-У прямокутній декартовій системі координат на площині зображено замкнену ламану $ABCA$, де $A(-1; 0)$, $B(0; 1)$, $C(1; 0)$. Узгодьте функцію (1--3) з кількістю (А--Д) спільних точок її графіка та ламаної $ABCA$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній декартовій системі координат на площині зображено замкнену ламану $ABCA$, де $A(-1; 0)$, $B(0; 1)$, $C(1; 0)$. Узгодьте функцію (1--3) з кількістю (А--Д) спільних точок її графіка та ламаної $ABCA$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -666,14 +720,11 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 18 ===
-\noindent\textbf{18.} \begin{minipage}[t]{0.55\textwidth}
-Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -710,14 +761,11 @@
     \textbf{Д} & $P$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 19 ===
-\noindent\textbf{19.} \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині зображено ламану $ABC$, $A(-2; 0)$, $B(0; 1)$, $C(2; 1)$ (див. рисунок). Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з ламаною $ABC$.
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат на площині зображено ламану $ABC$, $A(-2; 0)$, $B(0; 1)$, $C(2; 1)$ (див. рисунок). Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з ламаною $ABC$. \nmtyear{2024}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -762,13 +810,10 @@
     \textbf{Д} & більше трьох \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 20 ===
-\noindent\textbf{20.} Установіть відповідність між виразом (1--3) та значенням (А--Д) цього виразу.
+\noindent\zadnum Установіть відповідність між виразом (1--3) та значенням (А--Д) цього виразу. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -789,21 +834,15 @@
     \textbf{Д} & $5$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 21 ===
-\noindent\textbf{21.} $\dfrac{\cos(450^\circ + \alpha)}{\sin \alpha} = $
+\noindent\zadnum $\dfrac{\cos(450^\circ + \alpha)}{\sin \alpha} = $ \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{\operatorname{tg} \alpha}$}{$-1$}{$-\operatorname{tg} \alpha$}{$\operatorname{tg} \alpha$}{$1$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 22 ===
-\noindent\textbf{22.} Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу.
+\noindent\zadnum Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -835,7 +874,7 @@
 \noindent
 \begin{minipage}[t]{0.40\textwidth}
     \vspace{0.5cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -849,10 +888,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 23 ===
-\noindent\textbf{23.} Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=-1$.
+\noindent\zadnum Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=-1$. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -873,13 +909,10 @@
     \textbf{Д} & більше трьох \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 24 ===
-\noindent\textbf{24.} До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $a=3$.
+\noindent\zadnum До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $a=3$. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -893,7 +926,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -907,10 +940,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 25 ===
-\noindent\textbf{25.} Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу.
+\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -931,20 +961,15 @@
     \textbf{Д} & $[2; 5)$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 26 ===
-\noindent\textbf{26.} $\cos 2\alpha - \cos^2 \alpha = $
+\noindent\zadnum $\cos 2\alpha - \cos^2 \alpha = $ \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$\sin^2 \alpha$}{$-\sin 2\alpha$}{$0$}{$-\sin^2 \alpha$}{$\sin 2\alpha$}
 
-
-% === ЗАВДАННЯ 27 ===
-\noindent\textbf{27.} Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д). \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -965,13 +990,10 @@
     \textbf{Д} & не перетинає вісь ординат \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 28 ===
-\noindent\textbf{28.} Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=x$. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між функцією (1--3) та кількістю спільних точок (А--Д) її графіка з прямою $y=x$. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -992,13 +1014,10 @@
     \textbf{Д} & безліч \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 29 ===
-\noindent\textbf{29.} Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій (див. рисунок), координатою якої є значення цього виразу. \nmtyear{2024}
+\noindent\zadnum Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій (див. рисунок), координатою якої є значення цього виразу. \nmtyear{2024}
 
 \begin{center}
     \begin{tikzpicture}[scale=1.2]
@@ -1029,13 +1048,10 @@
     \textbf{Д} & $P$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 30 ===
-\noindent\textbf{30.} Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1056,13 +1072,10 @@
     \textbf{Д} & є цілим від'ємним числом \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 31 ===
-\noindent\textbf{31.} Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1083,37 +1096,25 @@
     \textbf{Д} & є нецілим від'ємним числом \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 32 ===
-\noindent\textbf{32.} \trigStyle{$\dfrac{\cos(540^\circ - \alpha)}{\sin \alpha} = $} \nmtyear{2024}
+\noindent\zadnum \trigStyle{$\dfrac{\cos(540^\circ - \alpha)}{\sin \alpha} = $} \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{\operatorname{tg} \alpha}$}{$-1$}{$1$}{$-\operatorname{tg} \alpha$}{$-\dfrac{1}{\operatorname{tg} \alpha}$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 33 ===
-\noindent\textbf{33.} \trigStyle{$2 - 2\cos^2 \alpha - \sin^2 \alpha = $} \nmtyear{2024}
+\noindent\zadnum \trigStyle{$2 - 2\cos^2 \alpha - \sin^2 \alpha = $} \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$-3\sin^2 \alpha$}{$\cos^2 \alpha$}{$-\sin^2 \alpha$}{$3\sin^2 \alpha$}{$\sin^2 \alpha$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 34 ===
-\noindent\textbf{34.} \trigStyle{$\sin^2 4\beta - \cos^2 4\beta = $} \nmtyear{2024}
+\noindent\zadnum \trigStyle{$\sin^2 4\beta - \cos^2 4\beta = $} \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$-\cos 2\beta$}{$1$}{$\cos 2\beta$}{$\cos 8\beta$}{$-\cos 8\beta$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 35 ===
-\noindent\textbf{35.} Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між виразом (1--3) та проміжком (А--Д), якому належить значення цього виразу. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1134,13 +1135,10 @@
     \textbf{Д} & $[2; 5)$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 36 ===
-\noindent\textbf{36.} Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між виразом (1--3) та твердженням про його значення (А--Д), яке є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1161,27 +1159,20 @@
     \textbf{Д} & є цілим від'ємним числом \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 37 ===
-\noindent\textbf{37.} \trigStyle{$\dfrac{3\cos^2 150^\circ - 3}{\sin 150^\circ} = $} \nmtyear{2024}
+\noindent\zadnum \trigStyle{$\dfrac{3\cos^2 150^\circ - 3}{\sin 150^\circ} = $} \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$-3$}{$\dfrac{3}{2}$}{$\dfrac{3\sqrt{3}}{2}$}{$-\dfrac{3\sqrt{3}}{2}$}{$-\dfrac{3}{2}$}
 
-% === ЗАВДАННЯ 38 ===
-\noindent\textbf{38.} $2\cos^2 (90^\circ + 3\alpha) + 2\cos^2 3\alpha =$ \nmtyear{2024}
+\noindent\zadnum $2\cos^2 (90^\circ + 3\alpha) + 2\cos^2 3\alpha =$ \nmtyear{2024}
 
 \vspace{0.3cm}
 \answerTableTall{$2\cos 6\alpha$}{$4$}{$2$}{$0$}{$-2$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 39 ===
-\noindent\textbf{39.} Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між твердженням (1--3) та функцією (А--Д), для якої це твердження є правильним. \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1195,7 +1186,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
@@ -1209,10 +1200,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 40 ===
-\noindent\textbf{40.} Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу, якщо $a=-2$. \nmtyear{2024}
+\noindent\zadnum Узгодьте вираз (1--3) з точкою (А--Д) на координатній прямій, координатою якої є значення виразу, якщо $a=-2$. \nmtyear{2024}
 
 \begin{center}
     \begin{tikzpicture}[scale=1.2]
@@ -1243,13 +1231,10 @@
     \textbf{Д} & $P$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 41 ===
-\noindent\textbf{41.} Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д). \nmtyear{2024}
+\noindent\zadnum Установіть відповідність між функцією (1--3) та її властивістю її графіка (А--Д). \nmtyear{2024}
 
 \vspace{0.3cm}
 
@@ -1263,7 +1248,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -1277,8 +1262,128 @@
     \end{tabular}
 \end{minipage}
 
-% === ЗАВДАННЯ 42 ===
-\noindent\textbf{42.} Доберіть до функції (1--3) координатні чверті (А--Д), у яких лежить графік цієї функції (координатні чверті показано на рисунку). \nmtyear{2025}
+\noindent\zadnum Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m > 0$. \nmtyear{2024}
+
+\vspace{0.3cm}
+
+\noindent
+\begin{minipage}[t]{0.55\textwidth}
+    \textit{Початок речення} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{1} & \trigStyle{Якщо $m \cos x \cdot \operatorname{tg} x = 2n \sin x$, то} \\[0.4cm]
+    \textbf{2} & Якщо $\sqrt{2m^2} = n$, то \\[0.4cm]
+    \textbf{3} & Якщо $4^{\log_2 m} = n$, то \\
+    \end{tabular}
+
+    \vspace{1.0cm}
+    \matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+    \textit{Закінчення речення} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{А} & $n = 2m$. \\[0.2cm]
+    \textbf{Б} & $n = m^2$. \\[0.2cm]
+    \textbf{В} & $n = 2^m$. \\[0.2cm]
+    \textbf{Г} & $n = m\sqrt{2}$. \\[0.2cm]
+    \textbf{Д} & $n = \dfrac{m}{2}$. \\
+    \end{tabular}
+\end{minipage}
+
+\noindent\zadnum Укажіть проміжок, якому належить значення виразу \trigStyle{$6 \cos 195^\circ \sin 195^\circ$}. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTableTall{$[2; +\infty)$}{$[1; 2)$}{$[0; 1)$}{$[-1; 0)$}{$(-\infty; -2)$}
+
+\noindent\zadnum Укажіть проміжок, якому належить значення виразу \trigStyle{$2 \cos 450^\circ + \operatorname{tg}(-60^\circ)$}. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTableTall{$[-2; -1)$}{$[-3; -2)$}{$[-1; 0)$}{$[1; 2)$}{$[0; 1)$}
+
+\noindent\zadnum Обчисліть \trigStyle{$2 \sin^2 x - 2$}, якщо \trigStyle{$\cos^2 x = 0{,}4$}. \nmtyear{2024}
+
+\vspace{0.3cm}
+\answerTable{$-3{,}2$}{$0{,}8$}{$1{,}2$}{$-0{,}8$}{$-1{,}2$}
+
+\noindent\zadnum Увідповідніть функцію (1--3) та її властивість (А--Д). \nmtyear{2024}
+
+\vspace{0.3cm}
+
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+    \textit{Функція} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{1} & $f(x) = x^2 + 2$ \\[0.4cm]
+    \textbf{2} & \trigStyle{$f(x) = \sin x$} \\[0.4cm]
+    \textbf{3} & $f(x) = x^3$ \\
+    \end{tabular}
+
+    \vspace{1.0cm}
+    \matchingGrid
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.50\textwidth}
+    \textit{Властивість функції} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} p{7cm}@{}}
+    \textbf{А} & зростає на всій області визначення \\[0.2cm]
+    \textbf{Б} & спадає на всій області визначення \\[0.2cm]
+    \textbf{В} & парна \\[0.2cm]
+    \textbf{Г} & має більше ніж два нулі \\[0.2cm]
+    \textbf{Д} & графік функції симетричний відносно осі $x$ \\
+    \end{tabular}
+\end{minipage}
+
+\noindent\zadnum Доберіть до числового виразу (1--3) його значення (А--Д). \nmtyear{2024}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Вираз} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{1} & $\lg 100$ \\[0.4cm]
+    \textbf{2} & \trigStyle{$\sin \dfrac{3\pi}{2}$} \\[0.6cm]
+    \textbf{3} & $(2 + \sqrt{3})(2 - \sqrt{3})$ \\
+    \end{tabular}
+}{
+    \textit{Значення виразу} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{А} & $-1$ \\[0.2cm]
+    \textbf{Б} & $0$ \\[0.2cm]
+    \textbf{В} & $1$ \\[0.2cm]
+    \textbf{Г} & $2$ \\[0.2cm]
+    \textbf{Д} & $10$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+
+\noindent\zadnum Установіть відповідність між виразом (1--3), де $\pi$ -- відома математична константа, та проміжком (А--Д), якому належить його значення. \nmtyear{2024}
+
+\vspace{0.3cm}
+
+\matchingLayout{
+    \textit{Вираз} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{1} & \trigStyle{$\cos \dfrac{\pi}{3}$} \\[0.4cm]
+    \textbf{2} & $\pi - 4$ \\[0.4cm]
+    \textbf{3} & $4^{\log_4 \pi}$ \\
+    \end{tabular}
+}{
+    \textit{Проміжок} \par \vspace{0.2cm}
+    \begin{tabular}{@{}p{0.5cm} l@{}}
+    \textbf{А} & $[-2; -1)$ \\[0.2cm]
+    \textbf{Б} & $[-1; 0)$ \\[0.2cm]
+    \textbf{В} & $[0; 1)$ \\[0.2cm]
+    \textbf{Г} & $[1; 2)$ \\[0.2cm]
+    \textbf{Д} & $[2; 4)$ \\
+    \end{tabular}
+}{
+    \matchingGrid
+}
+
+\typeTitle{НМТ 2025}
+
+\noindent\zadnum Доберіть до функції (1--3) координатні чверті (А--Д), у яких лежить графік цієї функції (координатні чверті показано на рисунку). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1292,7 +1397,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.30\textwidth}
@@ -1319,18 +1424,12 @@
     \end{tikzpicture}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 43 ===
-\noindent\textbf{43.} \trigStyle{$\dfrac{\sin\left(\frac{3\pi}{2} - \alpha\right)}{\cos \alpha} = $} \nmtyear{2025}
+\noindent\zadnum \trigStyle{$\dfrac{\sin\left(\frac{3\pi}{2} - \alpha\right)}{\cos \alpha} = $} \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTableTall{$\dfrac{1}{\operatorname{tg} \alpha}$}{$\operatorname{tg} \alpha$}{$-1$}{$-\operatorname{tg} \alpha$}{$1$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 44 ===
-\noindent\textbf{44.} Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2025}
+\noindent\zadnum Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1351,13 +1450,10 @@
     \textbf{Д} & $81$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 45 ===
-\noindent\textbf{45.} Узгодьте функцію (1--3) із її властивістю (А--Д). \nmtyear{2025}
+\noindent\zadnum Узгодьте функцію (1--3) із її властивістю (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1371,7 +1467,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -1385,10 +1481,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 46 ===
-\noindent\textbf{46.} Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2025}
+\noindent\zadnum Узгодьте вираз (1--3) із його значенням (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1409,29 +1502,20 @@
     \textbf{Д} & $\sqrt{2}$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 47 ===
-\noindent\textbf{47.} \trigStyle{$\operatorname{tg}^2 \alpha \cos^2 \alpha + \cos^2 \alpha = $} \nmtyear{2025}
+\noindent\zadnum \trigStyle{$\operatorname{tg}^2 \alpha \cos^2 \alpha + \cos^2 \alpha = $} \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTableTall{$1$}{$\sin^2 \alpha$}{$\operatorname{tg}^2 \alpha$}{$\cos 2\alpha$}{$\cos^2 \alpha$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 48 ===
-\noindent\textbf{48.} \trigStyle{$4\sin 450^\circ + \operatorname{tg} 135^\circ = $} \nmtyear{2025}
+\noindent\zadnum \trigStyle{$4\sin 450^\circ + \operatorname{tg} 135^\circ = $} \nmtyear{2025}
 
 \vspace{0.3cm}
 \answerTable{$-5$}{$-1$}{$-3$}{$3$}{$5$}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 49 ===
-\noindent\textbf{49.} Доберіть до числового виразу (1--3) його значення (А--Д). \nmtyear{2025}
+\noindent\zadnum Доберіть до числового виразу (1--3) його значення (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1452,13 +1536,10 @@
     \textbf{Д} & $3$ \\
     \end{tabular}
 }{
-    \answerGrid
+    \matchingGrid
 }
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 50 ===
-\noindent\textbf{50.} Доберіть до функції (1--3) властивість її графіка (А--Д). \nmtyear{2025}
+\noindent\zadnum Доберіть до функції (1--3) властивість її графіка (А--Д). \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1472,7 +1553,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -1486,10 +1567,7 @@
     \end{tabular}
 \end{minipage}
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 51 ===
-\noindent\textbf{51.} Узгодьте вираз (1--3) і твердження про його значення (А--Д), яке є правильним для цього виразу. \nmtyear{2025}
+\noindent\zadnum Узгодьте вираз (1--3) і твердження про його значення (А--Д), яке є правильним для цього виразу. \nmtyear{2025}
 
 \vspace{0.3cm}
 
@@ -1503,7 +1581,7 @@
     \end{tabular}
 
     \vspace{1.0cm}
-    \answerGrid
+    \matchingGrid
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
@@ -1517,142 +1595,80 @@
     \end{tabular}
 \end{minipage}
 
-% === ЗАВДАННЯ 52 ===
-\noindent\textbf{52.} Доберіть до кожного початку речення (1--3) його закінчення (А--Д) так, щоб утворилося правильне твердження, якщо $m > 0$.
+\typeTitle{НМТ 2026}
 
-\vspace{0.3cm}
+% НМТ 2026, сесія 30.05, завдання №13
+\zadtask{Спростіть вираз $\mathrm{tg}^2 x \cdot \cos^2 x - 1$. \nmtyear{2026}}
+\answerTableTall{$-\sin^2 x$}{$-\cos^2 x$}{$-1$}{$\cos^2 x$}{$\sin^2 x$}
+% Відповідь: Б
+\ifshowsolutions\solution{$\mathrm{tg}^2 x\cdot\cos^2 x=\dfrac{\sin^2 x}{\cos^2 x}\cdot\cos^2 x=\sin^2 x$. Тоді $\sin^2 x-1=-(1-\sin^2 x)=-\cos^2 x$. Відповідь: \textbf{Б}.}\fi
 
-\noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{Якщо $m \cos x \cdot \operatorname{tg} x = 2n \sin x$, то} \\[0.4cm]
-    \textbf{2} & Якщо $\sqrt{2m^2} = n$, то \\[0.4cm]
-    \textbf{3} & Якщо $4^{\log_2 m} = n$, то \\
-    \end{tabular}
+% НМТ 2026, сесія 1.06, завдання №13
+\zadtask{Відомо, що $\cos 210^\circ \cdot \sin\alpha > 0$. Якого з наведених значень може набувати кут $\alpha$? \nmtyear{2026}}
+\answerTable{$0^\circ$}{$30^\circ$}{$90^\circ$}{$150^\circ$}{$300^\circ$}
+% Відповідь: Д
+\ifshowsolutions\solution{$\cos 210^\circ<0$, тому для $\cos 210^\circ\cdot\sin\alpha>0$ потрібно $\sin\alpha<0$. Серед варіантів лише $\sin 300^\circ<0$. Відповідь: \textbf{Д}.}\fi
 
-    \vspace{1.0cm}
-    \answerGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $n = 2m$. \\[0.2cm]
-    \textbf{Б} & $n = m^2$. \\[0.2cm]
-    \textbf{В} & $n = 2^m$. \\[0.2cm]
-    \textbf{Г} & $n = m\sqrt{2}$. \\[0.2cm]
-    \textbf{Д} & $n = \dfrac{m}{2}$. \\
-    \end{tabular}
-\end{minipage}
+% НМТ 2026, сесія 3.06, завдання №13
+\zadtask{Обчисліть значення виразу $2\sin\left(-\dfrac{\pi}{2}\right) + \cos 3\pi$. \nmtyear{2026}}
+\answerTable{$-3$}{$-2$}{$-1$}{$2$}{$3$}
+% Відповідь: А
+\ifshowsolutions\solution{$\sin\left(-\dfrac{\pi}{2}\right) = -1$, $\cos 3\pi = -1$, тому $2\cdot(-1) + (-1) = -3$. Відповідь: \textbf{А} ($-3$).}\fi
 
-\vspace{0.7cm}
+% НМТ 2026, сесія 4.06, завдання №13
+\zadtask{Якому проміжку належить значення виразу $6 \sin 15^\circ \cos 15^\circ$? \nmtyear{2026}}
+\answerTable{$(0;\, 1)$}{$[1;\, 2)$}{$[2;\, 3)$}{$[3;\, 5)$}{$[5;\, 8)$}
+% Відповідь: Б
+\ifshowsolutions\solution{За формулою $2\sin\alpha\cos\alpha=\sin2\alpha$: $6\sin15^\circ\cos15^\circ=3\sin30^\circ=3\cdot\dfrac{1}{2}=1{,}5\in[1;\,2)$. Відповідь: \textbf{Б}.}\fi
 
-% === ЗАВДАННЯ 53 ===
-\noindent\textbf{53.} Укажіть проміжок, якому належить значення виразу \trigStyle{$6 \cos 195^\circ \sin 195^\circ$}.
+% НМТ 2026, сесія 5.06, завдання №10
+\zadtask{Спростіть вираз $\mathrm{tg}^2\alpha - \mathrm{tg}^2\alpha \cdot \sin^2\alpha$. \nmtyear{2026}}
+\answerTableTall{$\sin^2\alpha$}{$\cos^2\alpha$}{$\mathrm{tg}^2\alpha$}{$1$}{$\sin^2\alpha\cos^2\alpha$}
+% Відповідь: А
+\ifshowsolutions\solution{$\mathrm{tg}^2\alpha-\mathrm{tg}^2\alpha\sin^2\alpha=\mathrm{tg}^2\alpha(1-\sin^2\alpha)=\dfrac{\sin^2\alpha}{\cos^2\alpha}\cdot\cos^2\alpha=\sin^2\alpha$. Відповідь: \textbf{А}.}\fi
 
-\vspace{0.3cm}
-\answerTableTall{$[2; +\infty)$}{$[1; 2)$}{$[0; 1)$}{$[-1; 0)$}{$(-\infty; -2)$}
+% НМТ 2026, сесія 11.06, завдання №8 --- основна тема: Графіки елементарних функцій, їх побудова та перетворення
+\zadtask{Укажіть точку, яка належить графіку функції $y = \sin x$. \nmtyear{2026}}
+\answerTableTall{$\left(\dfrac{\pi}{2};\ 1\right)$}{$(\pi;\ -1)$}{$(0;\ 1)$}{$(\pi;\ 1)$}{$\left(\dfrac{\pi}{2};\ 0\right)$}
 
-\vspace{0.7cm}
+% НМТ 2026, сесія 12.06, завдання №13
+\zadtask{Обчисліть значення виразу $\sin^2 \alpha + 2\cos^2 \alpha$, якщо $\cos^2 \alpha = 0{,}6$. \nmtyear{2026}}
+\answerTable{$1{,}6$}{$2{,}2$}{$1{,}2$}{$2$}{$1{,}36$}
 
-% === ЗАВДАННЯ 54 ===
-\noindent\textbf{54.} Укажіть проміжок, якому належить значення виразу \trigStyle{$2 \cos 450^\circ + \operatorname{tg}(-60^\circ)$}.
+% НМТ 2026, сесія 15.06, завдання №13
+\zadtask{$\sin^2 120^\circ \cdot \cos 120^\circ = $ \nmtyear{2026}}
+\answerTableTall{$-\dfrac{1}{8}$}{$-\dfrac{\sqrt{3}}{8}$}{$-\dfrac{3}{8}$}{$-\dfrac{3\sqrt{3}}{8}$}{$-\dfrac{\sqrt{2}}{4}$}
+% Відповідь: В
 
-\vspace{0.3cm}
-\answerTableTall{$[-2; -1)$}{$[-3; -2)$}{$[-1; 0)$}{$[1; 2)$}{$[0; 1)$}
+% НМТ 2026, сесія 16.06, завдання №13
+\zadtask{Для кутів $\alpha$ і $\beta$ виконується умова $\alpha + \beta = 90^\circ$. Визначте $\sin \beta$, якщо $\cos \alpha = \dfrac{1}{4}$. \nmtyear{2026}}
+\answerTableTall{$\dfrac{1}{4}$}{$\dfrac{\sqrt{15}}{4}$}{$\dfrac{3}{4}$}{$-\dfrac{1}{4}$}{$-\dfrac{\sqrt{15}}{4}$}
+% Відповідь: А
 
-\vspace{0.7cm}
+% НМТ 2026, сесія 17.06, завдання №13
+\zadtask{Спростіть вираз $\dfrac{1 - \cos^2 \alpha}{\operatorname{tg} \alpha \cdot \cos \alpha}$. \nmtyear{2026}}
+\answerTable{$\sin \alpha$}{$\operatorname{tg} \alpha$}{$1$}{$\cos \alpha$}{$0$}
+% Відповідь: А
 
-% === ЗАВДАННЯ 55 ===
-\noindent\textbf{55.} Обчисліть \trigStyle{$2 \sin^2 x - 2$}, якщо \trigStyle{$\cos^2 x = 0{,}4$}.
+% НМТ 2026, сесія 19.06, завдання №10
+\zadtask{$\cos^2 \alpha - 1 = $ \nmtyear{2026}}
+\answerTable{$\sin^2 \alpha$}{$\sin 2\alpha$}{$1$}{$\cos 2\alpha$}{$-\sin^2 \alpha$}
+% Відповідь: Д
 
-\vspace{0.3cm}
-\answerTable{$-3{,}2$}{$0{,}8$}{$1{,}2$}{$-0{,}8$}{$-1{,}2$}
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{59.}~Б \ {\scriptsize\color{gray}(30.05, №13)}\par
+\noindent\textbf{60.}~Д \ {\scriptsize\color{gray}(1.06, №13)}\par
+\noindent\textbf{61.}~А \ {\scriptsize\color{gray}(3.06, №13)}\par
+\noindent\textbf{62.}~Б \ {\scriptsize\color{gray}(4.06, №13)}\par
+\noindent\textbf{63.}~А \ {\scriptsize\color{gray}(5.06, №10)}\par
+\noindent\textbf{66.}~В \ {\scriptsize\color{gray}(15.06, №13)}\par
+\noindent\textbf{67.}~А \ {\scriptsize\color{gray}(16.06, №13)}\par
+\noindent\textbf{68.}~А \ {\scriptsize\color{gray}(17.06, №13)}\par
+\noindent\textbf{69.}~Д \ {\scriptsize\color{gray}(19.06, №10)}\par
+\end{multicols}
+\fi
 
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 56 ===
-\noindent\textbf{56.} Увідповідніть функцію (1--3) та її властивість (А--Д).
-
-\vspace{0.3cm}
-
-\noindent
-\begin{minipage}[t]{0.45\textwidth}
-    \textit{Функція} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $f(x) = x^2 + 2$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$f(x) = \sin x$} \\[0.4cm]
-    \textbf{3} & $f(x) = x^3$ \\
-    \end{tabular}
-
-    \vspace{1.0cm}
-    \answerGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
-    \textit{Властивість функції} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} p{7cm}@{}}
-    \textbf{А} & зростає на всій області визначення \\[0.2cm]
-    \textbf{Б} & спадає на всій області визначення \\[0.2cm]
-    \textbf{В} & парна \\[0.2cm]
-    \textbf{Г} & має більше ніж два нулі \\[0.2cm]
-    \textbf{Д} & графік функції симетричний відносно осі $x$ \\
-    \end{tabular}
-\end{minipage}
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 57 ===
-\noindent\textbf{57.} Доберіть до числового виразу (1--3) його значення (А--Д).
-
-\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Вираз} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\lg 100$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\sin \dfrac{3\pi}{2}$} \\[0.6cm]
-    \textbf{3} & $(2 + \sqrt{3})(2 - \sqrt{3})$ \\
-    \end{tabular}
-}{
-    \textit{Значення виразу} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $-1$ \\[0.2cm]
-    \textbf{Б} & $0$ \\[0.2cm]
-    \textbf{В} & $1$ \\[0.2cm]
-    \textbf{Г} & $2$ \\[0.2cm]
-    \textbf{Д} & $10$ \\
-    \end{tabular}
-}{
-    \answerGrid
-}
-
-\vspace{0.7cm}
-
-% === ЗАВДАННЯ 58 ===
-\noindent\textbf{58.} Установіть відповідність між виразом (1--3), де $\pi$ -- відома математична константа, та проміжком (А--Д), якому належить його значення.
-
-\vspace{0.3cm}
-
-\matchingLayout{
-    \textit{Вираз} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\cos \dfrac{\pi}{3}$} \\[0.4cm]
-    \textbf{2} & $\pi - 4$ \\[0.4cm]
-    \textbf{3} & $4^{\log_4 \pi}$ \\
-    \end{tabular}
-}{
-    \textit{Проміжок} \par \vspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $[-2; -1)$ \\[0.2cm]
-    \textbf{Б} & $[-1; 0)$ \\[0.2cm]
-    \textbf{В} & $[0; 1)$ \\[0.2cm]
-    \textbf{Г} & $[1; 2)$ \\[0.2cm]
-    \textbf{Д} & $[2; 4)$ \\
-    \end{tabular}
-}{
-    \answerGrid
-}
-
+\endgroup
 \end{document}

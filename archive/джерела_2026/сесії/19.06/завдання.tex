@@ -1,0 +1,490 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+\setmainfont{Schoolbook-Regular.otf}[
+    Path = ../,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+\binoppenalty=10000
+\relpenalty=10000
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Збірник НМТ \textendash{} Варіант за 19 червня}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2026}
+
+\newcommand{\answerTable}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\answerTableTall}[5]{%
+\par\vspace{0.15cm}
+\noindent
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{3cm}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt, halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+#1
+\end{tcolorbox}\par\vspace{0.3cm}}
+\newcommand{\chapterTitle}[1]{\clearpage\sectionTitle{#1}}
+
+\newcommand{\nmtAnswerBox}{%
+\par\vspace{0.2cm}\noindent
+Відповідь:\ \ 
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}}
+
+\newcommand{\matchingGrid}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\par\vspace{0.3cm}\noindent\textbf{\thezad.}\ \ #1\par\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ }
+
+\begin{document}
+\thispagestyle{empty}
+\vspace*{1.2cm}
+\begin{center}
+{\Large\bfseries\color{mainGreen} РЕАЛЬНИЙ ВАРІАНТ НМТ-2026}\\[0.4cm]
+{\Huge\bfseries\color{mainGreen} ВАРІАНТ ЗА 19 ЧЕРВНЯ}\\[0.6cm]
+{\large Real Test Notebook з усіма геометричними рисунками}\\[1cm]
+{\large\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{Телеграм: @pvtr2525}}}
+\end{center}
+\clearpage
+
+\chapterTitle{ТЕСТОВИЙ ЗОШИТ (19 ЧЕРВНЯ)}
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише один правильний. Виберіть правильний варіант відповіді й позначте його.}
+
+% ===== №1 =====
+\zadtask{Дівчата вдвох ліпили вареники. Тетяна зліпила втричі більше вареників, ніж Оксана. Яку частину від усіх вареників зліпила Тетяна?}
+\answerTableTall{$\dfrac{1}{2}$}{$\dfrac{1}{3}$}{$\dfrac{1}{4}$}{$\dfrac{3}{4}$}{$\dfrac{2}{3}$}
+
+% ===== №2 =====
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+\zadnum На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Скільки всього годин за добу температура повітря знижувалася?
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.52\textwidth}
+\centering
+\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
+    \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
+    \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
+    \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
+    \node[below left, font=\scriptsize] at (0,0) {$0$};
+    \node[below, font=\scriptsize] at (2,0) {$2$};
+    \node[below, font=\scriptsize] at (6,0) {$6$};
+    \node[below, font=\scriptsize] at (10,0) {$10$};
+    \node[below, font=\scriptsize] at (16,0) {$16$};
+    \node[below, font=\scriptsize] at (24,0) {$24$};
+    \node[left, font=\scriptsize] at (0,2) {$2$};
+    \node[left, font=\scriptsize] at (0,6) {$6$};
+    \draw[magenta!80!black, thick, smooth] plot coordinates {(0,2) (2,2) (4,0) (6,-2) (8,-2) (10,0) (14,4) (16,6) (18,5) (22,2) (24,2)};
+    \fill (0,2) circle (2.5pt);
+    \fill (16,6) circle (2.5pt);
+    \fill (24,2) circle (2.5pt);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$4$}{$6$}{$8$}{$12$}{$14$}
+
+% ===== №3 =====
+\noindent
+\begin{minipage}[c]{0.54\textwidth}
+\zadnum Вісь Землі (пряма $OA$) утворює кут $66{,}5^\circ$ із площиною її орбіти (див. рисунок). Визначте кут між віссю Землі $OA$ та перпендикуляром $OB$ до площини її орбіти.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.44\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.82, thick, line join=round]
+    % сіре тло-квадрат
+    \fill[gray!22] (-2.6,-2.6) rectangle (2.6,2.6);
+    % Земля (майже на весь квадрат)
+    \shade[ball color=blue!18] (0,0) circle (2.4);
+    \draw[gray!55, thin] (0,0) circle (2.4);
+    % схематичні материки
+    \begin{scope}
+        \clip (0,0) circle (2.4);
+        \fill[green!35!olive!60, opacity=0.55] (-1.6,0.9) .. controls (-0.9,1.5) and (-0.2,0.9) .. (-0.5,0.3) .. controls (-1.1,0.0) and (-1.9,0.3) .. (-1.6,0.9);
+        \fill[green!35!olive!60, opacity=0.55] (0.3,-0.4) .. controls (1.0,-0.2) and (1.3,-1.1) .. (0.7,-1.6) .. controls (0.1,-1.4) and (-0.1,-0.8) .. (0.3,-0.4);
+        \fill[green!35!olive!60, opacity=0.55] (0.6,1.4) .. controls (1.3,1.7) and (1.7,0.9) .. (1.2,0.6) .. controls (0.7,0.7) and (0.4,1.1) .. (0.6,1.4);
+    \end{scope}
+    % площина орбіти (горизонталь через центр)
+    \draw[red!75, thick] (-3.4,0) -- (3.0,0);
+    \node[right, font=\scriptsize, align=left] at (2.6,0.0) {\textit{площина}\\ \textit{орбіти}};
+    % перпендикуляр OB (вертикаль, пунктир)
+    \draw[dashed] (0,-2.9) -- (0,3.0);
+    \node[above, font=\small] at (-0.05,3.0) {$B$};
+    % вісь OA (нахилена)
+    \draw (-1.15,-2.65) -- (1.15,2.65);
+    \node[above, font=\small] at (1.2,2.65) {$A$};
+    % центр O
+    \node[below right, font=\small] at (0.05,-0.05) {$O$};
+    % прямий кут між площиною орбіти і OB
+    \draw (-0.32,0) -- (-0.32,0.32) -- (0,0.32);
+    % кут 66,5 між віссю OA і площиною орбіти
+    \draw (0.9,0) arc (0:66.5:0.9);
+    \node[font=\small] at (1.5,0.55) {$66{,}5^\circ$};
+    % еліпс обертання біля A
+    \draw[blue!70, thick] (1.0,2.5) ellipse (0.42 and 0.14);
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$22{,}5^\circ$}{$23{,}5^\circ$}{$32{,}5^\circ$}{$33{,}5^\circ$}{$113{,}5^\circ$}
+
+% ===== №4 =====
+\zadtask{Розв'яжіть систему нерівностей $\begin{cases}x - 2 > -3,\\ -2x > -8.\end{cases}$}
+\answerTable{$(-1; 0{,}25)$}{$(4; +\infty)$}{$(-1; 4)$}{$(0{,}25; +\infty)$}{$(-5; 4)$}
+
+% ===== №5 =====
+\zadtask{Скільки всього ребер має чотирикутна призма?}
+\answerTable{$4$}{$8$}{$9$}{$12$}{$16$}
+
+% ===== №6 =====
+\zadtask{Спростіть вираз $(9a + 2b)^2 - 18ab$, якщо $a = \dfrac{1}{3}$.}
+\answerTableTall{$4b^2 + 9$}{$4b^2 - 6b + 9$}{$4b^2 + 6b + 9$}{$2b^2 - 6b + 9$}{$4b^2 + 6b + 6$}
+
+% ===== №7 =====
+\zadtask{Розв'яжіть рівняння $2x + 3 = x^2$.}
+\answerTable{$1;\ 4$}{$1;\ 3$}{$-3;\ 1$}{$-3;\ -1$}{$-1;\ 3$}
+
+% ===== №8 =====
+\zadtask{Графік парної функції $y = f(x)$ проходить через точку $(-3;\, 9)$. Визначте $f(3)$.}
+\answerTable{$9$}{$6$}{$3$}{$-9$}{$-3$}
+
+% ===== №9 =====
+\zadtask{Які з наведених тверджень є правильними?
+\vspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=0.08cm, topsep=0.06cm]
+\item Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.
+\item Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.
+\item У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.
+\end{enumerate}
+\vspace{0.1cm}}
+\answerTable{лише II}{лише III}{лише I та II}{лише I та III}{I, II та III}
+
+% ===== №10 =====
+\zadtask{$\cos^2 \alpha - 1 = $}
+\answerTable{$\sin^2 \alpha$}{$\sin 2\alpha$}{$1$}{$\cos 2\alpha$}{$-\sin^2 \alpha$}
+
+% ===== №11 =====
+\zadtask{Ірині на день народження друзі подарували чотири книжки. Вона пообіцяла якомога швидше їх прочитати. Скільки всього в Ірини є варіантів послідовності прочитання книг?}
+\answerTable{$4$}{$6$}{$12$}{$24$}{$256$}
+\newpage
+
+% ===== №12 =====
+\zadtask{У прямокутній системі координат у просторі задано сферу із центром у точці $M(-9;\, 12;\, 5)$. Визначте діаметр цієї сфери, якщо вона проходить через початок координат.}
+\answerTableTall{$30$}{$26$}{$10\sqrt{10}$}{$4\sqrt{21}$}{$5\sqrt{10}$}
+
+% ===== №13 =====
+\zadtask{Визначте похідну функції $y = (2x + 1)\sqrt{x}$.}
+\answerTableTall{$\dfrac{3}{2\sqrt{x}}$}{$\dfrac{6x + 1}{2\sqrt{x}}$}{$\dfrac{4x + 1}{2\sqrt{x}}$}{$\dfrac{2}{\sqrt{x}}$}{$\dfrac{1}{\sqrt{x}}$}
+
+% ===== №14 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що трикутник $AKD$ прямокутний (див. рисунок). Визначте довжину сторони $AD$, якщо $AB = 6\sqrt{3}$, а $\angle KAD = 60^\circ$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.5, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (10,4);
+    \coordinate (D) at (10,0);
+    \coordinate (K) at (2.4,4);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (K) -- (D);
+    \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
+    \pic[draw, angle radius=0.55cm, pic text={\scriptsize $60^\circ$}, angle eccentricity=1.6] {angle = D--A--K};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\answerTable{$12$}{$18$}{$12\sqrt{3}$}{$24$}{$24\sqrt{3}$}
+
+% ===== №15 =====
+\zadtask{Визначте проміжок, якому належить корінь рівняння $5^{6x + 2} = \dfrac{1}{25}$.}
+\answerTable{$[-2; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; +\infty)$}
+\newpage
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
+
+% ===== №16 =====
+\zadtask{Доберіть до числового виразу (1--3) його значення (А--Д).\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Числовий вираз}\par\vspace{0.15cm}
+\textbf{1} \quad $\dfrac{8}{5} : \dfrac{4}{15}$\\[0.35cm]
+\textbf{2} \quad $\sqrt{2} \cdot \left(\sqrt{2}\right)^3$\\[0.35cm]
+\textbf{3} \quad $\log_{16} 2$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+\textit{Значення виразу}\par\vspace{0.15cm}
+\textbf{А} \quad $-\dfrac{1}{4}$\\[0.2cm]
+\textbf{Б} \quad $4$\\[0.15cm]
+\textbf{В} \quad $\dfrac{1}{4}$\\[0.2cm]
+\textbf{Г} \quad $6$\\[0.15cm]
+\textbf{Д} \quad $\dfrac{1}{6}$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №17 =====
+\zadtask{До кожного початку речення (1--3) доберіть його закінчення (А--Д) так, щоб утворилося правильне твердження.\par
+\vspace{0.3cm}
+\noindent
+\begin{minipage}[t]{0.46\textwidth}
+\textit{Початок речення}\par\vspace{0.15cm}
+\textbf{1} \quad Графіки функцій $y = 3 - x$ та $y = 1 - x$\\[0.25cm]
+\textbf{2} \quad Графіки функцій $y = \dfrac{1}{x}$ та $y = x^2 - 4$\\[0.25cm]
+\textbf{3} \quad Графік функції $y = 3$ та графік рівняння $x^2 + y^2 = 9$
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.34\textwidth}
+\textit{Закінчення речення}\par\vspace{0.15cm}
+\textbf{А} \quad не мають спільних точок.\\[0.15cm]
+\textbf{Б} \quad мають єдину спільну точку.\\[0.15cm]
+\textbf{В} \quad мають лише дві спільні точки.\\[0.15cm]
+\textbf{Г} \quad мають лише три спільні точки.\\[0.15cm]
+\textbf{Д} \quad мають чотири спільні точки.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.14\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+
+% ===== №18 =====
+\zadtask{На рисунку зображено паралелограм $ABCD$, рівносторонній трикутник $CDK$ і прямокутну трапецію $AKNM$, що лежать в одній площині. Менша основа трапеції дорівнює стороні трикутника, її менша бічна сторона~--- стороні $BC$ паралелограма. Узгодьте геометричну фігуру (1--3) та її площу (А--Д), якщо $MN : AK = 5 : 9$ і $MN = 10$~см.
+\vspace{0.3cm}
+\begin{center}
+\begin{tikzpicture}[scale=0.42, thick, line join=round]
+    % середня горизонтальна лінія: A ... D ... K
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (5,0);
+    \coordinate (K) at (10,0);
+    % паралелограм ABCD: B,C зверху
+    \coordinate (B) at (2.5,4.33);
+    \coordinate (C) at (7.5,4.33);
+    % трапеція AKNM знизу (прямий кут при K)
+    \coordinate (N) at (10,-6);
+    \coordinate (M) at (3.5,-6);
+    % --- заливки ---
+    \filldraw[fill=orange!25, draw=black] (A) -- (B) -- (C) -- (D) -- cycle;
+    \filldraw[fill=cyan!25, draw=black] (D) -- (C) -- (K) -- cycle;
+    \filldraw[fill=green!20, draw=black] (A) -- (K) -- (N) -- (M) -- cycle;
+    % прямий кут при K
+    \draw (9.3,0) -- (9.3,-0.7) -- (10,-0.7);
+    % --- мітки рівних сторін ---
+    \path (B) -- (C) node[midway, sloped, font=\small] {$||$};
+    \path (D) -- (C) node[midway, sloped, font=\small] {$|$};
+    \path (C) -- (K) node[midway, sloped, font=\small] {$|$};
+    \path (D) -- (K) node[midway, font=\small, yshift=3pt] {$|$};
+    \path (K) -- (N) node[midway, sloped, font=\small] {$||$};
+    \path (M) -- (N) node[midway, font=\small, yshift=3pt] {$|$};
+    % --- підписи ---
+    \node[left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[right] at (K) {$K$};
+    \node[below] at (M) {$M$};
+    \node[below] at (N) {$N$};
+\end{tikzpicture}
+\end{center}
+\vspace{0.2cm}
+\noindent
+\begin{minipage}[t]{0.42\textwidth}
+\textit{Геометрична фігура}\par\vspace{0.15cm}
+\textbf{1} \quad трикутник $CDK$\\[0.25cm]
+\textbf{2} \quad паралелограм $ABCD$\\[0.25cm]
+\textbf{3} \quad трапеція $AKNM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\textit{Площа фігури}\par\vspace{0.15cm}
+\textbf{А} \quad $112$~см$^2$\\[0.15cm]
+\textbf{Б} \quad $140$~см$^2$\\[0.15cm]
+\textbf{В} \quad $25\sqrt{3}$~см$^2$\\[0.15cm]
+\textbf{Г} \quad $40\sqrt{3}$~см$^2$\\[0.15cm]
+\textbf{Д} \quad $60\sqrt{3}$~см$^2$\\[0.15cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0.4cm}
+\begin{flushright}\matchingGrid\end{flushright}
+\end{minipage}}
+\newpage
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у спеціально відведеному місці. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+
+% ===== №19 =====
+\zadtask{Знайдіть площу фігури, обмеженої графіком функції $y = \dfrac{x^3}{8}$, прямими $x = 2$, $x = 4$ та віссю $x$.}
+\nmtAnswerBox
+
+% ===== №20 =====
+\zadtask{Василь замовив виготовлення двох рамок для своїх картин. Вартість рамки для більшої картини на $40\,\%$ вища за вартість рамки для меншої картини. Визначте вартість (у грн) рамки для більшої картини, якщо за обидві рамки Василь заплатив $1560$~грн.}
+\nmtAnswerBox
+
+% ===== №21 =====
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено правильну трикутну піраміду та конус, у якому радіус основи відноситься до висоти як $5 : 12$. Радіус основи конуса дорівнює радіусу кола, уписаного в основу піраміди, а висота піраміди в $\sqrt{3}$ більша за висоту конуса. Визначте об'єм (у см$^3$) піраміди, якщо об'єм конуса дорівнює $800\pi$~см$^3$.
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % правильна трикутна піраміда
+    \coordinate (a) at (0,0);
+    \coordinate (b) at (2.8,0.6);
+    \coordinate (c) at (1.6,1.5);
+    \coordinate (ap) at (1.3,5);
+    \draw (a) -- (b) -- (ap) -- cycle;
+    \draw (a) -- (c) -- (b);
+    \draw[dashed] (a) -- (c);
+    \draw[dashed] (c) -- (ap);
+    % конус
+    \begin{scope}[shift={(4.6,0)}]
+        \draw (0,0.5) ellipse (1.5 and 0.45);
+        \draw[dashed] (-1.5,0.5) -- (0,4.6);
+        \draw (-1.5,0.5) .. controls (-1.5,0.1) and (1.5,0.1) .. (1.5,0.5);
+        \draw (-1.5,0.5) -- (0,4.6) -- (1.5,0.5);
+    \end{scope}
+\end{tikzpicture}
+\end{minipage}
+\par\vspace{0.2cm}
+\nmtAnswerBox
+
+% ===== №22 =====
+\zadtask{Визначте \textit{суму} всіх цілих значень $a$, за кожного з яких рівняння
+\[
+\dfrac{25\sin x - 3a + 4}{\sqrt{(x - \pi)(2\pi - x)}} = 0
+\]
+має принаймні один корінь.}
+\nmtAnswerBox
+
+\newpage
+% ===== ВІДПОВІДІ =====
+\sectionTitle{ВІДПОВІДІ ДО ВАРІАНТА (19 ЧЕРВНЯ)}
+
+\noindent\textbf{\large Завдання 1--15 (вибір однієї відповіді)}
+\par\vspace{0.2cm}
+\begin{multicols}{5}
+\noindent
+\textbf{1.}~Г\\
+\textbf{2.}~Д\\
+\textbf{3.}~Б\\
+\textbf{4.}~В\\
+\textbf{5.}~Г\\
+\textbf{6.}~В\\
+\textbf{7.}~Д\\
+\textbf{8.}~А\\
+\textbf{9.}~Б\\
+\textbf{10.}~Д\\
+\textbf{11.}~Г\\
+\textbf{12.}~В\\
+\textbf{13.}~Б\\
+\textbf{14.}~Г\\
+\textbf{15.}~Б
+\end{multicols}
+
+\par\vspace{0.3cm}
+\noindent\textbf{\large Завдання 16--18 (відповідність)}
+\par\vspace{0.2cm}
+\noindent
+\textbf{16.}\quad 1--Г,\ \ 2--Б,\ \ 3--В\\[0.15cm]
+\textbf{17.}\quad 1--А,\ \ 2--Г,\ \ 3--Б\\[0.15cm]
+\textbf{18.}\quad 1--В,\ \ 2--Г,\ \ 3--А
+
+\par\vspace{0.3cm}
+\noindent\textbf{\large Завдання 19--22 (коротка відповідь)}
+\par\vspace{0.2cm}
+\begin{multicols}{4}
+\noindent
+\textbf{19.}~$7{,}5$\\
+\textbf{20.}~$910$\\
+\textbf{21.}~$7200$\\
+\textbf{22.}~$-27$
+\end{multicols}
+
+\end{document}
