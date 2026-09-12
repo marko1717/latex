@@ -13,7 +13,8 @@
 
 Запуск:  python3 scripts/build_nmt_2023_2026.py
 """
-import re, os, sys, json, glob, collections, difflib
+import re
+import unicodedata, os, sys, json, glob, collections, difflib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARCH = os.path.join(ROOT, "archive", "старий_формат")
@@ -1008,7 +1009,10 @@ MASTER_EXTRA = r"""\usepackage{docmute}
 """
 
 def input_line(rel):
-    # шляхи з пробілами (зокрема подвійними) -- у лапках, пробіл як \space
+    # шляхи з пробілами (зокрема подвійними) -- у лапках, пробіл як \space.
+    # NFC: macOS віддає імена файлів у розкладеній формі (NFD), а git і Linux (Overleaf)
+    # тримають їх у складеній (NFC) -- без нормалізації \input не знаходить файл на Overleaf.
+    rel = unicodedata.normalize("NFC", rel)
     return "\\input{\"%s\"}\n" % rel.replace("\\", "/").replace(" ", "\\space ")
 
 def build_collection(fname, header, title_lines, sections, paths_by_unit):
