@@ -150,7 +150,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
-\fancyfoot[R]{\small\color{gray!80}НМТ 2023--2026}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
 % ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
@@ -947,7 +947,7 @@ def build_unit(key, by2026, log):
     total = sum(counts.values())
     stat = ", ".join("\\mbox{%s~--- %s}" % (y, c) for y, c in counts.items())
     tstat = "; ".join("\\mbox{%s~--- %s}" % (TYPE_SHORT[tp], c) for tp, c in type_counts.items())
-    header = f"База завдань НМТ 2023--2026 \\textendash{{}} Тема {key}"
+    header = f"База завдань НМТ 2022--2026 \\textendash{{}} Тема {key}"
     out = [PREAMBLE.replace("@@HEADER@@", header)]
     out.append("\n\\begin{document}\n\\begingroup\\setcounter{zad}{0}\n")
     if carried or pre_defs:
@@ -1023,14 +1023,14 @@ def build_collection(fname, header, title_lines, sections, paths_by_unit):
     open(os.path.join(ROOT, fname), "w", encoding="utf-8").write("".join(out))
 
 def build_master(paths_by_unit):
-    t = ("{\\Huge\\bfseries\\color{mainGreen} БАЗА ЗАВДАНЬ НМТ}\\\\[0.4cm]\n{\\LARGE\\bfseries\\color{mainGreen} 2023--2026}\\\\[0.6cm]\n"
+    t = ("{\\Huge\\bfseries\\color{mainGreen} БАЗА ЗАВДАНЬ НМТ}\\\\[0.4cm]\n{\\LARGE\\bfseries\\color{mainGreen} 2022--2026}\\\\[0.6cm]\n"
          "{\\Large\\bfseries з математики}\\\\[0.8cm]\n{\\large Усі завдання основних сесій: 6 розділів, 43 теми}\\\\[1.2cm]")
-    build_collection("НМТ_2023-2026_всі_теми.tex", "База завдань НМТ 2023--2026 \\textendash{} усі теми", t, SECTIONS, paths_by_unit)
+    build_collection("НМТ_2023-2026_всі_теми.tex", "База завдань НМТ 2022--2026 \\textendash{} усі теми", t, SECTIONS, paths_by_unit)
     for num, name, units in SECTIONS:
         t = ("{\\Huge\\bfseries\\color{mainGreen} РОЗДІЛ %s}\\\\[0.4cm]\n{\\LARGE\\bfseries\\color{mainGreen} %s}\\\\[0.6cm]\n"
-             "{\\Large База завдань НМТ 2023--2026}\\\\[0.8cm]\n{\\large Теми: %s}\\\\[1.2cm]") % (num, name, ", ".join(u for u in units))
+             "{\\Large База завдань НМТ 2022--2026}\\\\[0.8cm]\n{\\large Теми: %s}\\\\[1.2cm]") % (num, name, ", ".join(u for u in units))
         fname = "Розділ_%s_%s.tex" % (num, re.sub(r"[ ,]+", "_", name))
-        build_collection(fname, "База завдань НМТ 2023--2026 \\textendash{} Розділ %s" % num, t, [(num, name, units)], paths_by_unit)
+        build_collection(fname, "База завдань НМТ 2022--2026 \\textendash{} Розділ %s" % num, t, [(num, name, units)], paths_by_unit)
 
 def main():
     by2026 = load_2026()
