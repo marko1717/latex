@@ -268,6 +268,14 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
@@ -275,7 +283,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
-               "nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
+               "matchHead","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
 # старі макроси, які перейменовуємо в тілі на нові
 RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\matchTable\b", r"\\matchingGrid"),
@@ -781,6 +789,228 @@ def load_2026():
 
 SAFE_ENVS = {"enumerate", "itemize", "description", "center", "flushleft", "flushright", "samepage"}
 
+LBL = r"(?:[1-3]|[А-ДA-D])"
+
+def _args(t, i, n=2):
+    """n аргументів {..} починаючи з t[i] -> (список, індекс після) або (None, i)"""
+    out, j = [], i
+    for _ in range(n):
+        while j < len(t) and t[j] in " \t\n": j += 1
+        if j >= len(t) or t[j] != "{": return None, i
+        k = balanced(t, j); out.append(t[j+1:k]); j = k + 1
+    return out, j
+
+def _split_cells(row):
+    """розбити рядок таблиці на клітинки за & верхнього рівня"""
+    cells, depth, cur, i = [], 0, "", 0
+    while i < len(row):
+        c = row[i]
+        if c == "\\" and i + 1 < len(row): cur += row[i:i+2]; i += 2; continue
+        if c == "{": depth += 1
+        elif c == "}": depth -= 1
+        if c == "&" and depth == 0: cells.append(cur); cur = ""
+        else: cur += c
+        i += 1
+    cells.append(cur)
+    return cells
+
+def _tabulars(t):
+    """зовнішні оточення tabular: (початок, кінець, специфікація, тіло)"""
+    res, i = [], 0
+    while True:
+        i = t.find("\\begin{tabular}", i)
+        if i < 0: return res
+        j = i + len("\\begin{tabular}")
+        while j < len(t) and t[j] in " \n\t": j += 1
+        if j < len(t) and t[j] == "[":
+            j = t.find("]", j) + 1
+            while j < len(t) and t[j] in " \n\t": j += 1
+        if j >= len(t) or t[j] != "{": i = j; continue
+        k = balanced(t, j); spec = t[j+1:k]
+        depth, p, e = 1, k + 1, -1
+        while p < len(t):
+            b = t.find("\\begin{tabular}", p); e = t.find("\\end{tabular}", p)
+            if e < 0: break
+            if 0 <= b < e: depth += 1; p = b + 15
+            else:
+                depth -= 1
+                if depth == 0: break
+                p = e + 13
+        if e < 0 or depth != 0: i = k + 1; continue
+        res.append((i, e + len("\\end{tabular}"), spec, t[k+1:e]))
+        i = e + len("\\end{tabular}")
+
+def _sub_tabulars(t, fn):
+    for a, b, spec, body in reversed(_tabulars(t)):
+        new = fn(spec, body)
+        if new is not None: t = t[:a] + new + t[b:]
+    return t
+
+def _rows(body):
+    return [r.strip() for r in re.split(r"\\\\(?:\[[^\]]*\])?", body) if r.strip()]
+
+def _tabular_to_items(t):
+    """таблиця, де перша колонка -- мітка (1--3 або А--Д), -> послідовність \\matchItem"""
+    def fn(spec, body):
+        items = []
+        for r in _rows(body):
+            cells = _split_cells(r)
+            if len(cells) != 2: return None
+            mm = re.match(r"^\\textbf\{(" + LBL + r")\}$", cells[0].strip())
+            if not mm: return None
+            items.append("\\matchItem{%s}{%s}\n" % (mm.group(1), re.sub(r"\s+", " ", cells[1]).strip()))
+        return "".join(items) if len(items) >= 2 else None
+    return _sub_tabulars(t, fn)
+
+def _two_col_tabular(t):
+    """таблиця, де в одному рядку і пункт (1--3), і варіант (А--Д), -> дві колонки \\matchItem"""
+    def fn(spec, body):
+        left, right, heads = [], [], []
+        for r in _rows(body):
+            cells = _split_cells(r)
+            if len(cells) != 2: return None
+            a, b = (c.strip() for c in cells)
+            ha, hb = re.fullmatch(r"\\textit\{([^{}]*)\}", a), re.fullmatch(r"\\textit\{([^{}]*)\}", b)
+            if ha and hb: heads = [ha.group(1), hb.group(1)]; continue
+            for cell, box in ((a, left), (b, right)):
+                if not cell: continue
+                mm = re.match(r"^\\textbf\{(" + LBL + r")\}\s*(?:\\quad|\\ \\ |\\ )?\s*(.*)$", cell, re.S)
+                if not mm: return None
+                box.append("\\matchItem{%s}{%s}\n" % (mm.group(1), re.sub(r"\s+", " ", mm.group(2)).strip()))
+        if len(left) < 2 or len(right) < 2: return None
+        h1 = "\\matchHead{%s}\n" % heads[0] if heads else ""
+        h2 = "\\matchHead{%s}\n" % heads[1] if heads else ""
+        return ("\\noindent\n\\begin{minipage}[t]{0.46\\linewidth}\n" + h1 + "".join(left) +
+                "\\end{minipage}%\n\\hfill\n\\begin{minipage}[t]{0.5\\linewidth}\n" + h2 + "".join(right) +
+                "\\end{minipage}\n")
+    return _sub_tabulars(t, fn)
+
+def _inline_to_items(t):
+    """«\\textbf{1} \\quad текст» (до порожнього рядка, \\\\, \\vspace або кінця) -> \\matchItem"""
+    pat = re.compile(r"(?m)^[ \t]*\\textbf\{(" + LBL + r")\}[ \t]*(?:\\quad|\\ \\ |\\ )[ \t]*(.*?)(?=(?:\n[ \t]*\n)|(?:\\\\(?:\[[^\]]*\])?[ \t]*$)|(?:\n[ \t]*\\(?:nopagebreak|nbvspace|vspace|end|matchItem|matchHead|textbf|matchingGrid|par)\b)|(?:[ \t]*\n[ \t]*\})|(?:[ \t]\}[ \t]*\{)|\Z)", re.S)
+    def repl(m):
+        txt = re.sub(r"\s+", " ", m.group(2)).strip()
+        txt = re.sub(r"\\\\(\[[^\]]*\])?$", "", txt).strip()
+        if "&" in txt or "\\begin{tabular}" in txt: return m.group(0)   # клітинка таблиці -- не чіпаємо
+        return "\\matchItem{%s}{%s}" % (m.group(1), txt)
+    return pat.sub(repl, t)
+
+def _heads(t):
+    t = re.sub(r"(?m)^[ \t]*\\textit\{([^{}]{2,40})\}[ \t]*(?:\\par)+[ \t]*(?:\\nopagebreak)?\\(?:nbvspace|vspace)\{[^}]*\}[ \t]*$", r"\\matchHead{\1}", t)
+    """«\\textit{Вираз}» на власному рядку -> \\matchHead{Вираз}"""
+    t = re.sub(r"(?m)^[ \t]*\\textit\{([^{}]{2,40})\}[ \t]*(?:\\par)*[ \t]*(?:\\par)?[ \t]*$", r"\\matchHead{\1}", t)
+    t = re.sub(r"(?m)^[ \t]*\\textit\{([^{}]{2,40})\}[ \t]*\\par\\par\\n?(?:opagebreak)?\\(?:nbvspace|vspace)\{[^}]*\}[ \t]*$", r"\\matchHead{\1}", t)
+    t = re.sub(r"\\matchHead\{([^{}]*)\}[ \t]*\n(?:[ \t]*\n)?[ \t]*(?:\\nmtnobreak[ \t]*\n)?[ \t]*\\(?:nopagebreak)?\\(?:nbvspace|vspace)\{[^}]*\}[ \t]*\n", r"\\matchHead{\1}\n", t)
+    return t
+
+def _envs(t, name):
+    """зовнішні оточення name: (початок, кінець, тіло)"""
+    res, i, b, e = [], 0, "\\begin{" + name + "}", "\\end{" + name + "}"
+    while True:
+        i = t.find(b, i)
+        if i < 0: return res
+        j = i + len(b)
+        while j < len(t) and t[j] in " \n\t": j += 1
+        if j < len(t) and t[j] == "[": j = t.find("]", j) + 1
+        while j < len(t) and t[j] in " \n\t": j += 1
+        if j < len(t) and t[j] == "{": j = balanced(t, j) + 1
+        depth, p, k = 1, j, -1
+        while p < len(t):
+            nb, ne = t.find(b, p), t.find(e, p)
+            if ne < 0: break
+            if 0 <= nb < ne: depth += 1; p = nb + len(b)
+            else:
+                depth -= 1; k = ne
+                if depth == 0: break
+                p = ne + len(e)
+        if k < 0 or depth != 0: i = j; continue
+        res.append((i, k + len(e), t[j:k]))
+        i = k + len(e)
+
+def _env_balance(t):
+    c = collections.Counter()
+    for m in re.finditer(r"\\(begin|end)\{([a-zA-Z*]+)\}", t):
+        c[m.group(2)] += 1 if m.group(1) == "begin" else -1
+    return {k: v for k, v in c.items() if v}
+
+def _grid_to_macro(t):
+    """сітку відповідності, набрану таблицею вручну, замінюємо макросом \\matchingGrid"""
+    OK = re.compile(r"(?:\s|\\setlength\{[^{}]*\}\{[^{}]*\}|\\renewcommand\{[^{}]*\}\{[^{}]*\}|\\small|\\footnotesize|\\scriptsize|\\centering|\\noindent)*")
+    for a, b, spec, body in reversed(_tabulars(t)):
+        if "\\cline{2-6}" not in body and not re.fullmatch(r"\s*r(\|c){5}\|\s*", spec): continue
+        st, en = a, b
+        k = t.rfind("\\begingroup", 0, a)
+        if k >= 0 and a - k < 500:
+            between = re.sub(r"%[^\n]*", "", t[k + len("\\begingroup"):a])
+            if OK.fullmatch(between):
+                m2 = re.match(r"\s*(?:%[^\n]*\n\s*)*\\endgroup", t[b:])
+                if m2: st, en = k, b + m2.end()
+        t = t[:st] + "\\matchingGrid" + t[en:]
+    return t
+
+def _bottom_to_layout(t):
+    """\\matchingLayoutBottom{колонка1}{колонка2} (сітка знизу) -> \\matchingLayout з сіткою праворуч"""
+    key = "\\matchingLayoutBottom"
+    while True:
+        i = t.find(key)
+        if i < 0: return t
+        args, j = read_args(t, i + len(key), 2)
+        if args is None: return t
+        t = t[:i] + "\\matchingLayout{\n" + args[0].strip("\n") + "\n}{\n" + args[1].strip("\n") + "\n}{\n\\matchingGrid\n}\n" + t[j:]
+
+def _to_matching_layout(t):
+    """дві колонки пунктів + сітка -> один макет \\matchingLayout (сітка завжди праворуч)"""
+    if "\\matchingLayout" in t or "\\matchTable" in t: return t
+    mps = [m for m in _envs(t, "minipage") if "\\matchItem" in m[2]]
+    if len(mps) != 2: return t
+    (a1, b1, c1), (a2, b2, c2) = mps
+    if re.search(r"\\includegraphics|\\begin\{tikzpicture\}", c1 + c2): return t
+    tail = t[b2:]
+    if "\\matchingGrid" in c1 or "\\matchingGrid" in c2:
+        # сітка стоїть під однією з колонок -- виносимо її в третю
+        cut = lambda c: re.sub(r"(?:\\par)?\s*(?:\\(?:nbvspace|vspace)\{[^}]*\})?\s*\\matchingGrid", "", c)
+        c1, c2 = cut(c1), cut(c2)
+        mg = None
+    else:
+        mg = re.search(r"\\begin\{minipage\}[^\n]*\n(?:[^\n]*\n)?[ \t]*(?:\\begin\{flushright\})?\s*\\matchingGrid\s*(?:\\end\{flushright\})?\s*\\end\{minipage\}|\\matchingGrid", tail)
+        if not mg: return t
+        if re.search(r"\\zadtask|\\zadnum|\\answerTable", tail[:mg.start()]): return t
+    def clean(c):
+        c = re.sub(r"\\(?:nopagebreak|nmtnobreak)\b", "", c)
+        c = re.sub(r"\\(?:nbvspace|vspace)\{[^}]*\}", "", c)
+        c = re.sub(r"\n{3,}", "\n\n", c)
+        return c.strip("\n \t")
+    body = ("\\matchingLayout{\n" + clean(c1) + "\n}{\n" + clean(c2) + "\n}{\n\\matchingGrid\n}\n")
+    return t[:a1] + body + (tail if mg is None else tail[mg.end():]).lstrip("\n")
+
+def unify_matching(t):
+    """єдиний вигляд блоків «на відповідність»: однакові відступи, вирівняні мітки,
+    висячий відступ у довгих пунктах"""
+    if not re.search(r"\\matchingGrid|\\matchTable|\\cline\{2-6\}", t): return t
+    orig = t
+    t = _grid_to_macro(t)
+    t = _two_col_tabular(t)
+    t = _tabular_to_items(t)
+    t = _inline_to_items(t)
+    t = _heads(t)
+    t = _bottom_to_layout(t)
+    t = _to_matching_layout(t)
+    # прибрати ручні проміжки між пунктами -- відступ задає \\matchItem
+    t = re.sub(r"(\\matchItem\{[^{}]*\}\{(?:[^{}]|\{[^{}]*\})*\})[ \t]*\n(?:[ \t]*\n)?[ \t]*(?:\\nmtnobreak[ \t]*\n[ \t]*)?\\(?:nopagebreak)?\\(?:nbvspace|vspace)\{[^}]*\}[ \t]*\n", r"\1\n", t)
+    t = re.sub(r"(\\matchItem\{[^{}]*\}\{(?:[^{}]|\{[^{}]*\})*\})[ \t]*\n[ \t]*\n", r"\1\n", t)
+    # після \matchItem рядок уже завершено (\par), тож хвостове \\ або \\[..] прибираємо
+    lines = []
+    for ln in t.split("\n"):
+        st = ln.lstrip()
+        if st.startswith("\\matchItem") or st.startswith("\\matchHead"):
+            ln = re.sub(r"\\\\(\[[^\]]*\])?[ \t]*$", "", ln)
+        lines.append(ln)
+    t = "\n".join(lines)
+    for m in re.finditer(r"\\begin\{tabular\}(.*?)\\end\{tabular\}", t, re.S):
+        if "\\matchItem" in m.group(1): return orig      # перетворення зіпсувало таблицю -- лишаємо як було
+    if _env_balance(t) != _env_balance(orig): return orig  # порушено баланс оточень -- лишаємо як було
+    return t
+
 def unbreakable(s):
     """Завдання як одне ціле: усі вертикальні проміжки й межі абзаців верхнього рівня всередині
     завдання стають нерозривними (легальні місця розриву сторінки лишаються тільки між завданнями).
@@ -926,7 +1156,7 @@ def build_unit(key, by2026, log):
                     s = re.sub(r"(\\nopagebreak)?\\vspace\{[^}]*\}\s*\n\\nmtAnswerBox[ \t]*\n?", "", s)
                     s = re.sub(r"\\nmtAnswerBox[ \t]*\n?", "", s)
                 if it["inferred"]: s = "% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)\n" + s
-                s = unbreakable(s)
+                s = unbreakable(unify_matching(s))
                 last = s.rstrip().split("\n")[-1]
                 # між завданнями -- явне дозволене місце розриву сторінки (всередині завдання розривів немає)
                 s += "\n\\par\\penalty-20" + ("" if re.search(r"answerTable|nmtAnswerBox|matchingGrid", last) else "\\vspace{0.25cm}")
@@ -937,7 +1167,7 @@ def build_unit(key, by2026, log):
                 if t.get("restored"): note += " (відновлено за збірником)"
                 if e["primary"]: note += f" --- основна тема: {UNITS[e['primary']][3]}"
                 if e["secondary"]: note += " --- також у темі: " + ", ".join(UNITS[x][3] for x in e["secondary"])
-                s = note + "\n" + unbreakable(prep_2026(t)) + "\n"
+                s = note + "\n" + unbreakable(unify_matching(prep_2026(t))) + "\n"
                 if t.get("answer"):
                     s += "% Відповідь: " + t["answer"].replace("\n", " ") + "\n"
                     ans_lines.append((gl, t["answer"], t["session"], t["n"]))

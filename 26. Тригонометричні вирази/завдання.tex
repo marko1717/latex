@@ -173,6 +173,14 @@
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -518,28 +526,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\cos \dfrac{\pi}{2}$} \\[0.4cm]
-    \textbf{2} & $|\pi - 5|$ \\[0.4cm]
-    \textbf{3} & $2^{\pi}$ \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
-    \textit{Проміжок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $(-\infty; 0]$ \\[0.2cm]
-    \textbf{Б} & $(0; 2)$ \\[0.2cm]
-    \textbf{В} & $[2; 4)$ \\[0.2cm]
-    \textbf{Г} & $[4; 8)$ \\[0.2cm]
-    \textbf{Д} & $[8; +\infty)$ \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\cos \dfrac{\pi}{2}$}}
+\matchItem{2}{$|\pi - 5|$}
+\matchItem{3}{$2^{\pi}$}
+}{
+\matchHead{Проміжок}
+    \matchItem{А}{$(-\infty; 0]$}
+\matchItem{Б}{$(0; 2)$}
+\matchItem{В}{$[2; 4)$}
+\matchItem{Г}{$[4; 8)$}
+\matchItem{Д}{$[8; +\infty)$}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -552,28 +553,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & Функція $y=\log_{0{,}5} x$ \\[0.4cm]
-    \textbf{2} & \trigStyle{Функція $y=\sin x$} \\[0.4cm]
-    \textbf{3} & Функція $y=\dfrac{1}{2x-2}$ \\[0.35cm]
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
-    \textbf{А} & не визначена при $x=1$. \\[0.2cm]
-    \textbf{Б} & набуває від'ємного значення при $x=2$. \\[0.2cm]
-    \textbf{В} & є непарною. \\[0.2cm]
-    \textbf{Г} & має лише одну точку локального екстремуму. \\[0.2cm]
-    \textbf{Д} & зростає на проміжку $(0; +\infty)$. \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{Функція $y=\log_{0{,}5} x$}
+\matchItem{2}{\trigStyle{Функція $y=\sin x$}}
+\matchItem{3}{Функція $y=\dfrac{1}{2x-2}$}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{не визначена при $x=1$.}
+\matchItem{Б}{набуває від'ємного значення при $x=2$.}
+\matchItem{В}{є непарною.}
+\matchItem{Г}{має лише одну точку локального екстремуму.}
+\matchItem{Д}{зростає на проміжку $(0; +\infty)$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -586,28 +580,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{Якщо $n \sin m\pi = a$, то} \\[0.4cm]
-    \textbf{2} & Якщо $\dfrac{2^m}{2^n} = 2^a$, то \\[0.4cm]
-    \textbf{3} & Якщо $\sqrt[n]{\sqrt[m]{2}} = \sqrt[a]{2}$, то \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $a = mn$. \\[0.2cm]
-    \textbf{Б} & $a = 0$. \\[0.2cm]
-    \textbf{В} & $a = m - n$. \\[0.2cm]
-    \textbf{Г} & $a = n$. \\[0.2cm]
-    \textbf{Д} & $a = \dfrac{m}{n}$. \\[0.35cm]
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{\trigStyle{Якщо $n \sin m\pi = a$, то}}
+\matchItem{2}{Якщо $\dfrac{2^m}{2^n} = 2^a$, то}
+\matchItem{3}{Якщо $\sqrt[n]{\sqrt[m]{2}} = \sqrt[a]{2}$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = mn$.}
+\matchItem{Б}{$a = 0$.}
+\matchItem{В}{$a = m - n$.}
+\matchItem{Г}{$a = n$.}
+\matchItem{Д}{$a = \dfrac{m}{n}$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -620,28 +607,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{Якщо $n \cos 8\pi = a$, то} \\[0.4cm]
-    \textbf{2} & Якщо $\log_2 8 + \log_2 n = \log_2 a$, то \\[0.4cm]
-    \textbf{3} & Якщо $\sqrt[n]{\sqrt[3]{8}} = \sqrt[a]{8}$, то \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $a = 2n$. \\[0.2cm]
-    \textbf{Б} & $a = 8n$. \\[0.2cm]
-    \textbf{В} & $a = 8 + n$. \\[0.2cm]
-    \textbf{Г} & $a = n$. \\[0.2cm]
-    \textbf{Д} & $a = 3n$. \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{\trigStyle{Якщо $n \cos 8\pi = a$, то}}
+\matchItem{2}{Якщо $\log_2 8 + \log_2 n = \log_2 a$, то}
+\matchItem{3}{Якщо $\sqrt[n]{\sqrt[3]{8}} = \sqrt[a]{8}$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = 2n$.}
+\matchItem{Б}{$a = 8n$.}
+\matchItem{В}{$a = 8 + n$.}
+\matchItem{Г}{$a = n$.}
+\matchItem{Д}{$a = 3n$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -654,28 +634,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & Якщо $n^{\log_n m} = a$, то \\[0.4cm]
-    \textbf{2} & Якщо $\dfrac{mn^2 - nm^2}{n-m} = a$, то \\[0.4cm]
-    \textbf{3} & \trigStyle{Якщо $n \cos^2 m + n \sin^2 m = a$, то} \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $a = m + n$. \\[0.2cm]
-    \textbf{Б} & $a = m$. \\[0.2cm]
-    \textbf{В} & $a = m - n$. \\[0.2cm]
-    \textbf{Г} & $a = mn$. \\[0.2cm]
-    \textbf{Д} & $a = n$. \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{Якщо $n^{\log_n m} = a$, то}
+\matchItem{2}{Якщо $\dfrac{mn^2 - nm^2}{n-m} = a$, то}
+\matchItem{3}{\trigStyle{Якщо $n \cos^2 m + n \sin^2 m = a$, то}}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = m + n$.}
+\matchItem{Б}{$a = m$.}
+\matchItem{В}{$a = m - n$.}
+\matchItem{Г}{$a = mn$.}
+\matchItem{Д}{$a = n$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -688,21 +661,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\dfrac{\pi}{2}$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\sin \pi$} \\[0.4cm]
-    \textbf{3} & $\log_{\pi} \dfrac{1}{\pi}$ \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\dfrac{\pi}{2}$}
+\matchItem{2}{\trigStyle{$\sin \pi$}}
+\matchItem{3}{$\log_{\pi} \dfrac{1}{\pi}$}
 }{
-    \textit{Проміжок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $[-2; -1)$ \\[0.2cm]
-    \textbf{Б} & $[-1; 0)$ \\[0.2cm]
-    \textbf{В} & $[0; 1)$ \\[0.2cm]
-    \textbf{Г} & $[1; 2)$ \\[0.2cm]
-    \textbf{Д} & $[2; 3)$ \\
-    \end{tabular}
+\matchHead{Проміжок}
+    \matchItem{А}{$[-2; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 3)$}
 }{
     \matchingGrid
 }
@@ -735,21 +704,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\log_{\sqrt{2}} \cos 360^\circ$} \\[0.4cm]
-    \textbf{2} & $\dfrac{1}{\sqrt{2}-1}$ \\[0.6cm]
-    \textbf{3} & $1-\left(\sqrt{2}\right)^2$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\log_{\sqrt{2}} \cos 360^\circ$}}
+\matchItem{2}{$\dfrac{1}{\sqrt{2}-1}$}
+\matchItem{3}{$1-\left(\sqrt{2}\right)^2$}
 }{
-    \textit{Точка} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $K$ \\[0.2cm]
-    \textbf{Б} & $L$ \\[0.2cm]
-    \textbf{В} & $M$ \\[0.2cm]
-    \textbf{Г} & $N$ \\[0.2cm]
-    \textbf{Д} & $P$ \\
-    \end{tabular}
+\matchHead{Точка}
+    \matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
 }{
     \matchingGrid
 }
@@ -764,21 +729,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\dfrac{3^{-5}}{3^{-6}}$ \\[0.6cm]
-    \textbf{2} & $\log_2 0{,}1 + \log_2 320$ \\[0.4cm]
-    \textbf{3} & \trigStyle{$4\cos^2 30^\circ - 4\sin^2 30^\circ$} \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\dfrac{3^{-5}}{3^{-6}}$}
+\matchItem{2}{$\log_2 0{,}1 + \log_2 320$}
+\matchItem{3}{\trigStyle{$4\cos^2 30^\circ - 4\sin^2 30^\circ$}}
 }{
-    \textit{Значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $1$ \\[0.2cm]
-    \textbf{Б} & $2$ \\[0.2cm]
-    \textbf{В} & $3$ \\[0.2cm]
-    \textbf{Г} & $4$ \\[0.2cm]
-    \textbf{Д} & $5$ \\
-    \end{tabular}
+\matchHead{Значення виразу}
+    \matchItem{А}{$1$}
+\matchItem{Б}{$2$}
+\matchItem{В}{$3$}
+\matchItem{Г}{$4$}
+\matchItem{Д}{$5$}
 }{
     \matchingGrid
 }
@@ -794,12 +755,10 @@
 \nmtnobreak
 \noindent
 \begin{minipage}[t]{0.55\textwidth}
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $2\pi \cdot \pi^{-1}$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\operatorname{tg} \dfrac{5\pi}{4}$} \\[0.6cm]
-    \textbf{3} & $\log_{\pi} \dfrac{1}{\pi^2}$ \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$2\pi \cdot \pi^{-1}$}
+\matchItem{2}{\trigStyle{$\operatorname{tg} \dfrac{5\pi}{4}$}}
+\matchItem{3}{$\log_{\pi} \dfrac{1}{\pi^2}$}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.4\textwidth}
@@ -826,14 +785,12 @@
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.50\textwidth}
-    \textit{Точка} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $K$ \\[0.2cm]
-    \textbf{Б} & $L$ \\[0.2cm]
-    \textbf{В} & $M$ \\[0.2cm]
-    \textbf{Г} & $N$ \\[0.2cm]
-    \textbf{Д} & $P$ \\
-    \end{tabular}
+\matchHead{Точка}
+    \matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
 \end{minipage}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
@@ -846,28 +803,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & Значення виразу $a^{-1}$ \\[0.4cm]
-    \textbf{2} & Значення виразу $a^0$ \\[0.4cm]
-    \textbf{3} & \trigStyle{Значення виразу $\sin(\pi a)$} \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
-    \textbf{А} & є раціональним нецілим числом. \\[0.2cm]
-    \textbf{Б} & є ірраціональним числом. \\[0.2cm]
-    \textbf{В} & є натуральним числом. \\[0.2cm]
-    \textbf{Г} & дорівнює нулю. \\[0.2cm]
-    \textbf{Д} & є цілим від'ємним числом. \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{Значення виразу $a^{-1}$}
+\matchItem{2}{Значення виразу $a^0$}
+\matchItem{3}{\trigStyle{Значення виразу $\sin(\pi a)$}}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{є раціональним нецілим числом.}
+\matchItem{Б}{є ірраціональним числом.}
+\matchItem{В}{є натуральним числом.}
+\matchItem{Г}{дорівнює нулю.}
+\matchItem{Д}{є цілим від'ємним числом.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -879,21 +829,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\cos \dfrac{\pi}{3}$} \\[0.4cm]
-    \textbf{2} & $2\pi - 5$ \\[0.4cm]
-    \textbf{3} & $\log_3 \pi - \log_3 (3\pi)$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\cos \dfrac{\pi}{3}$}}
+\matchItem{2}{$2\pi - 5$}
+\matchItem{3}{$\log_3 \pi - \log_3 (3\pi)$}
 }{
-    \textit{Проміжок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $[-4; -1)$ \\[0.2cm]
-    \textbf{Б} & $[-1; 0)$ \\[0.2cm]
-    \textbf{В} & $[0; 1)$ \\[0.2cm]
-    \textbf{Г} & $[1; 2)$ \\[0.2cm]
-    \textbf{Д} & $[2; 5)$ \\
-    \end{tabular}
+\matchHead{Проміжок}
+    \matchItem{А}{$[-4; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 5)$}
 }{
     \matchingGrid
 }
@@ -919,21 +865,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\sin^2 \dfrac{\pi}{6} + \cos^2 \dfrac{\pi}{6}$} \\[0.4cm]
-    \textbf{2} & $\dfrac{\pi^2-4}{\pi-2} - \pi$ \\[0.6cm]
-    \textbf{3} & $\log_3 \pi^0$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\sin^2 \dfrac{\pi}{6} + \cos^2 \dfrac{\pi}{6}$}}
+\matchItem{2}{$\dfrac{\pi^2-4}{\pi-2} - \pi$}
+\matchItem{3}{$\log_3 \pi^0$}
 }{
-    \textit{Точка} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $K$ \\[0.2cm]
-    \textbf{Б} & $L$ \\[0.2cm]
-    \textbf{В} & $M$ \\[0.2cm]
-    \textbf{Г} & $N$ \\[0.2cm]
-    \textbf{Д} & $P$ \\
-    \end{tabular}
+\matchHead{Точка}
+    \matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
 }{
     \matchingGrid
 }
@@ -948,21 +890,19 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\sin \dfrac{7\pi}{2}$} \\[0.4cm]
-    \textbf{2} & \trigStyle{$\pi^{\cos 90^\circ}$} \\[0.4cm]
-    \textbf{3} & \trigStyle{$\dfrac{\pi}{3}$} \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\sin \dfrac{7\pi}{2}$}}
+\matchItem{2}{\trigStyle{$\pi^{\cos 90^\circ}$}}
+\matchItem{3}{\trigStyle{$\dfrac{\pi}{3}$}}
+
+\nmtnobreak
 }{
-    \textit{Твердження про значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.3cm} p{5cm}@{}}
-    \textbf{А} & є раціональним нецілим числом \\[0.2cm]
-    \textbf{Б} & є ірраціональним числом \\[0.2cm]
-    \textbf{В} & дорівнює 0 \\[0.2cm]
-    \textbf{Г} & є натуральним числом \\[0.2cm]
-    \textbf{Д} & є цілим від'ємним числом \\
-    \end{tabular}
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є раціональним нецілим числом}
+\matchItem{Б}{є ірраціональним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є натуральним числом}
+\matchItem{Д}{є цілим від'ємним числом}
 }{
     \matchingGrid
 }
@@ -977,21 +917,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\cos 2\pi$} \\[0.4cm]
-    \textbf{2} & $\log_{\pi} \dfrac{1}{\pi}$ \\[0.6cm]
-    \textbf{3} & $\pi^2 - 9$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\cos 2\pi$}}
+\matchItem{2}{$\log_{\pi} \dfrac{1}{\pi}$}
+\matchItem{3}{$\pi^2 - 9$}
 }{
-    \textit{Твердження про значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.3cm} p{5cm}@{}}
-    \textbf{А} & є цілим додатним числом \\[0.2cm]
-    \textbf{Б} & є цілим від'ємним числом \\[0.2cm]
-    \textbf{В} & дорівнює 0 \\[0.2cm]
-    \textbf{Г} & є нецілим додатним числом \\[0.2cm]
-    \textbf{Д} & є нецілим від'ємним числом \\
-    \end{tabular}
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є цілим додатним числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є нецілим додатним числом}
+\matchItem{Д}{є нецілим від'ємним числом}
 }{
     \matchingGrid
 }
@@ -1006,21 +942,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\operatorname{tg} \dfrac{\pi}{3}$} \\[0.4cm]
-    \textbf{2} & $1-\pi$ \\[0.4cm]
-    \textbf{3} & $\left(\dfrac{1}{2}\right)^{\log_2 \pi}$ \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\operatorname{tg} \dfrac{\pi}{3}$}}
+\matchItem{2}{$1-\pi$}
+\matchItem{3}{$\left(\dfrac{1}{2}\right)^{\log_2 \pi}$}
 }{
-    \textit{Проміжок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $[-5; -2)$ \\[0.2cm]
-    \textbf{Б} & $[-2; 0)$ \\[0.2cm]
-    \textbf{В} & $[0; 1)$ \\[0.2cm]
-    \textbf{Г} & $[1; 2)$ \\[0.2cm]
-    \textbf{Д} & $[2; 5)$ \\
-    \end{tabular}
+\matchHead{Проміжок}
+    \matchItem{А}{$[-5; -2)$}
+\matchItem{Б}{$[-2; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 5)$}
 }{
     \matchingGrid
 }
@@ -1035,21 +967,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\log_{\pi} 1$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\sin \left(-\dfrac{\pi}{6}\right)$} \\[0.4cm]
-    \textbf{3} & $\pi^3 \cdot \pi^{-4}$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\log_{\pi} 1$}
+\matchItem{2}{\trigStyle{$\sin \left(-\dfrac{\pi}{6}\right)$}}
+\matchItem{3}{$\pi^3 \cdot \pi^{-4}$}
 }{
-    \textit{Твердження про значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.3cm} p{5cm}@{}}
-    \textbf{А} & є нецілим додатним числом \\[0.2cm]
-    \textbf{Б} & є нецілим від'ємним числом \\[0.2cm]
-    \textbf{В} & дорівнює 0 \\[0.2cm]
-    \textbf{Г} & є цілим додатним числом \\[0.2cm]
-    \textbf{Д} & є цілим від'ємним числом \\
-    \end{tabular}
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є нецілим додатним числом}
+\matchItem{Б}{є нецілим від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є цілим додатним числом}
+\matchItem{Д}{є цілим від'ємним числом}
 }{
     \matchingGrid
 }
@@ -1064,28 +992,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Твердження} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
-    \textbf{1} & є непарною \\
-    \textbf{2} & зростає на відрізку $[1; 4]$ \\
-    \textbf{3} & найбільше значення функції на відрізку $[1; 4]$ є від'ємним числом \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Функція} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & \trigStyle{$y=-\cos x$} \\[0.3cm]
-    \textbf{Б} & $y=4^x$ \\[0.3cm]
-    \textbf{В} & $y=2\sqrt{x+1}$ \\[0.3cm]
-    \textbf{Г} & $y=x^2-4x+3$ \\[0.3cm]
-    \textbf{Д} & $y=x$ \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Твердження}
+    \matchItem{1}{є непарною}
+\matchItem{2}{зростає на відрізку $[1; 4]$}
+\matchItem{3}{найбільше значення функції на відрізку $[1; 4]$ є від'ємним числом}
+}{
+\matchHead{Функція}
+    \matchItem{А}{\trigStyle{$y=-\cos x$}}
+\matchItem{Б}{$y=4^x$}
+\matchItem{В}{$y=2\sqrt{x+1}$}
+\matchItem{Г}{$y=x^2-4x+3$}
+\matchItem{Д}{$y=x$}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -1108,21 +1029,19 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $|a|$ \\[0.4cm]
-    \textbf{2} & $a^0$ \\[0.4cm]
-    \textbf{3} & \trigStyle{$\operatorname{tg}(\pi a)$} \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$|a|$}
+\matchItem{2}{$a^0$}
+\matchItem{3}{\trigStyle{$\operatorname{tg}(\pi a)$}}
+
+\nmtnobreak
 }{
-    \textit{Точка} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $K$ \\[0.2cm]
-    \textbf{Б} & $L$ \\[0.2cm]
-    \textbf{В} & $M$ \\[0.2cm]
-    \textbf{Г} & $N$ \\[0.2cm]
-    \textbf{Д} & $P$ \\
-    \end{tabular}
+\matchHead{Точка}
+    \matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
 }{
     \matchingGrid
 }
@@ -1137,28 +1056,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{Якщо $m \cos x \cdot \operatorname{tg} x = 2n \sin x$, то} \\[0.4cm]
-    \textbf{2} & Якщо $\sqrt{2m^2} = n$, то \\[0.4cm]
-    \textbf{3} & Якщо $4^{\log_2 m} = n$, то \\
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $n = 2m$. \\[0.2cm]
-    \textbf{Б} & $n = m^2$. \\[0.2cm]
-    \textbf{В} & $n = 2^m$. \\[0.2cm]
-    \textbf{Г} & $n = m\sqrt{2}$. \\[0.2cm]
-    \textbf{Д} & $n = \dfrac{m}{2}$. \\[0.35cm]
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{\trigStyle{Якщо $m \cos x \cdot \operatorname{tg} x = 2n \sin x$, то}}
+\matchItem{2}{Якщо $\sqrt{2m^2} = n$, то}
+\matchItem{3}{Якщо $4^{\log_2 m} = n$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$n = 2m$.}
+\matchItem{Б}{$n = m^2$.}
+\matchItem{В}{$n = 2^m$.}
+\matchItem{Г}{$n = m\sqrt{2}$.}
+\matchItem{Д}{$n = \dfrac{m}{2}$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -1170,21 +1082,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\lg 100$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\sin \dfrac{3\pi}{2}$} \\[0.6cm]
-    \textbf{3} & $(2 + \sqrt{3})(2 - \sqrt{3})$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\lg 100$}
+\matchItem{2}{\trigStyle{$\sin \dfrac{3\pi}{2}$}}
+\matchItem{3}{$(2 + \sqrt{3})(2 - \sqrt{3})$}
 }{
-    \textit{Значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $-1$ \\[0.2cm]
-    \textbf{Б} & $0$ \\[0.2cm]
-    \textbf{В} & $1$ \\[0.2cm]
-    \textbf{Г} & $2$ \\[0.2cm]
-    \textbf{Д} & $10$ \\
-    \end{tabular}
+\matchHead{Значення виразу}
+    \matchItem{А}{$-1$}
+\matchItem{Б}{$0$}
+\matchItem{В}{$1$}
+\matchItem{Г}{$2$}
+\matchItem{Д}{$10$}
 }{
     \matchingGrid
 }
@@ -1199,21 +1107,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\cos \dfrac{\pi}{3}$} \\[0.4cm]
-    \textbf{2} & $\pi - 4$ \\[0.4cm]
-    \textbf{3} & $4^{\log_4 \pi}$ \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\cos \dfrac{\pi}{3}$}}
+\matchItem{2}{$\pi - 4$}
+\matchItem{3}{$4^{\log_4 \pi}$}
 }{
-    \textit{Проміжок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $[-2; -1)$ \\[0.2cm]
-    \textbf{Б} & $[-1; 0)$ \\[0.2cm]
-    \textbf{В} & $[0; 1)$ \\[0.2cm]
-    \textbf{Г} & $[1; 2)$ \\[0.2cm]
-    \textbf{Д} & $[2; 4)$ \\
-    \end{tabular}
+\matchHead{Проміжок}
+    \matchItem{А}{$[-2; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 4)$}
 }{
     \matchingGrid
 }
@@ -1228,21 +1132,19 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\dfrac{3}{3^{-3}}$ \\[0.6cm]
-    \textbf{2} & $\log_8 \sqrt[3]{2}$ \\[0.6cm]
-    \textbf{3} & \trigStyle{$2(\cos 30^\circ - 0{,}5)(\cos 30^\circ + 0{,}5)$} \\
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\dfrac{3}{3^{-3}}$}
+\matchItem{2}{$\log_8 \sqrt[3]{2}$}
+\matchItem{3}{\trigStyle{$2(\cos 30^\circ - 0{,}5)(\cos 30^\circ + 0{,}5)$}}
+
+\nmtnobreak
 }{
-    \textit{Значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $1$ \\[0.2cm]
-    \textbf{Б} & $\dfrac{1}{9}$ \\[0.4cm]
-    \textbf{В} & $\sqrt{3}$ \\[0.2cm]
-    \textbf{Г} & $3$ \\[0.2cm]
-    \textbf{Д} & $81$ \\
-    \end{tabular}
+\matchHead{Значення виразу}
+    \matchItem{А}{$1$}
+\matchItem{Б}{$\dfrac{1}{9}$}
+\matchItem{В}{$\sqrt{3}$}
+\matchItem{Г}{$3$}
+\matchItem{Д}{$81$}
 }{
     \matchingGrid
 }
@@ -1257,21 +1159,19 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & \trigStyle{$\sin\left(-\dfrac{\pi}{6}\right)$} \\[0.4cm]
-    \textbf{2} & $\pi - |\pi+2|$ \\[0.4cm]
-    \textbf{3} & $\left(-\dfrac{1}{\sqrt{2}}\right)^2$ \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\sin\left(-\dfrac{\pi}{6}\right)$}}
+\matchItem{2}{$\pi - |\pi+2|$}
+\matchItem{3}{$\left(-\dfrac{1}{\sqrt{2}}\right)^2$}
+
+\nmtnobreak
 }{
-    \textit{Значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $-\dfrac{1}{2}$ \\[0.4cm]
-    \textbf{Б} & $\dfrac{1}{2}$ \\[0.4cm]
-    \textbf{В} & $2$ \\[0.2cm]
-    \textbf{Г} & $-2$ \\[0.2cm]
-    \textbf{Д} & $\sqrt{2}$ \\
-    \end{tabular}
+\matchHead{Значення виразу}
+    \matchItem{А}{$-\dfrac{1}{2}$}
+\matchItem{Б}{$\dfrac{1}{2}$}
+\matchItem{В}{$2$}
+\matchItem{Г}{$-2$}
+\matchItem{Д}{$\sqrt{2}$}
 }{
     \matchingGrid
 }
@@ -1286,21 +1186,19 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $\log_3 27$ \\[0.4cm]
-    \textbf{2} & \trigStyle{$\operatorname{tg} \dfrac{2\pi}{3}$} \\[0.6cm]
-    \textbf{3} & $\dfrac{1}{\sqrt{5}-\sqrt{2}} : (\sqrt{5}+\sqrt{2})$ \\[0.35cm]
-    \end{tabular}
+\matchHead{Вираз}
+    \matchItem{1}{$\log_3 27$}
+\matchItem{2}{\trigStyle{$\operatorname{tg} \dfrac{2\pi}{3}$}}
+\matchItem{3}{$\dfrac{1}{\sqrt{5}-\sqrt{2}} : (\sqrt{5}+\sqrt{2})$}
+
+\nmtnobreak
 }{
-    \textit{Значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & $-3$ \\[0.2cm]
-    \textbf{Б} & $\sqrt{3}$ \\[0.2cm]
-    \textbf{В} & $\dfrac{1}{3}$ \\[0.4cm]
-    \textbf{Г} & $-\sqrt{3}$ \\[0.2cm]
-    \textbf{Д} & $3$ \\
-    \end{tabular}
+\matchHead{Значення виразу}
+    \matchItem{А}{$-3$}
+\matchItem{Б}{$\sqrt{3}$}
+\matchItem{В}{$\dfrac{1}{3}$}
+\matchItem{Г}{$-\sqrt{3}$}
+\matchItem{Д}{$3$}
 }{
     \matchingGrid
 }
@@ -1315,28 +1213,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
-    \textit{Вираз} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $(3\pi - 1)^0$ \\[0.4cm]
-    \textbf{2} & $\log_{\pi} \dfrac{1}{\pi^3}$ \\[0.6cm]
-    \textbf{3} & \trigStyle{$\operatorname{tg} \dfrac{\pi}{3}$} \\[0.35cm]
-    \end{tabular}
-
-    \nopagebreak\nbvspace{1.0cm}
-    \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
-    \textit{Твердження про значення виразу} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} p{6.2cm}@{}}
-    \textbf{А} & є натуральним числом \\[0.2cm]
-    \textbf{Б} & є цілим недодатним числом \\[0.2cm]
-    \textbf{В} & є раціональним нецілим числом \\[0.2cm]
-    \textbf{Г} & є ірраціональним додатним числом \\[0.2cm]
-    \textbf{Д} & є ірраціональним від'ємним числом \\
-    \end{tabular}
-\end{minipage}
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{$(3\pi - 1)^0$}
+\matchItem{2}{$\log_{\pi} \dfrac{1}{\pi^3}$}
+\matchItem{3}{\trigStyle{$\operatorname{tg} \dfrac{\pi}{3}$}}
+}{
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є натуральним числом}
+\matchItem{Б}{є цілим недодатним числом}
+\matchItem{В}{є раціональним нецілим числом}
+\matchItem{Г}{є ірраціональним додатним числом}
+\matchItem{Д}{є ірраціональним від'ємним числом}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 

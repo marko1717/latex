@@ -173,6 +173,14 @@
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -1296,26 +1304,22 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
 \noindent
-\begin{minipage}[t]{0.42\textwidth}
-\textit{Фігура}\par\nbvspace{0.15cm}
-\textbf{1} \quad $ACM$\\[0.25cm]
-\textbf{2} \quad $ABLK$\\[0.25cm]
-\textbf{3} \quad $BCML$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.32\textwidth}
-\textit{Площа фігури}\par\nbvspace{0.15cm}
-\textbf{А} \quad $8$~см$^2$\\[0.15cm]
-\textbf{Б} \quad $10$~см$^2$\\[0.15cm]
-\textbf{В} \quad $12$~см$^2$\\[0.15cm]
-\textbf{Г} \quad $14$~см$^2$\\[0.15cm]
-\textbf{Д} \quad $16$~см$^2$\\[0.15cm]
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.2\textwidth}
-\nopagebreak\nbvspace{0.4cm}
-\begin{flushright}\matchingGrid\end{flushright}
-\end{minipage}}
+\matchingLayout{
+\matchHead{Фігура}
+\matchItem{1}{$ACM$}
+\matchItem{2}{$ABLK$}
+\matchItem{3}{$BCML$}
+}{
+\matchHead{Площа фігури}
+\matchItem{А}{$8$~см$^2$}
+\matchItem{Б}{$10$~см$^2$}
+\matchItem{В}{$12$~см$^2$}
+\matchItem{Г}{$14$~см$^2$}
+\matchItem{Д}{$16$~см$^2$}
+}{
+\matchingGrid
+}
+}
 % Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
 \par\penalty-20
 \end{samepage}

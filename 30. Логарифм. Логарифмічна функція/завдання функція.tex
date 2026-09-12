@@ -173,6 +173,14 @@
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
@@ -484,33 +492,21 @@
 
 \nmtnobreak
 \matchingLayout{
-\textit{Твердження}
+\matchHead{Твердження}
 
 \nmtnobreak
-\textbf{1} \quad областю значень функції є проміжок $[0; +\infty)$
-
-\nmtnobreak
-\textbf{2} \quad графік функції симетричний відносно осі $y$
-
-\nmtnobreak
-\textbf{3} \quad найменше значення на відрізку $[1; 4]$ функція набуває в точці $x = 4$
+\matchItem{1}{областю значень функції є проміжок $[0; +\infty)$}
+\matchItem{2}{графік функції симетричний відносно осі $y$}
+\matchItem{3}{найменше значення на відрізку $[1; 4]$ функція набуває в точці $x = 4$}
 }{
-\textit{Функція}
+\matchHead{Функція}
 
 \nmtnobreak
-\textbf{А} \quad $y = x^2 + 4$
-
-\nmtnobreak
-\textbf{Б} \quad $y = x$
-
-\nmtnobreak
-\textbf{В} \quad $y = \sqrt{x}$
-
-\nmtnobreak
-\textbf{Г} \quad $y = \log_{0,5} x$
-
-\nmtnobreak
-\textbf{Д} \quad $y = -\displaystyle\frac{1}{x}$
+\matchItem{А}{$y = x^2 + 4$}
+\matchItem{Б}{$y = x$}
+\matchItem{В}{$y = \sqrt{x}$}
+\matchItem{Г}{$y = \log_{0,5} x$}
+\matchItem{Д}{$y = -\displaystyle\frac{1}{x}$}
 }{
 \matchingGrid
 }
@@ -555,21 +551,17 @@
 
 \nmtnobreak
 \matchingLayout{
-    \textit{Функція} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{1} & $y=2-x^2$ \\[0.4cm]
-    \textbf{2} & $y=\sin x$ \\[0.4cm]
-    \textbf{3} & $y=\log_5 x$ \\
-    \end{tabular}
+\matchHead{Функція}
+    \matchItem{1}{$y=2-x^2$}
+\matchItem{2}{$y=\sin x$}
+\matchItem{3}{$y=\log_5 x$}
 }{
-    \textit{Кількість спільних точок} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{@{}p{0.5cm} l@{}}
-    \textbf{А} & жодної \\[0.4cm]
-    \textbf{Б} & одна \\[0.4cm]
-    \textbf{В} & дві \\[0.4cm]
-    \textbf{Г} & три \\[0.4cm]
-    \textbf{Д} & більше трьох \\
-    \end{tabular}
+\matchHead{Кількість спільних точок}
+    \matchItem{А}{жодної}
+\matchItem{Б}{одна}
+\matchItem{В}{дві}
+\matchItem{Г}{три}
+\matchItem{Д}{більше трьох}
 }{
     \matchingGrid
 }
@@ -590,70 +582,21 @@
 
 \nmtnobreak
 \noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Початок речення} \par\par\nbvspace{0.3cm}
-    \textbf{1} \quad Нуль функції належить проміжку \\[0.4cm]
-    \textbf{2} \quad Точка максимуму функції належить проміжку \\[0.4cm]
-    \textbf{3} \quad Абсциса точки перетину графіка функції з графіком функції $y = \log_{\frac{1}{3}} x$ належить проміжку
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        % Сітка розширена вниз до -3.5
-        \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (5.5,4.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (5.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3.5) -- (0,4.5) node[left] {$y$};
-
-        \node[below left] at (0,0) {$0$};
-        \node[below] at (1,0) {$1$};
-        \node[left] at (0,1) {$1$};
-        \node[below] at (5,0) {$5$};
-        \node[below] at (-4,0) {$-4$};
-
-        % Графік строго через точки: (-4, -3), (-1.2, 0), (0, 2.4), (2.5, 4), (5, 2)
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-4, -3) (-1.2, 0) (0, 2.4) (2.5, 4) (5, 2)};
-
-        \fill (-4,-3) circle (3pt);
-        \fill (5,2) circle (3pt);
-        \node[right, fill=white, inner sep=1.5pt] at (2.5, 4) {$y=f(x)$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.2cm}
-
-\nmtnobreak
-\noindent
-\begin{minipage}[t]{0.55\textwidth}
-    \textit{Закінчення речення} \par\par\nbvspace{0.2cm}
-    \begin{tabular}{ll}
-    \textbf{А} & $(-4; -2]$. \\
-    \textbf{Б} & $(-2; 0]$. \\
-    \textbf{В} & $(0; 1]$. \\
-    \textbf{Г} & $(1; 3]$. \\
-    \textbf{Д} & $(3; 5]$. \\
-    \end{tabular}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-    \nopagebreak\nbvspace{0.5cm}
-    \begin{flushright}
-    \begingroup
-    \setlength{\tabcolsep}{4pt}
-    \renewcommand{\arraystretch}{1.2}
-    \small
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & & & & & \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-    \end{flushright}
-\end{minipage}
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Нуль функції належить проміжку}
+\matchItem{2}{Точка максимуму функції належить проміжку}
+\matchItem{3}{Абсциса точки перетину графіка функції з графіком функції $y = \log_{\frac{1}{3}} x$ належить проміжку}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$(-4; -2]$.}
+\matchItem{Б}{$(-2; 0]$.}
+\matchItem{В}{$(0; 1]$.}
+\matchItem{Г}{$(1; 3]$.}
+\matchItem{Д}{$(3; 5]$.}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -949,18 +892,16 @@
 \nopagebreak\nbvspace{0.3cm}
 
 \nmtnobreak
-\textit{Твердження} \par\par\nbvspace{0.2cm}
-\begin{tabular}{@{}p{0.4cm} p{14cm}@{}}
-\textbf{1} & не має спільних точок з функцією $y = \log_2(x-1)$ \\[0.4cm]
-\textbf{2} & є графіком функції $y=\dfrac{2x}{3}-2$ \\[0.4cm]
-\textbf{3} & кутовий коефіцієнт прямої є від'ємним числом \\
-\end{tabular}
+\matchHead{Твердження}
+\matchItem{1}{не має спільних точок з функцією $y = \log_2(x-1)$}
+\matchItem{2}{є графіком функції $y=\dfrac{2x}{3}-2$}
+\matchItem{3}{кутовий коефіцієнт прямої є від'ємним числом}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
 
 \nmtnobreak
-\textit{Пряма} \par\par\nbvspace{0.2cm}
+\matchHead{Пряма}
 
 \nmtnobreak
 \begin{center}
