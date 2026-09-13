@@ -120,7 +120,7 @@ def to_single(b):
         mm = re.search(r"\b" + re.escape(lab) + r"\s*~?--~?\s*([А-Д])", ans.group(1))
         if mm: letter = mm.group(1)
     out = ["\\begin{samepage}"]
-    if letter: out.append("% Відповідь: %s" % letter)
+    if letter: out.append("%% Відповідь: %s" % letter)
     out.append("\\zadtask{%s%s}" % (stmt, (" \\nmtyear{%s}" % year) if year else ""))
     out.append("\\answerRows{%s}" % "}{".join(t for _, t in opts))
     out.append("\\par\\penalty-20")
