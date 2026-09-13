@@ -1,0 +1,1083 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Показникові вирази, функція, рівняння і нерівності}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+% варіанти відповіді окремими рядками (довгі вирази не влазять у клітинки таблиці)
+\newcommand{\answerRows}[5]{\par\nopagebreak\vspace{0.15cm}%
+\matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}}
+
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\setcounter{zad}{0}
+
+\chapterTitle{Показникові вирази, функція, рівняння і нерівності}
+
+\typeTitle{Показникові вирази і функція}
+
+\begin{samepage}
+\noindent\zadnum Графік функції $y = 3^x$ паралельно перенесли на 2 одиниці вниз уздовж осі $y$. Укажіть функцію, графік якої отримали в результаті цього перетворення. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$y = 3^{x-2}$}{$y = 3^x - 2$}{$y = 3^{x+2}$}{$y = 3^x + 2$}{$y = \displaystyle\frac{3^x}{2}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Спростіть вираз $5^{1+x} \cdot 5^{1-x}$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$25^{1-x^2}$}{$5$}{$25$}{$5^{1-x^2}$}{$10$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $2^{3a}$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq 8$. \nmtyear{2023}}
+\answerRows{$8^a$}{$8 + a$}{$8a$}{$8 - a$}{$\displaystyle\frac{a}{8}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $2^\pi$ і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+\answerRows{$(-\infty; 0]$}{$(0; 2)$}{$[2; 4)$}{$[4; 8)$}{$[8; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $\displaystyle\frac{2^m}{2^n} = 2^a$, то>> так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}}
+\answerRows{$a = mn$.}{$a = 0$.}{$a = m - n$.}{$a = n$.}{$a = \displaystyle\frac{m}{n}$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 2^x$ та її найменшим значенням \mbox{(А--Д)} на відрізку $[0; 4]$. \nmtyear{2023}}
+\answerRows{$1$}{$2$}{$3$}{$4$}{$5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $3^m \cdot 9^n = 3^a$, то>> так, щоб утворилося правильне твердження. \nmtyear{2023}}
+\answerRows{$a = 0$.}{$a = 27^{mn}$.}{$a = 3mn$.}{$a = 2mn$.}{$a = m + 2n$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат на площині зображено коло $x^2+y^2=4$. Установіть відповідність між функцією $y=4^x$ та кількістю (А – Д) спільних точок, які має графік цієї функції із заданим колом. \nmtyear{2023}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+        % Сітка та осі
+
+        \draw[->, >=stealth, thick] (-3,0) -- (3,0) node[below] {$x$};
+        \draw[->, >=stealth, thick] (0,-3) -- (0,3) node[left] {$y$};
+
+        % Коло
+        \draw[thick] (0,0) circle (2cm);
+
+        % Підписи
+        \node[below left] at (0,0) {$0$};
+        \node[above right] at (1.4, 1.4) {$x^2+y^2=4$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\par\nopagebreak\vspace{0.15cm}
+\answerRows{жодної}{лише одна}{лише дві}{лише три}{більше за три}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Увідповідніть функцію $y = \left(\displaystyle\frac{1}{2}\right)^x$ із кількістю \mbox{(А--Д)} спільних точок її графіка з прямою $y = -x$. \nmtyear{2023}}
+\answerRows{жодної}{одна}{дві}{три}{безліч}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 5^{-x}$ та її найбільшим значенням \mbox{(А--Д)} на відрізку $[-1; 3]$. \nmtyear{2023}}
+\answerRows{$1$}{$2$}{$3$}{$4$}{$5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Увідповідніть функцію $y = 2^{-x}$ із кількістю \mbox{(А--Д)} спільних точок її графіка з прямою $y = x + 3$. \nmtyear{2023}}
+\answerRows{жодної}{одна}{дві}{три}{безліч}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 3^x$ та її властивістю \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{проходить через початок координат}{не містить точок з від'ємною ординатою}{не має спільних точок з віссю $y$}{двічі перетинає графік прямої $y = 3$}{графік знаходиться лише в I чверті}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $3^n \cdot 3 = 3^a$, то>> так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
+\answerRows{$a = 3n$.}{$a = n + 1$.}{$a = n + 3$.}{$a = \displaystyle\frac{3}{n}$.}{$a = \displaystyle\frac{n}{3}$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між твердженням <<областю визначення функції є проміжок $[-1; +\infty)$>> та функцією \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2023}}
+\answerRows{$y = -\cos x$}{$y = 4^x$}{$y = 2\sqrt{x + 1}$}{$y = x^2 - 4x + 3$}{$y = x$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 2^x$ та її властивістю \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{є зростаючою на $(-\infty; +\infty)$}{графік має одну спільну точку із графіком $y = x - 2$}{графік має дві спільні точки із графіком $y = x - 2$}{є спадною на проміжку $(-\infty; -2]$}{є спадною на проміжку $(-\infty; 2]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $2^{-a}$ і множиною \mbox{(А--Д)}, якій належить значення цього виразу, якщо $a = 5$. \nmtyear{2023}}
+\answerRows{ірраціональних додатних чисел}{натуральних чисел}{цілих від'ємних чисел}{раціональних нецілих чисел}{ірраціональних від'ємних чисел}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Функція $y = 3^{-x}$>> так, щоб утворилося правильне твердження. \nmtyear{2023}}
+\answerRows{має точку локального максимуму.}{має точку локального мінімуму.}{є непарною.}{зростає на всій області визначення.}{набуває лише додатних значень.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 2^x$ та властивістю її графіка \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{проходить через точку $(1; 0)$}{не перетинає вісь $y$}{симетричний відносно осі $y$}{розміщений лише в I та II чвертях}{розміщений лише в I та IV чвертях}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між твердженням <<функція має 2 нулі>> та функцією \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2024}}
+\answerRows{$y = x^2 - 4$}{$y = \displaystyle\frac{1}{x - 4}$}{$y = 2^x$}{$y = 0{,}5^x$}{$y = \sqrt{x + 1}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 4^x$ та її властивістю \mbox{(А--Д)}. \nmtyear{2024}}
+\answerRows{є зростаючою на всій області визначення}{набуває від'ємного значення при $x = -2$}{є парною}{має три спільні точки з графіком функції $y = -x$}{графік функції розташований лише в I та IV координатній чверті}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\left(\displaystyle\frac{1}{2}\right)^{\log_2 \pi}$ та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$[-5; -2)$}{$[-2; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = 4^x$ та властивістю її графіка \mbox{(А--Д)}. \nmtyear{2024}}
+\answerRows{розташований лише в першій чверті}{має спільну точку з віссю $x$}{проходить через точку $(0; 1)$}{не перетинає вісь $y$}{симетричний відносно осі $y$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Графік функції $y = 3^x$ має лише одну спільну точку з>> так, щоб утворилося правильне твердження. \nmtyear{2024}}
+\answerRows{віссю $x$.}{віссю $y$.}{прямою $y = x - 4$.}{прямою $y = -4$.}{прямою $y = -2$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Графік функції $y = 2^x$>> так, щоб утворилося правильне твердження. \nmtyear{2024}}
+\answerRows{симетричний відносно осі абсцис.}{симетричний відносно осі ординат.}{симетричний відносно початку координат.}{не перетинає вісь абсцис.}{не перетинає вісь ординат.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
+\noindent\zadnum На кожному з рисунків <<Рис. 1>> зображено графік функції $y=f(x)$, визначеної на проміжку $[-3; 3]$. Узгодьте рисунок \mbox{(1--3)} з твердженням \mbox{(А--Д)} щодо функції $y=f(x)$, графік якої зображено на цьому рисунку. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+% Блок рисунків
+\noindent
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
+    \centering
+    Рис. 1 \\
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
+        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
+        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
+        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
+        \node[below left] at (0,0) {\small $0$};
+        \node[left] at (0,1) {\small $1$};
+        \node[below] at (1,0) {\small $1$};
+        \node[below] at (3,0) {\small $3$};
+        \node[below] at (-3,0) {\small $-3$};
+
+        % Дуга (схожа на півокружність або параболу вниз)
+        \draw[thick] plot [smooth, tension=1.5] coordinates {(-3, -1) (0, -4) (3, -1)};
+        \node[right] at (2, -2.5) {\small $y=f(x)$};
+        \fill (-3,-1) circle (3pt);
+        \fill (3,-1) circle (3pt);
+    \end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
+    \centering
+    Рис. 2 \\
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
+        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
+        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
+        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
+        \node[below left] at (0,0) {\small $0$};
+        \node[left] at (0,1) {\small $1$};
+        \node[below] at (1,0) {\small $1$};
+        \node[below] at (3,0) {\small $3$};
+        \node[below] at (-3,0) {\small $-3$};
+
+        % "Горб"
+        \draw[thick] plot [smooth, tension=0.6] coordinates {(-3, -2) (-1, 3) (1, 0) (3, -1.5)};
+        \node[right] at (1, 2) {\small $y=f(x)$};
+        \fill (-3,-2) circle (3pt);
+        \fill (3,-1.5) circle (3pt);
+    \end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
+    \centering
+    Рис. 3 \\
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
+        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
+        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
+        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
+        \node[below left] at (0,0) {\small $0$};
+        \node[left] at (0,1) {\small $1$};
+        \node[below] at (1,0) {\small $1$};
+        \node[below] at (3,0) {\small $3$};
+        \node[below] at (-3,0) {\small $-3$};
+
+        % Спадна функція
+        \draw[thick] plot [smooth, tension=0.6] coordinates {(-2.5, 3.5) (-1, 2) (0, 0) (1, -1) (3, -3)};
+        \node[left] at (-2, 2) {\small $y=f(x)$};
+        \fill (3,-3) circle (3pt);
+    \end{tikzpicture}\end{nmtfit}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\par\nopagebreak\vspace{0.15cm}
+\answerRows{графік функції $f$ є фрагментом кола $x^2 + (y-1)^2 = 9$}{графік функції $f$ є фрагментом кола $x^2 + (y+1)^2 = 9$}{функція $f$ зростає на області визначення}{графік функції $y=f(x)+2$ розташований лише в I і II чвертях}{графік функції $f$ має лише одну спільну точку з графіком функції $y=2^x$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте функцію $y = 2^x$ із кількістю \mbox{(А--Д)} спільних точок її графіка з прямою $y = -x$. \nmtyear{2025}}
+\answerRows{жодної}{одна}{дві}{три}{безліч}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $4^6 : 4^{-m}$ із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює 1. \nmtyear{2025}}
+\answerRows{$\displaystyle\frac{1}{4}$}{$6$}{$4$}{$-6$}{$8$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $\sqrt{2^m} = 2^n$, то>> так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}}
+\answerRows{$n = 2m$.}{$n = m^2$.}{$n = m^2 + 2m$.}{$n = \sqrt{m}$.}{$n = \displaystyle\frac{m}{2}$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Узгодьте проміжок $[-4; 0]$ із функцією \mbox{(А--Д)}, що описує графік функції $y=f(x)$ на цьому проміжку. \nmtyear{2025}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+        \draw[step=1cm,gray!50,very thin] (-4.5,-0.5) grid (6.5,8.5);
+        \draw[->, >=stealth, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
+        \draw[->, >=stealth, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
+
+        \node[below left] at (0,0) {$0$};
+        \node[below] at (1,0) {$1$};
+        \node[left] at (0,1) {$-1$}; % На картинці тут -1 позначено як засічка, але насправді це 1, просто риска
+        \node[left] at (0,1) {$1$};
+        \node[below] at (6,0) {$6$};
+        \node[below] at (-4,0) {$-4$};
+
+        % Графік
+        % [-4; 0] -> y = sqrt(-x). (-4, 2) -> (0,0)
+        \draw[thick] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
+
+        % [0; 2] -> y = x^3. (0,0) -> (2, 8)
+        \draw[thick] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
+
+        % [2; 6] -> y = 12 - 2x. (2, 8) -> (6, 0)
+        \draw[thick] (2, 8) -- (6, 0);
+
+        \fill (-4, 2) circle (3pt);
+        \fill (6, 0) circle (3pt);
+        \node[right, fill=white, inner sep=1.5pt] at (4, 4) {$y=f(x)$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\par\nopagebreak\vspace{0.15cm}
+\answerRows{$y=x^3$}{$y=12-2x$}{$y=-\sqrt{x}$}{$y=2^x$}{$y=\sqrt{-x}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
+\noindent\zadnum Установіть відповідність між твердженням \mbox{(1--3)} та прямою, зображеною на рисунку \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\begin{minipage}[t]{0.60\textwidth}
+\matchHead{Твердження}
+    \matchItem{1}{не має спільних точок з функцією $y=\left(\dfrac{2}{3}\right)^x$}
+\matchItem{2}{є графіком функції $y=x-2$}
+\matchItem{3}{кутовий коефіцієнт прямої дорівнює $0$}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.30\textwidth}
+    \nopagebreak\nbvspace{0.5cm}
+    \matchingGrid
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\matchHead{Пряма}
+
+\nmtnobreak
+% Таблиця з графіками
+\begin{center}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|*{5}{c|}}
+\hline
+\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (2,0) {\tiny $2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[above right] at (0,1) {\tiny $1$};
+    \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
+    \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below left] at (-1,0) {\tiny $-1$};
+    \draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут
+    \draw[thick] (-1,-2) -- (-1,3); % x = -1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below] at (-2,0) {\tiny $-2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (3,0) {\tiny $3$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
+\end{tikzpicture}\end{nmtfit} \\
+\hline
+\end{tabular}
+\endgroup
+\end{center}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
+\noindent\zadnum Установіть відповідність між твердженням \mbox{(1--3)} та прямою, зображеною на рисунку \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\begin{minipage}[t]{0.60\textwidth}
+\matchHead{Твердження}
+    \matchItem{1}{не має спільних точок з функцією $y=\log_2(x-1)$}
+\matchItem{2}{є графіком функції $y=\dfrac{2x}{3}-2$}
+\matchItem{3}{кутовий коефіцієнт прямої є від'ємним числом}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.30\textwidth}
+    \nopagebreak\nbvspace{0.5cm}
+    \matchingGrid
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\matchHead{Пряма}
+
+\nmtnobreak
+% Таблиця з графіками
+\begin{center}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|*{5}{c|}}
+\hline
+\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (2,0) {\tiny $2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[above right] at (0,1) {\tiny $1$};
+    \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
+    \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below left] at (-1,0) {\tiny $-1$};
+    \draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут
+    \draw[thick] (-1,-2) -- (-1,3); % x = -1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below] at (-2,0) {\tiny $-2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (3,0) {\tiny $3$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
+\end{tikzpicture}\end{nmtfit} \\
+\hline
+\end{tabular}
+\endgroup
+\end{center}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\typeTitle{Показникові рівняння}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть систему рівнянь $\begin{cases} 2^{3x-y} = 2^7, \\ 2x + y = 3. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок цієї системи, то $x_0 \cdot y_0 =$ \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$2$}{$1$}{$-3$}{$-1$}{$-2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\left(\displaystyle\frac{1}{3}\right)^{2x-1} = 9$. \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$[2; +\infty)$}{$(-2; 0]$}{$(-\infty; -2]$}{$[1; 2)$}{$(0; 1]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть рівняння $3^x = 81 \cdot 9^x$. \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$4$}{$-4$}{$-2$}{$-3$}{$3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ ===
+\noindent\zadnum Якому проміжку належить корінь рівняння $2^x = \displaystyle\frac{1}{8}$? \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$(2; 4]$}{$(-6; -4]$}{$(-2; 0]$}{$(0; 2]$}{$(-4; -2]$}
+
+\nmtnobreak
+% === НМТ 2024 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $4^x \cdot 5^x = \displaystyle\frac{1}{400}$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$[2; +\infty)$}{$[-0{,}5; 2)$}{$[-2; -0{,}5)$}{$[-10; -2)$}{$(-\infty; -10)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $5^{3x} \cdot 5^{-2x} = \displaystyle\frac{1}{5}$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$(-\infty; -1]$}{$(-1; -0{,}5]$}{$(-0{,}5; 0]$}{$(0{,}5; +\infty)$}{$(0; 0{,}5]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть корінь рівняння $2^x = 2 \cdot 16$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$7$}{$3$}{$6$}{$4$}{$5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\left(\displaystyle\frac{1}{3}\right)^{x-7} = \sqrt{3}$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$(7; 10]$}{$(-4; 4)$}{$(-6; -4]$}{$(4; 7]$}{$[-7; -6]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить \textit{менший} корінь рівняння $3^{x^2} = 81$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$[-2; 0)$}{$(2; +\infty)$}{$[-3; -2)$}{$[0; 2)$}{$(-\infty; -3)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть систему рівнянь $\begin{cases} 2^x + 2y = 0, \\ 2^x - 4y = 6. \end{cases}$ \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$(-3; 3)$}{$(1; -1)$}{$(3; -3)$}{$(-1; 1)$}{$(2; -2)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть рівняння $10^x = 0{,}1$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$1$}{$-1$}{$0$}{$0{,}01$}{$-9{,}9$}
+
+\nmtnobreak
+% === НМТ 2025 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть систему рівнянь $\begin{cases} 2^{y+2x} = 64, \\ 2x - y = 12. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$ \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$4{,}5$}{$1{,}5$}{$7{,}5$}{$-3$}{$9$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть рівняння $3^{x+1} = 81$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$5$}{$3$}{$-3$}{$4$}{$2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\left(\displaystyle\frac{3}{8}\right)^x = \displaystyle\frac{8}{3}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$(-2; 0)$}{$(2; 4)$}{$(-6; -4)$}{$(-4; -2)$}{$(0; 2)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\left(\displaystyle\frac{1}{3}\right)^{x-7} = \sqrt{3}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$(-7; -6)$}{$(-6; 0)$}{$(0; 1)$}{$(6; 7)$}{$(1; 6)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 23.05, завдання №15 --- основна тема: Системи рівнянь
+\zadtask{Розв'яжіть систему рівнянь $\begin{cases} 5^x = \sqrt{5}, \\ \dfrac{y + 1}{2x + 3} = \dfrac{1 - 4x}{2}. \end{cases}$ Якщо $(x_0;\, y_0)$~--- розв'язок системи, то $x_0 + y_0 = $ \nmtyear{2026}}
+\answerTable{$-2{,}5$}{$-1{,}5$}{$2{,}5$}{$-3{,}5$}{$1{,}5$}
+% Відповідь: А
+\ifshowsolutions\solution{З першого рівняння $5^x=5^{1/2}$, тож $x_0=0{,}5$. Підставимо: $\dfrac{y+1}{2\cdot 0{,}5+3}=\dfrac{1-4\cdot 0{,}5}{2}$, тобто $\dfrac{y+1}{4}=-\dfrac{1}{2}$, звідки $y+1=-2$, $y_0=-3$. Тоді $x_0+y_0=0{,}5-3=-2{,}5$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 1.06, завдання №1
+\zadtask{Позначте число, що є коренем рівняння $3 \cdot 3^x = 27$. \nmtyear{2026}}
+\answerTable{$2$}{$3$}{$4$}{$9$}{$27$}
+% Відповідь: А
+\ifshowsolutions\solution{$3\cdot 3^x=27 \Rightarrow 3^{x+1}=3^3 \Rightarrow x+1=3 \Rightarrow x=2$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 3.06, завдання №11
+\zadtask{Якому проміжку належить корінь рівняння $2^{x+1} - 2^x = \dfrac{1}{8}$? \nmtyear{2026}}
+\answerTable{$(-\infty;\, -5)$}{$[-5;\, -3)$}{$[-3;\, 0)$}{$[0;\, 5)$}{$[5;\, +\infty)$}
+% Відповідь: В
+\ifshowsolutions\solution{$2^{x+1} - 2^x = 2^x(2-1) = 2^x = \dfrac18 = 2^{-3}$, звідки $x = -3 \in [-3;\, 0)$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 5.06, завдання №13
+\zadtask{Якому проміжку належить корінь рівняння $5^x \cdot 20^x = 1000$? \nmtyear{2026}}
+\answerTable{$(-\infty;\, 0)$}{$[0;\, 1{,}5)$}{$[1{,}5;\, 2)$}{$[2;\, 4)$}{$[4;\, +\infty)$}
+% Відповідь: В
+\ifshowsolutions\solution{$5^x\cdot 20^x=(5\cdot 20)^x=100^x=10^{2x}$, а $1000=10^3$. Отже $10^{2x}=10^3\Rightarrow 2x=3\Rightarrow x=1{,}5$, що належить $[1{,}5;\,2)$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №7
+\zadtask{Якому проміжку належить корінь рівняння $2^{2x-5} = 8$? \nmtyear{2026}}
+\answerTable{$(-\infty; -2)$}{$[0; 2)$}{$[-2; 0)$}{$[2; 4)$}{$[4; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 9.06, завдання №7
+\zadtask{Розв'яжіть рівняння $3^{x} = 81 \cdot 9^{x}$. \nmtyear{2026}}
+\answerTable{$-2$}{$-4$}{$-3$}{$3$}{$4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 10.06, завдання №7
+\zadtask{Позначте проміжок, якому належить корінь рівняння $\left(\dfrac{1}{3}\right)^{2x-1} = 9$. \nmtyear{2026}}
+\answerTable{$(-3; -2)$}{$(-2; -1)$}{$(-1; 0)$}{$(0; 1)$}{$(1; 2)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 17.06, завдання №7
+\zadtask{Розв'яжіть рівняння $3^x = 9^{x+2}$. \nmtyear{2026}}
+\answerTable{$-4$}{$4$}{$0$}{$-2$}{$2$}
+% Відповідь: А
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №15 --- основна тема: Системи рівнянь
+\zadtask{Розв'яжіть систему рівнянь $\begin{cases}2^{3x - y} = 2^7,\\ 2x + y = 3.\end{cases}$ Якщо $(x_0;\, y_0)$~--- розв'язок цієї системи, то $x_0 \cdot y_0 = $ \nmtyear{2026}}
+\answerTable{$2$}{$-2$}{$-1$}{$-3$}{$1$}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 19.06, завдання №15
+\zadtask{Визначте проміжок, якому належить корінь рівняння $5^{6x + 2} = \dfrac{1}{25}$. \nmtyear{2026}}
+\answerTable{$[-2; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; +\infty)$}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Показникові нерівності}
+
+\begin{samepage}
+\noindent\zadnum Яке з наведених чисел є розв'язком нерівності $5^{-x} > 25$? \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$0$}{$3$}{$-1$}{$-3$}{$1$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\left(\displaystyle\frac{1}{5}\right)^x > \displaystyle\frac{1}{25}$. \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$(5; +\infty)$}{$(-\infty; 5)$}{$(2; +\infty)$}{$(0; 2)$}{$(-\infty; 2)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $8^x > \displaystyle\frac{1}{64}$. \nmtyear{2023}
+
+\nmtnobreak
+\answerTable{$(-\infty; -2)$}{$(0; 2)$}{$(2; +\infty)$}{$(-2; +\infty)$}{$(-\infty; 2)$}
+
+\nmtnobreak
+% === НМТ 2024 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\left(\displaystyle\frac{1}{3}\right)^{2x-1} \leqslant 27^{-1}$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$[2; +\infty)$}{$[-1; +\infty)$}{$(-\infty; 4]$}{$(-\infty; -1]$}{$(-\infty; 2]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть систему нерівностей $\begin{cases} 5^x < 25, \\ 2 - x < 8. \end{cases}$ \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$(-6; 5)$}{$(2; 6)$}{$(-\infty; -6)$}{$(-6; 2)$}{$(2; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть систему нерівностей $\begin{cases} x^2 + 9 \geqslant 0, \\ 2^x > \displaystyle\frac{1}{16}. \end{cases}$ \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$[-3; +\infty)$}{$(-4; +\infty)$}{$(-4; -3]$}{$(-4; -3] \cup [3; +\infty)$}{$\varnothing$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $(0{,}1)^{x+2} < 0{,}1$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTable{$(-1; +\infty)$}{$(-\infty; 3)$}{$(-\infty; -1)$}{$(-2; +\infty)$}{$(3; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $5^x \leqslant 1$. \nmtyear{2024}
+
+\nmtnobreak
+\answerTableTall{$[1; +\infty)$}{$(-\infty; 1]$}{$\left(-\infty; \displaystyle\frac{1}{5}\right)$}{$(-\infty; 0]$}{$[0; +\infty)$}
+
+\nmtnobreak
+% === НМТ 2025 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $7^x \leqslant \displaystyle\frac{1}{49}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTableTall{$\left(-\infty; \displaystyle\frac{1}{243}\right]$}{$[-2; +\infty)$}{$\left[\displaystyle\frac{1}{7}; +\infty\right)$}{$(-\infty; -2]$}{$\left(-\infty; \displaystyle\frac{1}{2}\right]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\left(\displaystyle\frac{1}{4}\right)^{2x-6} > \displaystyle\frac{1}{16}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$(-\infty; -2)$}{$(-\infty; 2)$}{$(-2; +\infty)$}{$(4; +\infty)$}{$(-\infty; 4)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $3^x \cdot 5^x \leqslant \displaystyle\frac{1}{15}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTableTall{$(-\infty; 1]$}{$[1; +\infty)$}{$\left(-\infty; \displaystyle\frac{1}{15}\right]$}{$[-1; +\infty)$}{$(-\infty; -1]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $2^{3-x} > \displaystyle\frac{1}{4}$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$(-\infty; 5)$}{$(-5; +\infty)$}{$(-1; +\infty)$}{$(5; +\infty)$}{$(-\infty; -1)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $10^{x-2} > 1$. \nmtyear{2025}
+
+\nmtnobreak
+\answerTable{$(3; +\infty)$}{$(-2; +\infty)$}{$(-\infty; 2)$}{$(2{,}1; +\infty)$}{$(2; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 4.06, завдання №15
+\zadtask{Розв'яжіть нерівність $3^{x^2 - 2x + 1} \leqslant 1$. \nmtyear{2026}}
+\answerTable{$1$}{$(-\infty;\, -1]$}{$-1$}{$[1;\, +\infty)$}{$[-1;\, +\infty)$}
+% Відповідь: А
+\ifshowsolutions\solution{Оскільки $1=3^0$ і основа $3>1$, нерівність рівносильна $x^2-2x+1\leqslant0$, тобто $(x-1)^2\leqslant0$. Це виконується лише при $x=1$. Відповідь: \textbf{А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 15.06, завдання №7
+\zadtask{Розв'яжіть нерівність $5^{x-1} \leqslant \dfrac{1}{25}$. \nmtyear{2026}}
+\answerTable{$(-\infty; -1]$}{$(-\infty; -4]$}{$(-\infty; -3]$}{$[1; +\infty)$}{$[3; +\infty)$}
+% Відповідь: А
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 16.06, завдання №7
+\zadtask{Розв'яжіть нерівність $8^{2x+9} > 8^x$. \nmtyear{2026}}
+\answerTable{$(-\infty; -3)$}{$(-3; +\infty)$}{$(-9; +\infty)$}{$(9; +\infty)$}{$(-\infty; -9)$}
+% Відповідь: Г
+\par\penalty-20
+\end{samepage}
+
+\end{document}
