@@ -7,7 +7,7 @@
 
     python3 scripts/збірка_показникові.py
 """
-import os, re, sys, unicodedata
+import os, re, sys, json, unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = [("Показникові вирази і функція", "28. Показникова функція. Показникові рівняння/Показникові функція і вирази/завдання.tex"),
@@ -205,6 +205,20 @@ def preamble():
             "\\matchItem{А}{#1}\\matchItem{Б}{#2}\\matchItem{В}{#3}\\matchItem{Г}{#4}\\matchItem{Д}{#5}}\n")
     return pre
 
+ANSW = os.path.join(ROOT, "scripts", "data", "відповіді_показникові.json")
+
+def sig(block):
+    """стабільний підпис завдання: нормалізований текст без року й службових команд"""
+    t = re.sub(r"%[^\n]*", " ", block)
+    t = re.sub(r"(?s)\\begin\{(tikzpicture|axis)\}.*?\\end\{\1\}", " ", t)
+    t = re.sub(r"\\nmtyear\{\d+\}", " ", t)
+    t = re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", t)
+    return t[:160]
+
+def answers():
+    if not os.path.exists(ANSW): return {}
+    return json.load(open(ANSW, encoding="utf-8"))
+
 def carried_macros():
     """макроси, які теми означують після \\begin{document} (matchingLayout тощо)"""
     src = open(os.path.join(ROOT, SRC[0][1]), encoding="utf-8").read()
@@ -215,7 +229,7 @@ def carried_macros():
 def main():
     out = [preamble(), "\\begin{document}\n" + carried_macros() + "\n\\setcounter{zad}{0}\n"]
     out.append("\\chapterTitle{Показникові вирази, функція, рівняння і нерівності}\n")
-    stat = []
+    stat, order = [], []
     for title, path in SRC:
         bs = blocks(path)
         matched = [(b, to_single(b)) for b in bs if kind(b) == "matching"]
@@ -225,10 +239,25 @@ def main():
         singles = [b for b in bs if kind(b) == "single"]
         other = [b for b in bs if kind(b) not in ("single", "matching")] + kept
         out.append("\\typeTitle{%s}\n" % title)
-        for b in singles: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
-        for c in conv: out.append(c)
-        for b in other: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
+        for b in singles:
+            out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n"); order.append(b)
+        for c in conv:
+            out.append(c); order.append(c)
+        for b in other:
+            out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n"); order.append(b)
         stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d)" % (title, len(singles) + len(conv) + len(other), len(conv), dropped))
+    key = answers()
+    rows, missing = [], 0
+    for n, b in enumerate(order, 1):
+        a = key.get(sig(b))
+        if a: rows.append("\\mbox{%d~--- %s}" % (n, a))
+        else: rows.append("\\mbox{%d~--- ?}" % n); missing += 1
+    out.append("\\clearpage\n\\sectionTitle{Відповіді}\n")
+    out.append("\\noindent{\\small\\color{gray!80!black}Відповіді до завдань цього збірника. "
+               "Для завдань НМТ-2026 узято офіційні ключі, для 2023--2025 --- обчислено.}"
+               "\\par\\vspace{0.3cm}\n")
+    out.append("\\begin{multicols}{5}\\noindent\n" + "\\par\n".join(rows) + "\n\\end{multicols}\n")
+    if missing: print("   УВАГА: без відповіді", missing, "завдань")
     out.append("\\end{document}\n")
     txt = unicodedata.normalize("NFC", "\n".join(out))
     open(os.path.join(ROOT, OUT), "w", encoding="utf-8").write(txt)
