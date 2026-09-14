@@ -230,6 +230,8 @@ def main():
     out = [preamble(), "\\begin{document}\n" + carried_macros() + "\n\\setcounter{zad}{0}\n"]
     out.append("\\chapterTitle{Показникові вирази, функція, рівняння і нерівності}\n")
     stat, order = [], []
+    ann = len(out)          # місце під анотацію -- підставимо, коли будуть підрахунки
+    out.append("")
     for title, path in SRC:
         bs = blocks(path)
         matched = [(b, to_single(b)) for b in bs if kind(b) == "matching"]
@@ -245,7 +247,23 @@ def main():
             out.append(c); order.append(c)
         for b in other:
             out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n"); order.append(b)
-        stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d)" % (title, len(singles) + len(conv) + len(other), len(conv), dropped))
+        stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d)" % (title.lower(), len(singles) + len(conv) + len(other), len(conv), dropped))
+    import collections
+    years = collections.Counter()
+    for b in order:
+        y = re.search(r"\\nmtyear\{(\d{4})\}", b)
+        if y: years[y.group(1)] += 1
+    conv_total = sum(1 for b in order if "\\answerRows" in b)
+    parts = ", ".join(re.sub(r":.*", "", x) for x in stat)
+    out[ann] = ("\\noindent{\\small Збірник містить \\textbf{%d завдань} НМТ %s--%s років про показникові "
+                "вирази, показникову функцію, показникові рівняння та нерівності. Завдання зібрано з тем 28 і 29 "
+                "бази НМТ і згруповано у три частини: %s. Біля кожного завдання вказано рік.\\par\\vspace{0.15cm}\n"
+                "Завдання \\textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, "
+                "що стосується показникових, а п'ять варіантів відповіді надруковано окремими рядками, бо вирази "
+                "задовгі для клітинок таблиці; таких завдань %d. Відповіді до всіх завдань~--- на останній сторінці.\\par\\vspace{0.15cm}\n"
+                "За роками: %s.}\\par\\vspace{0.45cm}\n") % (
+                len(order), min(years), max(years), parts, conv_total,
+                ", ".join("\\mbox{%s~--- %d}" % (y, n) for y, n in sorted(years.items())))
     key = answers()
     rows, missing = [], 0
     for n, b in enumerate(order, 1):
