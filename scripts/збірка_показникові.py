@@ -43,6 +43,30 @@ def kind(b):
     if "\\nmtAnswerBox" in nb: return "input"
     return "?"
 
+def _minipages(t):
+    """зовнішні minipage: (початок, кінець, тіло)"""
+    res, i = [], 0
+    while True:
+        i = t.find("\\begin{minipage}", i)
+        if i < 0: return res
+        j = i + len("\\begin{minipage}")
+        while j < len(t) and t[j] in " \n\t": j += 1
+        if j < len(t) and t[j] == "[": j = t.find("]", j) + 1
+        while j < len(t) and t[j] in " \n\t": j += 1
+        if j < len(t) and t[j] == "{": j = balanced(t, j) + 1
+        depth, p, k = 1, j, -1
+        while p < len(t):
+            nb, ne = t.find("\\begin{minipage}", p), t.find("\\end{minipage}", p)
+            if ne < 0: break
+            if 0 <= nb < ne: depth += 1; p = nb + 16
+            else:
+                depth -= 1; k = ne
+                if depth == 0: break
+                p = ne + 14
+        if k < 0 or depth != 0: i = j; continue
+        res.append((i, k + len("\\end{minipage}"), t[j:k]))
+        i = k + len("\\end{minipage}")
+
 def items_of(col):
     """[(мітка, текст)] із послідовності \\matchItem"""
     res, i = [], 0
@@ -61,6 +85,26 @@ def pick_item(items):
         if EXPO.search(txt): return lab, txt
     return items[0]
 
+
+# Ручні рішення для завдань, де показникова функція стоїть не серед пунктів (1--3),
+# а серед варіантів (А--Д). Ключ -- рік і початок умови; значення -- який пункт лишити
+# ("2") або "drop", якщо завдання насправді не про показникові.
+OVERRIDE = [
+    ("2023", "Установіть відповідність між твердженням", "2"),    # (0;1) -> y=4^x
+    ("2024", "Установіть відповідність між твердженням", "3"),    # найменше значення 0,5 -> y=2^x
+    ("2024", "На кожному з рисунків", "drop"),                    # про рисунки, показникова лише в тексті варіанта
+    ("2025", "На рисунку зображено графік функції", "drop"),      # 2^x -- дистрактор, графік складено з інших функцій
+    ("2026", "На рисунку зображено графік функції", "drop"),      # відповідь 1--В, 2--Д, 3--Г: 2^x не використано
+    ("2025", "Установіть відповідність між твердженням", "drop"),  # пункти логарифмічні
+]
+
+def override_for(year, stmt):
+    plain = re.sub(r"\\[a-zA-Z]+|[${}\\]", " ", stmt)
+    plain = re.sub(r"\s+", " ", plain).strip()
+    for y, head, val in OVERRIDE:
+        if y == (year or "") and plain.startswith(head): return val
+    return None
+
 def statement_of(b):
     """текст умови (без \\par і далі) + рік"""
     m = re.search(r"\\zadtask\{", b)
@@ -69,7 +113,9 @@ def statement_of(b):
     else:
         m = re.search(r"\\noindent\\zadnum\s*", b)
         body = b[m.end():]
-    body = body.split("\\par")[0]
+    for cut in ("\\par", "\\vspace", "\\nbvspace", "\\nmtnobreak", "\\matchingLayout", "\\begin{minipage}", "\\noindent\n"):
+        k = body.find(cut)
+        if k > 0: body = body[:k]
     body = re.sub(r"\s+", " ", body).strip()
     yr = re.search(r"\\nmtyear\{(\d{4})\}", body)
     body = re.sub(r"\s*\\nmtyear\{\d{4}\}", "", body).strip()
@@ -78,13 +124,34 @@ def statement_of(b):
 def to_single(b):
     """завдання на відповідність -> тестове з одним пунктом і п'ятьма варіантами"""
     i = b.find("\\matchingLayout")
-    if i < 0: return None
+    if i < 0:
+        its = items_of(b)
+        expo = [(l, t) for l, t in its if EXPO.search(t)]
+        if not expo: return "DROP"
+        lab, item = expo[0]
+        out = b
+        # прибираємо колонку з пунктами і сітку: лишається умова + варіанти-рисунки
+        for a, e, body_mp in reversed(_minipages(out)):
+            if "\\matchItem" in body_mp or re.fullmatch(r"[\s%]*(?:\\(?:nopagebreak|nmtnobreak|n?bvspace\{[^}]*\}|matchingGrid|matchHead\{[^}]*\})[\s%]*)*", body_mp or ""):
+                out = out[:a] + out[e:]
+        out = re.sub(r"[ \t]*\\matchingGrid[ \t]*\n?", "", out)
+        out = re.sub(r"[ \t]*\\matchHead\{[^{}]*\}[ \t]*\n?", "", out, count=1)
+        quoted = item if item.lstrip().startswith("$") else "<<%s>>" % item
+        out = re.sub(r"\\mbox\{\(1--3\)\}|\(1\s*[–-]+\s*3\)", lambda mm: quoted, out, count=1)
+        out = re.sub(r"\n{3,}", "\n\n", out)
+        return "\\begin{samepage}\n" + out.strip() + "\n\\end{samepage}\n"
     c1, j = arg_at(b, b.index("{", i))
     c2, j = arg_at(b, j)
     items, opts = items_of(c1), items_of(c2)
     if len(items) < 2 or len(opts) != 5: return None
-    lab, item = pick_item(items)
     stmt, year = statement_of(b)
+    expo = [(l, t) for l, t in items if EXPO.search(t)]
+    if expo:
+        lab, item = expo[0]
+    else:
+        ov = override_for(year, stmt)
+        if ov in (None, "drop"): return "DROP"
+        lab, item = next(((l, t) for l, t in items if l == ov), items[0])
     quoted0 = item if item.lstrip().startswith("$") else "<<%s>>" % item
     if re.search(r"\\begin\{|includegraphics|tikzpicture", stmt):
         # умова з рисунком: лишаємо її як є, підставляємо пункт і додаємо варіанти рядками
@@ -152,15 +219,16 @@ def main():
     for title, path in SRC:
         bs = blocks(path)
         matched = [(b, to_single(b)) for b in bs if kind(b) == "matching"]
-        conv = [c for _, c in matched if c]
-        kept = [b for b, c in matched if not c]
+        conv = [c for _, c in matched if c and c != "DROP"]
+        kept = [b for b, c in matched if c is None]
+        dropped = sum(1 for _, c in matched if c == "DROP")
         singles = [b for b in bs if kind(b) == "single"]
         other = [b for b in bs if kind(b) not in ("single", "matching")] + kept
         out.append("\\typeTitle{%s}\n" % title)
         for b in singles: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
         for c in conv: out.append(c)
         for b in other: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
-        stat.append("%s: %d (з них %d зроблено з завдань на відповідність)" % (title, len(singles) + len(conv) + len(other), len(conv)))
+        stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d)" % (title, len(singles) + len(conv) + len(other), len(conv), dropped))
     out.append("\\end{document}\n")
     txt = unicodedata.normalize("NFC", "\n".join(out))
     open(os.path.join(ROOT, OUT), "w", encoding="utf-8").write(txt)
