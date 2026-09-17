@@ -742,6 +742,36 @@ def widen_grid_minipage(t):
         begins = list(re.finditer(r"\\begin\{minipage\}(\[[a-z]\])?\{(0\.\d+)\\textwidth\}", t))
     return t
 
+# помилки набору в джерелах, звірені з оригіналами (PDF сесій): (було, стало)
+SOURCE_FIXES = [
+    (r"\log_{\sqrt[3]{2}} 2^a", r"\log_{\sqrt[8]{2}} 2^a"),                                   # НМТ 2023: корінь 8-го степеня (НМТ23-25.pdf, с. 7)
+    (r"\ln \left(\sqrt{e} \cdot e^{\frac{1}{2}}\right)", r"\ln \left(\sqrt{e} \cdot e^{-\frac{1}{2}}\right)"),  # НМТ 2024: степінь -1/2 (с. 87)
+    (r"\log_3 \sqrt[3]{2}", r"\log_8 \sqrt[3]{2}"),                                           # НМТ 2025, 24.05 №18: основа 8 (с. 18)
+    (r"(\log_3 1 - 2)(3x - 6) \leqslant -6", r"(\log_3 1 - 2)(3x - 6) < -6"),                 # НМТ 2026, 17.06 №15: строга нерівність
+    (r"$y = \dfrac{1}{x} - 2$", r"$y = \dfrac{1}{x - 2}$"),                                   # НМТ 2026, 17.06 №17
+    # НМТ 2025, 4.06 №18: на прямій K=-1, L=-0,5, M=0, N=0,5, P=1 (с. 42), а не K і P поза поділками
+    ("\\draw[thick, ->] (-1.5,0) -- (1.5,0);\n\\foreach \\x/\\label in {-1/L, 0/M, 1/N} {\n"
+     "    \\draw[thick] (\\x,0.1) -- (\\x,-0.1) node[below] {\\small $\\label$};\n    \\node[above] at (\\x,0.1) {\\small $\\x$};\n}\n"
+     "\\node[below] at (-1.3,0) {\\small $K$};\n\\node[below] at (1.3,0) {\\small $P$};",
+     "\\draw[thick, ->] (-2.8,0) -- (2.8,0);\n\\foreach \\x/\\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {\n"
+     "    \\draw[thick] (\\x,0.1) -- (\\x,-0.1) node[below] {\\small $\\label$};\n}\n"
+     "\\node[above] at (-2,0.1) {\\small $-1$};\n\\node[above] at (0,0.1) {\\small $0$};\n\\node[above] at (2,0.1) {\\small $1$};"),
+    # НМТ 2025, 24.05 №17: у варіанті В пряма x = 1 (с. 18); рисунки взято з подібного завдання 2024 року, де x = -1
+    ("    \\node[below left] at (-1,0) {\\tiny $-1$};\n    \\draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут\n"
+     "    \\draw[thick] (-1,-2) -- (-1,3); % x = -1",
+     "    \\node[below right] at (1,0) {\\tiny $1$};\n    \\draw (1,0) -- (1.2,0) -- (1.2,0.2) -- (1,0.2); % прямий кут\n"
+     "    \\draw[thick] (1,-2) -- (1,3); % x = 1", r"\log_2(x-1)"),
+    # НМТ 2024: підпис y=f(x) закривав вершину графіка
+    (r"\node[right] at (2.5, 4) {$y=f(x)$};", r"\node[above] at (4.2, 4.5) {$y=f(x)$};"),
+]
+FIXES_USED = collections.Counter()
+
+def apply_source_fixes(t):
+    for a, b, *only in SOURCE_FIXES:
+        if a in t and all(c in t for c in only):     # третій елемент -- виправляти лише в завданні з цим текстом
+            t = t.replace(a, b); FIXES_USED[a] += 1
+    return t
+
 def fix_figures_tables(t):
     """підпис y=f(x)/y=g(x) на кривій -> білий фон; дроби -> висока таблиця; голі числа в таблиці -> математика; сирі '|' у словах; поля відповіді з \\framebox"""
     COLORS = r"(?:mainGreen|headerblue|yearOrange|red|blue|green|gray|black|cyan|magenta|orange|violet|brown|purple|teal|olive)(?:![0-9]+(?:![a-zA-Z]+)?)*"
@@ -981,12 +1011,23 @@ def _to_matching_layout(t):
         c = re.sub(r"\n{3,}", "\n\n", c)
         return c.strip("\n \t")
     body = ("\\matchingLayout{\n" + clean(c1) + "\n}{\n" + clean(c2) + "\n}{\n\\matchingGrid\n}\n")
-    return t[:a1] + body + (tail if mg is None else tail[mg.end():]).lstrip("\n")
+    head = t[:a1]
+    # рисунок між колонками (графік поруч із пунктами) не губимо: ставимо праворуч від умови
+    figs = re.findall(r"(?:\\begin\{nmtfit\})?\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}(?:\\end\{nmtfit\})?|\\includegraphics(?:\[[^\]]*\])?\{[^{}]*\}", t[b1:a2], re.S)
+    if figs:
+        fig = "\n".join(figs)
+        ms = re.search(r"(\\zadnum[ \t]*)((?:(?!\\begin\{|\n[ \t]*\n).)*?\\nmtyear\{\d{4}\})", head, re.S)
+        if ms:
+            head = (head[:ms.start(2)] + "\\begin{minipage}[t]{0.55\\textwidth}\n" + ms.group(2) + "\n\\end{minipage}\n\\hfill\n"
+                    "\\begin{minipage}[t]{0.4\\textwidth}\n\\vspace{0pt}\n\\begin{flushright}\n" + fig + "\n\\end{flushright}\n\\end{minipage}" + head[ms.end(2):])
+        else:
+            head = head + "\\begin{center}\n" + fig + "\n\\end{center}\n"
+    return head + body + (tail if mg is None else tail[mg.end():]).lstrip("\n")
 
 def unify_matching(t):
     """єдиний вигляд блоків «на відповідність»: однакові відступи, вирівняні мітки,
     висячий відступ у довгих пунктах"""
-    if not re.search(r"\\matchingGrid|\\matchTable|\\cline\{2-6\}", t): return t
+    if not re.search(r"\\matchingGrid|\\matchTable|\\cline\{2-6\}|\\matchingLayout", t): return t
     orig = t
     t = _grid_to_macro(t)
     t = _two_col_tabular(t)
@@ -1038,6 +1079,7 @@ def prep_2026(t):
     c = t["latex"]
     c = re.sub(r"\s*\\nmtyear\{\d{4}\}", "", c)
     c = clean_chunk(c)
+    c = apply_source_fixes(c)
     c = insert_year(c, "2026")
     c = fix_cyr_math(c)
     c = fix_figures_tables(c)
@@ -1097,6 +1139,7 @@ def build_unit(key, by2026, log):
             c = insert_year(c, it["year"])
         c = restore(c, store)
         c = fix_cyr_math(c)
+        c = apply_source_fixes(c)
         c = fix_figures_tables(c)
         c = re.sub(r"(?<!\\begin\{nmtfit\})\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", c)
         c = re.sub(r"\\end\{tikzpicture\}(?!\\end\{nmtfit\})", r"\\end{tikzpicture}\\end{nmtfit}", c)
@@ -1280,6 +1323,9 @@ def main():
         for w in e["warns"]: print("       ! " + w)
         for y, c in e["counts"].items(): tot[y] += c
     print("РАЗОМ (з урахуванням завдань у кількох темах):", dict(tot), "=", sum(tot.values()))
+    print("виправлення джерел:", ", ".join("%d" % FIXES_USED[f[0]] for f in SOURCE_FIXES))
+    for a, *_ in SOURCE_FIXES:
+        if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
 
 if __name__ == "__main__":
     main()

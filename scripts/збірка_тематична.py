@@ -1,19 +1,57 @@
 # -*- coding: utf-8 -*-
-"""Окремий файл: показникові вирази, функція, рівняння і нерівності.
+"""Тематичні збірники з бази НМТ: показникові, логарифмічні тощо.
 
 Завдання на відповідність перетворюються на тестові: з трьох пунктів лишається
-той, що стосується показникових виразів (показник містить змінну), а п'ять
-варіантів А--Д друкуються окремими рядками, а не в таблиці.
+той, що стосується теми збірника, а п'ять варіантів А--Д друкуються окремими
+рядками. Якщо тема стоїть лише серед варіантів -- пункт обирається за ключем
+(таблиця OVERRIDE); якщо завдання насправді не за темою -- воно відкидається.
+Наприкінці -- анотація на початку і ключ відповідей.
 
-    python3 scripts/збірка_показникові.py
+    python3 scripts/збірка_тематична.py показникові
+    python3 scripts/збірка_тематична.py логарифмічні
 """
-import os, re, sys, json, unicodedata
+import os, re, sys, json, unicodedata, collections
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = [("Показникові вирази і функція", "28. Показникова функція. Показникові рівняння/Показникові функція і вирази/завдання.tex"),
-       ("Показникові рівняння",          "28. Показникова функція. Показникові рівняння/Показникові рівняння/завдання.tex"),
-       ("Показникові нерівності",        "29. Показникові нерівності/завдання.tex")]
-OUT = "Показникові_рівняння_нерівності_функція.tex"
+
+CONFIGS = {
+    "показникові": dict(
+        title="Показникові вирази, функція, рівняння і нерівності",
+        out="Показникові_рівняння_нерівності_функція.tex",
+        src=[("Показникові вирази і функція", "28. Показникова функція. Показникові рівняння/Показникові функція і вирази/завдання.tex"),
+             ("Показникові рівняння",          "28. Показникова функція. Показникові рівняння/Показникові рівняння/завдання.tex"),
+             ("Показникові нерівності",        "29. Показникові нерівності/завдання.tex")],
+        detect=r"\^\s*\{[^{}]*[A-Za-zА-Яа-я\\][^{}]*\}|\^\s*\\?[A-Za-z]",
+        about="показникові вирази, показникову функцію, показникові рівняння та нерівності",
+        topics="тем 28 і 29", relevant="показникових",
+        answers="відповіді_показникові.json",
+        override=[
+            ("2023", "Установіть відповідність між твердженням", "2"),    # (0;1) -> y=4^x
+            ("2024", "Установіть відповідність між твердженням", "3"),    # найменше значення 0,5 -> y=2^x
+            ("2024", "На кожному з рисунків", "drop"),                    # про рисунки, показникова лише в тексті варіанта
+            ("2025", "На рисунку зображено графік функції", "drop"),      # 2^x -- дистрактор
+            ("2026", "На рисунку зображено графік функції", "drop"),      # відповідь 1--В, 2--Д, 3--Г: 2^x не використано
+            ("2025", "Установіть відповідність між твердженням", "drop"),  # пункти логарифмічні
+        ]),
+    "логарифмічні": dict(
+        title="Логарифмічні вирази, функція, рівняння і нерівності",
+        out="Логарифмічні_рівняння_нерівності_функція.tex",
+        src=[("Логарифмічні вирази",     "30. Логарифм. Логарифмічна функція/завдання вирази.tex"),
+             ("Логарифмічна функція",    "30. Логарифм. Логарифмічна функція/завдання функція.tex"),
+             ("Логарифмічні рівняння",   "31. Логарифмічні рівняння/завдання.tex"),
+             ("Логарифмічні нерівності", "32. Логарифмічні нерівності/завдання.tex")],
+        detect=r"\\log|\\lg(?![a-zA-Z])|\\ln(?![a-zA-Z])",
+        about="логарифмічні вирази, логарифмічну функцію, логарифмічні рівняння та нерівності",
+        topics="тем 30, 31 і 32", relevant="логарифмів",
+        answers="відповіді_логарифмічні.json",
+        override=[
+            ("2023", "Установіть відповідність між твердженням", "3"),    # найменше значення на [1; 4] у точці 4 -> y=log_0,5 x
+            ("2024", "Установіть відповідність між функцією (1--3) та властивістю її графіка", "drop"),  # log_0,5 x лише в дистракторі В
+            ("2023", "Установіть відповідність між функцією (1--3) та властивістю (А--Д) її графіка", "drop!"),  # для log_2 x правильні і Б, і В
+        ]),
+}
+
+CFG = None   # активна конфігурація (задається в main)
 
 def balanced(s, i):
     d = 0; j = i
@@ -78,30 +116,15 @@ def items_of(col):
         res.append((lab.strip(), txt.strip()))
         i = j
 
-EXPO = re.compile(r"\^\s*\{[^{}]*[A-Za-zА-Яа-я\\][^{}]*\}|\^\s*\\?[A-Za-z]")
-def pick_item(items):
-    """пункт, що стосується показникових: у показнику є змінна; інакше перший"""
-    for lab, txt in items:
-        if EXPO.search(txt): return lab, txt
-    return items[0]
+def topical(txt):
+    """чи стосується текст теми збірника"""
+    return re.search(CFG["detect"], txt) is not None
 
-
-# Ручні рішення для завдань, де показникова функція стоїть не серед пунктів (1--3),
-# а серед варіантів (А--Д). Ключ -- рік і початок умови; значення -- який пункт лишити
-# ("2") або "drop", якщо завдання насправді не про показникові.
-OVERRIDE = [
-    ("2023", "Установіть відповідність між твердженням", "2"),    # (0;1) -> y=4^x
-    ("2024", "Установіть відповідність між твердженням", "3"),    # найменше значення 0,5 -> y=2^x
-    ("2024", "На кожному з рисунків", "drop"),                    # про рисунки, показникова лише в тексті варіанта
-    ("2025", "На рисунку зображено графік функції", "drop"),      # 2^x -- дистрактор, графік складено з інших функцій
-    ("2026", "На рисунку зображено графік функції", "drop"),      # відповідь 1--В, 2--Д, 3--Г: 2^x не використано
-    ("2025", "Установіть відповідність між твердженням", "drop"),  # пункти логарифмічні
-]
 
 def override_for(year, stmt):
     plain = re.sub(r"\\[a-zA-Z]+|[${}\\]", " ", stmt)
     plain = re.sub(r"\s+", " ", plain).strip()
-    for y, head, val in OVERRIDE:
+    for y, head, val in CFG["override"]:
         if y == (year or "") and plain.startswith(head): return val
     return None
 
@@ -111,7 +134,7 @@ def statement_of(b):
     if m:
         body, _ = arg_at(b, m.end() - 1)
     else:
-        m = re.search(r"\\noindent\\zadnum\s*", b)
+        m = re.search(r"(?:\\noindent)?\\zadnum\s*", b)
         body = b[m.end():]
     for cut in ("\\par", "\\vspace", "\\nbvspace", "\\nmtnobreak", "\\matchingLayout", "\\begin{minipage}", "\\noindent\n"):
         k = body.find(cut)
@@ -126,7 +149,7 @@ def to_single(b):
     i = b.find("\\matchingLayout")
     if i < 0:
         its = items_of(b)
-        expo = [(l, t) for l, t in its if EXPO.search(t)]
+        expo = [(l, t) for l, t in its if topical(t)]
         if not expo: return "DROP"
         lab, item = expo[0]
         out = b
@@ -135,7 +158,13 @@ def to_single(b):
             if "\\matchItem" in body_mp or re.fullmatch(r"[\s%]*(?:\\(?:nopagebreak|nmtnobreak|n?bvspace\{[^}]*\}|matchingGrid|matchHead\{[^}]*\})[\s%]*)*", body_mp or ""):
                 out = out[:a] + out[e:]
         out = re.sub(r"[ \t]*\\matchingGrid[ \t]*\n?", "", out)
-        out = re.sub(r"[ \t]*\\matchHead\{[^{}]*\}[ \t]*\n?", "", out, count=1)
+        out = re.sub(r"[ \t]*\\matchHead\{[^{}]*\}[ \t]*\n?", "", out)
+        # пункти 1--3, що стоять поза minipage
+        while True:
+            k = re.search(r"[ \t]*\\matchItem\{[1-3]\}", out)
+            if not k: break
+            _, e = arg_at(out, out.index("{", k.end()))
+            out = out[:k.start()] + out[e:].lstrip(" \t").lstrip("\n")
         quoted = item if item.lstrip().startswith("$") else "<<%s>>" % item
         out = re.sub(r"\\mbox\{\(1--3\)\}|\(1\s*[–-]+\s*3\)", lambda mm: quoted, out, count=1)
         out = re.sub(r"\n{3,}", "\n\n", out)
@@ -145,12 +174,14 @@ def to_single(b):
     items, opts = items_of(c1), items_of(c2)
     if len(items) < 2 or len(opts) != 5: return None
     stmt, year = statement_of(b)
-    expo = [(l, t) for l, t in items if EXPO.search(t)]
+    if override_for(year, stmt) == "drop!": return "DROP"     # тестове вийшло б із кількома правильними відповідями
+    items = [(l, re.sub(r"\s*\\\\\s*", " ", t)) for l, t in items]   # розриви рядків усередині пункту
+    expo = [(l, t) for l, t in items if topical(t)]
     if expo:
         lab, item = expo[0]
     else:
         ov = override_for(year, stmt)
-        if ov in (None, "drop"): return "DROP"
+        if ov in (None, "drop", "drop!"): return "DROP"
         lab, item = next(((l, t) for l, t in items if l == ov), items[0])
     quoted0 = item if item.lstrip().startswith("$") else "<<%s>>" % item
     if re.search(r"\\begin\{|includegraphics|tikzpicture", stmt):
@@ -189,50 +220,67 @@ def to_single(b):
     out = ["\\begin{samepage}"]
     if letter: out.append("%% Відповідь: %s" % letter)
     out.append("\\zadtask{%s%s}" % (stmt, (" \\nmtyear{%s}" % year) if year else ""))
+    # рисунок між умовою і таблицею (координатна пряма тощо) переносимо разом з умовою
+    fig = re.search(r"\\begin\{center\}(?:(?!\\end\{center\}).)*?(?:tikzpicture|includegraphics).*?\\end\{center\}", b[:i], re.S)
+    if fig:
+        out.append("\\par\\nopagebreak\\vspace{0.1cm}")
+        out.append(fig.group(0))
     out.append("\\answerRows{%s}" % "}{".join(t for _, t in opts))
     out.append("\\par\\penalty-20")
     out.append("\\end{samepage}\n")
     return "\n".join(out)
 
 def preamble():
-    p = os.path.join(ROOT, "29. Показникові нерівності/завдання.tex")
+    p = os.path.join(ROOT, CFG["src"][-1][1])
     s = open(p, encoding="utf-8").read()
     pre = s[:s.index("\\begin{document}")]
     pre = re.sub(r"\\fancyhead\[C\]\{[^\n]*\}",
-                 "\\\\fancyhead[C]{\\\\small\\\\color{gray!80} Показникові вирази, функція, рівняння і нерівності}", pre, count=1)
+                 lambda m: "\\fancyhead[C]{\\small\\color{gray!80} %s}" % CFG["title"], pre, count=1)
     pre += ("% варіанти відповіді окремими рядками (довгі вирази не влазять у клітинки таблиці)\n"
             "\\newcommand{\\answerRows}[5]{\\par\\nopagebreak\\vspace{0.15cm}%\n"
             "\\matchItem{А}{#1}\\matchItem{Б}{#2}\\matchItem{В}{#3}\\matchItem{Г}{#4}\\matchItem{Д}{#5}}\n")
     return pre
 
-ANSW = os.path.join(ROOT, "scripts", "data", "відповіді_показникові.json")
 
 def sig(block):
     """стабільний підпис завдання: нормалізований текст без року й службових команд"""
     t = re.sub(r"%[^\n]*", " ", block)
     t = re.sub(r"(?s)\\begin\{(tikzpicture|axis)\}.*?\\end\{\1\}", " ", t)
-    t = re.sub(r"\\nmtyear\{\d+\}", " ", t)
+    t = re.sub(r"\\nmtyear\{\d+\}|\\(?:begin|end)\{samepage\}", " ", t)
     t = re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", t)
     return t[:160]
 
+def same_key(block):
+    """ключ для пошуку повторів: без рисунків, коментарів, року та оформлення"""
+    t = re.sub(r"%[^\n]*", " ", block)
+    t = re.sub(r"(?s)\\begin\{(tikzpicture|axis)\}.*?\\end\{\1\}", " ", t)
+    t = re.sub(r"\\nmtyear\{\d+\}|\\(?:mbox|textit|matchHead|noindent|zadnum|zadtask|par|nmtnobreak|nopagebreak)\b", " ", t)
+    return re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", t)
+
 def answers():
-    if not os.path.exists(ANSW): return {}
-    return json.load(open(ANSW, encoding="utf-8"))
+    p = os.path.join(ROOT, "scripts", "data", CFG["answers"])
+    if not os.path.exists(p): return {}
+    return json.load(open(p, encoding="utf-8"))
 
 def carried_macros():
     """макроси, які теми означують після \\begin{document} (matchingLayout тощо)"""
-    src = open(os.path.join(ROOT, SRC[0][1]), encoding="utf-8").read()
+    src = open(os.path.join(ROOT, CFG["src"][0][1]), encoding="utf-8").read()
     a = src.index("\\begin{document}") + len("\\begin{document}")
     b = src.index("\\chapterTitle{", a)
     return src[a:b].strip("\n")
 
 def main():
+    global CFG
+    name = sys.argv[1] if len(sys.argv) > 1 else "показникові"
+    if name not in CONFIGS: raise SystemExit("невідомий збірник: %s (є: %s)" % (name, ", ".join(CONFIGS)))
+    CFG = CONFIGS[name]
     out = [preamble(), "\\begin{document}\n" + carried_macros() + "\n\\setcounter{zad}{0}\n"]
-    out.append("\\chapterTitle{Показникові вирази, функція, рівняння і нерівності}\n")
+    out.append("\\chapterTitle{%s}\n" % CFG["title"])
     stat, order = [], []
+    seen, dups = set(), 0     # у базі трапляються однакові завдання з різних сесій -- друкуємо один раз
     ann = len(out)          # місце під анотацію -- підставимо, коли будуть підрахунки
     out.append("")
-    for title, path in SRC:
+    for title, path in CFG["src"]:
         bs = blocks(path)
         matched = [(b, to_single(b)) for b in bs if kind(b) == "matching"]
         conv = [c for _, c in matched if c and c != "DROP"]
@@ -241,25 +289,29 @@ def main():
         singles = [b for b in bs if kind(b) == "single"]
         other = [b for b in bs if kind(b) not in ("single", "matching")] + kept
         out.append("\\typeTitle{%s}\n" % title)
-        for b in singles:
-            out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n"); order.append(b)
-        for c in conv:
-            out.append(c); order.append(c)
-        for b in other:
-            out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n"); order.append(b)
-        stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d)" % (title.lower(), len(singles) + len(conv) + len(other), len(conv), dropped))
-    import collections
+        n0, dup0, nconv = len(order), dups, 0
+        for b in singles + conv + other:
+            k = same_key(b)
+            if k in seen: dups += 1; continue
+            seen.add(k)
+            is_conv = b in conv
+            b = b.replace("координатою якою", "координатою якої")   # описка в умові джерела
+            if is_conv: out.append(b); nconv += 1
+            else: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
+            order.append(b)
+        stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d, повторів %d)" % (
+            title.lower(), len(order) - n0, nconv, dropped, dups - dup0))
     years = collections.Counter()
     for b in order:
         y = re.search(r"\\nmtyear\{(\d{4})\}", b)
         if y: years[y.group(1)] += 1
     conv_total = sum(1 for b in order if "\\answerRows" in b)
     parts = ", ".join(re.sub(r":.*", "", x) for x in stat)
-    out[ann] = ("\\noindent{\\small Збірник містить \\textbf{%d завдань} НМТ %s--%s років про показникові "
-                "вирази, показникову функцію, показникові рівняння та нерівності. Завдання зібрано з тем 28 і 29 "
-                "бази НМТ і згруповано у три частини: %s. Біля кожного завдання вказано рік.\\par\\vspace{0.15cm}\n"
+    nparts = {1: "одну частину", 2: "дві частини", 3: "три частини", 4: "чотири частини"}.get(len(stat), "%d частин" % len(stat))
+    out[ann] = ("\\noindent{\\small Збірник містить \\textbf{%d завдань} НМТ %s--%s років про " + CFG["about"] + ". "
+                "Завдання зібрано з " + CFG["topics"] + " бази НМТ і згруповано у " + nparts + ": %s. Біля кожного завдання вказано рік.\\par\\vspace{0.15cm}\n"
                 "Завдання \\textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, "
-                "що стосується показникових, а п'ять варіантів відповіді надруковано окремими рядками, бо вирази "
+                "що стосується " + CFG["relevant"] + ", а п'ять варіантів відповіді надруковано окремими рядками, бо вирази "
                 "задовгі для клітинок таблиці; таких завдань %d. Відповіді до всіх завдань~--- на останній сторінці.\\par\\vspace{0.15cm}\n"
                 "За роками: %s.}\\par\\vspace{0.45cm}\n") % (
                 len(order), min(years), max(years), parts, conv_total,
@@ -272,14 +324,14 @@ def main():
         else: rows.append("\\mbox{%d~--- ?}" % n); missing += 1
     out.append("\\clearpage\n\\sectionTitle{Відповіді}\n")
     out.append("\\noindent{\\small\\color{gray!80!black}Відповіді до завдань цього збірника. "
-               "Для завдань НМТ-2026 узято офіційні ключі, для 2023--2025 --- обчислено.}"
+               "Відповіді обчислено й звірено з офіційними ключами там, де вони є.}"
                "\\par\\vspace{0.3cm}\n")
     out.append("\\begin{multicols}{5}\\noindent\n" + "\\par\n".join(rows) + "\n\\end{multicols}\n")
     if missing: print("   УВАГА: без відповіді", missing, "завдань")
     out.append("\\end{document}\n")
     txt = unicodedata.normalize("NFC", "\n".join(out))
-    open(os.path.join(ROOT, OUT), "w", encoding="utf-8").write(txt)
-    print("записано", OUT)
+    open(os.path.join(ROOT, CFG["out"]), "w", encoding="utf-8").write(txt)
+    print("записано", CFG["out"])
     for s in stat: print("   ", s)
 
 if __name__ == "__main__":

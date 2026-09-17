@@ -1,0 +1,1581 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Логарифмічні вирази, функція, рівняння і нерівності}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+% варіанти відповіді окремими рядками (довгі вирази не влазять у клітинки таблиці)
+\newcommand{\answerRows}[5]{\par\nopagebreak\vspace{0.15cm}%
+\matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}}
+
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси, перенесені зі старого файлу теми ---
+\newcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\setcounter{zad}{0}
+
+\chapterTitle{Логарифмічні вирази, функція, рівняння і нерівності}
+
+\noindent{\small Збірник містить \textbf{127 завдань} НМТ 2022--2026 років про логарифмічні вирази, логарифмічну функцію, логарифмічні рівняння та нерівності. Завдання зібрано з тем 30, 31 і 32 бази НМТ і згруповано у чотири частини: логарифмічні вирази, логарифмічна функція, логарифмічні рівняння, логарифмічні нерівності. Біля кожного завдання вказано рік.\par\vspace{0.15cm}
+Завдання \textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, що стосується логарифмів, а п'ять варіантів відповіді надруковано окремими рядками, бо вирази задовгі для клітинок таблиці; таких завдань 73. Відповіді до всіх завдань~--- на останній сторінці.\par\vspace{0.15cm}
+За роками: \mbox{2022~--- 1}, \mbox{2023~--- 28}, \mbox{2024~--- 35}, \mbox{2025~--- 32}, \mbox{2026~--- 31}.}\par\vspace{0.45cm}
+
+\typeTitle{Логарифмічні вирази}
+
+\begin{samepage}
+\noindent\zadnum $\log_3 \dfrac{1}{27} = $ \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$\displaystyle\frac{1}{3}$}{$3$}{$-\displaystyle\frac{1}{3}$}{$-3$}{$\displaystyle\frac{1}{9}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $\log_8 16$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$12$}{$2$}{$\displaystyle\frac{1}{2}$}{$8$}{$\displaystyle\frac{4}{3}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$0{,}5$}{$0{,}25$}{$16$}{$2$}{$4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $\lg 4 + \lg 0{,}025 = $ \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$\lg 4{,}025$}{$0{,}1$}{$10$}{$-2$}{$-1$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$0{,}25$}{$0{,}5$}{$16$}{$4$}{$2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $\lg 25 + \lg 40 = $ \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$4$}{$\lg 65$}{$1$}{$2$}{$3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $100^{\lg 3}$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$1000000$}{$6$}{$\sqrt{3}$}{$9$}{$3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $|\lg 5 - \lg 9| = $ \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$-\lg 45$}{$\lg \displaystyle\frac{5}{9}$}{$-\lg 4$}{$\lg \displaystyle\frac{9}{5}$}{$\lg 4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $|1 - \lg 1000| = $ \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$4$}{$-2$}{$-\lg 999$}{$2$}{$\lg 999$}
+
+\nmtnobreak
+% === НМТ 2024 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Скільки всього цілих чисел містить проміжок $[-1; \log_4 16]$? \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$6$}{$5$}{$2$}{$3$}{$4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $\log_2 \displaystyle\frac{16}{a}$, якщо $\log_2 a = 0{,}5$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$4{,}5$}{$3{,}5$}{$5$}{$8$}{$16$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Знайдіть значення виразу $5{,}6^{\log_{5,6} 12}$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$12$}{$6{,}4$}{$5{,}6$}{$67{,}2$}{$17{,}6$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить значення виразу $\log_{0,2} 125$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$[3; 25)$}{$[0; 3)$}{$(-\infty; -3)$}{$[25; +\infty)$}{$[-3; 0)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $2\log_6 3 + \log_6 4$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$2$}{$\log_6 13$}{$4$}{$2\log_6 7$}{$2\log_6 12$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $\log_a 3a - \log_a 3 = $ \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$1$}{$\log_a 9$}{$3$}{$0$}{$\log_a (3a - 3)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить число $\log_{\frac{1}{2}} 8$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(5; +\infty)$}{$(1; 5]$}{$(-\infty; -5]$}{$(-5; 0]$}{$(0; 1]$}
+
+\nmtnobreak
+% === НМТ 2025 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть значення виразу $\log_5 (5ab)$, якщо $\log_5 (ab) = 0{,}7$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$0{,}7$}{$5{,}7$}{$1{,}7$}{$5^{1{,}7}$}{$3{,}5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $|\log_{0,2} 25 - 1| = $ \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$-3$}{$3$}{$-\log_{0,2} 24$}{$4$}{$\log_{0,2} 24$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $\log_5 5^{10} = $ \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$1$}{$10$}{$5$}{$50$}{$2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Обчисліть $0{,}25^{\log_{0,5} 4}$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$16$}{$2$}{$0{,}25$}{$0{,}5$}{$4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum $|\lg 50 - 2| = $ \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$\lg 48$}{$\lg 5$}{$\lg 2$}{$\lg 0{,}5$}{$\lg 25$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 23.05, завдання №9
+\zadtask{Обчисліть $\log_{0{,}5} 8$. \nmtyear{2026}}
+\answerTableTall{$-2$}{$-4$}{$-3$}{$\dfrac{16}{3}$}{$3$}
+% Відповідь: В
+\ifshowsolutions\solution{Оскільки $0{,}5=2^{-1}$, а $8=2^3$, то $\log_{0{,}5}8=\dfrac{\log_2 8}{\log_2 0{,}5}=\dfrac{3}{-1}=-3$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 12.06, завдання №6 --- основна тема: Степені. Одночлени. Стандартний вигляд числа
+\zadtask{Яка з нерівностей є правильною, якщо $a = 2^{-3}$, $b = \lg 1$, $c = (-3)^2$? \nmtyear{2026}}
+\answerTable{$c < a < b$}{$a < b < c$}{$a < c < b$}{$b < a < c$}{$c < b < a$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 15.06, завдання №6
+\zadtask{Обчисліть $\log_4 2 + \log_4 32$. \nmtyear{2026}}
+\answerTable{$\log_4 34$}{$3$}{$2$}{$4$}{$16$}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 17.06, завдання №15 --- основна тема: Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів
+\zadtask{Знайдіть найменший цілий розв'язок нерівності $(\log_3 1 - 2)(3x - 6) < -6$. \nmtyear{2026}}
+\answerTable{$5$}{$4$}{$3$}{$2$}{$1$}
+% Відповідь: Б
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №13
+\zadtask{$\log_2 8 - \log_{\frac{1}{5}} 25 = $ \nmtyear{2026}}
+\answerTable{$-2$}{$2$}{$1$}{$-1$}{$5$}
+% Відповідь: Д
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $\log_{\sqrt[8]{2}} 2^a$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq 8$. \nmtyear{2023}}
+\answerRows{$8^a$}{$8 + a$}{$8a$}{$8 - a$}{$\displaystyle\frac{a}{8}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $2^{\log_4 a}$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a > 0$. \nmtyear{2023}}
+\answerRows{$-\displaystyle\frac{2}{a}$}{$2a$}{$2\sqrt{a}$}{$\sqrt{a}$}{$\displaystyle\frac{a}{2}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_2 a$ та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $\log_3 27^{mn} = a$, то>> так, щоб утворилося правильне твердження. \nmtyear{2023}}
+\answerRows{$a = 0$.}{$a = 27^{mn}$.}{$a = 3mn$.}{$a = 2mn$.}{$a = m + 2n$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $2^{-\lg n} = 2^{\lg a}$, то>> так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
+\answerRows{$a = -n - 2$.}{$a = \displaystyle\frac{1}{n}$.}{$a = n$.}{$a = -2$.}{$a = -n$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\ln e$ і проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $e \approx 2{,}7$. \nmtyear{2023}}
+\answerRows{$(-\infty; -2]$}{$(-2; 0]$}{$(0; 2]$}{$(2; 6]$}{$(6; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\ln \displaystyle\frac{1}{e}$ і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+\answerRows{$(-\infty; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$(2; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $n^{\log_n m} = a$, то>> так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}}
+\answerRows{$a = m + n$.}{$a = m$.}{$a = m - n$.}{$a = mn$.}{$a = n$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $1 + \log_3 n = \log_3 a$, то>> так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
+\answerRows{$a = 3n$.}{$a = n + 1$.}{$a = n + 3$.}{$a = \displaystyle\frac{3}{n}$.}{$a = \displaystyle\frac{n}{3}$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_\pi \dfrac{1}{\pi}$ і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+\answerRows{$[-2; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 3)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $\log_{\sqrt{5}} 5$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{$\sqrt{5}$}{$0$}{$2 - 2\sqrt{5}$}{$2$}{$-8$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_{\frac{1}{3}} \sqrt{3}$ і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$[-3; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 3]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_{0,2} a$ і множиною \mbox{(А--Д)}, якому належить значення цього виразу, якщо $a = 5$. \nmtyear{2024}}
+\answerRows{множина ірраціональних додатних чисел}{множина натуральних чисел}{множина цілих від'ємних чисел}{множина раціональних нецілих чисел}{множина ірраціональних від'ємних чисел}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $\log_5 125$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2024}}
+\answerRows{$\sqrt{10} - 3$}{$3 - \sqrt{10}$}{$\sqrt{10} + 3$}{$3$}{$25$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До виразу $\log_b b^a + 3$ доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq \sqrt{2}$. \nmtyear{2024}}
+\answerRows{$a + \sqrt{2}$}{$1$}{$a + 3$}{$a + 3b$}{$a - \sqrt{2}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_{\sqrt{2}} \cos 360°$ з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-1/L, 0/M, 1/N} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\node[below] at (-2,0) {\small $K$};
+\node[below] at (2,0) {\small $P$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_\pi \dfrac{1}{\pi^2}$ з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_3 \pi - \log_3 (3\pi)$ та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$[-4; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_2 0{,}1 + \log_2 320$ та значенням \mbox{(А--Д)} цього виразу. \nmtyear{2024}}
+\answerRows{$1$}{$2$}{$3$}{$4$}{$5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\left(\dfrac{1}{3}\right)^{\log_3 \sqrt{2}}$ та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$[-4; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_\pi 1$ та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+\answerRows{є нецілим додатним числом}{є нецілим від'ємним числом}{дорівнює 0}{є цілим додатним числом}{є цілим від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_3 \pi^0$ та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу. \nmtyear{2024}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-1/L, 0/M, 1/N} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\node[below] at (-2,0) {\small $K$};
+\node[below] at (2,0) {\small $P$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_{\sqrt{2}} 0{,}5$ та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$(-\infty; -2)$}{$[-2; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\left(\dfrac{1}{2}\right)^{\log_2 \pi}$ та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+\answerRows{$[-5; -2)$}{$[-2; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_\pi \dfrac{1}{\pi}$ та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+\answerRows{є цілим додатним числом}{є цілим від'ємним числом}{дорівнює 0}{є нецілим додатним числом}{є нецілим від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\ln \left(\sqrt{e} \cdot e^{-\frac{1}{2}}\right)$ та твердженням про його значення \mbox{(А--Д)}, яке є правильним, якщо $e \approx 2{,}7$. \nmtyear{2024}}
+\answerRows{є простим числом}{є цілим від'ємним числом}{дорівнює 0}{є нецілим додатним числом}{є нецілим від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі. Установіть відповідність між виразом $\log_5 (2\varphi - \sqrt{5})$ та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+\answerRows{є натуральним числом}{є цілим від'ємним числом}{дорівнює 0}{є раціональним нецілим числом}{є ірраціональним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $2\log_2 \sqrt{8}$ та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+\answerRows{є цілим додатним числом}{є цілим від'ємним числом}{дорівнює 0}{є нецілим додатним числом}{є нецілим від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\lg x^0$ та значенням \mbox{(А--Д)} цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}}
+\answerRows{$5$}{$\sqrt{5}$}{$0$}{$1 - \sqrt{5}$}{$-5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\ln 1$ й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_8 \sqrt[3]{2}$ із його значенням \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{$1$}{$\displaystyle\frac{1}{9}$}{$\sqrt{3}$}{$3$}{$81$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_{16} 2 + \log_{16} m$ із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює 1. \nmtyear{2025}}
+\answerRows{$\displaystyle\frac{1}{4}$}{$6$}{$4$}{$-6$}{$8$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\ln 2e - \ln 2$ й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.8,0) -- (2.8,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+}
+\node[above] at (-2,0.1) {\small $-1$};
+\node[above] at (0,0.1) {\small $0$};
+\node[above] at (2,0.1) {\small $1$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз $\log_5 (2\varphi - \sqrt{5})$ й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу. \nmtyear{2025}}
+\par\nopagebreak\vspace{0.1cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.5,0) -- (2.5,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \node[above] at (\x,0.1) {\small $\x$};
+}
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\answerRows{$K$}{$L$}{$M$}{$N$}{$P$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\ln \dfrac{1}{e}$ і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+\answerRows{є додатним цілим числом}{є від'ємним цілим числом}{є додатним нецілим числом}{є від'ємним нецілим числом}{дорівнює 0}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть до числового виразу $\log_3 27$ його значення \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{$-3$}{$\sqrt{3}$}{$\displaystyle\frac{1}{3}$}{$-\sqrt{3}$}{$3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_\pi \dfrac{1}{\pi^3}$ і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}}
+\answerRows{є натуральним числом}{є цілим недодатним числом}{є раціональним нецілим числом}{є ірраціональним додатним числом}{є ірраціональним від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $4^{\log_4 \pi}$, де $\pi$ -- відома математична константа, та проміжком \mbox{(А--Д)}, якому належить його значення. \nmtyear{2025}}
+\answerRows{$[-2; -1)$}{$[-1; 0)$}{$[0; 1)$}{$[1; 2)$}{$[2; 4)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Число $\varphi = \displaystyle\frac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз $\log_{\frac{1}{5}} (2\varphi - 1)$ та проміжок \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2025}}
+\answerRows{$(-\infty; -1]$}{$(-1; 0]$}{$(0; 1]$}{$(1; 2]$}{$(2; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Число $\delta = \sqrt{2} + 1$ називають срібним перетином. Узгодьте вираз $\log_2 (\delta - 1)$ та твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}}
+\answerRows{є натуральним числом}{є цілим від'ємним числом}{є раціональним нецілим числом}{є ірраціональним додатним числом}{є ірраціональним від'ємним числом}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть до числового виразу $\lg 100$ його значення \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{$-1$}{$0$}{$1$}{$2$}{$10$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Якщо $4^{\log_2 m} = n$, то>> так, щоб утворилося правильне твердження, якщо $m > 0$. \nmtyear{2025}}
+\answerRows{$n = 2m$.}{$n = m^2$.}{$n = 2^m$.}{$n = m\sqrt{2}$.}{$n = \displaystyle\frac{m}{2}$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть до виразу $81^{\log_3 a}$ його значення \mbox{(А--Д)}, якщо $a = \sqrt{2}$. \nmtyear{2025}}
+\answerRows{$-7$}{$-1$}{$4$}{$8$}{$64$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Б
+\zadtask{Установіть відповідність між виразом $\log_2 a + \log_2 \dfrac{16}{3}$ і його значенням \mbox{(А--Д)}, якщо $a = \dfrac{3}{8}$. \nmtyear{2026}}
+\answerRows{$2$}{$1$}{$\dfrac{1}{2}$}{$0$}{$-1$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: А
+\zadtask{Узгодьте вираз $0{,}04^{\,\log_5 a}$ із його значенням \mbox{(А--Д)}, якщо $a = 4$. \nmtyear{2026}}
+\answerRows{$\dfrac{1}{16}$}{$-8$}{$-7$}{$0{,}8$}{$-\dfrac{1}{16}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: В
+\zadtask{Узгодьте вираз $\log_4 8$ із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}}
+\answerRows{$[-1;\, 0)$}{$[0;\, 1)$}{$[1;\, 2)$}{$[2;\, 4)$}{$[4;\, +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Г
+\zadtask{Узгодьте вираз $a^{-2}\cdot a^3 \cdot \log_{27} 3$ з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a \neq 0$. \nmtyear{2026}}
+\answerRows{$-3a$}{$\dfrac{3}{a}$}{$0$}{$\dfrac{a}{3}$}{$3a$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Б
+\zadtask{Узгодьте вираз $\log_3 (1 - a)$ із його значенням \mbox{(А--Д)}, якщо $a = \dfrac{2}{3}$. \nmtyear{2026}}
+\answerRows{$4$}{$-1$}{$1$}{$\dfrac{20}{3}$}{$2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Б
+\zadtask{Узгодьте вираз $\log_{1/2} 32$ із його значенням \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-6$}{$-5$}{$5$}{$6$}{$7$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_{0{,}5} 2$ із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}}
+\answerRows{$[-2; -1)$}{$[-1; 1)$}{$[1; 2)$}{$[2; 3)$}{$[3; 4)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_8 200$ із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}}
+\answerRows{$[-5; 0)$}{$[0; 2)$}{$[2; 4)$}{$[4; 6)$}{$[6; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом $\log_\pi \dfrac{1}{\pi}$, де $\pi$~--- відома математична константа, та його значенням \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-1$}{$-0{,}5$}{$0$}{$0{,}5$}{$2\pi$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз $\log_{25} 5^n$ з тотожно рівним йому виразом \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-2n$}{$\dfrac{2}{n}$}{$\dfrac{n}{2}$}{$2n$}{$2n^2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: А
+\zadtask{Установіть відповідність між виразом $\log_2 \dfrac{1}{16}$ та його значенням \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-4$}{$-\dfrac{1}{4}$}{$\dfrac{1}{4}$}{$2$}{$4$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Г
+\zadtask{Узгодьте вираз $3^{-\log_3 2}$ з його значенням \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-2$}{$-0{,}5$}{$0$}{$0{,}5$}{$2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: В
+\zadtask{Доберіть до числового виразу $\log_{16} 2$ його значення \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{$-\dfrac{1}{4}$}{$4$}{$\dfrac{1}{4}$}{$6$}{$\dfrac{1}{6}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Завдання 601 (НМТ 2022, демоваріант) --- з тематичного збірника «Числа і вирази»
+\zadtask{У якому рядку числа $\log_2 64$, $\log_{64} 2$, $11$ розташовано за зростанням? \nmtyear{2022}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
+\begin{tabular}{ll}
+\textbf{А} & $\log_{64} 2$, $\log_2 64$, $11$ \\
+\textbf{Б} & $\log_2 64$, $11$, $\log_{64} 2$ \\
+\textbf{В} & $\log_2 64$, $\log_{64} 2$, $11$ \\
+\textbf{Г} & $11$, $\log_{64} 2$, $\log_2 64$ \\
+\textbf{Д} & $\log_{64} 2$, $11$, $\log_2 64$ \\
+\end{tabular}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\typeTitle{Логарифмічна функція}
+
+\begin{samepage}
+\noindent\zadnum Укажіть область визначення функції $y = \log_3 (x + 9)$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-\infty; +\infty)$}{$(0; +\infty)$}{$(9; +\infty)$}{$(-9; +\infty)$}{$(-9; 0)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Функція $y = \log_{0,5} x$>> так, щоб утворилося правильне твердження. \nmtyear{2023}}
+\answerRows{не визначена при $x = 1$.}{набуває від'ємного значення при $x = 2$.}{є непарною.}{має лише одну точку локального екстремуму.}{зростає на проміжку $(0; +\infty)$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Функція $y = \log_2 x$>> так, щоб утворилося правильне твердження. \nmtyear{2023}}
+\answerRows{не визначена при $x = -2$.}{набуває від'ємного значення при $x = 2$.}{є непарною.}{спадає на проміжку $(-\infty; 4]$.}{зростає на проміжку $(-\infty; +\infty)$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = \log_{0,5} (x - 4)$ та її властивістю \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{є спадною на всій області визначення}{графік функції перетинає вісь $y$ в точці з ординатою 4}{є непарною}{є парною}{областю визначення є проміжок $(0; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між твердженням <<найменше значення на відрізку $[1; 4]$ функція набуває в точці $x = 4$>> та функцією \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2023}}
+\answerRows{$y = x^2 + 4$}{$y = x$}{$y = \sqrt{x}$}{$y = \log_{0,5} x$}{$y = -\displaystyle\frac{1}{x}$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між функцією $y = \log_4 x$ та її властивістю \mbox{(А--Д)}. \nmtyear{2023}}
+\answerRows{має лише одну точку локального екстремуму}{є зростаючою на всій області визначення}{має від'ємний нуль}{є спадною на всій області визначення}{непарна}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат на площині зображено ламану $ABC$, де $A(-2; 0)$, $B(0; 1)$, $C(2; 1)$ (див. рисунок). Установіть відповідність між функцією $y=\log_5 x$ та кількістю (А – Д) спільних точок її графіка з ламаною $ABC$. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+        % Сітка
+        \draw[step=1cm,gray!50,very thin] (-2.5,-1.5) grid (3.5,2.5);
+        % Осі
+        \draw[->, >=stealth, thick] (-2.5,0) -- (3.5,0) node[below] {$x$};
+        \draw[->, >=stealth, thick] (0,-1.5) -- (0,2.5) node[left] {$y$};
+
+        % Ламана
+        \draw[thick] (-2, 0) -- (0, 1) -- (2, 1);
+
+        % Точки
+        \fill (-2,0) circle (3pt) node[above left] {$A$};
+        \fill (0,1) circle (3pt) node[above right] {$B$};
+        \fill (2,1) circle (3pt) node[above right] {$C$};
+
+        % Підписи координат
+        \node[below] at (-2,0) {$-2$};
+        \node[below left] at (0,0) {$0$};
+        \node[below] at (1,0) {$1$};
+        \node[below] at (2,0) {$2$};
+        \node[left] at (0,1) {$1$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\par\nopagebreak\vspace{0.15cm}
+\answerRows{жодної}{одна}{дві}{три}{більше трьох}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення <<Абсциса точки перетину графіка функції з графіком функції $y = \log_{\frac{1}{3}} x$ належить проміжку>> та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+\nbvspace{0pt}
+\begin{flushright}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+        % Сітка розширена вниз до -3.5
+        \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (5.5,4.5);
+        \draw[->, >=stealth, thick] (-4.5,0) -- (5.5,0) node[below] {$x$};
+        \draw[->, >=stealth, thick] (0,-3.5) -- (0,4.5) node[left] {$y$};
+
+        \node[below left] at (0,0) {$0$};
+        \node[below] at (1,0) {$1$};
+        \node[left] at (0,1) {$1$};
+        \node[below] at (5,0) {$5$};
+        \node[below] at (-4,0) {$-4$};
+
+        % Графік строго через точки: (-4, -3), (-1.2, 0), (0, 2.4), (2.5, 4), (5, 2)
+        \draw[thick] plot [smooth, tension=0.6] coordinates {(-4, -3) (-1.2, 0) (0, 2.4) (2.5, 4) (5, 2)};
+
+        \fill (-4,-3) circle (3pt);
+        \fill (5,2) circle (3pt);
+        \node[above, fill=white, inner sep=1.5pt] at (4.2, 4.5) {$y=f(x)$};
+    \end{tikzpicture}\end{nmtfit}
+\end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\par\nopagebreak\vspace{0.15cm}
+\answerRows{$(-4; -2]$.}{$(-2; 0]$.}{$(0; 1]$.}{$(1; 3]$.}{$(3; 5]$.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть закінчення \mbox{(А--Д)} до початку речення <<Графік функції $y = \log_2 x$>> так, щоб утворилося правильне твердження. \nmtyear{2024}}
+\answerRows{симетричний відносно осі абсцис.}{симетричний відносно осі ординат.}{симетричний відносно початку координат.}{не перетинає вісь абсцис.}{не перетинає вісь ординат.}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте функцію $y = \log_2 x$ із її властивістю \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{парна}{непарна}{область визначення функції є проміжок $(0; +\infty)$}{похідна функції є додатною на проміжку $(-\infty; 0)$}{є спадною на всій області визначення}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте функцію $y = \log_{0,1} (x - 4)$ із її властивістю \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{парна}{непарна}{область визначення функції є проміжок $(0; +\infty)$}{графік функції перетинає вісь $y$ в точці з ординатою 4}{спадає на всій області визначення}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть до функції $y = \log_3 (x - 5)$ її властивість \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{графік функції має лише 2 точки перетину з осями координат}{областю значень функції є проміжок $[-5; +\infty)$}{графік функції знаходиться лише в I та II координатних чвертях}{областю визначення функції є проміжок $(5; +\infty)$}{функція спадає на всій області визначення}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Узгодьте функцію $y = \lg x$ із її властивістю \mbox{(А--Д)}. \nmtyear{2025}}
+\answerRows{зростає на всій області визначення}{парна}{має точку максимуму}{не визначена лише в одній точці}{має точку мінімуму}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між твердженням <<не має спільних точок з функцією $y = \log_2(x-1)$>> та прямою, зображеною на рисунку \mbox{(А--Д)}, для якої це твердження є правильним. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+
+\nmtnobreak
+\begin{center}
+\begingroup
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|*{5}{c|}}
+\hline
+\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (2,0) {\tiny $2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[above right] at (0,1) {\tiny $1$};
+    \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
+    \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below right] at (1,0) {\tiny $1$};
+    \draw (1,0) -- (1.2,0) -- (1.2,0.2) -- (1,0.2); % прямий кут
+    \draw[thick] (1,-2) -- (1,3); % x = 1
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below right] at (0,0) {\tiny $0$};
+    \node[below] at (-2,0) {\tiny $-2$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
+\end{tikzpicture}\end{nmtfit} &
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
+    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\tiny $0$};
+    \node[below] at (3,0) {\tiny $3$};
+    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
+\end{tikzpicture}\end{nmtfit} \\
+\hline
+\end{tabular}
+\endgroup
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Б
+\zadtask{Установіть відповідність між характеристикою функції <<область визначення функції $y = \lg(x-2)$>> та проміжком \mbox{(А--Д)}, яким є ця характеристика. \nmtyear{2026}}
+\answerRows{$(-\infty;\, +\infty)$}{$(2;\, +\infty)$}{$[0;\, +\infty)$}{$(-\infty;\, 2]$}{$(-\infty;\, 2)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: А
+\zadtask{Установіть відповідність між функцією $y = \log_3 x$ та координатними чвертями \mbox{(А--Д)}, у яких розташований її графік. \nmtyear{2026}}
+\answerRows{I і IV}{I, II і III}{II, III і IV}{I і III}{II і IV}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Б
+\zadtask{Доберіть до функції $y = \log_{0{,}2} x$ її властивість \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{область визначення збігається з областю значень}{є спадною}{має лише три нулі}{має лише два нулі}{графік розташований у I та III чвертях}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Доберіть до функції $y = \lg x$ її властивість \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{є зростаючою}{є спадною}{не має нулів}{має лише два нулі}{є парною}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% Відповідь: Д
+\zadtask{Доберіть до функції $y = \log_{0{,}5} x$ властивість її графіка \mbox{(А--Д)}. \nmtyear{2026}}
+\answerRows{перетинає вісь $y$ з додатною ординатою, а вісь $x$ не перетинає}{не перетинає ані вісь $x$, ані вісь $y$}{розміщений лише в I, II та IV координатних чвертях}{перетинає вісь $y$ з від'ємною ординатою, а вісь $x$ не перетинає}{перетинає вісь $x$, а вісь $y$ не перетинає}
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Логарифмічні рівняння}
+
+\begin{samepage}
+\noindent\zadnum Якому проміжку належить корінь рівняння $\log_{0{,}5} x = -2$? \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(1; 4]$}{$(-1; 1]$}{$(8; +\infty)$}{$(-\infty; -1]$}{$(4; 8]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть рівняння $\log_4 (7 - 3x) = \displaystyle\frac{1}{2}$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$\displaystyle\frac{3}{5}$}{$-3$}{$-\displaystyle\frac{1}{3}$}{$-\displaystyle\frac{3}{5}$}{$\displaystyle\frac{5}{3}$}
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+% === НМТ 2024 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\log_{\frac{1}{3}} (x + 1) - \log_{\frac{1}{3}} 3 = -1$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(7; 9]$}{$(9; +\infty)$}{$(0; 1]$}{$(-1; 0]$}{$(1; 7]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\log_3 (2x + 1) = 3$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-13; -8]$}{$(8; 13]$}{$(13; 26)$}{$(0; 8]$}{$(-8; 0]$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $4 + 2\log_{\frac{1}{2}} x = 0$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(4; 8]$}{$(8; +\infty)$}{$(-1; 1]$}{$(1; 4]$}{$(-\infty; -1]$}
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+% === НМТ 2025 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $1 - \log_{0{,}5} x = 3$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-\infty; 0)$}{$[3; 10)$}{$[1; 3)$}{$[0; 1)$}{$[10; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\log_5 x + 1 = \log_5 12$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$[4; 6)$}{$[2; 4)$}{$[0; 2)$}{$[8; +\infty)$}{$[6; 8)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Укажіть проміжок, якому належить корінь рівняння $\log_{0{,}5} x = 2\log_{0{,}5} 2$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$[1; 3)$}{$[10; +\infty)$}{$(-\infty; 0)$}{$[3; 10)$}{$[0; 1)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Якому проміжку належить корінь рівняння $\log_6 x - \log_6 2 = 1$? \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(0; 1]$}{$(1; 4]$}{$(-\infty; 0]$}{$(4; 10]$}{$(10; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 2.06, завдання №10
+\zadtask{Якому проміжку належить корінь рівняння $\dfrac{\log_7(3x-4) - \log_7(x+5)}{2} = 0$? \nmtyear{2026}}
+\answerTable{$[-1;\, 1)$}{$[1;\, 3)$}{$[3;\, 5)$}{$[5;\, 7)$}{$[7;\, +\infty)$}
+% Відповідь: В
+\ifshowsolutions\solution{Рівняння рівносильне $\log_7(3x-4)-\log_7(x+5)=0$, тобто $\log_7\dfrac{3x-4}{x+5}=0$. Звідси $3x-4=x+5$, $x=4{,}5\in[3;5)$. Відповідь: \textbf{В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 3.06, завдання №15 --- основна тема: Системи рівнянь
+\zadtask{Розв'яжіть систему рівнянь $\begin{cases} \log_2 x = 2, \\[0.15cm] \dfrac{y+10}{x+1} = \dfrac{x+2}{2}. \end{cases}$ Якщо $(x_0;\,y_0)$~--- розв'язок системи, то $x_0 + y_0 = {}$ \nmtyear{2026}}
+\answerTable{$18$}{$29$}{$-6$}{$-4$}{$9$}
+% Відповідь: Д
+\ifshowsolutions\solution{Із $\log_2 x = 2$ маємо $x_0 = 4$. Тоді $\dfrac{y+10}{5} = \dfrac{6}{2} = 3$, звідки $y+10 = 15$, $y_0 = 5$. Отже $x_0 + y_0 = 9$. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 4.06, завдання №7
+\zadtask{Розв'яжіть рівняння $\log_9 (2x - 5) = \dfrac{1}{2}$. \nmtyear{2026}}
+\answerTable{$-1$}{$-4$}{$43$}{$4$}{$16$}
+% Відповідь: Г
+\ifshowsolutions\solution{За означенням логарифма $2x-5=9^{1/2}=3$, звідки $2x=8$, $x=4$ (ОДЗ $2x-5>0$ виконується). Відповідь: \textbf{Г}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №15
+\zadtask{Розв'яжіть рівняння $\log_5 x + \log_5(4x) = \log_5 25$. \nmtyear{2026}}
+\answerTableTall{$-\dfrac{5}{2}; \dfrac{5}{2}$}{$\dfrac{5}{2}$}{$\dfrac{2}{5}$}{$-5$}{$5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 10.06, завдання №15 --- основна тема: Системи рівнянь
+\zadtask{Розв'яжіть систему рівнянь
+\[
+\begin{cases} \log_2 x + \log_2 y = 2, \\[2pt] x + \dfrac{1}{y} = 10. \end{cases}
+\]
+Якщо $(x_0; y_0)$~--- розв'язок системи, то $x_0 + 2y_0 =$ \nmtyear{2026}}
+\answerTable{$2$}{$8{,}5$}{$9$}{$10$}{$8$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 11.06, завдання №7
+\zadtask{Якому проміжку належить корінь рівняння $\log_{0{,}5}(x - 2) = -2$? \nmtyear{2026}}
+\answerTable{$[1; 3)$}{$[3; 5)$}{$[5; 7)$}{$[7; 9)$}{$[9; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Логарифмічні нерівності}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_3 (2x - 1) < 2$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-\infty; 3{,}5)$}{$(0{,}5; 5)$}{$(0{,}5; +\infty)$}{$(0{,}5; 3{,}5)$}{$(-\infty; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_{0,7} x > 1$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(0{,}7; 1)$}{$(0; 0{,}7)$}{$(1; +\infty)$}{$(0{,}7; +\infty)$}{$(-\infty; 0{,}7)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_{0,3} (x + 3) > \log_{0,3} 4$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(0; 1)$}{$(7; +\infty)$}{$(-3; 1)$}{$(-\infty; 1)$}{$(1; +\infty)$}
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+% === НМТ 2024 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_{0,9} (3x) > 2$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(0{,}6; +\infty)$}{$(0; 0{,}27)$}{$(-\infty; 0{,}6)$}{$(-\infty; 0{,}27)$}{$(0{,}27; +\infty)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_3 (2x) > \log_3 10$. \nmtyear{2024}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-\infty; 8)$}{$(8; +\infty)$}{$(5; +\infty)$}{$(12; +\infty)$}{$(-\infty; 5)$}
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+% === НМТ 2025 ===
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_3 (2x - 1) < 2$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(-\infty; 5)$}{$(0{,}5; +\infty)$}{$(0{,}5; 3{,}5)$}{$(-\infty; 3{,}5)$}{$(0{,}5; 5)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $\log_3 (1 - 2x) < 2$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$\left(-4; \dfrac{1}{2}\right)$}{$(-4; +\infty)$}{$\left(-\dfrac{1}{2}; 4\right)$}{$(-\infty; 4)$}{$(-\infty; -4)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Розв'яжіть нерівність $3 + \log_2 x < \log_2 48$. \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTable{$(0; 16)$}{$(0; 6)$}{$(-\infty; 40)$}{$(0; 40)$}{$(-\infty; 6)$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 30.05, завдання №12
+\zadtask{Розв'яжіть нерівність $\log_5(4x - 7) < 2$. \nmtyear{2026}}
+\answerTableTall
+{$\left(\dfrac{7}{4};\, 8\right)$}
+{$(8;\, +\infty)$}
+{$\left(\dfrac{7}{4};\, +\infty\right)$}
+{$(-\infty;\, 8)$}
+{$\left(-\infty;\, \dfrac{7}{4}\right)$}
+% Відповідь: А
+\ifshowsolutions\solution{ОДЗ: $4x-7>0$. Оскільки $2=\log_5 25$, нерівність $4x-7<25$. Разом: $0<4x-7<25\Rightarrow \dfrac74<x<8$. Відповідь: \textbf{А} $\left(\dfrac74;\,8\right)$.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 12.06, завдання №7
+\zadtask{Розв'яжіть нерівність $\log_6(3 - 2x) < \log_6 3$. \nmtyear{2026}}
+\answerTable{$(-\infty; 0)$}{$(1{,}5; +\infty)$}{$(0; +\infty)$}{$(-1{,}5; 0)$}{$(0; 1{,}5)$}
+\par\penalty-20
+\end{samepage}
+
+\clearpage
+\sectionTitle{Відповіді}
+
+\noindent{\small\color{gray!80!black}Відповіді до завдань цього збірника. Відповіді обчислено й звірено з офіційними ключами там, де вони є.}\par\vspace{0.3cm}
+
+\begin{multicols}{5}\noindent
+\mbox{1~--- Г}\par
+\mbox{2~--- Д}\par
+\mbox{3~--- В}\par
+\mbox{4~--- Д}\par
+\mbox{5~--- В}\par
+\mbox{6~--- Д}\par
+\mbox{7~--- Г}\par
+\mbox{8~--- Г}\par
+\mbox{9~--- Г}\par
+\mbox{10~--- Д}\par
+\mbox{11~--- Б}\par
+\mbox{12~--- А}\par
+\mbox{13~--- Д}\par
+\mbox{14~--- А}\par
+\mbox{15~--- А}\par
+\mbox{16~--- Г}\par
+\mbox{17~--- В}\par
+\mbox{18~--- Б}\par
+\mbox{19~--- Б}\par
+\mbox{20~--- А}\par
+\mbox{21~--- В}\par
+\mbox{22~--- В}\par
+\mbox{23~--- Г}\par
+\mbox{24~--- Б}\par
+\mbox{25~--- Б}\par
+\mbox{26~--- Д}\par
+\mbox{27~--- В}\par
+\mbox{28~--- Г}\par
+\mbox{29~--- Б}\par
+\mbox{30~--- В}\par
+\mbox{31~--- Б}\par
+\mbox{32~--- В}\par
+\mbox{33~--- Б}\par
+\mbox{34~--- Б}\par
+\mbox{35~--- А}\par
+\mbox{36~--- Б}\par
+\mbox{37~--- Г}\par
+\mbox{38~--- Б}\par
+\mbox{39~--- В}\par
+\mbox{40~--- Г}\par
+\mbox{41~--- В}\par
+\mbox{42~--- В}\par
+\mbox{43~--- А}\par
+\mbox{44~--- Б}\par
+\mbox{45~--- Д}\par
+\mbox{46~--- В}\par
+\mbox{47~--- В}\par
+\mbox{48~--- В}\par
+\mbox{49~--- Б}\par
+\mbox{50~--- В}\par
+\mbox{51~--- Б}\par
+\mbox{52~--- В}\par
+\mbox{53~--- В}\par
+\mbox{54~--- А}\par
+\mbox{55~--- В}\par
+\mbox{56~--- В}\par
+\mbox{57~--- Б}\par
+\mbox{58~--- Д}\par
+\mbox{59~--- Д}\par
+\mbox{60~--- В}\par
+\mbox{61~--- Б}\par
+\mbox{62~--- Д}\par
+\mbox{63~--- Б}\par
+\mbox{64~--- Д}\par
+\mbox{65~--- Б}\par
+\mbox{66~--- В}\par
+\mbox{67~--- Г}\par
+\mbox{68~--- Б}\par
+\mbox{69~--- В}\par
+\mbox{70~--- Б}\par
+\mbox{71~--- А}\par
+\mbox{72~--- В}\par
+\mbox{73~--- Г}\par
+\mbox{74~--- Б}\par
+\mbox{75~--- Б}\par
+\mbox{76~--- Б}\par
+\mbox{77~--- В}\par
+\mbox{78~--- А}\par
+\mbox{79~--- В}\par
+\mbox{80~--- А}\par
+\mbox{81~--- Г}\par
+\mbox{82~--- В}\par
+\mbox{83~--- А}\par
+\mbox{84~--- Г}\par
+\mbox{85~--- Б}\par
+\mbox{86~--- А}\par
+\mbox{87~--- А}\par
+\mbox{88~--- Г}\par
+\mbox{89~--- Б}\par
+\mbox{90~--- А}\par
+\mbox{91~--- В}\par
+\mbox{92~--- Д}\par
+\mbox{93~--- В}\par
+\mbox{94~--- Д}\par
+\mbox{95~--- Г}\par
+\mbox{96~--- А}\par
+\mbox{97~--- В}\par
+\mbox{98~--- Б}\par
+\mbox{99~--- А}\par
+\mbox{100~--- Б}\par
+\mbox{101~--- А}\par
+\mbox{102~--- Д}\par
+\mbox{103~--- А}\par
+\mbox{104~--- Д}\par
+\mbox{105~--- А}\par
+\mbox{106~--- Б}\par
+\mbox{107~--- Г}\par
+\mbox{108~--- Б}\par
+\mbox{109~--- Б}\par
+\mbox{110~--- Г}\par
+\mbox{111~--- Д}\par
+\mbox{112~--- В}\par
+\mbox{113~--- Д}\par
+\mbox{114~--- Г}\par
+\mbox{115~--- Б}\par
+\mbox{116~--- В}\par
+\mbox{117~--- В}\par
+\mbox{118~--- Б}\par
+\mbox{119~--- Б}\par
+\mbox{120~--- В}\par
+\mbox{121~--- Б}\par
+\mbox{122~--- В}\par
+\mbox{123~--- Д}\par
+\mbox{124~--- А}\par
+\mbox{125~--- Б}\par
+\mbox{126~--- А}\par
+\mbox{127~--- Д}
+\end{multicols}
+
+\end{document}
