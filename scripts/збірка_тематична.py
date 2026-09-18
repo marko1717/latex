@@ -5,12 +5,14 @@
 той, що стосується теми збірника, а п'ять варіантів А--Д друкуються окремими
 рядками. Якщо тема стоїть лише серед варіантів -- пункт обирається за ключем
 (таблиця OVERRIDE); якщо завдання насправді не за темою -- воно відкидається.
-Наприкінці -- анотація на початку і ключ відповідей.
+На початку -- анотація, наприкінці -- ключ відповідей. Поруч записується
+файл «…_без_водяного_знака.tex» (версія для вчителів).
 
     python3 scripts/збірка_тематична.py показникові
     python3 scripts/збірка_тематична.py логарифмічні
+    python3 scripts/збірка_тематична.py призма
 """
-import os, re, sys, json, unicodedata, collections
+import os, re, sys, json, hashlib, unicodedata, collections
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -49,7 +51,29 @@ CONFIGS = {
             ("2024", "Установіть відповідність між функцією (1--3) та властивістю її графіка", "drop"),  # log_0,5 x лише в дистракторі В
             ("2023", "Установіть відповідність між функцією (1--3) та властивістю (А--Д) її графіка", "drop!"),  # для log_2 x правильні і Б, і В
         ]),
+    # третій елемент джерела -- параметри відбору: kinds (типи завдань), need (обов'язковий текст),
+    # drop (фрагменти умов завдань не за темою), file_order (порядок як у файлі теми)
+    "призма": dict(
+        title="Призма. Прямокутний паралелепіпед. Куб",
+        out="Призма_паралелепіпед_куб.tex",
+        src=[("Завдання з вибором однієї відповіді", "38. Призма. Паралелепіпед. Куб/завдання.tex",
+              dict(kinds=("single", "?"), file_order=True, drop=["ромба $ABCD$ проведено перпендикуляр"])),
+             ("Завдання з короткою відповіддю", "38. Призма. Паралелепіпед. Куб/завдання.tex",
+              dict(kinds=("input",), file_order=True))],
+        # задачі з призмою з тем 18 і 39--42 уже є в темі 38; єдина нова (тема 18, M(-3; 2; 0)) не звірена
+        # з оригіналом і має відповідь 164√82, неможливу на НМТ, тому не береться
+        strict_dups=True,   # одна задача з різних сесій (інші лапки, порядок варіантів) -- друкуємо один раз
+        detect=r"призм|паралелепіпед|куб(?![іи]чн)",
+        about="призму, прямокутний паралелепіпед і куб",
+        topics="теми 38", relevant="призми",
+        src_phrase="з теми 38 бази НМТ (серед них є задачі на призму й куб у системі координат і задачі, де призма поєднана з циліндром, конусом, пірамідою чи кулею)",
+        answers="відповіді_призма.json",
+        override=[]),
 }
+
+def src_paths(entry):
+    p = entry[1]
+    return p if isinstance(p, list) else [p]
 
 CFG = None   # активна конфігурація (задається в main)
 
@@ -231,7 +255,7 @@ def to_single(b):
     return "\n".join(out)
 
 def preamble():
-    p = os.path.join(ROOT, CFG["src"][-1][1])
+    p = os.path.join(ROOT, src_paths(CFG["src"][-1])[0])
     s = open(p, encoding="utf-8").read()
     pre = s[:s.index("\\begin{document}")]
     pre = re.sub(r"\\fancyhead\[C\]\{[^\n]*\}",
@@ -248,7 +272,8 @@ def sig(block):
     t = re.sub(r"(?s)\\begin\{(tikzpicture|axis)\}.*?\\end\{\1\}", " ", t)
     t = re.sub(r"\\nmtyear\{\d+\}|\\(?:begin|end)\{samepage\}", " ", t)
     t = re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", t)
-    return t[:160]
+    # початок тексту для читабельності + хеш усього тексту (у схожих задач початок однаковий)
+    return t[:80] + "#" + hashlib.sha1(t.encode("utf-8")).hexdigest()[:10]
 
 def same_key(block):
     """ключ для пошуку повторів: без рисунків, коментарів, року та оформлення"""
@@ -257,6 +282,27 @@ def same_key(block):
     t = re.sub(r"\\nmtyear\{\d+\}|\\(?:mbox|textit|matchHead|noindent|zadnum|zadtask|par|nmtnobreak|nopagebreak)\b", " ", t)
     return re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", t)
 
+def task_key(block):
+    """ключ повтору, стійкий до оформлення: умова без команд LaTeX + відсортовані варіанти
+    (у базі одна задача трапляється з іншими лапками, «\\text{см}» чи порядком варіантів)"""
+    t = re.sub(r"%[^\n]*", " ", block)
+    t = re.sub(r"(?s)\\begin\{(tikzpicture|axis)\}.*?\\end\{\1\}", " ", t)
+    t = re.sub(r"\\nmtyear\{\d+\}|\\begin\{minipage\}(?:\[[^\]]*\])?\{[^{}]*\}", " ", t)
+    norm = lambda x: re.sub(r"[^0-9A-Za-zА-Яа-яІіЇїЄєҐґ]+", "", re.sub(r"\\[a-zA-Z]+\*?", " ",
+                            re.sub(r"\\(?:begin|end)\{[^{}]*\}|\\(?:n?b?vspace|hspace)\*?\{[^{}]*\}|\(див\. рисунок\)", " ", x)))
+    m = re.search(r"\\answer(?:Table|TableTall|Rows)\s*\{", t)
+    if m:
+        opts, j = [], m.end() - 1
+        while j < len(t) and len(opts) < 5:
+            while j < len(t) and t[j] in " \n\t": j += 1
+            if j >= len(t) or t[j] != "{": break
+            a, j = arg_at(t, j); opts.append(norm(a))
+        return norm(t[:m.start()]) + "|" + "|".join(sorted(opts))
+    parts = re.split(r"\\textbf\{[А-Д]\}|\\item\b", t)
+    if len(parts) >= 6:
+        return norm(parts[0]) + "|" + "|".join(sorted(norm(x) for x in parts[1:]))
+    return norm(t)
+
 def answers():
     p = os.path.join(ROOT, "scripts", "data", CFG["answers"])
     if not os.path.exists(p): return {}
@@ -264,7 +310,7 @@ def answers():
 
 def carried_macros():
     """макроси, які теми означують після \\begin{document} (matchingLayout тощо)"""
-    src = open(os.path.join(ROOT, CFG["src"][0][1]), encoding="utf-8").read()
+    src = open(os.path.join(ROOT, src_paths(CFG["src"][0])[0]), encoding="utf-8").read()
     a = src.index("\\begin{document}") + len("\\begin{document}")
     b = src.index("\\chapterTitle{", a)
     return src[a:b].strip("\n")
@@ -280,8 +326,12 @@ def main():
     seen, dups = set(), 0     # у базі трапляються однакові завдання з різних сесій -- друкуємо один раз
     ann = len(out)          # місце під анотацію -- підставимо, коли будуть підрахунки
     out.append("")
-    for title, path in CFG["src"]:
-        bs = blocks(path)
+    for entry in CFG["src"]:
+        title, opt = entry[0], (entry[2] if len(entry) > 2 else {})
+        bs = [b for path in src_paths(entry) for b in blocks(path)]
+        if "kinds" in opt: bs = [b for b in bs if kind(b) in opt["kinds"]]
+        if "need" in opt: bs = [b for b in bs if re.search(opt["need"], re.sub(r"%[^\n]*", "", b), re.I)]
+        if "drop" in opt: bs = [b for b in bs if not any(d in b for d in opt["drop"])]
         matched = [(b, to_single(b)) for b in bs if kind(b) == "matching"]
         conv = [c for _, c in matched if c and c != "DROP"]
         kept = [b for b, c in matched if c is None]
@@ -290,10 +340,16 @@ def main():
         other = [b for b in bs if kind(b) not in ("single", "matching")] + kept
         out.append("\\typeTitle{%s}\n" % title)
         n0, dup0, nconv = len(order), dups, 0
-        for b in singles + conv + other:
+        seq = singles + conv + other
+        if opt.get("file_order"):
+            conv_of = dict(matched)
+            seq = [conv_of.get(b) or b if kind(b) == "matching" else b for b in bs]
+            seq = [b for b in seq if b != "DROP"]
+        for b in seq:
             k = same_key(b)
-            if k in seen: dups += 1; continue
-            seen.add(k)
+            k2 = task_key(b) if CFG.get("strict_dups") else k
+            if k in seen or k2 in seen: dups += 1; continue
+            seen.update((k, k2))
             is_conv = b in conv
             b = b.replace("координатою якою", "координатою якої")   # описка в умові джерела
             if is_conv: out.append(b); nconv += 1
@@ -308,13 +364,15 @@ def main():
     conv_total = sum(1 for b in order if "\\answerRows" in b)
     parts = ", ".join(re.sub(r":.*", "", x) for x in stat)
     nparts = {1: "одну частину", 2: "дві частини", 3: "три частини", 4: "чотири частини"}.get(len(stat), "%d частин" % len(stat))
+    src_phrase = CFG.get("src_phrase") or ("з " + CFG["topics"] + " бази НМТ")
+    conv_note = ("Завдання \\textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, "
+                 "що стосується " + CFG["relevant"] + ", а п'ять варіантів відповіді надруковано окремими рядками, бо вирази "
+                 "задовгі для клітинок таблиці; таких завдань %d. " % conv_total) if conv_total else ""
     out[ann] = ("\\noindent{\\small Збірник містить \\textbf{%d завдань} НМТ %s--%s років про " + CFG["about"] + ". "
-                "Завдання зібрано з " + CFG["topics"] + " бази НМТ і згруповано у " + nparts + ": %s. Біля кожного завдання вказано рік.\\par\\vspace{0.15cm}\n"
-                "Завдання \\textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, "
-                "що стосується " + CFG["relevant"] + ", а п'ять варіантів відповіді надруковано окремими рядками, бо вирази "
-                "задовгі для клітинок таблиці; таких завдань %d. Відповіді до всіх завдань~--- на останній сторінці.\\par\\vspace{0.15cm}\n"
+                "Завдання зібрано " + src_phrase + " і згруповано у " + nparts + ": %s. Біля кожного завдання вказано рік.\\par\\vspace{0.15cm}\n"
+                + conv_note + "Відповіді до всіх завдань~--- на останній сторінці.\\par\\vspace{0.15cm}\n"
                 "За роками: %s.}\\par\\vspace{0.45cm}\n") % (
-                len(order), min(years), max(years), parts, conv_total,
+                len(order), min(years), max(years), parts,
                 ", ".join("\\mbox{%s~--- %d}" % (y, n) for y, n in sorted(years.items())))
     key = answers()
     rows, missing = [], 0
@@ -331,7 +389,14 @@ def main():
     out.append("\\end{document}\n")
     txt = unicodedata.normalize("NFC", "\n".join(out))
     open(os.path.join(ROOT, CFG["out"]), "w", encoding="utf-8").write(txt)
-    print("записано", CFG["out"])
+    # та сама збірка без водяного знака (для вчителів): тонкий файл-обгортка, сам збірник не дублюється
+    stem = CFG["out"][:-4]
+    clean = unicodedata.normalize("NFC", stem + "_без_водяного_знака.tex")
+    open(os.path.join(ROOT, clean), "w", encoding="utf-8").write(unicodedata.normalize("NFC",
+        "%% Збірник «%s» без водяного знака @pvtr2525 -- версія для вчителів.\n"
+        "%% Компілюйте цей файл (XeLaTeX); завдання беруться з %s.tex.\n"
+        "\\def\\nmtnowatermark{}\n\\input{%s}\n" % (CFG["title"], stem, stem)))
+    print("записано", CFG["out"], "і", clean)
     for s in stat: print("   ", s)
 
 if __name__ == "__main__":

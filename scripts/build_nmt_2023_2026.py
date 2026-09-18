@@ -122,7 +122,10 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
 
 % --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
 \newsavebox{\nmtfitbox}
@@ -772,6 +775,20 @@ def apply_source_fixes(t):
             t = t.replace(a, b); FIXES_USED[a] += 1
     return t
 
+def order_cells_by_comment(t):
+    """клітинки \answerTable з рисунками підписані коментарем «% Г: Призма» -- буквою з оригіналу, але в кількох
+    старих файлах стоять не в тому порядку (свічки 14.06.2023); переставляємо клітинки за цими буквами"""
+    for m in reversed(list(re.finditer(r"\\answerTable(?:Tall|Small)?(?=\s*\{)", t))):
+        args, j = read_args(t, m.end(), 5)
+        if not args: continue
+        lab = [re.match(r"\s*%\s*([А-Д]):", a) for a in args]
+        if not all(lab): continue
+        ls = [x.group(1) for x in lab]
+        if sorted(ls) != list("АБВГД") or ls == list("АБВГД"): continue
+        t = t[:m.end()] + "".join("{%s}" % a for _, a in sorted(zip(ls, args))) + t[j:]
+        FIXES_USED["клітинки за коментарями"] += 1
+    return t
+
 def fix_figures_tables(t):
     """підпис y=f(x)/y=g(x) на кривій -> білий фон; дроби -> висока таблиця; голі числа в таблиці -> математика; сирі '|' у словах; поля відповіді з \\framebox"""
     COLORS = r"(?:mainGreen|headerblue|yearOrange|red|blue|green|gray|black|cyan|magenta|orange|violet|brown|purple|teal|olive)(?:![0-9]+(?:![a-zA-Z]+)?)*"
@@ -1140,6 +1157,7 @@ def build_unit(key, by2026, log):
         c = restore(c, store)
         c = fix_cyr_math(c)
         c = apply_source_fixes(c)
+        c = order_cells_by_comment(c)
         c = fix_figures_tables(c)
         c = re.sub(r"(?<!\\begin\{nmtfit\})\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", c)
         c = re.sub(r"\\end\{tikzpicture\}(?!\\end\{nmtfit\})", r"\\end{tikzpicture}\\end{nmtfit}", c)
@@ -1324,6 +1342,7 @@ def main():
         for y, c in e["counts"].items(): tot[y] += c
     print("РАЗОМ (з урахуванням завдань у кількох темах):", dict(tot), "=", sum(tot.values()))
     print("виправлення джерел:", ", ".join("%d" % FIXES_USED[f[0]] for f in SOURCE_FIXES))
+    print("клітинки з рисунками переставлено за коментарями:", FIXES_USED["клітинки за коментарями"])
     for a, *_ in SOURCE_FIXES:
         if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
 
