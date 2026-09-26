@@ -29,7 +29,7 @@ def зробити(json_шлях, title, header, вступ, out, name):
         розділ = ""
         if t["група"] != група:                          # заголовок розділу -- в одному блоці з першим завданням
             група = t["група"]; розділ = "\\sectionTitle{%s}\n" % група
-        tex.append(БЛОК % (розділ, t["код"], t["назва"], t["частота"], t["формати"], t["нмт"], t["код"], як_у_базі(t["latex"]).replace(r"\par\penalty-20", ""), t["відповідь"], t["пастки"]))
+        tex.append(БЛОК % (розділ, t["код"], t["назва"], t["частота"], t["формати"], t["нмт"], t["код"], як_у_базі(t["latex"]).replace(r"\par\penalty-20", ""), t.get("відповідь_показ", t["відповідь"]), t["пастки"]))
     tex.append("\\end{document}\n")
     ok, err, pdf, over = компілювати(нфк("\n".join(tex)).replace("ʼ", "'"), tempfile.mkdtemp(), name)   # у шрифті немає U+02BC
     if not ok: raise SystemExit(err)
