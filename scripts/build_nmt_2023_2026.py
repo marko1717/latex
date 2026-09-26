@@ -1292,7 +1292,8 @@ def build_unit(key, by2026, log):
         out.append("\n")
     out.append(COMPAT)
     if "\\includegraphics" in "".join(parts):          # і старі завдання, і завдання 2026 (ілюстрації)
-        out.append("\\graphicspath{{./}{%s/}}\n" % folder)
+        # NFC, як і в input_line(): на Overleaf (Linux) тека в NFD-записі не знаходиться
+        out.append("\\graphicspath{{./}{%s/}}\n" % unicodedata.normalize("NFC", folder))
     out.append("\\chapterTitle{Тема %s. %s}\n" % (key, title))
     secnum, secname = SECTION_OF[key]
     out.append("\\noindent{\\small\\color{gray!80} Розділ %s. %s \\quad\\textbullet\\quad Усього завдань: %d (НМТ %s); %s.}\\par\\vspace{0.2cm}\n\n" % (secnum, secname, total, stat, tstat))
