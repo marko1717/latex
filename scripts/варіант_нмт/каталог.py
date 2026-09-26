@@ -138,9 +138,10 @@ def зібрати(verbose=True):
     old = json.load(open(КАТАЛОГ, encoding="utf-8")) if os.path.exists(КАТАЛОГ) else []
     by_id = {r["id"]: r for r in old}
     by_key = {(r.get("ключ") or "")[:60]: r for r in old}
+    by_sess = {r["сесія_2026"]: r for r in old if r.get("сесія_2026")}   # завдання 2026: сесія й номер не змінюються
     kept = relinked = 0
     for r in cat:
-        o = by_id.get(r["id"]) or by_key.get(r["ключ"])
+        o = by_id.get(r["id"]) or by_key.get(r["ключ"]) or (by_sess.get(r.get("сесія_2026")) if r.get("сесія_2026") else None)
         if o is None:
             cands = difflib.get_close_matches(r["ключ"], [x for x in by_key if x], n=1, cutoff=0.93)
             o = by_key.get(cands[0]) if cands else None

@@ -21,7 +21,7 @@ import os, sys, json, base64, urllib.request, urllib.error, unicodedata
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MANIFEST = os.path.join(ROOT, "scripts", "data", "рисунки.json")
 ВХІДНІ = os.path.join(ROOT, "рисунки_вхідні")          # сирі зображення (у git не йдуть)
-МОДЕЛЬ = os.environ.get("NMT_IMAGE_MODEL", "gpt-image-1")
+МОДЕЛЬ = os.environ.get("NMT_IMAGE_MODEL")        # якщо не задано -- перша доступна модель зображень (моделі_зображень)
 
 СТИЛЬ = ("Clean flat vector illustration for a school math exam booklet, soft muted colors, "
          "white background, no text, no letters, no numbers, no labels, no watermark, no border, "
@@ -42,32 +42,47 @@ def знайти(items, id_):
     raise SystemExit("немає рисунка %s у %s" % (id_, MANIFEST))
 
 
+def моделі_зображень(key):
+    req = urllib.request.Request("https://api.openai.com/v1/models", headers={"Authorization": "Bearer " + key})
+    with urllib.request.urlopen(req, timeout=60) as r: ids = [m["id"] for m in json.load(r)["data"]]
+    # стабільні датовані версії -- першими
+    return sorted((i for i in ids if "image" in i or "dall" in i), key=lambda i: (not any(c.isdigit() for c in i.split("-")[-1]), i))
+
+
 def згенерувати(it):
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         raise SystemExit("немає змінної OPENAI_API_KEY -- додайте її в ~/.zshrc (export OPENAI_API_KEY=...) і відкрийте новий термінал")
-    body = {"model": МОДЕЛЬ, "prompt": (СТИЛЬ if it.get("стиль", True) else "") + it["промпт"],
+    model = МОДЕЛЬ or next(iter(моделі_зображень(key)), None)
+    if not model: raise SystemExit("проєкту OpenAI не доступна жодна модель зображень")
+    body = {"model": model, "prompt": (СТИЛЬ if it.get("стиль", True) else "") + it["промпт"],
             "size": it.get("формат", "1024x1024"), "n": 1}
-    if МОДЕЛЬ.startswith("gpt-image"):
+    if model.startswith("gpt-image"):
         body["quality"] = it.get("якість", "medium")
         if it.get("фон") == "прозорий": body["background"] = "transparent"; body["output_format"] = "png"
     req = urllib.request.Request("https://api.openai.com/v1/images/generations", data=json.dumps(body).encode("utf-8"),
                                  headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=300) as r: data = json.load(r)
-    except urllib.error.HTTPError as e:
-        msg = e.read().decode("utf-8", "replace")[:500]
-        raise SystemExit("OpenAI повернув помилку %d: %s" % (e.code, msg))
+    import time
+    for attempt in range(6):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r: data = json.load(r)
+            break
+        except urllib.error.HTTPError as e:
+            msg = e.read().decode("utf-8", "replace")[:500]
+            # одразу після верифікації організації доступ до моделі вмикається не на всіх серверах -- 403 чи 429 минають
+            if e.code in (403, 429, 500, 502, 503) and attempt < 5:
+                print("  OpenAI: %d, повтор через %d с" % (e.code, 15 * (attempt + 1))); time.sleep(15 * (attempt + 1)); continue
+            raise SystemExit("OpenAI повернув помилку %d: %s" % (e.code, msg))
     os.makedirs(ВХІДНІ, exist_ok=True)
     n = sum(1 for f in os.listdir(ВХІДНІ) if f.startswith(it["id"] + "_")) + 1
     path = os.path.join(ВХІДНІ, "%s_%02d.png" % (it["id"], n))
     open(path, "wb").write(base64.b64decode(data["data"][0]["b64_json"]))
-    it["стан"] = "згенеровано"; it.setdefault("спроби", []).append(os.path.basename(path))
-    print("записано", path)
+    it["стан"] = "згенеровано"; it.setdefault("спроби", []).append(os.path.basename(path)); it["модель"] = model
+    print("записано", path, "(%s)" % model)
     return path
 
 
-def обробити(it, src=None, max_w=1400):
+def обробити(it, src=None, max_w=None):
     """обрізати білі поля, зменшити, зберегти PNG у теці теми під іменем id.png"""
     from PIL import Image, ImageChops
     src = src or os.path.join(ВХІДНІ, it["спроби"][-1])
@@ -82,13 +97,14 @@ def обробити(it, src=None, max_w=1400):
         pad = int(0.02 * max(im.size))
         box = (max(0, box[0] - pad), max(0, box[1] - pad), min(im.width, box[2] + pad), min(im.height, box[3] + pad))
         im = im.crop(box)
+    max_w = max_w or it.get("ширина", 1000)
     if im.width > max_w: im = im.resize((max_w, round(im.height * max_w / im.width)), Image.LANCZOS)
     folder = os.path.join(ROOT, unicodedata.normalize("NFC", it["тека"]))
     if not os.path.isdir(folder):
         folder = next(os.path.join(ROOT, d) for d in os.listdir(ROOT) if unicodedata.normalize("NFC", d) == unicodedata.normalize("NFC", it["тека"]))
-    out = os.path.join(folder, it["id"] + ".png")
-    if im.mode == "RGBA": im.save(out, optimize=True)
-    else: im.quantize(colors=128, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
+    out = os.path.join(folder, it.get("імʼя", it["id"]) + ".png")     # латинське ім'я: так надійніше для LaTeX і Overleaf
+    if im.mode == "RGBA": im.quantize(colors=256, method=Image.Quantize.FASTOCTREE).save(out, optimize=True)
+    else: im.quantize(colors=192, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
     it["стан"] = "прийнято"; it["файл"] = os.path.relpath(out, ROOT)
     print("записано", out, "%d КБ" % (os.path.getsize(out) // 1024))
     return out
