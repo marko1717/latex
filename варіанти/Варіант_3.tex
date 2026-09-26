@@ -182,12 +182,32 @@
 \newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
 \newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
 \newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \graphicspath{{../1. Числа. Звичайні та десяткові дроби. Модуль числа/}{../10. Основи планіметрії/}{../11. Трикутники/}{../12. Паралелограм/}{../13. Прямокутник/}{../14. Квадрат/}{../15. Ромб/}{../16. Трапеція/}{../17. Коло, круг і їх елементи/}{../18. Координати і вектори на площині і в просторі. Рівняння кола/}{../19. Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів/}{../2.відсотки, арифметичні задачі, подільність/}{../20. Функція та її властивості/}{../21.  Графіки елементарних функцій, їх побудова графіків функцій та їх перетворення/}{../22. Модульні  рівняння та нерівності/}{../23. Ірраціональні рівняння та нерівності/}{../24. Арифметична прогресія/}{../25. Геометрична прогресія/}{../26. Тригонометричні вирази/}{../27. Тригонометричні рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові функція і вирази/}{../29. Показникові нерівності/}{../3. Степені. Одночлени. стандартний вигляд числа/}{../30. Логарифм. Логарифмічна функція/}{../31. Логарифмічні рівняння/}{../32. Логарифмічні нерівності/}{../33. Похідна/}{../34. Первісна/}{../35. Комбінаторика/}{../36. Теорія ймовірності/}{../37. Статистика/}{../38. Призма. Паралелепіпед. Куб/}{../39. Піраміда/}{../4.Многочлени. ФСМ/}{../40. Циліндр/}{../41. Конус/}{../42. Куля. Сфера/}{../43. Параметри/}{../5. дробові раціональні вирази і перетворення/}{../6. Лінійні рівняння/}{../7. Квадратні корені. Корені вищих степенів. Раціональний степінь/}{../8. квадратні рівняння, і рівняння, що до них зводяться/}{../9. Системи рівнянь/}}
+\renewcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}\noindent
+\begin{tcolorbox}[nobeforeafter, width=\linewidth, colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\nopagebreak\vspace{0.15cm}\nopagebreak
+}
+\renewcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{5}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
 
 \begin{document}
 % макроси бази, потрібні аналогам
@@ -299,8 +319,8 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\zadtask{$|1 - 4 \cdot 2{,}5| =$}
-\answerTable{$9$}{$11$}{$-9$}{$7{,}5$}{$-11$}
+\zadtask{$|1 - 0{,}5^{-2}| =$}
+\answerTable{$0$}{$2$}{$1$}{$3$}{$1{,}25$}
 \par\penalty-20
 \end{samepage}
 \endgroup
@@ -416,15 +436,30 @@
 \endgroup
 
 \begingroup
+% --- макроси, перенесені зі старого файлу теми ---
+\providecommand{\matchingLayout}{}\renewcommand{\matchingLayout}[3]{
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        \nmtHeadUnless{#1}{\textit{Величина / Початок} \par \nbvspace{0.2cm}}
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        \nmtHeadUnless{#2}{\textit{Значення / Закінчення} \par \nbvspace{0.2cm}}
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}
+}
+
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
-\definecolor{bar1}{RGB}{200, 120, 20}
-\definecolor{bar2}{RGB}{255, 220, 0}
-\definecolor{bar3}{RGB}{220, 30, 30}
-\definecolor{bar4}{RGB}{128, 0, 128}
-\definecolor{bar5}{RGB}{0, 160, 220}
-\definecolor{bar6}{RGB}{120, 180, 50}
 \definecolor{hexcol}{RGB}{200,110,60}
 \providecommand{\hexthree}{}\renewcommand{\hexthree}[2]{%
     \draw[hexcol, line width=1.1pt]
@@ -482,20 +517,38 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\zadtask{Група туристів рухається у напрямку $OA$, утворюючи кут $15°$ із напрямком <<північ>> (див. рисунок). На який кут $\alpha$ потрібно повернути цій групі, щоб вони рухалися в напрямку <<захід>>?}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.42\textwidth}
-\answerTableSmall{$95°$}{$85°$}{$115°$}{$105°$}{$75°$}
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У паралелограмі $ABCD$ діагональ $BD$ утворює зі сторонами $BC$ і $CD$ кути $48^\circ$ і $72^\circ$ (див. рисунок). Визначте градусну міру кута $ABC$.
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.42\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.15]{tourists_compass.png}
-\end{flushright}
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (4,0);
+        \coordinate (C) at (5.2,2.5);
+        \coordinate (B) at (1.2,2.5);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (D);
+
+        \pic [draw, pic text={$48^\circ$}, angle radius=0.6cm, angle eccentricity=1.7] {angle = D--B--C};
+        \pic [draw, pic text={$72^\circ$}, angle radius=0.6cm, angle eccentricity=1.4] {angle = C--D--B};
+        \pic [draw, angle radius=0.5cm] {angle = C--D--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
 \end{minipage}
-\par\penalty-20\vspace{0.25cm}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
+\answerTable{$72^\circ$}{$132^\circ$}{$120^\circ$}{$108^\circ$}{$60^\circ$}
+\par\penalty-20
 \end{samepage}
 \endgroup
 
@@ -571,8 +624,8 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\noindent\zadnum Укажіть число, яке задовольняє систему нерівностей $\begin{cases} x > -3, \\ x \leqslant 7. \end{cases}$
-\answerTable{$-3$}{$-10$}{$10$}{$5$}{$-6$}
+\zadtask{Розв'яжіть нерівність $7 - x < 2$.}
+\answerTable{$(-\infty;\,-5)$}{$(-\infty;\,9)$}{$(-5;\,+\infty)$}{$(-\infty;\,5)$}{$(5;\,+\infty)$}
 \par\penalty-20
 \end{samepage}
 \endgroup
@@ -641,18 +694,18 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\noindent\zadnum Укажіть формулу для обчислення площі $S$ бічної поверхні циліндра, висота й радіус основи дорівнюють $R$.
+\noindent\zadnum Укажіть формулу для обчислення об’єму $V$ циліндра, радіус якого і висота дорівнюють $R$.
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
-\answerTableTall{$S=\pi R^2$}{$S=\dfrac{\pi R^2}{3}$}{$S=\dfrac{\pi R^3}{3}$}{$S=\pi R^3$}{$S=2\pi R^2$}
+\answerTableTall{$V=2\pi R^3$}{$V=\pi R^3$}{$V=\dfrac{\pi R^3}{3}$}{$V=\dfrac{\pi R^2}{3}$}{$V=\pi R^2$}
 \par\penalty-20
 \end{samepage}
 \endgroup
 
 \begin{samepage}
-\zadtask{Спростіть вираз $\dfrac{12a^5 - 4a^5}{4}$.}
-\answerTable{$2a^{10}$}{$2a^5$}{$12a^{10}$}{$-a^5$}{$11a^5$}
+\zadtask{Спростіть вираз $(m-2)(m+2) - (m+5)^2$.}
+\answerTable{$10m - 29$}{$-10m + 21$}{$-29$}{$-10m - 29$}{$-10m - 21$}
 \par\penalty-20
 \end{samepage}
 
@@ -728,9 +781,15 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\zadtask{Позначте проміжок, якому належить корінь рівняння $\left(\dfrac{1}{3}\right)^{2x-1} = 9$.}
-\answerTable{$(-3; -2)$}{$(-2; -1)$}{$(-1; 0)$}{$(0; 1)$}{$(1; 2)$}
-\par\penalty-20
+\noindent\zadnum Розв'яжіть рівняння $\log_4 (7 - 3x) = \displaystyle\frac{1}{2}$.\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\answerTableTall{$\displaystyle\frac{3}{5}$}{$-3$}{$-\displaystyle\frac{1}{3}$}{$-\displaystyle\frac{3}{5}$}{$\displaystyle\frac{5}{3}$}
+\nopagebreak\nbvspace{0.5cm}
+
+\nmtnobreak
+\par\penalty-20\vspace{0.25cm}
 \end{samepage}
 \endgroup
 
@@ -758,16 +817,15 @@
 \end{samepage}
 
 \begin{samepage}
-\zadtask{Розгляньте наведені нижче твердження.\par
+\zadtask{Які з наведених тверджень щодо кутів на площині є правильними?\par
 \nopagebreak\nbvspace{0.1cm}
 \begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Кожен кут рівностороннього трикутника дорівнює третині розгорнутого кута.
-\item Кожен гострий кут тупокутного трикутника менший від $45^\circ$.
-\item У прямокутному трикутнику хоча б один із гострих кутів не менший від $45^\circ$.
+\item Якщо сума двох кутів дорівнює $180^\circ$, то ці кути суміжні.
+\item Бісектриси двох суміжних кутів перпендикулярні.
+\item Кут, суміжний із гострим кутом, є тупим.
 \end{enumerate}
-\nopagebreak\nbvspace{0.1cm}
-\noindent Які з тверджень є \textit{правильними}?}
-\answerTable{лише I}{лише II}{лише I та II}{лише I та III}{I, II та III}
+\nopagebreak\nbvspace{0.1cm}}
+\answerTable{лише I}{лише II}{лише III}{лише I та II}{лише II та III}
 \par\penalty-20
 \end{samepage}
 
@@ -891,66 +949,66 @@
     \vspace{0.2cm}}
 \begin{samepage}
 \noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На дитячій каруселі розташовано 19 транспортних засобів: човники, літачки й машинки (див. рисунок). Дмитрик навмання сідає в один із транспортних засобів, \textit{окрім літачків}. Яка \textbf{ймовірність} того, що він сяде в \textit{машинку}?
+На рисунку зображено план кав’ярні, у якій 25 місць (див. план). У той час, коли Соломія зайшла в кав’ярню, у ній були вільні всі місця, окрім місць біля барної стійки. Соломія вибирає місце навмання. Яка \textbf{ймовірність} того, що вибране нею місце буде за круглим столиком?
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     %
-    \fill[yellow!10] (0,0) circle (4.0cm);
-    \fill[cyan!10] (0,0) circle (3.2cm); %
-    \fill[green!5] (0,0) circle (2.0cm); 
-
-    %
-    \draw[thick, gray!40] (0,0) circle (4.0cm);
-    \draw[thick, gray!40] (0,0) circle (3.2cm);
-    \draw[thick, gray!40] (0,0) circle (2.0cm);
-
-    %
-    \tikzset{icon/.style={thick, line join=round}}
-
-    %
-    \foreach \i in {1,...,10} {
-        \pgfmathsetmacro{\ang}{\i * 360/10}
-        \begin{scope}[rotate=\ang, shift={(3.5,0)}]
-            \begin{scope}[rotate=90]
-                 \draw[icon, fill=brown!80!black] (-0.35,0) arc (180:360:0.35 and 0.25) -- cycle;
-                 \draw[icon, fill=white] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; 
-            \end{scope}
-        \end{scope}
+    \tikzset{
+        chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
+        rectChair/.style={rectangle, draw=black!50, fill=red!70!black, minimum width=0.4cm, minimum height=0.6cm, rounded corners=2pt},
+        roundTable/.style={circle, draw=brown!80!black, fill=orange!30, minimum size=1.2cm},
+        rectTable/.style={rectangle, draw=brown!80!black, fill=orange!30, minimum width=1.2cm, minimum height=1.6cm},
+        mat/.style={rectangle, fill=orange!60!red, minimum width=0.6cm, minimum height=0.4cm}
     }
 
     %
-    \foreach \i in {1,...,5} {
-        \pgfmathsetmacro{\ang}{\i * 360/5}
-        \begin{scope}[rotate=\ang, shift={(2.6,0)}]
-            \begin{scope}[rotate=90]
-                \draw[icon, fill=cyan!80!blue] (-0.35,-0.2) rectangle (0.35,0.2);
-                \draw[icon, fill=black] (-0.25,-0.2) circle (0.1); %
-                \draw[icon, fill=black] (0.25,-0.2) circle (0.1);
-                \draw[icon, fill=cyan!30] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0) -- cycle; %
-            \end{scope}
-        \end{scope}
+    \draw[fill=red!60!black, rounded corners=5pt] (-0.5, 5.5) rectangle (9.5, 6.2);
+    \node[font=\footnotesize] at (4.5, 6.6) {Барна стійка};
+    %
+    \foreach \x in {0.5, 2.5, 4.5, 6.5, 8.5} {
+        \node[chair] at (\x, 4.8) {};
+        %
+        \draw[thick, red!40!black] (\x-0.2, 4.9) arc (180:360:0.2);
     }
 
     %
-    \foreach \i in {1,...,4} {
-        \pgfmathsetmacro{\ang}{\i * 360/4 + 45}
-        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
-            \begin{scope}[rotate=90] 
-                \draw[icon, fill=green!60!black] (0,-0.35) -- (0,0.4); %
-                \draw[icon, fill=green!60!black] (-0.35,0) -- (0.35,0); %
-                \draw[icon, fill=red] (-0.15,-0.3) -- (0.15,-0.3); %
-            \end{scope}
-        \end{scope}
+    \foreach \x in {1.5, 4.5, 7.5} {
+        %
+        \node[roundTable] at (\x, 2.5) {};
+        %
+        \fill[orange!60] (\x-0.2, 2.5) rectangle (\x+0.2, 2.9);
+
+        %
+        \node[rectChair, rotate=0] at (\x, 3.4) {}; %
+        \node[rectChair, rotate=180] at (\x, 1.6) {}; %
+        \node[rectChair, rotate=90] at (\x-0.9, 2.5) {}; %
+        \node[rectChair, rotate=-90] at (\x+0.9, 2.5) {}; %
     }
 
     %
-    \node[anchor=west, font=\tiny] at (2.9, 3.5) {\textcolor{brown!80!black}{\rule{8pt}{8pt}} човник};
-    \node[anchor=west, font=\tiny] at (2.9, 3.0) {\textcolor{green!60!black}{\rule{8pt}{8pt}} літачок};
-    \node[anchor=west, font=\tiny] at (2.9, 2.5) {\textcolor{cyan!80!blue}{\rule{8pt}{8pt}} машинка};
+    \foreach \x in {2.5, 6.5} {
+        %
+        \node[rectTable] at (\x, -0.5) {};
+        %
+        \fill[orange!60] (\x-0.3, -0.2) rectangle (\x-0.1, 0.2);
+        \fill[orange!60] (\x+0.1, -0.2) rectangle (\x+0.3, 0.2);
+
+        %
+        \node[rectChair, rotate=90] at (\x-0.9, -0.2) {}; 
+        \node[rectChair, rotate=90] at (\x-0.9, -0.9) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.2) {}; 
+        \node[rectChair, rotate=-90] at (\x+0.9, -0.9) {}; 
+    }
+
+    %
+    \draw[fill=cyan!10, draw=gray] (-0.5, -2.0) rectangle (9.5, -1.7);
+    \draw[fill=gray!20] (3.5, -2.1) rectangle (5.5, -1.6); %
+    \node[font=\footnotesize] at (2.0, -2.4) {Вікно};
+    \node[font=\footnotesize] at (7.0, -2.4) {Вікно};
 
 \end{tikzpicture}\end{nmtfit}
 \end{center}
@@ -958,7 +1016,7 @@
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
-\answerTableTall{$\dfrac{5}{19}$}{$\dfrac{1}{3}$}{$\dfrac{1}{15}$}{$\dfrac{2}{3}$}{$\dfrac{1}{5}$}
+\answerTableTall{$\dfrac{12}{25}$}{$\dfrac{1}{12}$}{$\dfrac{3}{5}$}{$\dfrac{4}{25}$}{$\dfrac{1}{5}$}
 \par\penalty-20
 \end{samepage}
 \endgroup
@@ -1045,82 +1103,11 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат --- точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(12; 15; 16)$ є вершиною паралелепіпеда. Визначте довжину (модуль) вектора $\vec{OK}$.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    %
-    \begin{nmtfit}\begin{tikzpicture}[x={(-0.5cm,-0.4cm)}, y={(0.8cm,0cm)}, z={(0cm,0.8cm)}, scale=0.15]
-
-        %
-        \coordinate (O) at (0,0,0);
-        \coordinate (K) at (12,15,16);
-
-        %
-        \def\xk{12}
-        \def\yk{15}
-        \def\zk{16}
-
-        %
-        \coordinate (A) at (\xk,0,0);
-        \coordinate (B) at (0,\yk,0);
-        \coordinate (C) at (0,0,\zk);
-        \coordinate (XY) at (\xk,\yk,0);
-        \coordinate (XZ) at (\xk,0,\zk);
-        \coordinate (YZ) at (0,\yk,\zk);
-
-        %
-        \draw[->, >=stealth] (0,0,0) -- (\xk+5,0,0) node[below left] {$x$};
-        \draw[->, >=stealth] (0,0,0) -- (0,\yk+5,0) node[right] {$y$};
-        \draw[->, >=stealth] (0,0,0) -- (0,0,\zk+5) node[left] {$z$};
-
-        %
-        \draw[dashed] (A) -- (XY) -- (B);
-        \draw[dashed] (XY) -- (K);
-
-        %
-        \draw[thick] (O) -- (A) -- (XZ) -- (C) -- cycle; %
-        \draw[thick] (O) -- (B) -- (YZ) -- (C) -- cycle; %
-        %
-
-        %
-        %
-        %
-
-        %
-        \draw[thick] (O) -- (A);
-        \draw[thick] (O) -- (B);
-        \draw[thick] (O) -- (C);
-
-        \draw[thick] (A) -- (XZ);
-        \draw[thick] (C) -- (XZ);
-        \draw[thick] (C) -- (YZ);
-        \draw[thick] (B) -- (YZ);
-        \draw[thick] (XZ) -- (K);
-        \draw[thick] (YZ) -- (K);
-
-        %
-        \draw[thick] (A) -- (XY) -- (B);
-        \draw[thick] (XY) -- (K);
-
-        %
-
-        %
-        \node[below right] at (O) {$O$};
-        \node[above] at (K) {$K$};
-        \fill (O) circle (8pt);
-        \fill (K) circle (8pt);
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
+\zadtask{Яка з наведених точок лежить у координатній площині $yz$ прямокутної системи координат у просторі?}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
-\answerTable{$25$}{$43$}{$\sqrt{337}$}{$\sqrt{86}$}{$11$}
+\answerTable{$(2; 0; -5)$}{$(-2; 5; 0)$}{$(0; 2; -5)$}{$(2; 0; 0)$}{$(-2; 5; 2)$}
 \par\penalty-20
 \end{samepage}
 \endgroup
@@ -1212,15 +1199,17 @@
 \providecommand{\matchingLayout}{}\renewcommand{\matchingLayout}[3]{
     \noindent
     \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+       
         #1
     \end{minipage}%
     \hfill
     \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        
         #2
     \end{minipage}%
     \hfill
     \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
-        \vspace{0pt} 
+        \vspace{0pt} % Хаки для вирівнювання minipage по верху
         \begin{flushright}
         #3
         \end{flushright}
@@ -1230,234 +1219,6 @@
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
-
-% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{#1}
-\providecommand{\answerTableSmall}[5]{%
-\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
-\hline
-\end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
-\begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На сторонах $AD$ й $BC$ паралелограма $ABCD$ вибрано відповідно точки $K$ й $M$ так, що чотирикутник $KMCD$ є ромбом (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $AK : KD = 1 : 2$, $KC = d$, $\angle CKD = \alpha$.
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
-        %
-        \def\myAngle{25} 
-        \def\sideKD{3} 
-
-        \coordinate (K) at (0,0);
-        \coordinate (D) at (\sideKD, 0);
-        \coordinate (A) at (-1.5, 0); 
-
-        %
-        \coordinate (C) at ($(D) + ({2*\myAngle}:\sideKD)$);
-        \coordinate (M) at ($(K) + ({2*\myAngle}:\sideKD)$);
-        \coordinate (B) at ($(A) + ({2*\myAngle}:\sideKD)$);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; 
-        \draw[thick] (K) -- (M); 
-        \draw[thick] (K) -- (C) node[midway, above left, xshift=2pt] {$d$}; 
-
-        %
-        \pic [draw, pic text={\small $\alpha$}, angle radius=0.9cm, angle eccentricity=1.2] {angle = D--K--C};
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[above] at (M) {$M$};
-        \node[below] at (K) {$K$};
-
-        \fill (K) circle (1.5pt);
-        \fill (M) circle (1.5pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.2cm}
-\answerTableTall{$\dfrac{3d^2\tg\alpha}{2}$}{$\dfrac{3d^2}{4\tg\alpha}$}{$\dfrac{3d^2\tg\alpha}{4}$}{$\dfrac{3d^2}{2\tg\alpha}$}{$\dfrac{4d^2\tg\alpha}{3}$}
-\par\penalty-20
-\end{samepage}
-\endgroup
-
-\begingroup
-% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
-\providecommand{\trigStyle}[1]{#1}
-\providecommand{\answerTableSmall}[5]{%
-\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
-\hline
-\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
-\hline
-\end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
-\begin{samepage}
-\zadtask{Розв'яжіть систему рівнянь $\begin{cases} \sqrt{y} - \dfrac{6}{x} = 6, \\[0.6cm] \sqrt{y} + \dfrac{4}{x} = 1. \end{cases}$ Якщо $(x_0; y_0)$ --- розв'язок системи, то $x_0 + y_0 =$}
-\answerTable{$2$}{$9$}{$-2$}{$7$}{$83$}
-\par\penalty-20
-\end{samepage}
-\endgroup
-
-\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
-
-\begin{samepage}
-\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу.
-\par\nopagebreak\nbvspace{0.3cm}
-\noindent
-\matchingLayout{
-\matchHead{Вираз}
-\matchItem{1}{$\dfrac{4}{7} - \dfrac{3}{4}$}
-\matchItem{2}{$\sqrt{0{,}5} \cdot \sqrt{32}$}
-\matchItem{3}{$\log_8 4$}
-}{
-\matchHead{Проміжок}
-\matchItem{А}{$[-1;\, 0)$}
-\matchItem{Б}{$[0;\, 1)$}
-\matchItem{В}{$[1;\, 2)$}
-\matchItem{Г}{$[2;\, 4)$}
-\matchItem{Д}{$[4;\, +\infty)$}
-}{
-\matchingGrid
-}}
-\par\penalty-20
-\end{samepage}
-
-\begin{samepage}
-\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження.
-\par\nopagebreak\nbvspace{0.3cm}
-\noindent
-\matchingLayout{
-\matchHead{Початок речення}
-\matchItem{1}{Графіки функцій $y = \dfrac{4}{x}$ та $y = -x$}
-\matchItem{2}{Графіки функцій $y = \sqrt{x}$ та $y = x - 2$}
-\matchItem{3}{Графік функції $y = x^2 - 2$ та графік рівняння $x^2 + y^2 = 4$}
-}{
-\matchHead{Закінчення речення}
-\matchItem{А}{не мають спільних точок.}
-\matchItem{Б}{мають єдину спільну точку.}
-\matchItem{В}{мають лише дві спільні точки.}
-\matchItem{Г}{мають лише три спільні точки.}
-\matchItem{Д}{мають чотири спільні точки.}
-}{
-\matchingGrid
-}}
-\par\penalty-20
-\end{samepage}
-
-\begingroup
-% --- макроси, перенесені зі старого файлу теми ---
-\providecommand{\matchingLayout}{}\renewcommand{\matchingLayout}[3]{
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
-        \vspace{0pt} 
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}
-}
-
-% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
-\definecolor{gold}{RGB}{240, 190, 40}
-\definecolor{silver}{RGB}{170, 170, 175}
-\definecolor{bronze}{RGB}{190, 120, 70}
 \definecolor{bar1}{RGB}{200, 120, 20}
 \definecolor{bar2}{RGB}{255, 220, 0}
 \definecolor{bar3}{RGB}{220, 30, 30}
@@ -1515,44 +1276,273 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\zadtask{Вершини $A$ та $D$ прямокутника $ABCD$ є центрами кіл, які дотикаються ззовні, вершина $B$ належить більшому колу (див. рисунок). Радіуси більшого і меншого кіл дорівнюють $6$~см і $2$~см. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}.\par
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $O$ так, що $BO \parallel CD$, $AO = OD$ (див. рисунок). $AD = 12$, $\angle BAD = \alpha$. Знайдіть площу цієї трапеції.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4\textwidth}
+    \nopagebreak\nbvspace{-0.3cm}
+    \begin{flushright}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+        \coordinate (A) at (-6,0);
+        \coordinate (D) at (6,0);
+        \coordinate (O) at (0,0);
+
+        %
+        %
+        %
+        %
+        %
+        %
+        %
+
+        \coordinate (B) at (-3, 5.2); %
+        \coordinate (C) at (3, 5.2);
+
+        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thick] (B) -- (O);
+
+        %
+        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.4) -- ++(-30:0.8); %
+        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.4) -- ++(-120:0.8); %
+
+        %
+        \draw[thick] ($(A)!0.5!(O)$) ++(0, -0.3) -- ++(0, 0.6); 
+        \draw[thick] ($(A)!0.5!(O)$) ++(0.2, -0.3) -- ++(0.2, 0.6); %
+
+        \draw[thick] ($(O)!0.5!(D)$) ++(0, -0.3) -- ++(0, 0.6);
+        \draw[thick] ($(O)!0.5!(D)$) ++(0.2, -0.3) -- ++(0.2, 0.6); %
+
+        %
+        \pic [draw, pic text={\small $\alpha$}, angle radius=.5cm, angle eccentricity=1.7] {angle = D--A--B};
+
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \node[below] at (O) {$O$};
+
+        \fill (O) circle (4pt);
+    \end{tikzpicture}\end{nmtfit}
+    \end{flushright}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{$27\,\mathrm{tg}\,\alpha$}{$27\sin\alpha$}{$54\,\mathrm{tg}\,\alpha$}{$\dfrac{27}{\sin\alpha}$}{$\dfrac{27}{\mathrm{tg}\,\alpha}$}
+\par\penalty-20
+\end{samepage}
+\endgroup
+
+\begingroup
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\begin{samepage}
+\zadtask{Знайдіть суму коренів рівняння $5(x + 3)^2 = 125$.}
+\answerTable{$-6$}{$-16$}{$6$}{$10$}{$0$}
+\par\penalty-20
+\end{samepage}
+\endgroup
+
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
+
+\begin{samepage}
+\zadtask{Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a < 0$.
+\par\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt{9a^2}$}
+\matchItem{2}{$3a^4 : a^5$}
+\matchItem{3}{$\dfrac{3 - 3a}{a^2 - a}$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$3a$}
+\matchItem{Б}{$\dfrac{3}{a}$}
+\matchItem{В}{$-3a$}
+\matchItem{Г}{$\dfrac{a}{3}$}
+\matchItem{Д}{$-\dfrac{3}{a}$}
+}{
+\matchingGrid
+}}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження.
+\par\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Графіки функцій $y = \dfrac{4}{x}$ та $y = -x$}
+\matchItem{2}{Графіки функцій $y = \sqrt{x}$ та $y = x - 2$}
+\matchItem{3}{Графік функції $y = x^2 - 2$ та графік рівняння $x^2 + y^2 = 4$}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{не мають спільних точок.}
+\matchItem{Б}{мають єдину спільну точку.}
+\matchItem{В}{мають лише дві спільні точки.}
+\matchItem{Г}{мають лише три спільні точки.}
+\matchItem{Д}{мають чотири спільні точки.}
+}{
+\matchingGrid
+}}
+\par\penalty-20
+\end{samepage}
+
+\begingroup
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\definecolor{gold}{RGB}{240, 190, 40}
+\definecolor{silver}{RGB}{170, 170, 175}
+\definecolor{bronze}{RGB}{190, 120, 70}
+\definecolor{hexcol}{RGB}{200,110,60}
+\providecommand{\hexthree}{}\renewcommand{\hexthree}[2]{%
+    \draw[hexcol, line width=1.1pt]
+        ($(#1,#2)+(0:30)$) -- ($(#1,#2)+(60:30)$) -- ($(#1,#2)+(120:30)$) --
+        ($(#1,#2)+(180:30)$) -- ($(#1,#2)+(240:30)$) -- ($(#1,#2)+(300:30)$) -- cycle;
+}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\begin{samepage}
+\zadnum На рисунку зображено правильний трикутник $ABC$ та прямокутні рівнобедрені трикутники $AKB$ і $BMC$. Установіть відповідність між кутом \mbox{(1--3)} та його градусною мірою \mbox{(А--Д)}.\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.9, thick]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,6);
-    \coordinate (C) at (8,6);
-    \coordinate (D) at (8,0);
-    \draw[gray!60] (A) circle (6);
-    \draw[gray!60] (D) circle (2);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \fill (A) circle (4pt);
-    \fill (D) circle (4pt);
-    \fill (6,0) circle (3pt);
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right, xshift=0.1cm] at (D) {$D$};
+    \coordinate (C) at (2,0);
+    \coordinate (B) at (1,1.732);
+    \coordinate (K) at (-0.366,1.366);
+    \coordinate (M) at (2.366,1.366);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (A) -- (K) -- (B);
+    \draw[thick] (B) -- (M) -- (C);
+    \draw[thick] (A) -- (M);
+    \draw[thick] (K) -- (B);
+    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = A--K--B};
+    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = B--M--C};
+    \node[below left, font=\scriptsize] at (A) {$A$};
+    \node[above, font=\scriptsize] at (B) {$B$};
+    \node[below right, font=\scriptsize] at (C) {$C$};
+    \node[left, font=\scriptsize] at (K) {$K$};
+    \node[right, font=\scriptsize] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
 \noindent
 \matchingLayout{
-\matchHead{Відрізок}
-\matchItem{1}{$BC$}
-\matchItem{2}{$BD$}
-\matchItem{3}{відстань від точки $C$ до відрізка $BD$}
+\matchHead{Кут}
+\matchItem{1}{$\angle ACM$}
+\matchItem{2}{$\angle KBM$}
+\matchItem{3}{$\angle KAM$}
 }{
-\matchHead{Довжина відрізка}
-\matchItem{А}{$4{,}8$~см}
-\matchItem{Б}{$5$~см}
-\matchItem{В}{$8$~см}
-\matchItem{Г}{$10$~см}
-\matchItem{Д}{$14$~см}
+\matchHead{Градусна міра}
+\matchItem{А}{$75^\circ$}
+\matchItem{Б}{$90^\circ$}
+\matchItem{В}{$105^\circ$}
+\matchItem{Г}{$135^\circ$}
+\matchItem{Д}{$150^\circ$}
 }{
 \matchingGrid
 }
-}
+\par\nbvspace{0.5cm}
+
 \par\penalty-20
 \end{samepage}
 \endgroup
@@ -1560,7 +1550,7 @@
 \instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у бланку відповідей. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
 
 \begin{samepage}
-\zadtask{Визначте критичні точки функції $f(x) = -4x^3 + 3x^2 + 36x - 11$. У відповідь запишіть ту з них, яка є \textit{точкою мінімуму}.}
+\zadtask{Знайдіть \textit{значення $x_0$}, при якому функція $y = -2x^4 + 25x^2 - 4$ набуває \textit{найбільшого} значення на проміжку $[-1;\, 4]$.}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -1690,7 +1680,7 @@
     \end{itemize}
     \vspace{0.2cm}}
 \begin{samepage}
-\noindent\zadnum Задано сферу з площею поверхні $432\pi$~\text{см}$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об’єм (у \text{см}$^3$) піраміди.
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм цієї піраміди (у \text{см}$^3$), якщо площа її основи дорівнює 288~\text{см}$^2$.
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -1765,27 +1755,27 @@
 \begin{center}\small\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{|c|c|p{0.62\textwidth}|}\hline
 \textbf{№} & \textbf{Відповідь} & \textbf{Джерело завдання} \\ \hline
-1 & А & НМТ 2024, сесія 10.06.2024, № 3 \\ \hline
+1 & Г & НМТ 2024, сесія 01.06.2024, № 7 \\ \hline
 2 & А & НМТ 2026, сесія 15.06.2026, № 2 \\ \hline
-3 & Г & НМТ 2024, сесія 14.06.2024, № 1 \\ \hline
-4 & Г & НМТ 2025, сесія 02.06.2025, № 4 \\ \hline
-5 & Д & НМТ 2023 \\ \hline
-6 & Б & аналог (авторське завдання за зразком НМТ) \\ \hline
-7 & В & НМТ 2026, сесія 10.06.2026, № 7 \\ \hline
+3 & В & НМТ 2024 \\ \hline
+4 & Д & НМТ 2026, сесія 10.06.2026, № 4 \\ \hline
+5 & Б & НМТ 2023 \\ \hline
+6 & Г & аналог (авторське завдання за зразком НМТ) \\ \hline
+7 & Д & НМТ 2023, сесія 19.06.2023, 1 зміна, № 11 \\ \hline
 8 & Б & аналог (авторське завдання за зразком НМТ) \\ \hline
-9 & Г & аналог (авторське завдання за зразком НМТ) \\ \hline
+9 & Д & аналог (авторське завдання за зразком НМТ) \\ \hline
 10 & Г & НМТ 2024, сесія 04.06.2024, № 15 \\ \hline
-11 & Б & НМТ 2025, сесія 11.06.2025, № 2 \\ \hline
-12 & А & НМТ 2025, сесія 05.06.2025, № 10 \\ \hline
+11 & В & НМТ 2025, сесія 09.06.2025, № 2 \\ \hline
+12 & В & НМТ 2023, сесія 19.06.2023, 2 зміна, № 4 \\ \hline
 13 & Д & НМТ 2024 \\ \hline
-14 & В & НМТ 2024, сесія 20.06.2024, № 12 \\ \hline
-15 & Г & НМТ 2024, сесія 21.06.2024, № 15 \\ \hline
-16 & 1~--~А, 2~--~Д, 3~--~Б & аналог (авторське завдання за зразком НМТ) \\ \hline
+14 & А & НМТ 2024, сесія 10.06.2024, № 14 \\ \hline
+15 & А & НМТ 2024, сесія 12.06.2024, № 15 \\ \hline
+16 & 1~--~В, 2~--~Б, 3~--~Д & аналог (авторське завдання за зразком НМТ) \\ \hline
 17 & 1~--~А, 2~--~Б, 3~--~Г & аналог (авторське завдання за зразком НМТ) \\ \hline
-18 & 1~--~В, 2~--~Г, 3~--~А & НМТ 2026, сесія 11.06.2026, № 18 \\ \hline
-19 & $-1{,}5$ & аналог (авторське завдання за зразком НМТ) \\ \hline
+18 & 1~--~В, 2~--~Д, 3~--~А & НМТ 2026, сесія 05.06.2026, № 18 \\ \hline
+19 & $2{,}5$ & аналог (авторське завдання за зразком НМТ) \\ \hline
 20 & $1650$ & НМТ 2023, сесія 08.06.2023, 1 зміна, № 17 \\ \hline
-21 & $972$ & НМТ 2025, сесія 16.06.2025, № 22 \\ \hline
+21 & $1152$ & НМТ 2025, сесія 24.05.2025, № 22 \\ \hline
 22 & $6$ & НМТ 2023 \\ \hline
 \end{tabular}\end{center}
 

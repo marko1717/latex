@@ -113,6 +113,9 @@ def скласти(cat, gen, args, rnd, used, спроб=300):
             taken.add(t["id"]); used_units |= set(t.get("теми", [])); used_fam |= родини(t)
             вибір[i] = (t, kind)
         if ok:
+            # у завданнях на відповідність 16--18 ключі різні (однакові поспіль виглядають як підказка)
+            ключі = [вибір[i][0].get("відповідь") for i in range(len(структура)) if вибір[i][0].get("тип") == "matching"]
+            if len(set(ключі)) < len(ключі): continue
             if спроба: print("  (типи без повторів -- зі спроби %d)" % (спроба + 1))
             return [вибір[i] for i in range(len(структура))]
     raise SystemExit("не вдалося скласти варіант без повторів типів за %d спроб -- зменште --кількість чи --нових" % спроб)
@@ -157,7 +160,30 @@ def преамбула(title, header):
     # рисунки-файли лежать у теках тем; варіант -- у теці «варіанти»
     folders = sorted({нфк(os.path.dirname(f)) for _, f in файли_тем()})
     pre += "\\graphicspath{%s}\n" % "".join("{../%s/}" % d for d in folders)
-    return pre
+    return pre + ВАРІАНТ_МАКРОСИ
+
+
+# інструкція не відривається від першого завдання свого блоку (розриву сторінки між ними немає);
+# у полі короткої відповіді 5 клітинок до коми (є відповіді на кшталт 21000)
+ВАРІАНТ_МАКРОСИ = r"""\renewcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}\noindent
+\begin{tcolorbox}[nobeforeafter, width=\linewidth, colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\nopagebreak\vspace{0.15cm}\nopagebreak
+}
+\renewcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{5}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+"""
 
 
 def відповідь_латех(a, тип_завдання):
@@ -250,6 +276,9 @@ def main():
     if missing: print("  ! у каталозі %d завдань, яких уже немає в базі (оновіть: каталог.py)" % len(missing))
     cat = [r for r in cat if r["id"] in blocks]
     log = журнал()
+    if args.номер:   # перескласти варіант із тим самим номером: старий запис журналу замінюється
+        нові = {str(int(args.номер) + j) for j in range(args.кількість)}
+        log = [v for v in log if str(v["номер"]) not in нові]
     used = set() if args.повтори else {i for v in log for i in v["завдання"]}
     seed = args.seed if args.seed is not None else random.SystemRandom().randrange(10 ** 6)
     rnd = random.Random(seed)

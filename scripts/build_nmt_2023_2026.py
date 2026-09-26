@@ -277,6 +277,8 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
 \newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
 \newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
@@ -286,7 +288,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
-               "matchHead","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
+               "matchHead","nmtHeadUnless","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
 # старі макроси, які перейменовуємо в тілі на нові
 RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\matchTable\b", r"\\matchingGrid"),
@@ -1266,6 +1268,8 @@ def build_unit(key, by2026, log):
             if c.startswith("\\newcommand{\\matchingLayout"):
                 for a, b in ML_WIDTHS: c = c.replace(a, b)
                 c = re.sub(r"(\\begin\{minipage\}\[t\]\{[^}]*\})", r"\1\\vspace{0pt}\\raggedright", c)
+                # «Величина / Початок» тощо: не дублювати заголовки, які завдання (2026) задає саме
+                c = re.sub(r"(\\textit\{[^{}]*\}\s*\\par\s*\\vspace\{[^}]*\})(\s*)(#[12])", r"\\nmtHeadUnless{\3}{\1}\2\3", c)
             c = re.sub(r"\\vspace\{(?!0pt\})", r"\\nbvspace{", c)   # усередині завдання розривів сторінки немає
             out.append(c + "\n")
         for c in pre_defs: out.append(c + "\n")

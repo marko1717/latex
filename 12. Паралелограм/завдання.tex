@@ -182,6 +182,8 @@
 \newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
 \newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
 \newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
@@ -193,12 +195,12 @@
 \newcommand{\matchingLayout}[3]{
     \noindent
     \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        \textit{Величина / Початок} \par \nbvspace{0.2cm}
+        \nmtHeadUnless{#1}{\textit{Величина / Початок} \par \nbvspace{0.2cm}}
         #1
     \end{minipage}%
     \hfill
     \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        \textit{Значення / Закінчення} \par \nbvspace{0.2cm}
+        \nmtHeadUnless{#2}{\textit{Значення / Закінчення} \par \nbvspace{0.2cm}}
         #2
     \end{minipage}%
     \hfill

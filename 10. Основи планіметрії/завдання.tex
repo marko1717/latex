@@ -182,6 +182,8 @@
 \newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
 \newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
 \newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
@@ -820,7 +822,27 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
 \hfill
 \begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\includegraphics[scale=0.2]{tourists_southeast.png}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.95]
+    \coordinate (O) at (0,0);
+    \draw[<->, thick] (-2.4,0) -- (2.4,0);
+    \draw[<->, thick] (0,-2.3) -- (0,2.4);
+    \node[above] at (0,2.4) {\small\textit{північ}};
+    \node[below] at (0,-2.3) {\small\textit{південь}};
+    \node[below left] at (2.45,-0.05) {\small\textit{схід}};
+    \node[below right] at (-2.45,-0.05) {\small\textit{захід}};
+    \node[below left] at (O) {$O$};
+    \draw (0,0.22) -- (-0.22,0.22) -- (-0.22,0);
+    % OA: 15° від півночі на схід
+    \draw[thick] (O) -- (75:2.5) node[right] {$A$};
+    \draw (90:1.45) arc (90:75:1.45);
+    \node[font=\scriptsize] at (82.5:1.95) {$15^\circ$};
+    % напрямок «південний схід»: бісектриса кута між сходом і півднем
+    \draw[thick] (O) -- (-45:2.2) node[below, align=center, font=\small\itshape] {південний\\схід};
+    % шуканий кут повороту
+    \draw (75:0.42) arc (75:-45:0.42);
+    \draw (75:0.5) arc (75:-45:0.5);
+    \node at (18:0.8) {$?$};
+\end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
 \par\penalty-20\vspace{0.25cm}
