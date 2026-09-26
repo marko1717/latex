@@ -81,32 +81,41 @@ def вибрати(cands, rnd, складність, used_units, weight_year=Tru
     return rnd.choices(cands, weights=ws, k=1)[0]
 
 
-def скласти(cat, gen, args, rnd, used):
-    """слот -> (завдання, 'оригінал'|'аналог'); повертає список із 22 пар"""
+def скласти(cat, gen, args, rnd, used, спроб=300):
+    """слот -> (завдання, 'оригінал'|'аналог'); повертає список із 22 пар.
+
+    Правило: тип завдання (тема: прогресія, тригонометрія, логарифми, призма, трикутник ...)
+    у варіанті не повторюється, окрім функцій. Слоти з найвужчим вибором типів заповнюються
+    першими; якщо якийсь слот лишився без завдань -- варіант складається наново."""
     роки = розгорнути_роки(args.роки)
     orig, new = пул(cat, gen, роки, used)
     структура = СТРУКТУРА_2026
-    # які слоти заповнити аналогами: випадково з тих, для яких бібліотека має завдання
     можна = [i for i, c in enumerate(структура) if new.get(c)]
     k = min(args.нових, len(можна))
-    нові_слоти = set(rnd.sample(можна, k)) if k else set()
     if args.нових > k:
         print("  ! аналогів вистачає лише на %d слотів із %d запитаних" % (k, args.нових))
-    вибір, used_units, taken = [], set(), set()
-    for i, c in enumerate(структура):
-        if i in нові_слоти:
-            cands = [g for g in new[c] if g["id"] not in taken]
-            kind = "аналог"
-        else:
-            cands = [r for r in orig[c] if r["id"] not in taken]
-            kind = "оригінал"
-            if not cands and new.get(c):
-                cands, kind = [g for g in new[c] if g["id"] not in taken], "аналог"
-        if not cands: raise SystemExit("для слота %d (%s) не лишилося завдань -- зменште --кількість або дозвольте повтори" % (i + 1, c))
-        t = вибрати(cands, rnd, args.складність, used_units, weight_year=(kind == "оригінал"))
-        taken.add(t["id"]); used_units |= set(t.get("теми", []))
-        вибір.append((t, kind))
-    return вибір
+    for спроба in range(спроб):
+        нові_слоти = set(rnd.sample(можна, k)) if k else set()
+        пули = {}
+        for i, c in enumerate(структура):
+            p = new[c] if i in нові_слоти else orig[c]
+            if not p and new.get(c): p = new[c]
+            пули[i] = p
+        # найобмеженіші слоти першими: менше різних типів -> раніше; далі менший пул
+        порядок = sorted(range(len(структура)), key=lambda i: (len({f for r in пули[i] for f in родини(r)} or {""}), len(пули[i]), rnd.random()))
+        вибір, used_units, taken, used_fam = {}, set(), set(), set()
+        ok = True
+        for i in порядок:
+            cands = [r for r in пули[i] if r["id"] not in taken and not (родини(r) & used_fam)]
+            if not cands: ok = False; break
+            kind = "аналог" if (i in нові_слоти or not orig[структура[i]]) else "оригінал"
+            t = вибрати(cands, rnd, args.складність, used_units, weight_year=(kind == "оригінал"))
+            taken.add(t["id"]); used_units |= set(t.get("теми", [])); used_fam |= родини(t)
+            вибір[i] = (t, kind)
+        if ok:
+            if спроба: print("  (типи без повторів -- зі спроби %d)" % (спроба + 1))
+            return [вибір[i] for i in range(len(структура))]
+    raise SystemExit("не вдалося скласти варіант без повторів типів за %d спроб -- зменште --кількість чи --нових" % спроб)
 
 
 def розгорнути_роки(s):
