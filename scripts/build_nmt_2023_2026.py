@@ -770,6 +770,9 @@ SOURCE_FIXES = [
     ("yticklabels={,,,0,1,,,,,}", "yticklabels={,,0,1,,,,,,}", "ytick={-2,-1,...,6}"),
     # НМТ 2024: підпис y=f(x) закривав вершину графіка
     (r"\node[right] at (2.5, 4) {$y=f(x)$};", r"\node[above] at (4.2, 4.5) {$y=f(x)$};"),
+    # НМТ 2026, контейнери для сміття: напис «ПЛАСТИК» довший за наліпку
+    (r"\node[rotate=90, text=black, font=\bfseries] at (\x+1, 1.5) {\txt};",
+     r"\node[rotate=90, text=black, font=\bfseries\scriptsize] at (\x+1, 1.5) {\txt};", "0/bin1/ПЛАСТИК"),
 ]
 FIXES_USED = collections.Counter()
 

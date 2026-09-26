@@ -57,12 +57,23 @@ def придатне(r, роки):
             and (r.get("рисунок_огляд") or {}).get("стан") != "вада")      # рисунок, що заважає розвʼязанню
 
 
+# найменша кількість кроків міркування (поле «кроки», оцінка двох незалежних рецензентів) для слота:
+# №14 НМТ -- обчислювальна планіметрія, одне з найважчих тестових завдань (кілька трикутників,
+# тригонометрія + теорема Піфагора, додаткова побудова); завдання в 1--3 кроки туди не беруться
+МІН_КРОКИ = {"планіметрія_обчислення": 4}
+
+
 def пул(cat, gen, роки, used):
     orig, new = collections.defaultdict(list), collections.defaultdict(list)
+    за_id = {r["id"]: r for r in cat}
     for r in cat:
-        if придатне(r, роки) and r["id"] not in used: orig[r["категорія"]].append(r)
+        if придатне(r, роки) and r["id"] not in used and (r.get("кроки") or 0) >= МІН_КРОКИ.get(r["категорія"], 0):
+            orig[r["категорія"]].append(r)
     for g in gen:
-        if g.get("перевірено") and g["id"] not in used: new[g["категорія"]].append(g)
+        # складність аналога -- його власна або завдання-зразка
+        g.setdefault("складність", (за_id.get(g.get("зразок")) or {}).get("складність") or 2)
+        if g.get("перевірено") and g["id"] not in used and (g.get("кроки") or 0) >= МІН_КРОКИ.get(g["категорія"], 0):
+            new[g["категорія"]].append(g)
     return orig, new
 
 
@@ -203,8 +214,10 @@ def зібрати_латех(номер, вибір, blocks, args):
     out.append("\\noindent{\\small Варіант складено за структурою НМТ 2023--2026: 15 завдань з вибором однієї відповіді, "
                "3 на встановлення відповідності й 4 з короткою відповіддю (максимум 32 бали). "
                + ("Усі завдання -- справжні завдання НМТ %s." % років_рядок(роки) if not n_new else
-                  "%d завдань -- справжні завдання НМТ %s, %d -- авторські аналоги таких самих завдань." %
-                  (22 - n_new, років_рядок(роки), n_new))
+                  "Усі 22 завдання -- авторські, складені за зразком справжніх завдань НМТ 2023--2026 "
+                  "(такі самі за змістом і дистракторами)." if n_new == 22 else
+                  "%d %s -- справжні завдання НМТ %s, %d -- авторські аналоги таких самих завдань." %
+                  (22 - n_new, завдань(22 - n_new), років_рядок(роки), n_new))
                + " Відповіді -- на останній сторінці.}\\par\\vspace{0.4cm}\n")
     seg_cache = {}
     for i, (t, kind) in enumerate(вибір, 1):
@@ -233,6 +246,10 @@ def зібрати_латех(номер, вибір, blocks, args):
     return нфк("\n".join(out))
 
 
+def завдань(n):
+    return "завдання" if n % 10 in (1, 2, 3, 4) and n % 100 not in (11, 12, 13, 14) else "завдань"
+
+
 def років_рядок(c):
     ys = sorted(y for y in c if y)
     return (ys[0] + "--" + ys[-1] + " років") if len(ys) > 1 else ((ys[0] + " року") if ys else "")
@@ -257,6 +274,27 @@ def джерело(t, kind):
 
 
 # ---------------------------------------------------------------- головне
+def записати(номер, вибір, blocks, args):
+    tex = зібрати_латех(номер, вибір, blocks, args)
+    name = "Варіант_%s" % номер
+    open(os.path.join(ВАРІАНТИ, name + ".tex"), "w", encoding="utf-8").write(tex)
+    open(os.path.join(ВАРІАНТИ, name + "_без_водяного_знака.tex"), "w", encoding="utf-8").write(нфк(
+        "%% Варіант № %s без водяного знака @pvtr2525 -- версія для вчителів.\n\\def\\nmtnowatermark{}\n\\input{%s}\n" % (номер, name)))
+    return name
+
+
+def перезібрати(args, cat, gen, blocks, log):
+    """той самий склад із журналу -- новий LaTeX (виправлені рисунки, умови, макроси бази)"""
+    за_id = {r["id"]: (r, "оригінал") for r in cat}
+    за_id.update({g["id"]: (g, "аналог") for g in gen})
+    for n in args.перезібрати:
+        v = next((v for v in log if str(v["номер"]) == str(n)), None)
+        if v is None: raise SystemExit("у журналі немає варіанта %s" % n)
+        brak = [i for i in v["завдання"] if i not in за_id]
+        if brak: raise SystemExit("варіант %s: завдань %s уже немає в каталозі (оновіть каталог.py)" % (n, ", ".join(brak)))
+        print("перезібрано варіанти/%s.tex" % записати(str(n), [за_id[i] for i in v["завдання"]], blocks, args))
+
+
 def main():
     ap = argparse.ArgumentParser(description="тренувальні варіанти НМТ з математики")
     ap.add_argument("--кількість", type=int, default=1)
@@ -268,6 +306,8 @@ def main():
     ap.add_argument("--показати-роки", dest="показати_роки", action="store_true", help="лишити біля завдань позначку року")
     ap.add_argument("--дозволити-повтори", dest="повтори", action="store_true")
     ap.add_argument("--без-журналу", dest="без_журналу", action="store_true", help="не записувати використані завдання")
+    ap.add_argument("--перезібрати", nargs="+", metavar="N", help="лише перезаписати .tex варіантів N ... з тими самими "
+                    "завданнями, що в журналі (після виправлень у базі); нічого не вибирає наново")
     args = ap.parse_args()
 
     cat, gen = каталог(), згенеровані()
@@ -276,6 +316,8 @@ def main():
     if missing: print("  ! у каталозі %d завдань, яких уже немає в базі (оновіть: каталог.py)" % len(missing))
     cat = [r for r in cat if r["id"] in blocks]
     log = журнал()
+    if args.перезібрати:
+        return перезібрати(args, cat, gen, blocks, log)
     if args.номер:   # перескласти варіант із тим самим номером: старий запис журналу замінюється
         нові = {str(int(args.номер) + j) for j in range(args.кількість)}
         log = [v for v in log if str(v["номер"]) not in нові]
@@ -287,11 +329,7 @@ def main():
     for j in range(args.кількість):
         номер = str(перший + j)
         вибір = скласти(cat, gen, args, rnd, used)
-        tex = зібрати_латех(номер, вибір, blocks, args)
-        name = "Варіант_%s" % номер
-        open(os.path.join(ВАРІАНТИ, name + ".tex"), "w", encoding="utf-8").write(tex)
-        open(os.path.join(ВАРІАНТИ, name + "_без_водяного_знака.tex"), "w", encoding="utf-8").write(нфк(
-            "%% Варіант № %s без водяного знака @pvtr2525 -- версія для вчителів.\n\\def\\nmtnowatermark{}\n\\input{%s}\n" % (номер, name)))
+        name = записати(номер, вибір, blocks, args)
         ids = [t["id"] for t, _ in вибір]
         used |= set(ids)
         log.append(dict(номер=номер, seed=seed, нових=sum(1 for _, k in вибір if k == "аналог"), завдання=ids,
