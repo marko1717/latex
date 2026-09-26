@@ -19,7 +19,8 @@ from каталог import rule_category                     # noqa: E402
 from класифікувати import одиниця, норм               # noqa: E402
 
 ДАНІ = os.path.join(ROOT, "локальне", "classtime")
-# теки зі спільної бібліотеки ClassTime (позначка «ЗНО») -- чиї вони, ще не уточнено: у роздатку не пускати
+# теки «1.1…2.2» (позначка «ЗНО») -- спільна бібліотека ClassTime, не матеріали користувача (підтверджено
+# 2026-09-26): лише зразки, у роздаток не йдуть -- навіть якщо картинку скопійовано й у власний набір
 СПІЛЬНІ_ТЕКИ = ("1.1.", "1.2.", "1.3.", "1.4.", "2.1.", "2.2.")
 
 
@@ -100,7 +101,7 @@ def main():
         if len(n) < 30: return None
         votes = collections.Counter(i for k in range(0, max(1, len(n) - 8), 2) for i in ix.get(n[k:k + 8], ()))
         best = None
-        for i, _ in votes.most_common(5):
+        for i, _ in sorted(votes.items(), key=lambda x: (-x[1], x[0]))[:5]:   # рівні -- за id, щоб щоразу однаково
             r = difflib.SequenceMatcher(None, n[:300], d[i][:len(n[:300]) + 40], autojunk=False).ratio()
             if r > 0.7 and (not best or r > best[1]): best = (i, round(r, 2))
         return best
@@ -125,7 +126,7 @@ def main():
                         теми=[u], родини=sorted({S.РОДИНИ[u]} if u in S.РОДИНИ else set()),
                         орієнтовна_категорія=rule_category(dict(теми=[u], тип=т, блок=текст)) if т else "без відповіді",
                         кластер=клас.get(i), є_в_базі=б[0] if б else None, є_в_osvita=о[0] if о else None,
-                        поширення="уточнити" if any(t.startswith(СПІЛЬНІ_ТЕКИ) for t in теки) else "так",
+                        поширення="ні" if any(t.startswith(СПІЛЬНІ_ТЕКИ) for t in теки) else "так",
                         текст=текст))
     json.dump(cat, open(os.path.join(ДАНІ, "каталог.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 

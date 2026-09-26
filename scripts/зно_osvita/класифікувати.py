@@ -91,7 +91,7 @@ def main():
         n = норм(r.get("умова", ""))[:400]
         голоси = collections.Counter(i for k in range(0, max(1, len(n) - 8), 2) for i in індекс.get(n[k:k + 8], ()))
         best = None
-        for i, _ in голоси.most_common(5):
+        for i, _ in sorted(голоси.items(), key=lambda x: (-x[1], x[0]))[:5]:   # рівні -- за id, щоб щоразу однаково
             bn = база[i]
             q = difflib.SequenceMatcher(None, n, bn[:len(n) + 40], autojunk=False).ratio()
             if q > 0.8 and (not best or q > best[1]): best = (i, q)
