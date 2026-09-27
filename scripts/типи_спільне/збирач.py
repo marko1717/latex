@@ -52,14 +52,18 @@ def пастки_текст(пастки, σ):
     return "; ".join(r for _, r in sorted(рядки))
 
 
+def рисунки_АД(рисунки):
+    """п'ять рисунків у таблиці з літерами А--Д (варіанти-рисунки)"""
+    клітинки = " & ".join(r"\vspace{3pt}\begin{nmtfit}%s\end{nmtfit}\vspace{2pt}" % p for p in рисунки)
+    return ("\\begingroup\\setlength{\\tabcolsep}{2pt}\n\\begin{tabular}{|*{5}{>{\\centering\\arraybackslash}m{3.1cm}|}}\\hline\n"
+            "\\rule[-0.15cm]{0pt}{0.6cm}\\textbf{А} & \\textbf{Б} & \\textbf{В} & \\textbf{Г} & \\textbf{Д} \\\\ \\hline\n"
+            + клітинки + " \\\\ \\hline\n\\end{tabular}\\endgroup")
+
+
 def таблиця(t, показ):
     вид = t.get("таблиця", "")
     if вид == "рисунки":
-        клітинки = " & ".join(r"\vspace{3pt}\begin{nmtfit}%s\end{nmtfit}\vspace{2pt}" % p for p in показ)
-        return ("\\par\\nopagebreak\\vspace{0.15cm}\\noindent\\begingroup\\setlength{\\tabcolsep}{2pt}\n"
-                "\\begin{tabular}{|*{5}{>{\\centering\\arraybackslash}m{3.1cm}|}}\\hline\n"
-                "\\rule[-0.15cm]{0pt}{0.6cm}\\textbf{А} & \\textbf{Б} & \\textbf{В} & \\textbf{Г} & \\textbf{Д} \\\\ \\hline\n"
-                + клітинки + " \\\\ \\hline\n\\end{tabular}\\endgroup\\par\\vspace{0.25cm}")
+        return "\\par\\nopagebreak\\vspace{0.15cm}\\noindent" + рисунки_АД(показ) + "\\par\\vspace{0.25cm}"
     if вид == "список":
         рядки = " \\\\[0.25cm]\n".join(r"\textbf{%s} & %s" % (L[i], p) for i, p in enumerate(показ))
         return "\\par\\nopagebreak\\vspace{0.1cm}\\noindent\\begin{tabular}{@{}l@{\\quad}l@{}}\n" + рядки + "\n\\end{tabular}\\par\\vspace{0.25cm}"
@@ -97,23 +101,46 @@ def пари(t):
 
 
 def блок_відповідності(t):
-    ліві = "\n".join(r"\matchItem{%d}{%s}" % (i + 1, s) for i, s in enumerate(t["ліві"]))
-    праві = "\n".join(r"\matchItem{%s}{%s}" % (L[j], s) for j, s in enumerate(t["праві"]))
-    рис = ("\\nmtnobreak\n\\nopagebreak\\nbvspace{0.3cm}\n\\begin{center}\\begin{nmtfit}%s\\end{nmtfit}\\end{center}\n" % t["рисунок"]
-           if t.get("рисунок") else "")
-    return ("\\zadtask{%s}\n%s\\nmtnobreak\n\\nopagebreak\\nbvspace{0.3cm}\n\\noindent\n\\matchingLayout{\n\\matchHead{%s}\n%s\n}{\n\\matchHead{%s}\n%s\n}{\n\\matchingGrid\n}"
-            % (t["умова"], рис, t["заголовок_ліво"], ліві, t["заголовок_право"], праві))
+    """макет НМТ: умова (рисунок під нею або поруч, три рисунки «Рис. 1--3» у ряд), колонки 1--3 і А--Д, сітка відповідей;
+    якщо варіанти -- рисунки (праві_рисунки), вони йдуть таблицею під колонкою пунктів"""
+    ліві = "\\matchHead{%s}\n" % t["заголовок_ліво"] + "\n".join(r"\matchItem{%d}{%s}" % (i + 1, s) for i, s in enumerate(t["ліві"]))
+    рис = t.get("рисунок")
+    if рис and t.get("розміщення") == "поруч":
+        w = t.get("ширина", 0.55)
+        верх = ("\\noindent\n\\begin{minipage}[c]{%.2f\\textwidth}\n\\zadnum %s\n\\end{minipage}\\hfill\n"
+                "\\begin{minipage}[c]{%.2f\\textwidth}\\centering\n\\begin{nmtfit}%s\\end{nmtfit}\n\\end{minipage}\\par\n") % (w, t["умова"], 0.96 - w, рис)
+    else:
+        верх = "\\zadtask{%s}\n" % t["умова"]
+        if рис: верх += "\\nmtnobreak\n\\nopagebreak\\nbvspace{0.3cm}\n\\begin{center}\\begin{nmtfit}%s\\end{nmtfit}\\end{center}\n" % рис
+    if t.get("рисунки_ліво"):
+        верх += "\\nmtnobreak\n\\nopagebreak\\nbvspace{0.2cm}\n\\noindent" + "\\hfill".join(
+            "\\begin{minipage}[t]{0.32\\textwidth}\\centering Рис.~%d\\\\[2pt]\\begin{nmtfit}%s\\end{nmtfit}\\end{minipage}" % (i + 1, p)
+            for i, p in enumerate(t["рисунки_ліво"])) + "\\par\n"
+    if t.get("праві_рисунки"):
+        низ = ("\\noindent\\begin{minipage}[t]{0.62\\textwidth}\\vspace{0pt}\\raggedright\n%s\n\\end{minipage}\\hfill\n"
+               "\\begin{minipage}[t]{0.3\\textwidth}\\vspace{0pt}\\begin{flushright}\\matchingGrid\\end{flushright}\\end{minipage}\n"
+               "\\par\\nopagebreak\\vspace{0.25cm}\\noindent\\matchHead{%s}\n\\nopagebreak\\noindent%s\\par\\vspace{0.2cm}") % (
+                   ліві, t["заголовок_право"], рисунки_АД(t["праві_рисунки"]))
+    else:
+        праві = "\n".join(r"\matchItem{%s}{%s}" % (L[j], s) for j, s in enumerate(t["праві"]))
+        низ = "\\noindent\n\\matchingLayout{\n%s\n}{\n\\matchHead{%s}\n%s\n}{\n\\matchingGrid\n}" % (ліві, t["заголовок_право"], праві)
+    return верх + "\\nmtnobreak\n\\nopagebreak\\nbvspace{0.3cm}\n" + низ
 
 
 def відповідність(t):
     """перевірка: кожному пункту відповідає рівно один варіант, усі три різні; пастки -- лише на неправильних парах"""
-    assert len(t["ліві"]) == 3 and len(t["праві"]) == len(t["варіанти"]) == 5, t["код"]
+    assert len(t["ліві"]) == 3 and len(t.get("праві_рисунки") or t["праві"]) == len(t["варіанти"]) == 5, t["код"]
     h = пари(t)
-    assert all(len(p) == 1 for p in h), (t["код"], "варіантів для пунктів: %s" % h)
+    assert len(h) == 3 and all(len(p) == 1 for p in h), (t["код"], "варіантів для пунктів: %s" % h)
     k = [p[0] for p in h]
     assert len(set(k)) == 3, (t["код"], "два пункти мають однакову відповідь")
     for (i, j) in t["пастки"]:
         assert 1 <= i <= 3 and 0 <= j <= 4 and k[i - 1] != j, (t["код"], "пастка на правильній парі", (i, j))
+    # дистрактори конкурентні: кожен зайвий варіант -- пастка якогось пункту, у кожного пункту є пастка серед варіантів
+    for j in set(range(5)) - set(k):
+        assert any(jj == j for _, jj in t["пастки"]), (t["код"], "зайвий варіант %s не є пасткою жодного пункту" % L[j])
+    for i in (1, 2, 3):
+        assert any(ii == i for ii, _ in t["пастки"]), (t["код"], "пункт %d без пастки серед варіантів" % i)
     пастки = "; ".join("%d~--~%s: %s" % (i, L[j], текст) for (i, j), текст in sorted(t["пастки"].items()))
     return dict(код=t["код"], група=t["група"], назва=t["назва"], частота=t["частота"], формати=t["формати"], нмт=t["нмт"],
                 latex=блок_відповідності(t), відповідь="".join(L[j] for j in k),
@@ -125,7 +152,8 @@ def зібрати_відповідності(ТИПИ, ВИХІД):
     як у НМТ: числа за зростанням, проміжки й точки -- зліва направо)"""
     out = [відповідність(t) for t in ТИПИ]
     json.dump(out, open(ВИХІД, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    print("усі %d зразків: кожному пункту -- рівно один варіант, відповіді різні, пастки -- лише на неправильних парах" % len(out))
+    print("усі %d зразків: кожному пункту -- рівно один варіант, відповіді різні, пастки -- лише на неправильних парах; "
+          "обидва зайві варіанти -- пастки пунктів, у кожного пункту є пастка" % len(out))
     print("літери відповідей:", dict(sorted(collections.Counter("".join(r["відповідь"] for r in out)).items())))
     print("відповіді:", " ".join(r["відповідь"] for r in out))
 
