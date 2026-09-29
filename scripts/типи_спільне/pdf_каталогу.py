@@ -20,6 +20,11 @@ from аналоги import компілювати                        # noqa:
 
 
 
+def показ_відповіді(t):
+    v = t.get("відповідь_показ", t["відповідь"])
+    return "$-$" + v[1:] if v.startswith("-") else v        # від'ємна відповідь: мінус, а не дефіс
+
+
 def зробити(json_шлях, title, header, вступ, out, name):
     T = json.load(open(json_шлях, encoding="utf-8"))
     tex = [V.преамбула(title, header), "\\begin{document}", V.тіло_теми(файли_тем()[0][1]) + "\n",
@@ -29,7 +34,7 @@ def зробити(json_шлях, title, header, вступ, out, name):
         розділ = ""
         if t["група"] != група:                          # заголовок розділу -- в одному блоці з першим завданням
             група = t["група"]; розділ = "\\sectionTitle{%s}\n" % група
-        tex.append(БЛОК % (розділ, t["код"], t["назва"], t["частота"], t["формати"], t["нмт"], t["код"], як_у_базі(t["latex"]).replace(r"\par\penalty-20", ""), t.get("відповідь_показ", t["відповідь"]), t["пастки"]))
+        tex.append(БЛОК % (розділ, t["код"], t["назва"], t["частота"], t["формати"], t["нмт"], t["код"], як_у_базі(t["latex"]).replace(r"\par\penalty-20", ""), показ_відповіді(t), t["пастки"]))
     tex.append("\\end{document}\n")
     ok, err, pdf, over = компілювати(нфк("\n".join(tex)).replace("ʼ", "'"), tempfile.mkdtemp(), name)   # у шрифті немає U+02BC
     if not ok: raise SystemExit(err)
