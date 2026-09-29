@@ -246,6 +246,11 @@ def показ_числа(v):
 
 
 def блок_відкритий(t):
+    if t.get("рисунок") and t.get("розміщення") == "поруч":     # як у НМТ 2026: умова ліворуч, рисунок праворуч
+        w = t.get("ширина", 0.56)
+        return ("\\noindent\n\\begin{minipage}[c]{%.2f\\textwidth}\n\\zadnum %s\n\\end{minipage}\\hfill\n"
+                "\\begin{minipage}[c]{%.2f\\textwidth}\\centering\n\\begin{nmtfit}%s\\end{nmtfit}\n\\end{minipage}\n"
+                "\\par\\nbvspace{0.2cm}\n\\nmtAnswerBox") % (w, t["умова"], 0.96 - w, t["рисунок"])
     s = "\\zadtask{%s}\n" % t["умова"]
     if t.get("рисунок"):
         s += "\\nmtnobreak\n\\nopagebreak\\nbvspace{0.3cm}\n\\begin{center}\\begin{nmtfit}%s\\end{nmtfit}\\end{center}\n" % t["рисунок"]
