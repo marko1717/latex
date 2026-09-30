@@ -1,0 +1,577 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Пробний НМТ № 1 (повний)}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ з математики}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+\graphicspath{{../1. Числа. Звичайні та десяткові дроби. Модуль числа/}{../10. Основи планіметрії/}{../11. Трикутники/}{../12. Паралелограм/}{../13. Прямокутник/}{../14. Квадрат/}{../15. Ромб/}{../16. Трапеція/}{../17. Коло, круг і їх елементи/}{../18. Координати і вектори на площині і в просторі. Рівняння кола/}{../19. Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів/}{../2.відсотки, арифметичні задачі, подільність/}{../20. Функція та її властивості/}{../21.  Графіки елементарних функцій, їх побудова графіків функцій та їх перетворення/}{../22. Модульні  рівняння та нерівності/}{../23. Ірраціональні рівняння та нерівності/}{../24. Арифметична прогресія/}{../25. Геометрична прогресія/}{../26. Тригонометричні вирази/}{../27. Тригонометричні рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові функція і вирази/}{../29. Показникові нерівності/}{../3. Степені. Одночлени. стандартний вигляд числа/}{../30. Логарифм. Логарифмічна функція/}{../31. Логарифмічні рівняння/}{../32. Логарифмічні нерівності/}{../33. Похідна/}{../34. Первісна/}{../35. Комбінаторика/}{../36. Теорія ймовірності/}{../37. Статистика/}{../38. Призма. Паралелепіпед. Куб/}{../39. Піраміда/}{../4.Многочлени. ФСМ/}{../40. Циліндр/}{../41. Конус/}{../42. Куля. Сфера/}{../43. Параметри/}{../5. дробові раціональні вирази і перетворення/}{../6. Лінійні рівняння/}{../7. Квадратні корені. Корені вищих степенів. Раціональний степінь/}{../8. квадратні рівняння, і рівняння, що до них зводяться/}{../9. Системи рівнянь/}}
+\renewcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}\noindent
+\begin{tcolorbox}[nobeforeafter, width=\linewidth, colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\nopagebreak\vspace{0.15cm}\nopagebreak
+}
+\renewcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{5}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+
+\begin{document}
+\relpenalty=10000 \binoppenalty=10000   % формула в рядку не розривається після «=» чи «+»
+% макроси бази
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\setcounter{zad}{0}
+
+\chapterTitle{Пробний НМТ з математики № 1 (повний)}
+
+\noindent{\small Повноцінний пробний НМТ за структурою НМТ 2026: 15 завдань з вибором однієї відповіді, 3 на встановлення відповідності й 4 з короткою відповіддю (максимум 32 бали), усі теми програми. Завдання нові, авторські, складені за зразком справжніх завдань НМТ. Час -- як на НМТ; відповіді опублікуємо окремо.}\par\vspace{0.4cm}
+
+\instructionBox{Завдання 1--15 мають по п'ять варіантів відповіді, з яких лише \textbf{один правильний}. Виберіть правильний, на Вашу думку, варіант відповіді й позначте його в бланку відповідей.}
+
+\begin{samepage}
+\zadtask{Кількість столів і кількість стільців на складі відносяться як $4:7$. Якою \textit{може} бути загальна кількість столів і стільців на цьому складі?}
+\answerTable{$21$}{$28$}{$44$}{$48$}{$70$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На діаграмі відображено розподіл працівників компанії за віком (у роках). Скільки працівників компанії мають вік від $30$ до $49$ років включно?
+\end{minipage}\hfill
+\begin{minipage}[c]{0.41\textwidth}\centering
+\begin{nmtfit}\begin{tikzpicture}[x=1.25cm, y=0.07cm]
+\foreach \v in {5,10,...,55} \draw[gray!30, very thin] (0,\v) -- (5.6,\v);
+\foreach \v in {0,10,...,50} \node[left, font=\footnotesize] at (0,\v) {\v};
+\draw[->] (0,0) -- (5.8,0);
+\draw[->] (0,0) -- (0,60) node[above, font=\footnotesize] {осіб};
+\foreach \i/\m/\v in {1/{20--29}/35, 2/{30--39}/50, 3/{40--49}/40, 4/{50--59}/25, 5/{60+}/10}
+  { \fill[mainGreen!55] (\i-0.32,0) rectangle (\i+0.32,\v); \draw (\i-0.32,0) rectangle (\i+0.32,\v); \node[below, font=\footnotesize, text height=1.5ex, text depth=.25ex] at (\i,0) {\m}; }
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\answerTable{$40$}{$50$}{$85$}{$90$}{$125$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{У трикутнику $ABC$ кут $A$ дорівнює $48^\circ$, а зовнішній кут при вершині $C$ -- $115^\circ$. Знайдіть кут $B$.}
+\answerTable{$17^\circ$}{$65^\circ$}{$67^\circ$}{$132^\circ$}{$163^\circ$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Розв'яжіть нерівність $x^2-2x-15\leqslant 0$.}
+\answerTable{$[-5;\,3]$}{$[-3;\,5]$}{$(-3;\,5)$}{{\small$(-\infty;-3]\cup[5;+\infty)$}}{{\small$(-\infty;-5]\cup[3;+\infty)$}}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Піраміда має $12$ ребер. Скільки граней має ця піраміда?}
+\answerTable{$6$}{$7$}{$8$}{$12$}{$13$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{$\dfrac{x^2-9}{x^2+3x}=$}
+\answerTableTall{$\dfrac{x-3}{x}$}{$\dfrac{x+3}{x}$}{$\dfrac{3-x}{x}$}{$-\dfrac{3}{x}$}{$x-3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Розв'яжіть рівняння $\left(\dfrac{1}{3}\right)^{x+1}=27$.}
+\answerTable{$-4$}{$-2$}{$2$}{$4$}{$26$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на відрізку $[-5;\,5]$. Укажіть \textit{усі} точки локального мінімуму цієї функції.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.41\textwidth}\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.45]
+\draw[gray!35, very thin] (-6,-3) grid (6,4);
+\draw[->] (-6,0) -- (6.5,0) node[below left, font=\footnotesize] {$x$};
+\draw[->] (0,-3) -- (0,4.5) node[below left, font=\footnotesize] {$y$};
+\node[below left, font=\scriptsize] at (0,0) {$0$};
+\node[below, font=\scriptsize] at (1,0) {$1$}; \node[left, font=\scriptsize] at (0,1) {$1$};
+\draw[very thick] (-5,3) .. controls (-4,-1.167) and (-3,-2) .. (-2,-2) .. controls (-1.333,-2) and (-0.667,3) .. (0,3) .. controls (0.667,3) and (1.333,-1) .. (2,-1) .. controls (2.667,-1) and (3.333,2) .. (4,2) .. controls (4.333,2) and (4.667,1.611) .. (5,1);
+\node[circle, fill, inner sep=1.5pt] at (-5,3) {}; \node[circle, fill, inner sep=1.5pt] at (5,1) {};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\answerTable{$-2$ і $2$}{$0$ і $4$}{$-2$}{$-2$ і $-1$}{$-2$, $2$ і $5$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Які з наведених тверджень є правильними?\par\nopagebreak\nbvspace{0.1cm}\noindent\begin{tabular}{@{}r@{\ \ }p{0.9\linewidth}@{}}I. & Діаметр кола, перпендикулярний до хорди, ділить цю хорду навпіл. \\II. & Центральний кут удвічі більший за вписаний кут, що спирається на ту саму дугу. \\III. & Будь-які дві хорди кола, що перетинаються, діляться точкою перетину навпіл.\end{tabular}}
+\answerTable{лише I}{лише III}{лише II та III}{I, II та III}{лише I та II}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Послідовність $(a_n)$ задано формулою $n$-го члена $a_n=2^n-3n$. Знайдіть $a_5-a_3$.}
+\answerTable{$-2$}{$16$}{$17$}{$18$}{$24$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{У гуртку $10$ хлопців і $8$ дівчат. Скількома способами можна вибрати двох хлопців і одну дівчину для участі в конкурсі?}
+\answerTable{$53$}{$80$}{$360$}{$720$}{$816$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Сфера з центром у точці $O(2;\,-1;\,3)$ проходить через точку $A(4;\,1;\,2)$. Знайдіть радіус цієї сфери.}
+\answerTable{$3$}{$\sqrt{21}$}{$5$}{$\sqrt{61}$}{$9$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{$(1-\sin^2\alpha)\cdot\operatorname{tg}^2\alpha=$}
+\answerTable{$-\sin^2\alpha$}{$\cos^2\alpha$}{$1$}{$\operatorname{tg}^2\alpha$}{$\sin^2\alpha$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum У рівнобічній трапеції $ABCD$ основи $BC=14$~см і $AD=50$~см, діагональ $AC$ перпендикулярна до бічної сторони $CD$ (див. рисунок). Знайдіть площу трапеції.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.41\textwidth}\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.075, line join=round, line cap=round]
+\coordinate (A) at (0.000,0.000);
+\coordinate (B) at (18.000,24.000);
+\coordinate (C) at (32.000,24.000);
+\coordinate (D) at (50.000,0.000);
+\coordinate (H) at (32.000,0.000);
+\draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+\draw[thick] (A) -- (C);
+\draw[thick, dashed] (C) -- (H);
+\node[circle, fill, inner sep=1.3pt] at (A) {};
+\node[circle, fill, inner sep=1.3pt] at (B) {};
+\node[circle, fill, inner sep=1.3pt] at (C) {};
+\node[circle, fill, inner sep=1.3pt] at (D) {};
+\node[circle, fill, inner sep=1.3pt] at (H) {};
+\pic[draw, angle radius=0.2cm] {right angle = A--C--D};
+\pic[draw, angle radius=0.2cm] {right angle = C--H--D};
+\node[font=\small, inner sep=0pt] at (-3.602,-2.079) {$A$};
+\node[font=\small, inner sep=0pt] at (14.398,26.079) {$B$};
+\node[font=\small, inner sep=0pt] at (35.602,26.079) {$C$};
+\node[font=\small, inner sep=0pt] at (53.602,-2.079) {$D$};
+\node[font=\small, inner sep=0pt] at (30.933,-3.982) {$H$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\answerTable{$576$~см$^2$}{$600$~см$^2$}{$768$~см$^2$}{$1200$~см$^2$}{$1536$~см$^2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Пара чисел $(x_0;\,y_0)$ -- розв'язок системи рівнянь \[\begin{cases}\dfrac{1}{x}+\dfrac{1}{y}=\dfrac{3}{4},\\[4pt] x+y=6,\end{cases}\] причому $x_0>y_0$. Знайдіть $x_0-y_0$.}
+\answerTable{$-2$}{$2$}{$4$}{$2\sqrt5$}{$8$}
+\par\penalty-20
+\end{samepage}
+
+\instructionBox{У завданнях 16--18 до кожного з трьох рядків інформації, позначених цифрами, доберіть один правильний, на Вашу думку, варіант, позначений буквою.}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та його значенням \mbox{(А--Д)}, якщо $a=4$.}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$a^{3/2}$}
+\matchItem{2}{$\dfrac{a^2-2a}{a-2}$}
+\matchItem{3}{$\log_{0{,}5}a$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-2$}
+\matchItem{Б}{$2$}
+\matchItem{В}{$4$}
+\matchItem{Г}{$6$}
+\matchItem{Д}{$8$}
+}{
+\matchingGrid
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження.}
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Графік функції $y=|x|-3$}
+\matchItem{2}{Графік функції $y=x^3$}
+\matchItem{3}{Графік функції $y=(x-2)^2$}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{перетинає вісь $y$ у точці $(0;\,3)$.}
+\matchItem{Б}{симетричний відносно початку координат.}
+\matchItem{В}{симетричний відносно осі $y$.}
+\matchItem{Г}{має з віссю $x$ лише одну спільну точку $(2;\,0)$.}
+\matchItem{Д}{симетричний відносно прямої $x=-2$.}
+}{
+\matchingGrid
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent
+\begin{minipage}[c]{0.55\textwidth}
+\zadnum У прямокутнику $ABCD$ сторони $AB=6$~см і $AD=8$~см, точка $M$ -- середина сторони $BC$ (див. рисунок). Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.41\textwidth}\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.42, line join=round, line cap=round]
+\coordinate (A) at (0.000,0.000);
+\coordinate (B) at (0.000,6.000);
+\coordinate (C) at (8.000,6.000);
+\coordinate (D) at (8.000,0.000);
+\coordinate (M) at (4.000,6.000);
+\draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+\draw[thick] (A) -- (M);
+\draw[thick] (M) -- (D);
+\node[circle, fill, inner sep=1.3pt] at (A) {};
+\node[circle, fill, inner sep=1.3pt] at (B) {};
+\node[circle, fill, inner sep=1.3pt] at (C) {};
+\node[circle, fill, inner sep=1.3pt] at (D) {};
+\node[circle, fill, inner sep=1.3pt] at (M) {};
+\pic[draw, angle radius=0.2cm] {right angle = B--A--D};
+\node[font=\small, inner sep=0pt] at (-0.643,-0.371) {$A$};
+\node[font=\small, inner sep=0pt] at (-0.643,6.371) {$B$};
+\node[font=\small, inner sep=0pt] at (8.643,6.371) {$C$};
+\node[font=\small, inner sep=0pt] at (8.643,-0.371) {$D$};
+\node[font=\small, inner sep=0pt] at (4.191,6.711) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}\par
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Фігура}
+\matchItem{1}{трикутник $ABM$}
+\matchItem{2}{трикутник $AMD$}
+\matchItem{3}{трапеція $AMCD$}
+}{
+\matchHead{Площа}
+\matchItem{А}{$12$~см$^2$}
+\matchItem{Б}{$18$~см$^2$}
+\matchItem{В}{$24$~см$^2$}
+\matchItem{Г}{$36$~см$^2$}
+\matchItem{Д}{$48$~см$^2$}
+}{
+\matchingGrid
+}
+\par\penalty-20
+\end{samepage}
+
+\instructionBox{Розв'яжіть завдання 19--22. Одержані числові відповіді запишіть у бланку відповідей. Відповідь записуйте лише десятковим дробом, урахувавши положення коми. Знак «мінус» записуйте перед першою цифрою числа.}
+
+\begin{samepage}
+\zadtask{Обчисліть $\displaystyle\int_{-1}^{2}\left(3x^2-4x+1\right)dx$.}
+\nmtnobreak
+\nopagebreak\nbvspace{0.4cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{За три дні туристи пройшли $60$~км. Першого дня вони пройшли $35\,\%$ усього шляху, а другого -- на $20\,\%$ менше, ніж першого. Скільки кілометрів туристи пройшли третього дня?}
+\nmtnobreak
+\nopagebreak\nbvspace{0.4cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено правильну чотирикутну призму й циліндр. Радіус основи циліндра дорівнює радіусу кола, \textit{описаного} навколо основи призми, а висота призми на $6$~см менша за висоту циліндра. Об'єм циліндра дорівнює $400\pi$~см$^3$, а площа його бічної поверхні -- $160\pi$~см$^2$. Визначте об'єм (у см$^3$) призми.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.40\textwidth}\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, line join=round]
+\begin{scope}[shift={(0,0)}]
+\draw[thick] (-1.393,-0.104) -- (0.246,-0.589);
+\draw[thick] (0.246,-0.589) -- (1.393,0.104);
+\draw[thick, dashed] (1.393,0.104) -- (-0.246,0.589);
+\draw[thick, dashed] (-1.393,-0.104) -- (-0.246,0.589);
+\draw[thick] (-1.393,2.071) -- (0.246,1.587);
+\draw[thick] (0.246,1.587) -- (1.393,2.279);
+\draw[thick] (1.393,2.279) -- (-0.246,2.764);
+\draw[thick] (-1.393,2.071) -- (-0.246,2.764);
+\draw[thick] (0.246,-0.589) -- (0.246,1.587);
+\draw[thick] (-1.393,-0.104) -- (-1.393,2.071);
+\draw[thick] (1.393,0.104) -- (1.393,2.279);
+\draw[thick, dashed] (-0.246,0.589) -- (-0.246,2.764);
+\end{scope}
+\begin{scope}[shift={(4.2,0)}]
+\draw[thick] (0,3.263) ellipse (1.3 and 0.549);
+\draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.549);
+\draw[thick] (-1.3,0) arc (180:360:1.3 and 0.549);
+\draw[thick] (-1.3,0) -- (-1.3,3.263);
+\draw[thick] (1.3,0) -- (1.3,3.263);
+\end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\zadtask{Визначте \textit{суму} всіх значень $a$, за кожного з яких рівняння \[\dfrac{|x-a|-3}{x^2-x-12}=0\] має \textit{єдиний} корінь.}
+\nmtnobreak
+\nopagebreak\nbvspace{0.4cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\end{document}

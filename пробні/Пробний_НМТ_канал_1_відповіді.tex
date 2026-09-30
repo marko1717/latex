@@ -1,0 +1,321 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Пробний НМТ № 1 (повний)}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ з математики}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+\graphicspath{{../1. Числа. Звичайні та десяткові дроби. Модуль числа/}{../10. Основи планіметрії/}{../11. Трикутники/}{../12. Паралелограм/}{../13. Прямокутник/}{../14. Квадрат/}{../15. Ромб/}{../16. Трапеція/}{../17. Коло, круг і їх елементи/}{../18. Координати і вектори на площині і в просторі. Рівняння кола/}{../19. Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів/}{../2.відсотки, арифметичні задачі, подільність/}{../20. Функція та її властивості/}{../21.  Графіки елементарних функцій, їх побудова графіків функцій та їх перетворення/}{../22. Модульні  рівняння та нерівності/}{../23. Ірраціональні рівняння та нерівності/}{../24. Арифметична прогресія/}{../25. Геометрична прогресія/}{../26. Тригонометричні вирази/}{../27. Тригонометричні рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові функція і вирази/}{../29. Показникові нерівності/}{../3. Степені. Одночлени. стандартний вигляд числа/}{../30. Логарифм. Логарифмічна функція/}{../31. Логарифмічні рівняння/}{../32. Логарифмічні нерівності/}{../33. Похідна/}{../34. Первісна/}{../35. Комбінаторика/}{../36. Теорія ймовірності/}{../37. Статистика/}{../38. Призма. Паралелепіпед. Куб/}{../39. Піраміда/}{../4.Многочлени. ФСМ/}{../40. Циліндр/}{../41. Конус/}{../42. Куля. Сфера/}{../43. Параметри/}{../5. дробові раціональні вирази і перетворення/}{../6. Лінійні рівняння/}{../7. Квадратні корені. Корені вищих степенів. Раціональний степінь/}{../8. квадратні рівняння, і рівняння, що до них зводяться/}{../9. Системи рівнянь/}}
+\renewcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}\noindent
+\begin{tcolorbox}[nobeforeafter, width=\linewidth, colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\nopagebreak\vspace{0.15cm}\nopagebreak
+}
+\renewcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{5}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+
+\begin{document}
+\chapterTitle{Пробний НМТ з математики № 1 (повний): відповіді}
+
+\begin{center}\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c||c|c||c|c|}\hline
+\textbf{№} & \textbf{Відповідь} & \textbf{№} & \textbf{Відповідь} & \textbf{№} & \textbf{Відповідь} \\ \hline
+
+1 & В & 9 & Д & 17 & 1~--~В, 2~--~Б, 3~--~Г \\ \hline
+2 & Г & 10 & Г & 18 & 1~--~А, 2~--~В, 3~--~Г \\ \hline
+3 & В & 11 & В & 19 & $6$ \\ \hline
+4 & Б & 12 & А & 20 & $22{{,}}2$ \\ \hline
+5 & Б & 13 & Д & 21 & $500$ \\ \hline
+6 & А & 14 & В & 22 & $2$ \\ \hline
+7 & А & 15 & Б &  &  \\ \hline
+8 & А & 16 & 1~--~Д, 2~--~В, 3~--~А &  &  \\ \hline
+\end{tabular}\end{center}
+
+\noindent{\small\color{gray!80!black}Оцінювання: 1--15 -- по 1 балу; 16--18 -- по 1 балу за кожну правильно встановлену відповідність (до 3 балів); 19--22 -- по 2 бали. Разом 32 бали.}\par\vspace{0.3cm}
+
+\sectionTitle{Розв'язки й типові помилки}
+
+\par\noindent\textbf{1.} Столів $4k$, стільців $7k$, разом $11k$ -- число, кратне $11$; з наведених лише $44$.\quad{\small\color{gray!80!black}(Відношення й подільність: якою може бути кількість)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- шукали число, кратне різниці частин $7-4=3$ (і $7$); Б -- шукали число, кратне добутку частин $4\cdot7$; Г -- шукали число, кратне меншій частині $4$; Д -- шукали число, кратне більшій частині $7$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{2.} Групи $30$--$39$ і $40$--$49$: $50+40=90$ працівників.\quad{\small\color{gray!80!black}(Стовпчикова діаграма)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- урахували лише групу $40$--$49$; Б -- урахували лише групу $30$--$39$; В -- порахували молодших за $40$ років; Д -- порахували молодших за $50$ років.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{3.} Зовнішній кут дорівнює сумі двох внутрішніх, не суміжних з ним: $\angle B=115^\circ-48^\circ=67^\circ$.\quad{\small\color{gray!80!black}(Сума кутів трикутника, зовнішній кут)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- зовнішній кут сплутали з внутрішнім: $180^\circ-48^\circ-115^\circ$; Б -- знайшли внутрішній кут $C$; Г -- знайшли суму кутів $B$ і $C$; Д -- додали зовнішній кут і кут $A$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{4.} Корені $x=-3$ і $x=5$; вітки параболи напрямлені вгору, тому $x^2-2x-15\leqslant0$ між коренями: $[-3;\,5]$.\quad{\small\color{gray!80!black}(Квадратна нерівність: проміжок)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- помилилися в знаках коренів: $x=-5$ і $x=3$; В -- загубили знак рівності: кінці не включили; Г -- вибрали проміжки, де тричлен додатний; Д -- обидві помилки: знаки коренів і проміжки.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{5.} У $n$-кутної піраміди $2n$ ребер: $n=6$. Граней $n+1=7$ (шість бічних і основа).\quad{\small\color{gray!80!black}(Будова многогранників: грані, ребра, елементи)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- порахували лише бічні грані; В -- сплутали з шестикутною призмою ($6+2$ грані); Г -- вважали, що граней стільки ж, скільки ребер; Д -- додали до кількості ребер основу.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{6.} $\frac{(x-3)(x+3)}{x(x+3)}=\frac{x-3}{x}$.\quad{\small\color{gray!80!black}(Скорочення дробу)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- розклали чисельник як $(x+3)^2$; В -- помилилися в знаку при розкладі різниці квадратів; Г -- «скоротили» $x^2$ у чисельнику й знаменнику; Д -- знаменник скоротили повністю, забувши множник $x$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{7.} $3^{-(x+1)}=3^3$, $-x-1=3$, $x=-4$.\quad{\small\color{gray!80!black}(Показникове: зведення до однієї основи (дробова чи десяткова основа))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- мінус поставили лише перед $x$: $-x+1=3$; В -- загубили мінус: $\frac13=3^{-1}$ -- $x+1=3$; Г -- з $-x-1=3$ отримали $x=4$; Д -- прирівняли показник до числа $27$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{8.} Мінімуми -- там, де спадання змінюється зростанням: $x=-2$ і $x=2$.\quad{\small\color{gray!80!black}(Точки екстремуму за графіком)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- точки максимуму; В -- лише точка найменшого значення; Г -- значення функції в точках мінімуму, а не самі точки; Д -- кінець відрізка не є точкою екстремуму.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{9.} I і II правильні. III хибне: навпіл діляться лише діаметри.\quad{\small\color{gray!80!black}(Коло: хорди, діаметри, дотичні, кути)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- не знали зв'язку центрального й вписаного кутів; Б -- вважали, що хорди діляться навпіл; В -- сплутали властивість хорди з властивістю діаметрів; Г -- властивість діаметрів поширили на будь-які хорди.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{10.} $a_5=32-15=17$, $a_3=8-9=-1$; $a_5-a_3=18$.\quad{\small\color{gray!80!black}(Послідовність за формулою $n$-го члена)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- $2^n$ прочитали як $2n$; Б -- помилилися в знаку: $a_3=1$; В -- знайшли лише $a_5$; Д -- урахували лише $2^n$: $2^5-2^3$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{11.} $C_{10}^2\cdot C_8^1=45\cdot8=360$.\quad{\small\color{gray!80!black}(Сполучення (вибір без порядку), зокрема з умовою)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- кількості способів додали, а не перемножили; Б -- вибрали по одному хлопцю й дівчині; Г -- порядок вибору хлопців вважали важливим: $10\cdot9\cdot8$; Д -- вибрали будь-яких трьох із $18$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{12.} $R=OA=\sqrt{2^2+2^2+(-1)^2}=3$.\quad{\small\color{gray!80!black}(Відстань між точками; сфера з відомим центром)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- узяли відстань від $A$ до початку координат; В -- додали модулі різниць координат без квадратів і кореня; Г -- додали координати точок замість відняти; Д -- забули добути квадратний корінь.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{13.} $\cos^2\alpha\cdot\frac{\sin^2\alpha}{\cos^2\alpha}=\sin^2\alpha$.\quad{\small\color{gray!80!black}(Основна тотожність: спрощення)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- $1-\sin^2\alpha=-\cos^2\alpha$ (знак); Б -- замінили $1-\sin^2\alpha$ на $\cos^2\alpha$ і загубили $\operatorname{tg}^2\alpha$; В -- вважали, що $\operatorname{tg}^2\alpha\cdot\cos^2\alpha=1$; Г -- вважали, що $1-\sin^2\alpha=1$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{14.} $CH\perp AD$: $AH=\frac{50+14}{2}=32$, $HD=\frac{50-14}{2}=18$. У прямокутному трикутнику $ACD$ $CH^2=AH\cdot HD=576$, $CH=24$; $S=\frac{14+50}{2}\cdot24=768$~см$^2$.\quad{\small\color{gray!80!black}(Трапеція: площа)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- висотою взяли відрізок $HD=18$; Б -- знайшли площу трикутника $ACD$; Г -- площу рахували як $AD\cdot CH$; Д -- площу трапеції рахували без множника $\frac12$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{15.} $\frac{x+y}{xy}=\frac34$, тому $xy=8$; з $x+y=6$: $x_0=4$, $y_0=2$, різниця $2$.\quad{\small\color{gray!80!black}(Нелінійна система: сума й добуток ($\tfrac1x+\tfrac1y$ і $x+y$))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- переплутали $x_0$ і $y_0$; В -- знайшли лише $x_0$; Г -- вважали $(x-y)^2=(x+y)^2-2xy$; Д -- знайшли $xy=8$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{16.} 1) $\sqrt{4^3}=8$; 2) $\frac{a(a-2)}{a-2}=a=4$; 3) $\log_{0{,}5}4=-2$.\quad{\small\color{gray!80!black}(Значення виразу за заданого значення змінної)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~Г: помножили основу на показник: $4\cdot\frac32$; 2~--~Д: «скоротили» почленно: $\frac{a^2}{a}+\frac{2a}{2}=2a$; 3~--~Б: не врахували, що основа $0{,}5<1$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{17.} 1) $|{-x}|-3=|x|-3$ -- парна; 2) $(-x)^3=-x^3$ -- непарна; 3) $(x-2)^2=0$ лише при $x=2$.\quad{\small\color{gray!80!black}(Графік функції -- його властивість: перетин з осями, симетрія)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~А: помилилися в знаку: $|0|-3=3$; 2~--~В: сплутали: кубічна парабола симетрична відносно осі $y$; 3~--~Д: помилилися в знаку зсуву: вісь симетрії $x=-2$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{18.} 1) $\frac12\cdot6\cdot4=12$; 2) основа $AD=8$, висота $6$: $24$; 3) основи $MC=4$ і $AD=8$, висота $6$: $36$.\quad{\small\color{gray!80!black}(Прямокутник: діагоналі, точки на сторонах, площі частин)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~В: вважали $BM=BC$; 2~--~Д: площу трикутника рахували без $\frac12$; 3~--~Б: висотою трапеції взяли половину $AB$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{19.} $F(x)=x^3-2x^2+x$; $F(2)-F(-1)=2-(-4)=6$.\quad{\small\color{gray!80!black}(Інтеграл від многочлена й степенів (зокрема після розкриття дужок))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $2$ -- забули відняти значення первісної в нижній межі; $-6$ -- відняли у зворотному порядку; $-3$ -- замість первісної підставили межі в саму функцію.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{20.} Першого дня $60\cdot0{,}35=21$~км, другого $21\cdot0{,}8=16{,}8$~км, третього $60-21-16{,}8=22{,}2$~км.\quad{\small\color{gray!80!black}(Три величини через відсотки: частини відомої суми чи середнього)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $30$ -- другого дня -- $35\,\%-20\,\%=15\,\%$ шляху; $27$ -- другого дня -- $20\,\%$ шляху; $16{,}8$ -- знайшли, скільки пройшли другого дня.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{21.} $\frac{\pi r^2H}{2\pi rH}=\frac r2=\frac{400}{160}$, $r=5$, $H=16$. Діагональ квадрата $10$, сторона $5\sqrt2$, площа $50$; висота призми $10$; $V=500$~см$^3$.\quad{\small\color{gray!80!black}(Правильна призма чи куб і тіло обертання)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $1000$ -- радіус циліндра взяли за радіус вписаного кола: сторона $2r$; $800$ -- висотою призми взяли висоту циліндра; $250$ -- сторону основи взяли рівною радіусу.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{22.} Корені чисельника $x=a\pm3$ (завжди різні); знаменник $=(x-4)(x+3)$. Корінь єдиний, коли один із $a\pm3$ дорівнює $4$ або $-3$: $a=1,\,7,\,-6,\,0$; обидва вилучитися не можуть. Сума $2$.\quad{\small\color{gray!80!black}(Дріб дорівнює нулю: корінь знаменника вилучає корінь чисельника)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $8$ -- урахували лише корінь знаменника $x=4$; $-6$ -- урахували лише корінь знаменника $x=-3$; $-2$ -- розклали знаменник з помилкою знака: $(x+4)(x-3)$.}\par\vspace{0.15cm}
+
+\end{document}

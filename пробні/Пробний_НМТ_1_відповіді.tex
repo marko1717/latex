@@ -1,0 +1,321 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Пробний НМТ № 1}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ з математики}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+\graphicspath{{../1. Числа. Звичайні та десяткові дроби. Модуль числа/}{../10. Основи планіметрії/}{../11. Трикутники/}{../12. Паралелограм/}{../13. Прямокутник/}{../14. Квадрат/}{../15. Ромб/}{../16. Трапеція/}{../17. Коло, круг і їх елементи/}{../18. Координати і вектори на площині і в просторі. Рівняння кола/}{../19. Лінійні та квадратні нерівності. Системи лінійних нерівностей. Метод інтервалів/}{../2.відсотки, арифметичні задачі, подільність/}{../20. Функція та її властивості/}{../21.  Графіки елементарних функцій, їх побудова графіків функцій та їх перетворення/}{../22. Модульні  рівняння та нерівності/}{../23. Ірраціональні рівняння та нерівності/}{../24. Арифметична прогресія/}{../25. Геометрична прогресія/}{../26. Тригонометричні вирази/}{../27. Тригонометричні рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові рівняння/}{../28. Показникова функція. Показникові рівняння/Показникові функція і вирази/}{../29. Показникові нерівності/}{../3. Степені. Одночлени. стандартний вигляд числа/}{../30. Логарифм. Логарифмічна функція/}{../31. Логарифмічні рівняння/}{../32. Логарифмічні нерівності/}{../33. Похідна/}{../34. Первісна/}{../35. Комбінаторика/}{../36. Теорія ймовірності/}{../37. Статистика/}{../38. Призма. Паралелепіпед. Куб/}{../39. Піраміда/}{../4.Многочлени. ФСМ/}{../40. Циліндр/}{../41. Конус/}{../42. Куля. Сфера/}{../43. Параметри/}{../5. дробові раціональні вирази і перетворення/}{../6. Лінійні рівняння/}{../7. Квадратні корені. Корені вищих степенів. Раціональний степінь/}{../8. квадратні рівняння, і рівняння, що до них зводяться/}{../9. Системи рівнянь/}}
+\renewcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}\noindent
+\begin{tcolorbox}[nobeforeafter, width=\linewidth, colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\nopagebreak\vspace{0.15cm}\nopagebreak
+}
+\renewcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{5}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+
+\begin{document}
+\chapterTitle{Пробний НМТ з математики № 1: відповіді}
+
+\begin{center}\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c||c|c||c|c|}\hline
+\textbf{№} & \textbf{Відповідь} & \textbf{№} & \textbf{Відповідь} & \textbf{№} & \textbf{Відповідь} \\ \hline
+
+1 & Б & 9 & Г & 17 & 1~--~А, 2~--~Г, 3~--~В \\ \hline
+2 & В & 10 & А & 18 & 1~--~А, 2~--~Д, 3~--~Г \\ \hline
+3 & В & 11 & В & 19 & $24$ \\ \hline
+4 & Б & 12 & А & 20 & $1140$ \\ \hline
+5 & Д & 13 & А & 21 & $1152$ \\ \hline
+6 & Г & 14 & Д & 22 & $-27$ \\ \hline
+7 & В & 15 & Б &  &  \\ \hline
+8 & Б & 16 & 1~--~Б, 2~--~Д, 3~--~Г &  &  \\ \hline
+\end{tabular}\end{center}
+
+\noindent{\small\color{gray!80!black}Оцінювання: 1--15 -- по 1 балу; 16--18 -- по 1 балу за кожну правильно встановлену відповідність (до 3 балів); 19--22 -- по 2 бали. Разом 32 бали.}\par\vspace{0.3cm}
+
+\sectionTitle{Розв'язки й типові помилки}
+
+\par\noindent\textbf{1.} За годину перший наповнює $\frac16$ басейну, другий -- $\frac1{12}$, разом $\frac16+\frac1{12}=\frac14$; басейн -- за $4$~год.\quad{\small\color{gray!80!black}(Рух і продуктивність)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- «разом -- удвічі швидше за перший»: $6:2$; В -- узяли час швидшого насоса; Г -- знайшли середнє $\frac{6+12}{2}$; Д -- додали час роботи насосів.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{2.} У суботу продали $260$ квитків, у середу -- $100$; різниця $160$.\quad{\small\color{gray!80!black}(Стовпчикова діаграма)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- порівняли суботу з п'ятницею (сусідній стовпчик); Б -- сплутали суботу з неділею; Г -- відняли найменше значення (вівторок); Д -- виписали кількість квитків у суботу.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{3.} Нехай $AK=x$, тоді $KB=x-6$; $x+x-6=20$, звідки $x=13$.\quad{\small\color{gray!80!black}(Точки на прямій: довжини й відношення)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- знайшли $KB$; Б -- поділили $AB$ навпіл, не врахувавши різниці; Г -- від $AB$ відняли різницю: $20-6$; Д -- до половини $AB$ додали різницю: $10+6$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{4.} $64=\left(\frac14\right)^{-3}$; основа менша за $1$, тому $x-1\leqslant-3$, $x\leqslant-2$.\quad{\small\color{gray!80!black}(Показникова: зведення до основи (основа менша за 1))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- з $x-1\leqslant-3$ отримали $x\leqslant-4$ (переносячи $1$, не змінили знак); В -- не змінили знак нерівності, хоча основа $\frac14<1$; Г -- записали $64=\left(\frac14\right)^{3}$ (загубили мінус у показнику); Д -- обидві помилки разом.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{5.} Перпендикуляр до площини, нахиленої під кутом $35^\circ$, утворює з горизонтальною площиною кут $90^\circ-35^\circ=55^\circ$.\quad{\small\color{gray!80!black}(Кути в просторі: практичні задачі)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- узяли кут між площинами; Б -- суміжний кут: $180^\circ-35^\circ$ (кут між прямою й площиною не буває тупим); В -- «промені перпендикулярні до панелі» -- вважали, що й до даху; Г -- додали прямий кут: $90^\circ+35^\circ$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{6.} $4a^2-12a+9-(4a^2-9)=18-12a$.\quad{\small\color{gray!80!black}(Формули скороченого множення: спрощення)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- $(2a-3)^2=4a^2-9$ (без подвоєного добутку); Б -- розкрили дужки після мінуса без зміни знака: $-(4a^2-9)=-4a^2-9$; В -- подвоєний добуток без множника $2$: $-6a$; Д -- знак подвоєного добутку: $(2a-3)^2=4a^2+12a+9$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{7.} ОДЗ: $x>3$. $\log_2\big((x+3)(x-3)\big)=4$, $x^2-9=16$, $x=\pm5$; ОДЗ задовольняє лише $x=5$.\quad{\small\color{gray!80!black}(Логарифмічне: різниця чи сума логарифмів з однаковою основою)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- $x^2-9=16$ записали як $x^2=16$; Б -- $2^4$ обчислили як $2\cdot4=8$: $x^2-9=8$; Г -- суму логарифмів замінили логарифмом суми: $2x=16$; Д -- не перевірили ОДЗ: $x>3$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{8.} Графік іде вгору від точки $(-2;\,-1)$ до точки $(0;\,3)$, тобто на $[-2;\,0]$ (і ще на $[3;\,5]$).\quad{\small\color{gray!80!black}(Властивості функції за графіком: зростання, спадання)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А, В -- проміжки спадання; Г, Д -- проміжок містить і ділянку спадання.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{9.} I і III правильні. II хибне: $5+7=12$, а кожна сторона має бути меншою за суму двох інших.\quad{\small\color{gray!80!black}(Трикутник: медіана, бісектриса, висота, нерівність трикутника)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- не знали властивості медіани прямокутного трикутника; Б -- сплутали нерівність трикутника зі знаком «$\geqslant$»; В -- «вироджений» трикутник $5+7=12$ вважали існуючим, а III -- хибним; Д -- вважали, що трикутник $5$, $7$, $12$ існує.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{10.} $q^3=\frac{b_5}{b_2}=-8$, $q=-2$; $b_6=b_5q=-96$.\quad{\small\color{gray!80!black}(Геометрична прогресія: знаменник і члени)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- з $q^3=-8$ узяли $q=-8$; В -- сплутали з арифметичною прогресією: $d=18$; Г -- загубили знак: $q=2$; Д -- знайшли $b_7=b_5q^2$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{11.} Не менше трьох книжок прочитали $12+10=22$ учні; $P=\frac{22}{50}=0{,}44$.\quad{\small\color{gray!80!black}(Ймовірність за діаграмою чи планом)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- «не менше трьох» зрозуміли як «більше трьох»; Б -- урахували лише учнів, що прочитали рівно три книжки; Г -- знайшли ймовірність протилежної події (менше трьох); Д -- «не менше трьох» зрозуміли як «не більше трьох».}\par\vspace{0.15cm}
+
+\par\noindent\textbf{12.} При симетрії відносно осі $y$ координата $y$ не змінюється, а $x$ і $z$ змінюють знак: $(2;\,5;\,3)$.\quad{\small\color{gray!80!black}(Симетрія й проєкції: координатні осі й площини)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- змінили знак лише координати $y$ (симетрія відносно площини $xz$); В -- симетрія відносно початку координат; Г -- знайшли проєкцію точки на вісь $y$; Д -- симетрія відносно площини $yz$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{13.} $1-\sin^2\alpha=\cos^2\alpha$, тому вираз дорівнює $\operatorname{tg}^2\alpha+1=\frac{1}{\cos^2\alpha}$.\quad{\small\color{gray!80!black}(Основна тотожність: спрощення)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: Б -- сплутали $1+\operatorname{tg}^2\alpha$ з $1+\operatorname{ctg}^2\alpha=\frac{1}{\sin^2\alpha}$; В -- знайшли лише перший доданок; Г -- перевернули дріб: $\frac{\cos^2\alpha}{\sin^2\alpha}$; Д -- перевернули відповідь.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{14.} Висота трикутника $AKD$, проведена з $K$, дорівнює $AB=4\sqrt3$. З трикутника з кутом $30^\circ$ при $D$: $KD=\frac{4\sqrt3}{\sin30^\circ}=8\sqrt3$; з прямокутного трикутника $AKD$: $AD=\frac{KD}{\cos30^\circ}=16$. Площа $\frac12\cdot16\cdot4\sqrt3=32\sqrt3$~см$^2$.\quad{\small\color{gray!80!black}(Складна обчислювальна задача (кілька кроків, кути $30^\circ$ і $60^\circ$))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- $AD$ знайшли як $AB:\sin60^\circ=8$; Б -- $AD$ знайшли як $KD\cdot\cos30^\circ=12$ (помножили замість поділити); В -- знайшли площу прямокутника; Г -- вважали, що $AD=2AB$ (катет проти кута $30^\circ$).}\par\vspace{0.15cm}
+
+\par\noindent\textbf{15.} $7-2x=25$, $x=-9$ (перевірка: $\sqrt{25}=5$); $-9\in(-12;\,-6]$.\quad{\small\color{gray!80!black}(Ірраціональне рівняння (праворуч число))}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: А -- перенесли $7$ без зміни знака: $-2x=25+7$, $x=-16$; В -- замість $5^2$ узяли $5\cdot2$: $x=-1{,}5$; Г -- не піднесли $5$ до квадрата: $x=1$; Д -- помилилися в знаку: $2x=25-7$, $x=9$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{16.} 1) $\log_{0{,}5}4=-2$; 2) $2^2=4$; 3) $\sqrt{4}=2$.\quad{\small\color{gray!80!black}(Значення числового виразу)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~Г: не врахували, що основа $0{,}5<1$; 2~--~А: вважали, що мінус у показнику дає від'ємне число; 2~--~В: не врахували мінус у показнику; 3~--~Д: забули добути корінь: $\frac{12}{3}$.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{17.} 1) парна: $f(-x)=f(x)$; 2) $x-2\geqslant0$; 3) кутовий коефіцієнт $-2<0$, функція спадає.\quad{\small\color{gray!80!black}(Функція -- її властивість: парність, монотонність, період, область визначення)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~В: сплутали: парабола спадає лише на $(-\infty;\,0]$; 2~--~Д: сплутали область визначення з областю значень; 3~--~Б: вважали лінійну функцію непарною.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{18.} 1) $\frac12\cdot5\cdot12=30$; 2) $AD=16$, $16\cdot12=192$; 3) основи $HD=11$ і $BC=16$: $\frac{11+16}{2}\cdot12=162$.\quad{\small\color{gray!80!black}(Паралелограм: висота й площі частин)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: 1~--~Б: площу трикутника рахували без $\frac12$; 2~--~В: площу паралелограма рахували як половину добутку; 3~--~Д: знайшли площу всього паралелограма.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{19.} $f'(x)=6x^2+6x-12=6(x+2)(x-1)$; на $[-3;\,0]$ лежить $x=-2$. $f(-3)=13$, $f(-2)=24$, $f(0)=4$; найбільше -- $24$.\quad{\small\color{gray!80!black}(Критичні точки, екстремуми, найбільше й найменше значення на відрізку)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $-2$ -- відповіли точкою максимуму, а не значенням; $13$ -- узяли значення на лівому кінці відрізка; $4$ -- узяли значення на правому кінці відрізка; $-3$ -- узяли критичну точку $x=1$ поза відрізком.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{20.} Джинси: $600\cdot1{,}4=840$~грн. Зі знижками: $600\cdot0{,}85+840\cdot0{,}75=510+630=1140$~грн.\quad{\small\color{gray!80!black}(Знижки: вартість покупки)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $864$ -- знижки $15\,\%$ і $25\,\%$ додали й застосували до всієї суми; $960$ -- не врахували, що джинси дорожчі на $40\,\%$; $1164$ -- переплутали знижки на футболку й джинси.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{21.} Діагональ основи піраміди $6\sqrt2\cdot\sqrt2=12$~см, її половина $6$; висота піраміди $\sqrt{10^2-6^2}=8$~см. Призма: сторона основи $12$, висота $8$; $V=12^2\cdot8=1152$~см$^3$.\quad{\small\color{gray!80!black}(Призма й піраміда)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $576$ -- сторону основи призми взяли рівною стороні основи піраміди; $1440$ -- висотою призми взяли бічне ребро піраміди; $384$ -- об'єм призми рахували за формулою піраміди.}\par\vspace{0.15cm}
+
+\par\noindent\textbf{22.} $2^{x-a}=2^3$, $x=a+3$; знаменник визначений і не дорівнює нулю при $-5<x<5$: $-8<a<2$, цілі $a=-7,\ldots,1$, сума $-27$.\quad{\small\color{gray!80!black}(Дріб дорівнює нулю: корінь чисельника має потрапити в ОДЗ знаменника)}\par\nopagebreak
+
+\noindent{\footnotesize\color{gray!85!black}Типові помилки: $-33$ -- під коренем у знаменнику взяли нестрогу нерівність; $27$ -- помилилися в знаку: $x=a-3$; $-36$ -- записали $8=2^4$.}\par\vspace{0.15cm}
+
+\end{document}
