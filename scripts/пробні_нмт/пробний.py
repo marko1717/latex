@@ -110,7 +110,7 @@ def зібрати(тека):
     out = []
     for i, (z, r) in enumerate(zip(ЗАВДАННЯ, готові), 1):
         out.append(dict(id="%s-%02d" % (КОНФІГ["id"], i), номер=i, слот=z["слот"], тип_каталогу=z["тип_каталогу"],
-                        назва_типу=T[z["тип_каталогу"]]["назва"], теми=z["теми"], тип=ТИП_ЗАВДАННЯ[z["слот"]],
+                        назва_типу=z.get("назва_у_ключі") or T[z["тип_каталогу"]]["назва"], теми=z["теми"], тип=ТИП_ЗАВДАННЯ[z["слот"]],
                         latex=r["latex"], відповідь=r["відповідь"], пастки=r["пастки"], розвʼязок=z.get("розвʼязок", ""),
                         рисунок=bool(z.get("рисунок"))))
     json.dump(out, open(os.path.join(тека, "завдання.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -156,9 +156,9 @@ def відповіді(КОНФІГ, out):
         s.append("\\sectionTitle{Розв'язки й типові помилки}\n")
         for z in out:
             s.append("\\par\\noindent\\textbf{%d.} %s\\quad{\\small\\color{gray!80!black}(%s)}\\par\\nopagebreak\n" % (
-                z["номер"], z["розвʼязок"] or "", z["назва_типу"]))
+                z["номер"], (z["розвʼязок"] or "").replace("ʼ", "'"), z["назва_типу"].replace("ʼ", "'")))
             if z["пастки"]:
-                s.append("\\noindent{\\footnotesize\\color{gray!85!black}Типові помилки: %s.}\\par\\vspace{0.15cm}\n" % z["пастки"])
+                s.append("\\noindent{\\footnotesize\\color{gray!85!black}Типові помилки: %s.}\\par\\vspace{0.15cm}\n" % z["пастки"].replace("ʼ", "'"))
     s.append("\\end{document}\n")
     return нфк("\n".join(s))
 
