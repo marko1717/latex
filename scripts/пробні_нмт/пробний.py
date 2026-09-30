@@ -66,6 +66,32 @@ def заповнити(z, i):
     return dict(z, код=str(i), група=z["слот"], назва=z["тип_каталогу"], частота="", формати="", нмт="")
 
 
+def вирівняти(тести, готові):
+    """літери 1--15: рівно по 3 на кожну, без трьох однакових поспіль; закріплені (фіксований) не рухаються;
+    де можна -- природна літера (найменше перестановок). Перевірки й зауваги якості вже зробив З.зібрати."""
+    природні = [З.правильні(t)[0] for t in тести]
+    фікс = {i for i, t in enumerate(тести) if t.get("фіксований")}
+    лічба = collections.Counter(природні[i] for i in фікс)
+    ціль = [None] * 15
+    for i in фікс: ціль[i] = природні[i]
+    for i in range(15):
+        if i in фікс: continue
+        def штраф(g):
+            поспіль = i >= 2 and ціль[i - 1] == g and ціль[i - 2] == g
+            наступні = i + 1 < 15 and ціль[i + 1] == g and (i + 2 < 15 and ціль[i + 2] == g or i >= 1 and ціль[i - 1] == g)
+            return (лічба[g] >= 3, поспіль or наступні, g != природні[i], лічба[g])
+        g = min(range(5), key=штраф)
+        ціль[i] = g; лічба[g] += 1
+    out = []
+    for t, r, k, g in zip(тести, готові, природні, ціль):
+        σ = list(range(5)); σ[k], σ[g] = g, k
+        order = sorted(range(5), key=lambda i: σ[i])
+        t2 = dict(t, показ=[t["показ"][i] for i in order], варіанти=[t["варіанти"][i] for i in order])
+        assert З.правильні(t2) == [g], (t["код"], g)
+        out.append(dict(r, latex=З.блок(t2, t2["показ"]), відповідь=L[g], пастки=З.пастки_текст(t["пастки"], σ)))
+    return out
+
+
 def зібрати(тека):
     КОНФІГ, ЗАВДАННЯ = завантажити_спец(тека)
     T = типи_каталогів()
@@ -78,6 +104,7 @@ def зібрати(тека):
     З.зібрати_відповідності(відп, os.path.join(tmp, "в.json"))
     З.зібрати_відкриті(відкр, os.path.join(tmp, "к.json"))
     готові = sum((json.load(open(os.path.join(tmp, f), encoding="utf-8")) for f in ("т.json", "в.json", "к.json")), [])
+    готові[:15] = вирівняти(тести, готові[:15])
     ключі = [r["відповідь"] for r in готові[15:18]]
     assert len(set(ключі)) == 3, ("ключі 16--18 однакові", ключі)
     out = []
@@ -103,7 +130,8 @@ def документ(КОНФІГ, out):
          "\\noindent{\\small %s}\\par\\vspace{0.4cm}\n" % КОНФІГ["вступ"]]
     for z in out:
         if z["номер"] in V.ІНСТРУКЦІЇ: s.append("\\instructionBox{%s}\n" % V.ІНСТРУКЦІЇ[z["номер"]])
-        s.append("\\begin{samepage}\n%s\n\\end{samepage}\n" % як_у_базі(V.чистий_блок(z["latex"], False)))
+        блок = re.sub(r"(\\begin\{minipage\}\[c\]\{[0-9.]+\\textwidth\}\n)(\\zadnum)", r"\1\\raggedright\2", z["latex"])   # текст біля рисунка -- без розтягнутих пробілів
+        s.append("\\begin{samepage}\n%s\n\\end{samepage}\n" % як_у_базі(V.чистий_блок(блок, False)))
     s.append("\\end{document}\n")
     return нфк("\n".join(s))
 
