@@ -158,6 +158,7 @@ def правда(*значення):
     "nmt_wall_shelf.png": "Studio product photo of a single wooden wall shelf held by one diagonal black metal support bracket, strict side view, mounted on a plain light wall, pure white background, soft shadow, no objects on the shelf, no text, no logos, no people.",
     "nmt_door.png": "Studio product photo of a modern interior wooden door standing half open in its frame, three-quarter view slightly from above, pure white background, soft shadow, no text, no logos, no people. (--формат 1024x1536)",
     "nmt_drawbridge.png": "A small bascule drawbridge over a calm river with both bridge leaves raised symmetrically at the same angle, strict side view, simple composition, no people, no boats, no text. (стильова приставка скрипта, --формат 1536x1024)",
+    "nmt_ironing_board.png": "Studio product photo of a household ironing board standing open on the floor, strict side view, two straight metal legs crossed in an X shape and joined by a hinge at the middle, the flat padded board lying horizontally on top of the legs, plain light grey fabric cover, pure white background, soft shadow, no iron on it, no text, no logos, no people. (--якість medium --ширина 800 --формат 1536x1024; пробні/клас_1, № 3)",
     "nmt_barrier.png": "Studio product photo of an automatic parking barrier gate in the open position: a grey post with a long red and white striped boom arm raised steeply upward, almost vertical, strict side view, pure white background, soft shadow, no text, no logos, no people, no cars. (--формат 1024x1536)",
 }
 
