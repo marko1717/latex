@@ -365,8 +365,8 @@ def тип(**kw): ТИПИ.append(kw)
 
 тип(код="Є2", група=Г_Є, назва=r"Формули зведення: спрощення дробу", частота=r"2024, 2025 (по 2--3 завдання)",
     формати=r"тотожно рівний вираз", нмт=r"$\dfrac{\cos(450^\circ+\alpha)}{\sin\alpha}$ (2024); $\dfrac{\sin\left(\frac{3\pi}{2}-\alpha\right)}{\cos\alpha}$ (2025)",
-    умова=r"$\dfrac{\cos(270^\circ+\alpha)}{\cos(180^\circ-\alpha)}=$",
-    показ=[r"$\operatorname{tg}\alpha$", r"$-\operatorname{tg}\alpha$", r"$\operatorname{ctg}\alpha$", r"$-\operatorname{ctg}\alpha$", r"$-1$"],
+    умова=r"$\dfrac{\cos(270^\circ+\alpha)}{\cos(180^\circ-\alpha)}=$", таблиця="Tall",
+    показ=[r"$\operatorname{tg}\alpha$", r"$-\operatorname{tg}\alpha$", r"$\dfrac{1}{\operatorname{tg}\alpha}$", r"$-\dfrac{1}{\operatorname{tg}\alpha}$", r"$-1$"],
     варіанти=[tan(x), -tan(x), 1 / tan(x), -1 / tan(x), -1], обч=lambda: cos(3 * pi / 2 + x) / cos(pi - x),
     пастки={0: r"загубили знак косинуса в II чверті", (2, 3): r"для $180^\circ$ назву функції змінили, а для $270^\circ$ -- ні",
             4: r"для $270^\circ$ не змінили назву функції"})
@@ -389,11 +389,11 @@ def тип(**kw): ТИПИ.append(kw)
 
 тип(код="Є5", група=Г_Є, назва=r"Основна тотожність: спрощення", частота=r"щороку (у 2024 і 2026 -- по 4--5 завдань)",
     формати=r"тотожно рівний вираз", нмт=r"$\operatorname{tg}^2\alpha\cos^2\alpha+\cos^2\alpha$ (2025); $\operatorname{tg}^2x\cdot\cos^2x-1$ (2026); $\dfrac{1-\cos^2\alpha}{\operatorname{tg}\alpha\cdot\cos\alpha}$ (2026)",
-    умова=r"$(1-\cos^2\alpha)\cdot\operatorname{ctg}^2\alpha=$",
-    показ=[r"$\sin^2\alpha$", r"$\cos^2\alpha$", r"$1$", r"$\operatorname{ctg}^2\alpha$", r"$-\cos^2\alpha$"],
-    варіанти=[sin(x) ** 2, cos(x) ** 2, 1, 1 / tan(x) ** 2, -cos(x) ** 2], обч=lambda: (1 - cos(x) ** 2) / tan(x) ** 2,
-    пастки={0: r"«скоротили» $\operatorname{ctg}^2\alpha$", 2: r"вважали $\sin^2\alpha\cdot\operatorname{ctg}^2\alpha=1$", 3: r"вважали $1-\cos^2\alpha=1$",
-            4: r"$1-\cos^2\alpha=-\sin^2\alpha$"})
+    умова=r"$(\sin^2\alpha-1)\cdot\operatorname{tg}^2\alpha=$",
+    показ=[r"$\sin^2\alpha$", r"$-\sin^2\alpha$", r"$-\cos^2\alpha$", r"$-\operatorname{tg}^2\alpha$", r"$-1$"],
+    варіанти=[sin(x) ** 2, -sin(x) ** 2, -cos(x) ** 2, -tan(x) ** 2, -1], обч=lambda: (sin(x) ** 2 - 1) * tan(x) ** 2,
+    пастки={0: r"знак: $\sin^2\alpha-1=\cos^2\alpha$", 2: r"«скоротили» $\operatorname{tg}^2\alpha$", 3: r"вважали $\sin^2\alpha-1=-1$",
+            4: r"вважали $\cos^2\alpha\cdot\operatorname{tg}^2\alpha=1$"})
 
 тип(код="Є6", група=Г_Є, назва=r"Основна тотожність: значення за відомим квадратом", частота=r"2024, 2026",
     формати=r"значення виразу", нмт=r"$2\sin^2x-2$, якщо $\cos^2x=0{,}4$ (2024); $\sin^2\alpha+2\cos^2\alpha$, якщо $\cos^2\alpha=0{,}6$ (2026)",
