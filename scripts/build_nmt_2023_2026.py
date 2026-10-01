@@ -797,6 +797,9 @@ SOURCE_FIXES = [
 FIXES_USED = collections.Counter()
 
 def apply_source_fixes(t):
+    # рядки з самих пробілів -- порожні, кілька порожніх поспіль -- один (так їх і записує збирач): інакше не впізнаються виправлення,
+    # що містять порожні рядки (напр. цілі рисунки TikZ, скопійовані з готового файла теми)
+    t = re.sub(r"\n{3,}", "\n\n", re.sub(r"(?m)^[ \t]+$", "", t))
     for a, b, *only in SOURCE_FIXES:
         if a in t and all(c in t for c in only):     # третій елемент -- виправляти лише в завданні з цим текстом
             t = t.replace(a, b); FIXES_USED[a] += 1
