@@ -16,11 +16,10 @@ import os, re
 
 ШРИФТИ = os.path.expanduser("~/nmt-slides/design-system/project/fonts/")
 
-ПРЕАМБУЛА = r"""
+ОСНОВА = r"""
 % ===================== ТЕМА «ЗІН» (дизайн-система ~/nmt-slides) =====================
 \usetikzlibrary{backgrounds}
 \tcbuselibrary{raster}
-\geometry{left=1.7cm, right=1.7cm, top=2.2cm, bottom=1.8cm, headheight=20pt, headsep=0.5cm, footskip=0.85cm}
 \definecolor{zinPaper}{HTML}{F5F0EC}
 \definecolor{zinSurface}{HTML}{FFFDFB}
 \definecolor{zinSurfaceII}{HTML}{F9F6F2}
@@ -58,6 +57,10 @@ import os, re
 \newcommand{\zinMarker}[1]{\tikz[baseline=(t.base)]{\node[inner sep=0pt](t){#1};\begin{scope}[on background layer]
   \fill[zinMarker] ([xshift=-1.2mm,yshift=-1.3mm]t.base west) rectangle ([xshift=1.2mm,yshift=3.4mm]t.base east);\end{scope}}}
 \newcommand{\zinEyebrow}[1]{{\zinCaps\fontsize{8.5}{10}\selectfont\color{zinMuted}#1}}
+"""
+
+ВАРІАНТ = r"""
+\geometry{left=1.7cm, right=1.7cm, top=2.2cm, bottom=1.8cm, headheight=20pt, headsep=0.5cm, footskip=0.85cm}
 % ---- колонтитули
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
@@ -159,12 +162,20 @@ import os, re
 % ===================== кінець теми «зін» =====================
 """
 
+ПРЕАМБУЛА = ОСНОВА + ВАРІАНТ
+
 ТЕКСТ = {
     "mulish": r"""\setmainfont{Mulish-SemiBold.ttf}[Path=<<fonts>>, Ligatures=TeX, Scale=0.93, BoldFont=Mulish-ExtraBold.ttf,
   ItalicFont=Mulish-SemiBold.ttf, ItalicFeatures={FakeSlant=0.16}, BoldItalicFont=Mulish-ExtraBold.ttf, BoldItalicFeatures={FakeSlant=0.16}]
 \linespread{1.05}""",
     "schoolbook": "% текст -- Schoolbook (як у базі)",
 }
+
+
+def основа(текст="mulish"):
+    """кольори, шрифти й дрібні елементи теми (для інших сторінок у тому ж стилі: довідкові тощо); потребує fontspec, tikz,
+    tcolorbox і mathastext, завантаженого зі Schoolbook ДО цього блоку (тоді формули лишаються Schoolbook)"""
+    return ОСНОВА.replace("<<textfont>>", ТЕКСТ[текст]).replace("<<fonts>>", ШРИФТИ)
 
 
 def застосувати(tex, назва, eyebrow, шапка, заголовок=None, чипи=("22 завдання", "32 бали", "відповіді~-- наприкінці"), текст="mulish"):

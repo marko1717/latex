@@ -11,6 +11,8 @@ OpenAI Images API, scripts/рисунок_api.py, або готова A4 з scri
 
 --дизайн зін -- варіант у темі «зін» (scripts/пробні_нмт/тема_зін.py: картки, мітки, папір, Mulish -- як обкладинка й «Про мене»);
 --текст schoolbook -- у цій темі текст завдань шрифтом бази, а не Mulish.
+--довідкові ДОВІДКОВІ.pdf -- готові довідкові сторінки (scripts/пробні_нмт/довідкові_зін.py) замість сторінок із
+ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf; разом із --про-мене цей PDF не потрібен (можна передати «-»).
 """
 import os, re, sys, json, shutil, tempfile, subprocess, argparse, importlib.util
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -65,6 +67,7 @@ def main():
     ap.add_argument("--сторінки", default="2-5", help="сторінки «Про мене» й довідкових із ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf")
     ap.add_argument("--дизайн", choices=["класичний", "зін"], default="класичний")
     ap.add_argument("--текст", choices=["mulish", "schoolbook"], default="mulish", help="шрифт тексту в темі «зін»")
+    ap.add_argument("--довідкові", default=None, help="готовий PDF довідкових (усі його сторінки)")
     ap.add_argument("--про-мене", dest="про_мене_pdf", default=None,
                     help="окрема сторінка «Про мене» (scripts/пробні_нмт/про_мене.py); тоді з ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf беруться лише довідкові 3--5")
     a = ap.parse_args()
@@ -93,9 +96,12 @@ def main():
     if not ok: raise SystemExit("помилка LaTeX\n" + err)
     print("варіант: рядків за полем", over)
     обкладинка_pdf(a.обкладинка, os.path.join(tmp, "0_обкладинка.pdf"))
-    f, l = ("3", "5") if a.про_мене_pdf and a.сторінки == "2-5" else a.сторінки.split("-")
-    subprocess.run(["pdfseparate", "-f", f, "-l", l, a.про_мене, os.path.join(tmp, "1_стор_%d.pdf")], check=True)
-    сторінки = [os.path.join(tmp, "1_стор_%d.pdf" % i) for i in range(int(f), int(l) + 1)]
+    if a.довідкові:
+        сторінки = [a.довідкові]
+    else:
+        f, l = ("3", "5") if a.про_мене_pdf and a.сторінки == "2-5" else a.сторінки.split("-")
+        subprocess.run(["pdfseparate", "-f", f, "-l", l, a.про_мене, os.path.join(tmp, "1_стор_%d.pdf")], check=True)
+        сторінки = [os.path.join(tmp, "1_стор_%d.pdf" % i) for i in range(int(f), int(l) + 1)]
     if a.про_мене_pdf: сторінки = [a.про_мене_pdf] + сторінки
     subprocess.run(["pdfunite", os.path.join(tmp, "0_обкладинка.pdf")] + сторінки + [pdf, a.вихід], check=True)
     open(os.path.splitext(a.вихід)[0] + ".tex", "w", encoding="utf-8").write(tex)
