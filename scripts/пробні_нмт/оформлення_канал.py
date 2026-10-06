@@ -8,6 +8,9 @@ OpenAI Images API, scripts/рисунок_api.py, або готова A4 з scri
 
 ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf -- PDF, з якого беруться сторінки «Про мене» й довідкових (за замовчуванням 2--5, як в авторському
 варіанті за 4 червня).
+
+--дизайн зін -- варіант у темі «зін» (scripts/пробні_нмт/тема_зін.py: картки, мітки, папір, Mulish -- як обкладинка й «Про мене»);
+--текст schoolbook -- у цій темі текст завдань шрифтом бази, а не Mulish.
 """
 import os, re, sys, json, shutil, tempfile, subprocess, argparse, importlib.util
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -60,6 +63,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("тека"); ap.add_argument("обкладинка"); ap.add_argument("про_мене"); ap.add_argument("вихід")
     ap.add_argument("--сторінки", default="2-5", help="сторінки «Про мене» й довідкових із ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf")
+    ap.add_argument("--дизайн", choices=["класичний", "зін"], default="класичний")
+    ap.add_argument("--текст", choices=["mulish", "schoolbook"], default="mulish", help="шрифт тексту в темі «зін»")
     ap.add_argument("--про-мене", dest="про_мене_pdf", default=None,
                     help="окрема сторінка «Про мене» (scripts/пробні_нмт/про_мене.py); тоді з ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf беруться лише довідкові 3--5")
     a = ap.parse_args()
@@ -74,7 +79,14 @@ def main():
     finally:
         П.V.ІНСТРУКЦІЇ.clear(); П.V.ІНСТРУКЦІЇ.update(стара)
     tex = tex.replace("\\noindent{\\small }\\par\\vspace{0.4cm}\n", "")                 # порожній вступ
-    tex = tex.replace("\\end{document}", сторінка_відповідей(завдання) + "\\end{document}")
+    if a.дизайн == "зін":
+        import тема_зін
+        номер = (re.findall(r"(\d+)$", os.path.basename(тека)) or ["1"])[0]
+        tex = тема_зін.застосувати(tex, НАЗВА, "НМТ · МАТЕМАТИКА · ВАРІАНТ %s" % номер, КОЛОНТИТУЛ.upper(),
+                                   заголовок="Авторський \\zinMarker{варіант НМТ}", текст=a.текст)
+        tex = tex.replace("\\end{document}", тема_зін.сторінка_відповідей(завдання) + "\\end{document}")
+    else:
+        tex = tex.replace("\\end{document}", сторінка_відповідей(завдання) + "\\end{document}")
     tmp = tempfile.mkdtemp(prefix="канал_")
     компілювати(tex, tmp, "канал_оформлення")
     ok, err, pdf, over = компілювати(tex, tmp, "канал_оформлення")
