@@ -56,7 +56,9 @@ def обкладинка_pdf(png, куди):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("тека"); ap.add_argument("обкладинка"); ap.add_argument("про_мене"); ap.add_argument("вихід")
-    ap.add_argument("--сторінки", default="2-5")
+    ap.add_argument("--сторінки", default="2-5", help="сторінки «Про мене» й довідкових із ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf")
+    ap.add_argument("--про-мене", dest="про_мене_pdf", default=None,
+                    help="окрема сторінка «Про мене» (scripts/пробні_нмт/про_мене.py); тоді з ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf беруться лише довідкові 3--5")
     a = ap.parse_args()
     тека = os.path.abspath(a.тека)
     spec = importlib.util.spec_from_file_location("спец_канал", os.path.join(тека, "спец.py"))
@@ -76,9 +78,10 @@ def main():
     if not ok: raise SystemExit("помилка LaTeX\n" + err)
     print("варіант: рядків за полем", over)
     обкладинка_pdf(a.обкладинка, os.path.join(tmp, "0_обкладинка.pdf"))
-    f, l = a.сторінки.split("-")
+    f, l = ("3", "5") if a.про_мене_pdf and a.сторінки == "2-5" else a.сторінки.split("-")
     subprocess.run(["pdfseparate", "-f", f, "-l", l, a.про_мене, os.path.join(tmp, "1_стор_%d.pdf")], check=True)
     сторінки = [os.path.join(tmp, "1_стор_%d.pdf" % i) for i in range(int(f), int(l) + 1)]
+    if a.про_мене_pdf: сторінки = [a.про_мене_pdf] + сторінки
     subprocess.run(["pdfunite", os.path.join(tmp, "0_обкладинка.pdf")] + сторінки + [pdf, a.вихід], check=True)
     open(os.path.splitext(a.вихід)[0] + ".tex", "w", encoding="utf-8").write(tex)
     print("готово:", a.вихід)
