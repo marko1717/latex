@@ -1,0 +1,1617 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Піраміда}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається;
+% п'ять колонок |m{w}| мають 10 відступів \tabcolsep і 6 вертикальних ліній -- тоді таблиця рівно на \linewidth
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-10\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+% варіанти відповіді окремими рядками (довгі вирази не влазять у клітинки таблиці)
+\newcommand{\answerRows}[5]{\par\nopagebreak\vspace{0.15cm}%
+\matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}}
+
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+\setcounter{zad}{0}
+
+\chapterTitle{Піраміда}
+
+\noindent{\small Збірник містить \textbf{48 завдань} НМТ 2023--2026 років про піраміду. Завдання зібрано з теми 39 бази НМТ (серед них є задачі на піраміду в системі координат і задачі, де піраміда поєднана з призмою) і згруповано у дві частини: завдання з вибором однієї відповіді, завдання з короткою відповіддю. Біля кожного завдання вказано рік.\par\vspace{0.15cm}
+Відповіді до всіх завдань~--- на останній сторінці.\par\vspace{0.15cm}
+За роками: \mbox{2023~--- 10}, \mbox{2024~--- 13}, \mbox{2025~--- 15}, \mbox{2026~--- 10}.}\par\vspace{0.45cm}
+
+\typeTitle{Завдання з вибором однієї відповіді}
+
+\begin{samepage}
+% === ЗАВДАННЯ 7 (Формула бічної пов. прав. 4-кутної) ===
+\noindent\zadnum Укажіть формулу для обчислення площі $S$ бічної поверхні правильної чотирикутної піраміди, сторона основи й апофема якої дорівнюють $a$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{$S=\dfrac{a^2}{2}$}{$S=2a^2$}{$S=a^4$}{$S=6a^2$}{$S=4a^2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 8 (Формула повної поверхні 4-кутної) ===
+\noindent\zadnum Укажіть формулу, за якою визначається площа $S$ повної поверхні правильної чотирикутної піраміди, сторона основи якої і апофема дорівнюють $a$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{$S=6a^2$}{$S=3a^2$}{$S=2a^2$}{$S=5a^2$}{$S=a^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 9 (Формула об'єму прав. 4-кутної a і a) ===
+\noindent\zadnum Укажіть формулу для обчислення об’єму $V$ правильної чотирикутної піраміди, сторона основи й висота якої дорівнюють $a$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{$V=\sqrt{5}a^2$}{$V=\dfrac{a^3}{4}$}{$V=\sqrt{3}a^2$}{$V=\dfrac{a^3}{3}$}{$V=a^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 10 (Основа - прямокутний рівнобедрений трикутник) ===
+\noindent\zadnum Основою трикутної піраміди є рівнобедрений прямокутний трикутник із катетом $a$. Укажіть формулу для обчислення об’єму $V$ цієї піраміди, якщо її висота дорівнює катету основи. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{$V=\dfrac{a^3}{2}$}{$V=\dfrac{a^3}{6}$}{$V=\dfrac{a^3}{4}$}{$V=\dfrac{a^3}{3}$}{$V=a^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 11 (Теорія - бічна грань 4-кутної) ===
+\noindent\zadnum Доберіть закінчення речення так, щоб утворилося правильне твердження: «Бічною гранню правильної чотирикутної піраміди є... \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\textbf{А} \quad квадрат».
+
+\nmtnobreak
+\noindent
+\textbf{Б} \quad рівнобедрений трикутник».
+
+\nmtnobreak
+\noindent
+\textbf{В} \quad прямокутний трикутник».
+
+\nmtnobreak
+\noindent
+\textbf{Г} \quad паралелограм».
+
+\nmtnobreak
+\noindent
+\textbf{Д} \quad відрізок».
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 12 (Прямокутник 6x8, H=діагональ) ===
+\noindent\zadnum В основі чотирикутної піраміди лежить прямокутник зі сторонами 6~см та 8~см, а висота піраміди дорівнює діагоналі основи. Знайдіть об’єм піраміди. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTableTall{160 \text{см}$^3$}{240 \text{см}$^3$}{$\dfrac{280}{3}$ \text{см}$^3$}{280 \text{см}$^3$}{480 \text{см}$^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 13 (Ромб сторона 10, діагональ 12, H=сторона) ===
+\noindent\zadnum Основою чотирикутної піраміди є ромб зі стороною 10~см. Менша діагональ ромба дорівнює 12~см. Знайдіть об’єм цієї піраміди, якщо її висота дорівнює стороні основи. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{1200 \text{см}$^3$}{320 \text{см}$^3$}{480 \text{см}$^3$}{640 \text{см}$^3$}{960 \text{см}$^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 14 (Правильна трикутна, S бічна) ===
+\noindent\zadnum Обчисліть площу бічної поверхні правильної трикутної піраміди, сторона основи якої дорівнює 8~см, а апофема на 2~см більша за сторону основи піраміди. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{120 \text{см}$^2$}{384 \text{см}$^2$}{72 \text{см}$^2$}{192 \text{см}$^2$}{240 \text{см}$^2$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 15 (Теорія - 4-кутна піраміда) ===
+\noindent\zadnum Укажіть многогранник, що має одну грань основи та чотири бічні грані. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\textbf{А} \quad трикутна призма
+
+\nmtnobreak
+\noindent
+\textbf{Б} \quad чотирикутна призма
+
+\nmtnobreak
+\noindent
+\textbf{В} \quad п’ятикутна призма
+
+\nmtnobreak
+\noindent
+\textbf{Г} \quad трикутна піраміда
+
+\nmtnobreak
+\noindent
+\textbf{Д} \quad чотирикутна піраміда
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 16 (Елементи піраміди - SA) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено чотирикутну піраміду $SABCD$. Чим є для цієї піраміди відрізок $SA$? \nmtyear{2024}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad ребро основи
+
+\textbf{Б} \quad діагональ основи
+
+\textbf{В} \quad бічне ребро
+
+\textbf{Г} \quad висота
+
+\textbf{Д} \quad апофема
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3,0);
+    \coordinate (C) at (4,1.5);
+    \coordinate (B) at (1,1.5);
+    \coordinate (S) at (2,4);
+
+    \draw[dashed] (S) -- (B);
+    \draw[dashed] (A) -- (B) -- (C);
+
+    \draw[thick] (S) -- (A) -- (D) -- (S) -- (C) -- (D);
+    \draw[thick] (A) -- (D);
+
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[right] at (C) {$C$};
+    \node[left] at (B) {$B$};
+    \node[above] at (S) {$S$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 17 (Трикутна піраміда, площа основи 25) ===
+\noindent\zadnum Площа основи трикутної піраміди дорівнює площі квадрата зі стороною 5~см. Визначте об’єм піраміди, якщо вершина віддалена на 24~см від площини основи. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{200 \text{см}$^3$}{160 \text{см}$^3$}{300 \text{см}$^3$}{480 \text{см}$^3$}{600 \text{см}$^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 18 (Ромб 12 і 20, H=15) ===
+\noindent\zadnum В основі чотирикутної піраміди лежить ромб з діагоналями 12~см і 20~см. Знайдіть об’єм цієї піраміди, якщо її висота дорівнює 15~см. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\answerTable{1600 \text{см}$^3$}{1200 \text{см}$^3$}{600 \text{см}$^3$}{1800 \text{см}$^3$}{800 \text{см}$^3$}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 19 (Виправлено: 3D вигляд) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$, $O$ – центр кола, вписаного у трикутник $ABC$. Укажіть площину, яка \textit{може} проходити через $OB$ та точку $A$. \nmtyear{2024}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad $ASB$
+
+\textbf{Б} \quad $ASC$
+
+\textbf{В} \quad $BSC$
+
+\textbf{Г} \quad $ASO$
+
+\textbf{Д} \quad $ABC$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round, line cap=round,
+    x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}] % Налаштування осей для 3D
+
+    % Координати вершин у просторі (x, y, z)
+    % z - висота
+    \coordinate (S) at (1.5, 1.5, 4);   % Вершина
+    \coordinate (C) at (0, 0, 0);       % Задня точка (початок)
+    \coordinate (A) at (3, 0, 0);       % Ліва передня
+    \coordinate (B) at (1.5, 3.5, 0);   % Права точка
+
+    % Центр O (приблизно в площині z=0)
+    \coordinate (O) at (1.5, 1.2, 0);
+
+    % Невидимі лінії (пунктир)
+    \draw[dashed] (C) -- (A);
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (S) -- (C);
+
+    % Додаткові пунктири для завдання (O, B, A на площині)
+    \draw[dashed, gray] (A) -- (O) -- (B); 
+    \draw[dashed, gray] (C) -- (O);
+
+    % Видимі лінії (суцільні)
+    \draw[thick] (A) -- (B);     % Ребро основи спереду
+    \draw[thick] (S) -- (A);     % Бічне ребро
+    \draw[thick] (S) -- (B);     % Бічне ребро
+     \draw[dashed] (S) -- (O);
+
+    % Точки та підписи
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[above left] at (C) {$C$}; % C ззаду
+    \node[above] at (S) {$S$};
+
+    \fill[black] (O) circle (1.5pt) node[below right, yshift=-2pt] {$O$};
+    \fill[black] (A) circle (1.5pt);
+    \fill[black] (B) circle (1.5pt);
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 21 (Перетин площин SMC і ABS) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Точка $M$ – середина ребра $AB$. Укажіть лінію перетину площин $SMC$ і $ABS$. \nmtyear{2024}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad $SM$
+
+\textbf{Б} \quad $AB$
+
+\textbf{В} \quad $AC$
+
+\textbf{Г} \quad $BC$
+
+\textbf{Д} \quad $CM$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
+    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    % Координати
+    \coordinate (A) at (2, -1, 0);
+    \coordinate (B) at (0, 3, 0);
+    \coordinate (C) at (-1.5, 0, 0);
+    \coordinate (S) at (0, 0, 3.5);
+    \coordinate (M) at ($(A)!0.5!(B)$); % Середина AB
+
+    % Невидимі лінії
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (C) -- (M); % Частина площини SMC
+    \draw[dashed] (S) -- (C);
+
+    % Площина SMC (заливка)
+    \fill[headerblue!20, opacity=0.5] (S) -- (M) -- (C) -- cycle;
+
+    % Видимі лінії
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (C) -- (A);
+    \draw[thick, red!80!black] (S) -- (M); % Шукана лінія
+
+    % Точки
+    \fill (S) circle (1.5pt) node[above] {$S$};
+    \fill (A) circle (1.5pt) node[below left] {$A$};
+    \fill (B) circle (1.5pt) node[right] {$B$};
+    \fill (C) circle (1.5pt) node[left] {$C$};
+    \fill (M) circle (1.5pt) node[below right] {$M$};
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 22 (Пряма в площині SCM) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Точка $M$ – середина ребра $AB$. Укажіть пряму, що лежить у площині $SCM$. \nmtyear{2024}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad $SB$
+
+\textbf{Б} \quad $AM$
+
+\textbf{В} \quad $BC$
+
+\textbf{Г} \quad $SA$
+
+\textbf{Д} \quad $SC$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
+    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    % Координати (ті самі, щоб зберегти стиль)
+    \coordinate (A) at (2, -1, 0);
+    \coordinate (B) at (0, 3, 0);
+    \coordinate (C) at (-1.5, 0, 0);
+    \coordinate (S) at (0, 0, 3.5);
+    \coordinate (M) at ($(A)!0.5!(B)$);
+
+    % Невидимі
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (S) -- (C);
+    \draw[dashed] (C) -- (M);
+
+    % Площина
+    \fill[orange!20, opacity=0.5] (S) -- (M) -- (C) -- cycle;
+
+    % Видимі
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (C) -- (A);
+    \draw[thick] (S) -- (M);
+
+    % Виділимо SC (відповідь)
+    \draw[dashed, thick, blue!80!black] (S) -- (C);
+
+    % Точки
+    \fill (S) circle (1.5pt) node[above] {$S$};
+    \fill (A) circle (1.5pt) node[below left] {$A$};
+    \fill (B) circle (1.5pt) node[right] {$B$};
+    \fill (C) circle (1.5pt) node[left] {$C$};
+    \fill (M) circle (1.5pt) node[below right] {$M$};
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 26 (Теорія - бічна грань шестикутної) ===
+\noindent\zadnum Бічна грань правильної шестикутної піраміди є \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\textbf{А} \quad рівнобедреним трикутником
+
+\nmtnobreak
+\noindent
+\textbf{Б} \quad паралелограмом, що не є прямокутником
+
+\nmtnobreak
+\noindent
+\textbf{В} \quad шестикутником
+
+\nmtnobreak
+\noindent
+\textbf{Г} \quad прямокутним трикутником з гострим кутом $30^\circ$
+
+\nmtnobreak
+\noindent
+\textbf{Д} \quad прямокутником
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 28 (Трикутна піраміда - площини через S) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. Скільки всього різних площин, паралельних площині основи піраміди, можна провести через її вершину $S$? \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одну
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad безліч
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
+    x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    \coordinate (A) at (3, -1, 0);
+    \coordinate (B) at (1, 3, 0);
+    \coordinate (C) at (-2, 0, 0);
+    \coordinate (S) at (0.5, 1, 4);
+
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (C) -- (S); % Видимість C-S залежить від ракурсу, тут зробимо пунктир для задньої грані
+    % Але зазвичай SA, SB, SC - ребра. 
+    % Зробимо простіше: основа ABC, вершина S.
+    % Невидиме ребро зазвичай те, що ззаду (AC або BC).
+    % В даному ракурсі (C зліва ззаду, A спереду, B справа): CB невидиме.
+
+    % Перемалюємо чіткіше для відповідності скріншоту
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (S) -- (C);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (A) -- (C);
+    \draw[dashed] (C) -- (B); 
+
+    % Висота (віртуальна для розуміння)
+    \draw[dashed, gray] (S) -- (0.5, 1, 0); 
+
+    \node[below] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+    \node[above] at (S) {$S$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 31 (Чотирикутна - прямі паралельні AB через S) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено чотирикутну піраміду $SABCD$. Скільки різних прямих, паралельних прямій $AB$, можна провести через точку $S$? \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одна
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad більше трьох
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
+    % Координати (класична проекція)
+    \coordinate (A) at (-2, -1);
+    \coordinate (B) at (1.5, -1);
+    \coordinate (C) at (2.5, 0.8);
+    \coordinate (D) at (-1, 0.8);
+    \coordinate (S) at (0.25, 3.5); % Вершина по центру
+
+    % Невидимі лінії (задні)
+    \draw[dashed] (A) -- (D);
+    \draw[dashed] (D) -- (C);
+    \draw[dashed] (S) -- (D);
+
+    % Видимі лінії
+    \draw[thick] (A) -- (B) -- (C); % Основа перед
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (S) -- (C);
+
+    % Пряма через S паралельна AB (синій пунктир)
+    \draw[thick, dashed, blue!80!black] (-1.5, 3.5) -- (2.0, 3.5);
+
+    % Підписи
+    \node[below left] at (A) {$A$};
+    \node[below right] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (D) {$D$};
+    \node[above] at (S) {$S$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 32 (Трикутна SABC - пара прямих в одній площині) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$, $SO$ – висота піраміди. Укажіть пару прямих, що лежать в одній площині. \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad $SB$ і $AC$
+
+\textbf{Б} \quad $SO$ і $AC$
+
+\textbf{В} \quad $SA$ і $BC$
+
+\textbf{Г} \quad $SO$ і $BC$
+
+\textbf{Д} \quad $SO$ і $SB$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
+    x={(-0.5cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    \coordinate (A) at (3, -1, 0);
+    \coordinate (B) at (1, 3, 0);
+    \coordinate (C) at (-1, -1, 0);
+    \coordinate (O) at (1, 0.5, 0); % Проекція висоти
+    \coordinate (S) at (1, 0.5, 3.5);
+
+    \draw[dashed] (A) -- (B); % Заднє ребро
+    \draw[dashed] (S) -- (O); % Висота
+    \draw[dashed] (A) -- (O); % Допоміжні
+    \draw[dashed] (B) -- (O);
+    \draw[dashed] (C) -- (O);
+
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (S) -- (C);
+    \draw[thick] (A) -- (C);
+    \draw[thick] (C) -- (B);
+
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[below] at (C) {$C$};
+    \node[above] at (S) {$S$};
+    \fill (O) circle (1.5pt) node[below right, font=\footnotesize] {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 33 (Чотирикутна - прямі перпендикулярні SO) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено чотирикутну піраміду $SABCD$. Скільки прямих, перпендикулярних до висоти $SO$, лежать в площині основи $ABCD$? \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одна
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad безліч
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
+    % Координати
+    \coordinate (A) at (-2, -1);
+    \coordinate (B) at (1.5, -1);
+    \coordinate (C) at (2.5, 0.8);
+    \coordinate (D) at (-1, 0.8);
+
+    % Центр перетину діагоналей (середина AC)
+    \coordinate (O) at (0.25, -0.1); 
+    \coordinate (S) at (0.25, 3.2); % Вершина чітко над центром
+
+    % Основа (невидимі сторони)
+    \draw[dashed] (A) -- (D) -- (C);
+    \draw[dashed] (S) -- (D);
+
+    % Основа (видимі сторони)
+    \draw[thick] (A) -- (B) -- (C);
+
+    % Ребра
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (S) -- (C);
+
+    % Діагоналі та висота (внутрішні лінії)
+    \draw[dashed, gray] (A) -- (C);
+    \draw[dashed, gray] (B) -- (D);
+    \draw[dashed, thick] (S) -- (O); % Висота
+
+    % Підписи
+    \node[below left] at (A) {$A$};
+    \node[below right] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[left] at (D) {$D$};
+    \node[above] at (S) {$S$};
+    \node[below, font=\footnotesize, yshift=-2pt] at (O) {$O$};
+
+    % Позначення прямого кута біля висоти
+    \draw (O) -- ++(0, 0.25) -- ++(0.25, 0);
+
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 35 (Піраміда SABC, площини через AM і S) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$. $AM$ – медіана трикутника $ABC$. Скільки всього площин можна провести через пряму $AM$ та точку $S$? \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad жодної
+
+\textbf{Б} \quad лише одну
+
+\textbf{В} \quad лише дві
+
+\textbf{Г} \quad лише три
+
+\textbf{Д} \quad більше як три
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
+    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    \coordinate (A) at (2, -1, 0);
+    \coordinate (B) at (0, 3, 0);
+    \coordinate (C) at (-1.5, 0, 0);
+    \coordinate (S) at (0, 0.5, 4);
+    \coordinate (M) at ($(C)!0.5!(B)$); % Медіана на BC
+
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (S) -- (C); % Задня грань
+    \draw[dashed] (A) -- (M); % Медіана AM
+
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (A) -- (C);
+
+    \node[below left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+    \node[above] at (S) {$S$};
+    \node[right, font=\footnotesize] at (M) {$M$};
+    \fill (M) circle (1.5pt);
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 38 (Піраміда SABC, бічна грань) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+На рисунку зображено трикутну піраміду $SABC$ з основою $ABC$. $SM$ – апофема піраміди. Бічною гранню цієї піраміди є \nmtyear{2025}
+
+\nopagebreak\nbvspace{0.3cm}
+\textbf{А} \quad $SA$
+
+\textbf{Б} \quad $SCM$
+
+\textbf{В} \quad $ABC$
+
+\textbf{Г} \quad $ABS$
+
+\textbf{Д} \quad $SB$
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
+    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+
+    \coordinate (A) at (2, -1, 0);
+    \coordinate (B) at (0, 3, 0);
+    \coordinate (C) at (-1.5, 0, 0);
+    \coordinate (S) at (0, 0.5, 4);
+    \coordinate (M) at ($(A)!0.5!(B)$); % Апофема на AB
+
+    \draw[dashed] (C) -- (B);
+    \draw[dashed] (S) -- (C);
+    \draw[dashed] (C) -- (M); % Для наочності (не обов'язково)
+
+    \draw[thick] (S) -- (A);
+    \draw[thick] (S) -- (B);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (A) -- (C);
+    \draw[thick] (S) -- (M);
+
+    % Прямий кут
+    \draw (M) -- ++(-0.2, 0.1) -- ++(0.1, 0.2); 
+
+    \node[below left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+    \node[above] at (S) {$S$};
+    \node[below right] at (M) {$M$};
+    \fill (M) circle (1.5pt);
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 23.05, завдання №3
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum У чотирикутній піраміді $SABCD$ точка $M$ належить ребру $AB$. По якій прямій перетинаються площини $ABS$ і $MCS$? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \coordinate (A) at (1.6,0);
+    \coordinate (B) at (-0.8,1.0);
+    \coordinate (C) at (1.6,1.0);
+    \coordinate (D) at (3.4,0.3);
+    \coordinate (S) at (1.1,3.2);
+    \coordinate (M) at ($(A)!0.55!(B)$);
+    \draw (A) -- (S) -- (D) -- cycle;
+    \draw (A) -- (D);
+    \draw (S) -- (C);
+    \draw (C) -- (D);
+    \draw[dashed] (B) -- (C);
+    \draw (B) -- (S);
+    \draw (A) -- (B);
+    \fill (M) circle (1.5pt);
+    \node[above] at (S) {$S$};
+    \node[left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below] at (A) {$A$};
+    \node[right] at (D) {$D$};
+    \node[below left] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\answerTable{$MC$}{$AB$}{$SB$}{$BC$}{$SM$}
+% Відповідь: Д
+\ifshowsolutions\solution{Спільними точками площин $ABS$ і $MCS$ є $S$ (вершина) та $M$ (бо $M\in AB\subset ABS$ і $M\in MCS$). Через дві спільні точки площини перетинаються по прямій $SM$. Відповідь: \textbf{Д}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 30.05, завдання №2
+\noindent
+\begin{minipage}[c]{0.60\textwidth}
+\zadnum На рисунку зображено правильну трикутну піраміду $SABC$ з вершиною $S$. Скільки всього апофем можна провести в цій піраміді, якщо у неї $4$ грані? \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.38\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
+    \coordinate (S) at (1.2, 3);
+    \coordinate (A) at (1.5, 0);
+    \coordinate (B) at (3, 1);
+    \coordinate (C) at (0, 1);
+    \draw[thick] (A) -- (B) -- (S) -- cycle;
+    \draw[thick] (S) -- (A);
+    \draw[thick, dashed] (C) -- (B);
+    \draw[thick] (C) -- (A);
+    \draw[thick] (C) -- (S);
+    \node[above] at (S) {$S$};
+    \node[below] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\begin{flushleft}
+\textbf{А} \quad жодної \\[0.1cm]
+\textbf{Б} \quad лише одну \\[0.1cm]
+\textbf{В} \quad лише дві \\[0.1cm]
+\textbf{Г} \quad лише три \\[0.1cm]
+\textbf{Д} \quad більше трьох
+\end{flushleft}
+% Відповідь: Г
+\ifshowsolutions\solution{Апофема~--- це висота бічної грані, проведена з вершини $S$. Правильна трикутна піраміда має $3$ бічні грані, отже $3$ апофеми. Відповідь: \textbf{Г} (лише три).}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №5
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum На рисунку зображено правильну чотирикутну піраміду $SABCD$, $SO$~--- її висота. Скільки всього є прямих, перпендикулярних до $SO$ та які проходять через дві вершини основи піраміди? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.2cm}
+\par\noindent\textbf{А}\ \ лише одна
+\par\noindent\textbf{Б}\ \ дві
+\par\noindent\textbf{В}\ \ чотири
+\par\noindent\textbf{Г}\ \ шість
+\par\noindent\textbf{Д}\ \ більше шести
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.5,1.2);
+    \coordinate (C) at (5,1.2);
+    \coordinate (D) at (3.5,0);
+    \coordinate (O) at (2.5,0.6);
+    \coordinate (S) at (2.5,4.5);
+    \draw (A) -- (D) -- (C) -- (S) -- cycle;
+    \draw (S) -- (D);
+    \draw[dashed] (A) -- (B) -- (C);
+    \draw[dashed] (S) -- (B);
+    \draw[dashed] (A) -- (C);
+    \draw[dashed] (B) -- (D);
+    \draw[dashed] (S) -- (O);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+    \node[above] at (S) {$S$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.3cm}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 11.06, завдання №5
+\zadtask{У якій просторовій фігурі можна провести апофему? \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.1cm}
+\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
+    \item у правильній піраміді
+    \item у конусі
+    \item у циліндрі
+    \item у призмі
+    \item у будь-якій піраміді
+\end{enumerate}
+\nopagebreak\nbvspace{0.1cm}}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №12 --- основна тема: Координати і вектори на площині і в просторі. Рівняння кола
+\zadtask{У прямокутній системі координат у просторі задано піраміду з вершиною $S(-5;\, 12;\, 16)$. Основа цієї піраміди лежить у координатній площині $xy$, точка $K$ є основою висоти цієї піраміди. Знайдіть відстань від точки $K$ до початку координат. \nmtyear{2026}}
+\answerTable{$13$}{$12$}{$5$}{$16$}{$7$}
+% Відповідь: А
+\par\penalty-20
+\end{samepage}
+
+\typeTitle{Завдання з короткою відповіддю}
+
+\begin{samepage}
+% === ЗАВДАННЯ 1 (Діагональний переріз правильної 4-кутної - рівносторонній трикутник 6) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник зі стороною 6. Визначте об’єм $V$ цієї піраміди. У відповіді запишіть значення $\dfrac{V}{\sqrt{3}}$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 2 (Діагональний переріз прямокутний трикутник) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм (у \text{см}$^3$) піраміди, якщо її бічне ребро дорівнює $6\sqrt{2}$~\text{см}. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 3 (Бічна грань правильної трикутної - рівносторонній) ===
+\noindent\zadnum Бічна грань правильної трикутної піраміди є рівностороннім трикутником зі стороною $4\sqrt{6}$~\text{см}. Визначте висоту (у \text{см}) цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 4 (Бічна грань - прямокутний трикутник) ===
+\noindent\zadnum Бічна грань правильної трикутної піраміди є прямокутним трикутником з гіпотенузою 6~\text{см}. Визначте площу (у \text{см}$^2$) бічної поверхні цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 5 (Правильна трикутна сторона 8sqrt3, апофема 8) ===
+\noindent\zadnum Сторона основи правильної трикутної піраміди дорівнює $8\sqrt{3}$, апофема – 8. Визначте об’єм цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 6 (Діагональний переріз площа 72sqrt3) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, площа якого дорівнює $72\sqrt{3}$. Визначте площу основи цієї піраміди. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 23 (Координати - Прямокутний рівнобедрений в основі) ===
+\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
+У прямокутній системі координат у просторі задано трикутну піраміду $SABC$ з вершиною $S(0; 0; 9)$. Основою піраміди є прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$), що лежить у площині $xy$, $A(-8; 10; 0)$, $B(8; -2; 0)$. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\nopagebreak\nbvspace{-0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+    % Осі
+    \draw[-latex, gray] (0,0,0) -- (4,0,0) node[left] {$x$};
+    \draw[-latex, gray] (0,0,0) -- (0,4,0) node[right] {$y$};
+    \draw[-latex, gray] (0,0,0) -- (0,0,5) node[left] {$z$};
+
+    % Точки (схематично для візуалізації умов)
+    \coordinate (S) at (0,0,4); % Масштабовано
+    \coordinate (A) at (2, -2, 0);
+    \coordinate (B) at (-1, 3, 0);
+    \coordinate (C) at (-1, -2, 0); % Прямий кут тут умовно
+
+    \draw[dashed] (A) -- (C) -- (B);
+    \draw[dashed] (S) -- (C);
+
+    \draw[thick] (S) -- (A) -- (B) -- cycle;
+    \draw[thick] (S) -- (B);
+
+    \node[above] at (S) {$S$};
+    \node[right] at (B) {$B$};
+    \node[left] at (A) {$A$};
+    \node[below] at (C) {$C$};
+    \node[left, font=\tiny] at (0,0,0) {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\end{minipage}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 24 (Координати - Правильна чотирикутна, всі ребра рівні) ===
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну піраміду $SABCD$, $A(15; 1; 10)$, $B(-1; 5; 6)$. Усі ребра піраміди рівні. Знайдіть об’єм цієї піраміди. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 25 (Діагональний переріз рівносторонній, H=4sqrt6) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є рівносторонній трикутник, висота піраміди дорівнює $4\sqrt{6}$~см. Визначте площу $S$ (у \text{см}$^2$) бічної поверхні цієї піраміди. У відповіді запишіть значення $\dfrac{S}{\sqrt{7}}$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 27 (Діаг. переріз прямокутний, площа основи 288) ===
+\noindent\zadnum Діагональним перерізом правильної чотирикутної піраміди є прямокутний трикутник. Визначте об’єм цієї піраміди (у \text{см}$^3$), якщо площа її основи дорівнює 288~\text{см}$^2$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 29 (Піраміда і циліндр, Sбіч циліндра 600pi) ===
+\noindent\zadnum Правильна чотирикутна піраміда й циліндр мають рівні висоти. Радіус кола, описаного навколо основи піраміди дорівнює радіусу кола основи циліндра. Площа бічної поверхні циліндра дорівнює $600\pi$~\text{см}$^2$, а площа його основи – $225\pi$~\text{см}$^2$. Знайдіть об’єм піраміди (у \text{см}$^3$). \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 30 (Сфера 648pi і піраміда 45 град) ===
+\noindent\zadnum Задано сферу з площею поверхні $648\pi$~\text{см}$^2$ і правильну чотирикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери. Знайдіть об’єм піраміди (у \text{см}$^3$), якщо її апофема нахилена до площини основи під кутом $45^\circ$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 34 (Піраміда і циліндр 81pi, кут 45) ===
+\noindent\zadnum Задано правильну чотирикутну піраміду й циліндр з площею основи $81\pi$~\text{см}$^2$. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Бічне ребро піраміди утворює з площиною її основи кут $45^\circ$. Обчисліть об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 37 (Сфера 432pi і трикутна піраміда) ===
+\noindent\zadnum Задано сферу з площею поверхні $432\pi$~\text{см}$^2$ і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу сфери, а висота піраміди – діаметру сфери. Визначте об’єм (у \text{см}$^3$) піраміди. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 39 (Конус і трикутна піраміда 25 см) ===
+\noindent\zadnum Твірна конуса і бічне ребро правильної трикутної піраміди дорівнює 25~\text{см}. Апофема піраміди дорівнює радіусу основи конуса. Знайдіть площу бічної поверхні піраміди (у \text{см}$^2$), якщо площа бічної поверхні конуса дорівнює $500\pi$~\text{см}$^2$. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 40 (Конус і трикутна піраміда, медіана 9) ===
+\noindent\zadnum Конус і правильна трикутна піраміда мають рівні висоти. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи конуса. Обчисліть об’єм (у \text{см}$^3$) піраміди, якщо медіана основи піраміди дорівнює 9~\text{см}, а твірна конуса – 12~\text{см}. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.5cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 1.06, завдання №21 --- основна тема: Конус
+\noindent
+\begin{minipage}[c]{0.62\textwidth}
+\zadnum Конус і правильна трикутна піраміда мають \textit{рівні висоти}. Радіус основи конуса дорівнює радіусу кола, \textit{вписаного} в основу піраміди, і дорівнює $4\sqrt{3}$. Площа бічної поверхні піраміди дорівнює $288$. Знайдіть об'єм конуса. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.36\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick, line join=round]
+    \draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.38);
+    \draw[thick] (-1.3,0) arc (180:360:1.3 and 0.38);
+    \coordinate (CV) at (0,3);
+    \draw[thick] (CV) -- (-1.3,0);
+    \draw[thick] (CV) -- (1.3,0);
+    \draw[thick, dashed] (CV) -- (0,0);
+    \draw[<-, >=stealth, gray] (0,0) -- (1.3,0);
+    \node[below, font=\scriptsize] at (0.7,-0.05) {$R$};
+    \coordinate (A) at (3.2,-0.35);
+    \coordinate (B) at (5.6,-0.35);
+    \coordinate (C) at (4.4,0.45);
+    \coordinate (S) at (4.4,3);
+    \draw[thick] (A) -- (B) -- (S) -- cycle;
+    \draw[thick] (A) -- (S);
+    \draw[thick, dashed] (A) -- (C) -- (B);
+    \draw[thick, dashed] (C) -- (S);
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\nmtAnswerBox
+% Відповідь: $64$
+\ifshowsolutions\solution{Для основи піраміди $r=\dfrac{a}{2\sqrt3}=4\sqrt3$, звідки сторона $a=24$. Площа бічної поверхні $S=\dfrac12\cdot 3a\cdot l=288$, тож $l=\dfrac{288}{36}=8$ (апофема). З $l^2=h^2+r^2$: $h^2=64-48=16$, $h=4$. Тоді висота й радіус конуса: $h=4$, $R=4\sqrt3$, а $V=\dfrac13\pi R^2 h=\dfrac13\pi\cdot48\cdot4=64\pi$. Отже $\dfrac{V}{\pi}=64$. Відповідь: \textbf{$64$}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 4.06, завдання №21 --- основна тема: Призма. Паралелепіпед. Куб
+\noindent
+\begin{minipage}[c]{0.58\textwidth}
+\zadnum На рисунку зображено правильну чотирикутну призму та правильну чотирикутну піраміду. Сторона основи піраміди вдвічі менша від діагоналі основи призми. Усі ребра піраміди рівні й дорівнюють $3\sqrt{2}$~см. Знайдіть об'єм (у см$^3$) призми, якщо сума довжин висот призми та піраміди дорівнює $13$~см. \nmtyear{2026}
+\par\nbvspace{0.4cm}
+\nmtAnswerBox
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.65, thick, line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1.8,0);
+    \coordinate (C) at (2.6, 0.7);
+    \coordinate (D) at (0.8, 0.7);
+    \coordinate (A1) at (0,3.8);
+    \coordinate (B1) at (1.8,3.8);
+    \coordinate (C1) at (2.6, 4.5);
+    \coordinate (D1) at (0.8, 4.5);
+    \draw (A) -- (B) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
+    \draw (B) -- (B1) -- (C1);
+    \draw (A1) -- (B1);
+    \draw[dashed] (A) -- (D) -- (C);
+    \draw[dashed] (D) -- (D1);
+    \begin{scope}[shift={(3.8,0)}]
+        \coordinate (P_A) at (0,0);
+        \coordinate (P_B) at (2.2,0);
+        \coordinate (P_C) at (3.2, 0.9);
+        \coordinate (P_D) at (1.0, 0.9);
+        \coordinate (P_S) at (1.6, 4.0);
+        \draw (P_A) -- (P_B) -- (P_C) -- (P_S) -- cycle;
+        \draw (P_B) -- (P_S);
+        \draw[dashed] (P_A) -- (P_D) -- (P_C);
+        \draw[dashed] (P_D) -- (P_S);
+    \end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.3cm}
+% Відповідь: $360$
+\ifshowsolutions\solution{Усі ребра піраміди $=3\sqrt2$, тож сторона її основи $a_p=3\sqrt2$, а діагональ основи $a_p\sqrt2=6$. Висота піраміди $h_2=\sqrt{(3\sqrt2)^2-3^2}=\sqrt{18-9}=3$. Сторона основи піраміди вдвічі менша від діагоналі основи призми, тож діагональ призми $=6\sqrt2$, а її сторона $a=\dfrac{6\sqrt2}{\sqrt2}=6$, площа основи $S=36$. Висота призми $h_1=13-3=10$, об'єм $V=36\cdot10=360$~см$^3$. Відповідь: \textbf{360}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 9.06, завдання №21 --- основна тема: Призма. Паралелепіпед. Куб
+\begin{minipage}[c]{0.50\textwidth}
+\zadnum На рисунку зображено пряму чотирикутну призму й чотирикутну піраміду $SABCD$, основою якої є ромб $ABCD$. Основою призми є прямокутник, більша сторона якого дорівнює $20$~см, а менша сторона дорівнює діагоналі $AC$ ромба. $BD = 20$~см, $SA = SC = 25$~см, $SB = SD = 26$~см. Визначте об'єм (у см$^3$) призми, якщо площа її бічної поверхні дорівнює $680$~см$^2$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % ---- Прямокутна призма (зліва) ----
+    \def\dx{0.85}\def\dy{0.6}
+    \coordinate (F1) at (0,0);
+    \coordinate (F2) at (2.2,0);
+    \coordinate (F3) at (2.2,3.4);
+    \coordinate (F4) at (0,3.4);
+    \coordinate (K1) at (\dx,\dy);
+    \coordinate (K2) at ({2.2+\dx},\dy);
+    \coordinate (K3) at ({2.2+\dx},{3.4+\dy});
+    \coordinate (K4) at (\dx,{3.4+\dy});
+    \draw (F1)--(F2)--(F3)--(F4)--cycle;     % передня грань
+    \draw (F4)--(K4)--(K3)--(F3);            % верхня грань
+    \draw (F2)--(K2)--(K3);                   % права грань
+    \draw[dashed] (F1)--(K1);
+    \draw[dashed] (K1)--(K2);
+    \draw[dashed] (K1)--(K4);
+
+    % ---- Піраміда SABCD (справа) ----
+    \begin{scope}[shift={(4.6,0.2)}]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (3.2,0);
+        \coordinate (B) at (1.1,0.9);
+        \coordinate (C) at (4.3,0.9);
+        \coordinate (S) at (2.15,4.4);
+        \coordinate (O) at (2.15,0.45);
+        \draw (A) -- (D) -- (C) -- (S) -- cycle;
+        \draw (S) -- (D);
+        \draw[dashed] (A) -- (B) -- (C);
+        \draw[dashed] (S) -- (B);
+        \draw[dashed] (A) -- (C);
+        \draw[dashed] (B) -- (D);
+        \draw[dashed] (S) -- (O);
+        \node[below left] at (A) {$A$};
+        \node[below right] at (D) {$D$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[above] at (S) {$S$};
+    \end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 10.06, завдання №21 --- основна тема: Циліндр
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено циліндр і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Висоти циліндра й піраміди рівні. Визначте об'єм (у см$^3$) $V$ піраміди, якщо площа основи циліндра дорівнює площі його бічної поверхні та становить $108\pi$~см$^2$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % циліндр
+    \draw (0,3.6) ellipse (1.4 and 0.4);
+    \draw[dashed] (-1.4,0) arc (180:0:1.4 and 0.4);
+    \draw (-1.4,0) arc (180:360:1.4 and 0.4);
+    \draw (-1.4,0) -- (-1.4,3.6);
+    \draw (1.4,0) -- (1.4,3.6);
+    % піраміда
+    \begin{scope}[shift={(4.4,0)}]
+        \coordinate (P1) at (-1.3,-0.1);
+        \coordinate (P2) at (1.5,0);
+        \coordinate (P3) at (0.4,0.75);
+        \coordinate (T) at (0.2,3.7);
+        \draw (P1) -- (P2) -- (T) -- cycle;
+        \draw[dashed] (P1) -- (P3) -- (P2);
+        \draw[dashed] (P3) -- (T);
+    \end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\nmtAnswerBox
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 19.06, завдання №21 --- також у темі: Конус
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено правильну трикутну піраміду та конус, у якому радіус основи відноситься до висоти як $5 : 12$. Радіус основи конуса дорівнює радіусу кола, уписаного в основу піраміди, а висота піраміди в $\sqrt{3}$ більша за висоту конуса. Визначте об'єм (у см$^3$) піраміди, якщо об'єм конуса дорівнює $800\pi$~см$^3$. \nmtyear{2026}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.42\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+    % правильна трикутна піраміда
+    \coordinate (a) at (0,0);
+    \coordinate (b) at (2.8,0.6);
+    \coordinate (c) at (1.6,1.5);
+    \coordinate (ap) at (1.3,5);
+    \draw (a) -- (b) -- (ap) -- cycle;
+    \draw (a) -- (c) -- (b);
+    \draw[dashed] (a) -- (c);
+    \draw[dashed] (c) -- (ap);
+    % конус
+    \begin{scope}[shift={(4.6,0)}]
+        \draw (0,0.5) ellipse (1.5 and 0.45);
+        \draw[dashed] (-1.5,0.5) -- (0,4.6);
+        \draw (-1.5,0.5) .. controls (-1.5,0.1) and (1.5,0.1) .. (1.5,0.5);
+        \draw (-1.5,0.5) -- (0,4.6) -- (1.5,0.5);
+    \end{scope}
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\nmtAnswerBox
+% Відповідь: $7200$
+\par\penalty-20
+\end{samepage}
+
+\clearpage
+\sectionTitle{Відповіді}
+
+\noindent{\small\color{gray!80!black}Відповіді до завдань цього збірника. Відповіді обчислено й звірено з офіційними ключами там, де вони є.}\par\vspace{0.3cm}
+
+\begin{multicols}{5}\noindent
+\mbox{1~--- Б}\par
+\mbox{2~--- Б}\par
+\mbox{3~--- Г}\par
+\mbox{4~--- Б}\par
+\mbox{5~--- Б}\par
+\mbox{6~--- А}\par
+\mbox{7~--- Б}\par
+\mbox{8~--- А}\par
+\mbox{9~--- Д}\par
+\mbox{10~--- В}\par
+\mbox{11~--- А}\par
+\mbox{12~--- В}\par
+\mbox{13~--- Д}\par
+\mbox{14~--- А}\par
+\mbox{15~--- Д}\par
+\mbox{16~--- А}\par
+\mbox{17~--- Б}\par
+\mbox{18~--- Б}\par
+\mbox{19~--- Д}\par
+\mbox{20~--- Д}\par
+\mbox{21~--- Б}\par
+\mbox{22~--- Г}\par
+\mbox{23~--- Д}\par
+\mbox{24~--- Г}\par
+\mbox{25~--- Г}\par
+\mbox{26~--- А}\par
+\mbox{27~--- А}\par
+\mbox{28~--- 18}\par
+\mbox{29~--- 144}\par
+\mbox{30~--- 8}\par
+\mbox{31~--- 27}\par
+\mbox{32~--- 192}\par
+\mbox{33~--- 144}\par
+\mbox{34~--- 300}\par
+\mbox{35~--- 1152}\par
+\mbox{36~--- 64}\par
+\mbox{37~--- 1152}\par
+\mbox{38~--- 3000}\par
+\mbox{39~--- 972}\par
+\mbox{40~--- 486}\par
+\mbox{41~--- 972}\par
+\mbox{42~--- 900}\par
+\mbox{43~--- 162}\par
+\mbox{44~--- 64}\par
+\mbox{45~--- 360}\par
+\mbox{46~--- 2800}\par
+\mbox{47~--- 243}\par
+\mbox{48~--- 7200}
+\end{multicols}
+
+\end{document}
