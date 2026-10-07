@@ -11,6 +11,8 @@ OpenAI Images API, scripts/рисунок_api.py, або готова A4 з scri
 
 --дизайн зін -- варіант у темі «зін» (scripts/пробні_нмт/тема_зін.py: картки, мітки, папір, Mulish -- як обкладинка й «Про мене»);
 --текст schoolbook -- у цій темі текст завдань шрифтом бази, а не Mulish.
+--дизайн нмт -- «як справжній НМТ» (scripts/пробні_нмт/тема_нмт.py): титулка в рамці з інструкціями (ОБКЛАДИНКА = «-»), довідкові,
+завдання з клітинками для чернетки, «Кінець зошита», бланк відповідей і ключ; «Про мене» -- лише якщо передано --про-мене.
 --довідкові ДОВІДКОВІ.pdf -- готові довідкові сторінки (scripts/пробні_нмт/довідкові_зін.py) замість сторінок із
 ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf; разом із --про-мене цей PDF не потрібен (можна передати «-»).
 """
@@ -46,6 +48,11 @@ def сторінка_відповідей(завдання):
             "\\noindent " + кор + "\\par\n")
 
 
+def сторінок_pdf(path):
+    r = subprocess.run(["pdfinfo", path], capture_output=True, text=True)
+    return int(re.search(r"Pages:\s+(\d+)", r.stdout).group(1))
+
+
 def обкладинка_pdf(png, куди):
     """A4: готовий PDF (обкладинка_зін.py) -- як є; PNG вписано за висотою, по центру, поля кольору країв зображення"""
     if png.lower().endswith(".pdf"):
@@ -65,7 +72,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("тека"); ap.add_argument("обкладинка"); ap.add_argument("про_мене"); ap.add_argument("вихід")
     ap.add_argument("--сторінки", default="2-5", help="сторінки «Про мене» й довідкових із ПРО_МЕНЕ_І_ДОВІДКОВІ.pdf")
-    ap.add_argument("--дизайн", choices=["класичний", "зін"], default="класичний")
+    ap.add_argument("--дизайн", choices=["класичний", "зін", "нмт"], default="класичний")
     ap.add_argument("--текст", choices=["mulish", "schoolbook"], default="mulish", help="шрифт тексту в темі «зін»")
     ap.add_argument("--довідкові", default=None, help="готовий PDF довідкових (усі його сторінки)")
     ap.add_argument("--про-мене", dest="про_мене_pdf", default=None,
@@ -76,33 +83,47 @@ def main():
     m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
     завдання = json.load(open(os.path.join(тека, "завдання.json"), encoding="utf-8"))
     К = dict(m.КОНФІГ, назва=НАЗВА, колонтитул=КОЛОНТИТУЛ, вступ="")
-    стара = dict(П.V.ІНСТРУКЦІЇ); П.V.ІНСТРУКЦІЇ.clear(); П.V.ІНСТРУКЦІЇ.update(ІНСТРУКЦІЇ)
+    if a.дизайн == "нмт":
+        import тема_нмт
+    стара = dict(П.V.ІНСТРУКЦІЇ); П.V.ІНСТРУКЦІЇ.clear()
+    П.V.ІНСТРУКЦІЇ.update(тема_нмт.ІНСТРУКЦІЇ if a.дизайн == "нмт" else ІНСТРУКЦІЇ)
     try:
         tex = П.документ(К, завдання)
     finally:
         П.V.ІНСТРУКЦІЇ.clear(); П.V.ІНСТРУКЦІЇ.update(стара)
     tex = tex.replace("\\noindent{\\small }\\par\\vspace{0.4cm}\n", "")                 # порожній вступ
-    if a.дизайн == "зін":
+    номер = (re.findall(r"(\d+)$", os.path.basename(тека)) or ["1"])[0]
+    # довідкові сторінки: готовий PDF або сторінки авторського PDF
+    tmp = tempfile.mkdtemp(prefix="канал_")
+    if a.довідкові:
+        сторінки = [a.довідкові]
+    else:
+        f, l = ("3", "5") if (a.про_мене_pdf or a.дизайн == "нмт") and a.сторінки == "2-5" else a.сторінки.split("-")
+        subprocess.run(["pdfseparate", "-f", f, "-l", l, a.про_мене, os.path.join(tmp, "1_стор_%d.pdf")], check=True)
+        сторінки = [os.path.join(tmp, "1_стор_%d.pdf" % i) for i in range(int(f), int(l) + 1)]
+    if a.про_мене_pdf: сторінки = [a.про_мене_pdf] + сторінки
+    перед = sum(сторінок_pdf(x) for x in сторінки)                                      # сторінок між обкладинкою й варіантом
+    if a.дизайн == "нмт":
+        tex = тема_нмт.застосувати(tex, НАЗВА, завдання, перша_сторінка=2 + перед)
+        tex = tex.replace("\\end{document}", тема_нмт.бланк(номер) + тема_нмт.ключ(завдання) + "\\end{document}")
+    elif a.дизайн == "зін":
         import тема_зін
-        номер = (re.findall(r"(\d+)$", os.path.basename(тека)) or ["1"])[0]
         tex = тема_зін.застосувати(tex, НАЗВА, "НМТ · МАТЕМАТИКА · ВАРІАНТ %s" % номер, КОЛОНТИТУЛ.upper(),
                                    заголовок="Авторський \\zinMarker{варіант НМТ}", текст=a.текст)
         tex = tex.replace("\\end{document}", тема_зін.сторінка_відповідей(завдання) + "\\end{document}")
     else:
         tex = tex.replace("\\end{document}", сторінка_відповідей(завдання) + "\\end{document}")
-    tmp = tempfile.mkdtemp(prefix="канал_")
     компілювати(tex, tmp, "канал_оформлення")
     ok, err, pdf, over = компілювати(tex, tmp, "канал_оформлення")
     if not ok: raise SystemExit("помилка LaTeX\n" + err)
     print("варіант: рядків за полем", over)
-    обкладинка_pdf(a.обкладинка, os.path.join(tmp, "0_обкладинка.pdf"))
-    if a.довідкові:
-        сторінки = [a.довідкові]
+    if a.дизайн == "нмт" and a.обкладинка == "-":
+        бланк_на = 1 + перед + сторінок_pdf(pdf) - 1                                 # бланк -- передостання сторінка (остання -- ключ)
+        довідкові_з = 2 + (1 if a.про_мене_pdf else 0)
+        тема_нмт.титулка_pdf(os.path.join(tmp, "0_обкладинка.pdf"), номер,
+                             довідкові="%d--%d" % (довідкові_з, 1 + перед), сторінка_бланка=бланк_на)
     else:
-        f, l = ("3", "5") if a.про_мене_pdf and a.сторінки == "2-5" else a.сторінки.split("-")
-        subprocess.run(["pdfseparate", "-f", f, "-l", l, a.про_мене, os.path.join(tmp, "1_стор_%d.pdf")], check=True)
-        сторінки = [os.path.join(tmp, "1_стор_%d.pdf" % i) for i in range(int(f), int(l) + 1)]
-    if a.про_мене_pdf: сторінки = [a.про_мене_pdf] + сторінки
+        обкладинка_pdf(a.обкладинка, os.path.join(tmp, "0_обкладинка.pdf"))
     subprocess.run(["pdfunite", os.path.join(tmp, "0_обкладинка.pdf")] + сторінки + [pdf, a.вихід], check=True)
     open(os.path.splitext(a.вихід)[0] + ".tex", "w", encoding="utf-8").write(tex)
     print("готово:", a.вихід)
