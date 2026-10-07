@@ -12,6 +12,7 @@
     python3 scripts/збірка_тематична.py логарифмічні
     python3 scripts/збірка_тематична.py призма
     python3 scripts/збірка_тематична.py піраміда
+    python3 scripts/збірка_тематична.py призма_піраміда
 """
 import os, re, sys, json, hashlib, unicodedata, collections
 
@@ -83,6 +84,23 @@ CONFIGS = {
         # відповіді -- з каталогу генератора варіантів (перевірені двома розв'язками); три завдання 2024, яких немає в каталозі
         # (дубль задачі з ромбом і дві задачі з координатами), розв'язано окремо: 600 см³ (Г), 300, 1152
         answers="відповіді_піраміда.json",
+        override=[]),
+    # призма й піраміда разом: ті самі відбори; задача з обома тілами (є в темах 38 і 39) друкується один раз -- у призмі
+    "призма_піраміда": dict(
+        title="Призма і піраміда",
+        out="Призма_і_піраміда.tex",
+        src=[("Призма, паралелепіпед, куб: завдання з вибором однієї відповіді", "38. Призма. Паралелепіпед. Куб/завдання.tex",
+              dict(kinds=("single", "?"), file_order=True, drop=["ромба $ABCD$ проведено перпендикуляр"])),
+             ("Призма, паралелепіпед, куб: завдання з короткою відповіддю", "38. Призма. Паралелепіпед. Куб/завдання.tex",
+              dict(kinds=("input",), file_order=True)),
+             ("Піраміда: завдання з вибором однієї відповіді", "39. Піраміда/завдання.tex", dict(kinds=("single", "?"), file_order=True)),
+             ("Піраміда: завдання з короткою відповіддю", "39. Піраміда/завдання.tex", dict(kinds=("input",), file_order=True))],
+        strict_dups=True,
+        detect=r"призм|паралелепіпед|куб(?![іи]чн)|пірамід|тетраедр",
+        about="призму, прямокутний паралелепіпед, куб і піраміду",
+        topics="тем 38 і 39", relevant="призми чи піраміди",
+        src_phrase="з тем 38 і 39 бази НМТ",
+        answers=["відповіді_призма.json", "відповіді_піраміда.json"],
         override=[]),
 }
 
@@ -319,9 +337,12 @@ def task_key(block):
     return norm(t)
 
 def answers():
-    p = os.path.join(ROOT, "scripts", "data", CFG["answers"])
-    if not os.path.exists(p): return {}
-    return json.load(open(p, encoding="utf-8"))
+    """ключ збірника; кілька файлів (збірник із кількох тем) -- об'єднуються"""
+    key = {}
+    for f in ([CFG["answers"]] if isinstance(CFG["answers"], str) else CFG["answers"]):
+        p = os.path.join(ROOT, "scripts", "data", f)
+        if os.path.exists(p): key.update(json.load(open(p, encoding="utf-8")))
+    return key
 
 def carried_macros():
     """макроси, які теми означують після \\begin{document} (matchingLayout тощо)"""
@@ -367,8 +388,11 @@ def main():
             seen.update((k, k2))
             is_conv = b in conv
             b = b.replace("координатою якою", "координатою якої")   # описка в умові джерела
-            if is_conv: out.append(b); nconv += 1
-            else: out.append("\\begin{samepage}\n" + b.strip() + "\n\\end{samepage}\n")
+            # номер завдання стоїть перед minipage з умовою: з тризначним номером 0,55 + 0,40 ширини не вміщаються
+            # (лише в надрукованому тексті -- підпис для ключа рахується від b)
+            друк = re.sub(r"(\\zadnum\s*\\begin\{minipage\}(?:\[[a-z]\])?\{)0\.55(\\textwidth\})", r"\g<1>0.52\2", b)
+            if is_conv: out.append(друк); nconv += 1
+            else: out.append("\\begin{samepage}\n" + друк.strip() + "\n\\end{samepage}\n")
             order.append(b)
         stat.append("%s: %d завдань (з відповідностей %d, відкинуто не за темою %d, повторів %d)" % (
             title.lower(), len(order) - n0, nconv, dropped, dups - dup0))
@@ -377,7 +401,9 @@ def main():
         y = re.search(r"\\nmtyear\{(\d{4})\}", b)
         if y: years[y.group(1)] += 1
     conv_total = sum(1 for b in order if "\\answerRows" in b)
-    parts = ", ".join(re.sub(r":.*", "", x) for x in stat)
+    назви = [e[0].lower() for e in CFG["src"]]
+    # назви частин із комами чи двокрапкою (збірник із кількох тем) -- через крапку з комою
+    parts = ("; " if any("," in t or ":" in t for t in назви) else ", ").join(назви)
     nparts = {1: "одну частину", 2: "дві частини", 3: "три частини", 4: "чотири частини"}.get(len(stat), "%d частин" % len(stat))
     src_phrase = CFG.get("src_phrase") or ("з " + CFG["topics"] + " бази НМТ")
     conv_note = ("Завдання \\textit{на встановлення відповідності} перероблено на тестові: із трьох пунктів залишено той, "
