@@ -195,11 +195,23 @@ def відповіді(КОНФІГ, out):
     return нфк("\n".join(s))
 
 
+ХЕНДЛ = ("\\fancyhead[R]{\\small\\color{mainGreen}\\textbf{\\href{https://t.me/pvtr2525}{@pvtr2525}}}\n"
+         "\\fancyfoot[L]{\\small\\color{gray!80}\\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}\n")
+
+
+def без_хендлу(t):
+    """версія для школи: без водяного знака й без @pvtr2525 у колонтитулах"""
+    assert t.count(ХЕНДЛ) == 1, "колонтитул з хендлом не знайдено"
+    return "% без водяного знака й без хендлу каналу\n\\def\\nmtnowatermark{}\n" + t.replace(ХЕНДЛ, "\\fancyhead[R]{}\n\\fancyfoot[L]{}\n")
+
+
 def записати_pdf(тека, КОНФІГ, out, куди=None):
     """.tex -- у теці «пробні» (один рівень від кореня, як «варіанти»: шляхи до шрифтів і рисунків тем ті самі, Overleaf збирає)"""
     name = КОНФІГ["файл"]
     тека = os.path.dirname(тека)
     tex = {name: документ(КОНФІГ, out), name + "_відповіді": відповіді(КОНФІГ, out)}
+    tex[name + "_без_хендлу"] = без_хендлу(tex[name])
+    tex[name + "_відповіді_без_хендлу"] = без_хендлу(tex[name + "_відповіді"])
     for n, t in tex.items():
         open(os.path.join(тека, n + ".tex"), "w", encoding="utf-8").write(t)
     open(os.path.join(тека, name + "_без_водяного_знака.tex"), "w", encoding="utf-8").write(нфк(
