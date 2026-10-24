@@ -3,7 +3,7 @@
 маркер, Mulish) -- A4 для збирача оформлення_канал.py. Два режими:
 
     python3 scripts/пробні_нмт/обкладинка_зін.py ВИХІД.pdf --постер ПОСТЕР.png
-    python3 scripts/пробні_нмт/обкладинка_зін.py ВИХІД.pdf --ілюстрація ІЛЮСТРАЦІЯ.png [--варіант 1]
+    python3 scripts/пробні_нмт/обкладинка_зін.py ВИХІД.pdf --ілюстрація ІЛЮСТРАЦІЯ.png [--варіант 1] [--чип3 "пройдені теми"]
 
 --постер: цілком згенерований постер (scripts/рисунок_api.py, 1024x1536, з написами) -- картка з рамкою й тінню на папері,
 щоб відмінність пропорцій 2:3 і A4 не давала обрізаних полів.
@@ -73,7 +73,7 @@ import os, shutil, tempfile, subprocess, argparse, statistics
 % ---- чипи
 \node[pill, sh, fill=surface, anchor=west, font=\mXBold\fontsize{14}{16}\selectfont, text=ink] (c1) at (1.8,18.35) {22 завдання};
 \node[pill, sh, fill=surface, anchor=west, font=\mXBold\fontsize{14}{16}\selectfont, text=ink] (c2) at ($(c1.east)+(0.55,0)$) {32 бали};
-\node[pill, sh, fill=surface, anchor=west, font=\mXBold\fontsize{14}{16}\selectfont, text=ink] (c3) at ($(c2.east)+(0.55,0)$) {усі теми};
+\node[pill, sh, fill=surface, anchor=west, font=\mXBold\fontsize{14}{16}\selectfont, text=ink] (c3) at ($(c2.east)+(0.55,0)$) {<<chip3>>};
 
 % ---- ілюстрація на всю ширину (поля -- того ж паперу, що й сторінка)
 \node[anchor=north, inner sep=0] at (10.5,17.35) {\includegraphics[width=22cm]{art.png}};
@@ -101,6 +101,7 @@ def main():
     г = ap.add_mutually_exclusive_group(required=True)
     г.add_argument("--постер"); г.add_argument("--ілюстрація")
     ap.add_argument("--варіант", default="1")
+    ap.add_argument("--чип3", default="усі теми", help="третій чип (режим --ілюстрація): «усі теми» для каналу, «пройдені теми» для класу")
     a = ap.parse_args()
     from PIL import Image
     tmp = tempfile.mkdtemp(prefix="обкладинка_")
@@ -118,7 +119,7 @@ def main():
             тіло = тіло.replace("<<%s>>" % k, "%.3f" % v)
     else:
         кольори["pagebg"] = колір_краю(малюнок)
-        тіло = ІЛЮСТРАЦІЯ.replace("<<variant>>", a.варіант)
+        тіло = ІЛЮСТРАЦІЯ.replace("<<variant>>", a.варіант).replace("<<chip3>>", a.чип3)
     визн = "\n".join(r"\definecolor{%s}{HTML}{%s}" % (k, v.upper()) for k, v in кольори.items())
     tex = ПРЕАМБУЛА.replace("<<fonts>>", ШРИФТИ).replace("<<colors>>", визн) + тіло + КІНЕЦЬ
     open(os.path.join(tmp, "обкладинка.tex"), "w", encoding="utf-8").write(tex)
