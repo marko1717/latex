@@ -793,6 +793,10 @@ SOURCE_FIXES = [
     # НМТ 2026, контейнери для сміття: напис «ПЛАСТИК» довший за наліпку
     (r"\node[rotate=90, text=black, font=\bfseries] at (\x+1, 1.5) {\txt};",
      r"\node[rotate=90, text=black, font=\bfseries\scriptsize] at (\x+1, 1.5) {\txt};", "0/bin1/ПЛАСТИК"),
+    # НМТ 2026, 18.06 №18 (папір у клітинку): точки перенесено неправильно -- усі три площі виходили по 6 см², такого варіанта
+    # немає; в оригіналі (с. 110) K(0;0), L(2;0), M(6;0), A(1;4), B(3;4), C(6;4), зеленим AK, BL, CM, AC, KM -> ключ БАГ
+    ('    \\draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);\n    % точки: верхній ряд A,B,C; нижній ряд K,L,M\n    \\coordinate (A) at (1,3);\n    \\coordinate (B) at (3,3);\n    \\coordinate (C) at (5,3);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (4,0);\n    \\foreach \\p/\\lab/\\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\node[font=\\scriptsize] at (6.5,3.5) {$1$~см$^2$};\n    \\draw[gray!60] (6,3) rectangle (7,4);',
+     '    \\draw[step=1cm, gray!40, thin] (-1.5,-1.5) grid (10.5,5.5);\n    % як в оригіналі (с. 110): висота 4 клітинки, C над M; зеленим -- AK, BL, CM, AC, KM\n    \\coordinate (A) at (1,4);\n    \\coordinate (B) at (3,4);\n    \\coordinate (C) at (6,4);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (6,0);\n    \\draw[thick, green!55!black] (K) -- (A) -- (C) -- (M) -- cycle;\n    \\draw[thick, green!55!black] (L) -- (B);\n    \\foreach \\p/\\lab/\\pos in {A/A/above left, B/B/above, C/C/above, K/K/below left, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\draw[thick] (8,3) rectangle (9,4);\n    \\node[right, font=\\scriptsize] at (9,3.5) {$1$~см$^2$};'),
 ]
 FIXES_USED = collections.Counter()
 
