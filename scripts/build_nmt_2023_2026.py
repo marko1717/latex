@@ -1397,6 +1397,39 @@ def build_master(paths_by_unit):
         fname = "Розділ_%s_%s.tex" % (num, re.sub(r"[ ,]+", "_", name))
         build_collection(fname, "База завдань НМТ 2022--2026 \\textendash{} Розділ %s" % num, t, [(num, name, units)], paths_by_unit)
 
+ПЕРЕМАЛЬОВАНІ = collections.Counter()
+
+
+def перемалювати_за_оригіналом(шляхи):
+    """рисунки, перемальовані за оригіналами НМТ (scripts/data/рисунки_за_оригіналом.json: id завдання, номер рисунка
+    в завданні, tikz), -- у готові файли тем. Ключ -- id завдання (як у каталозі): текст завдань не змінюється, тож id ті
+    самі; рисунки вже написано за правилами дизайн-системи, нормалізатор їх не чіпає."""
+    f = os.path.join(DATA, "рисунки_за_оригіналом.json")
+    if not os.path.exists(f): return []
+    за_id = collections.defaultdict(dict)
+    for r in json.load(open(f, encoding="utf-8")):
+        за_id[r["id"]][int(r.get("рисунок", 0))] = r["tikz"]
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
+    import спільне as SP
+    def блок(m):
+        b = m.group(1); i = SP.підпис(b)
+        if i not in за_id: return m.group(0)
+        k = [-1]
+        def рис(mm):
+            k[0] += 1
+            нове = за_id[i].get(k[0])
+            if нове is None: return mm.group(0)
+            ПЕРЕМАЛЬОВАНІ[(i, k[0])] += 1
+            return нове.strip()
+        return "\\begin{samepage}" + re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", рис, b, flags=re.S) + "\\end{samepage}"
+    for шлях in шляхи:
+        повний = os.path.join(ROOT, шлях)
+        t = open(повний, encoding="utf-8").read()
+        t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
+        if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
+    return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)]]
+
+
 def main():
     by2026 = load_2026()
     log = []; paths_by_unit = {}
@@ -1405,6 +1438,7 @@ def main():
         paths_by_unit[key] = os.path.relpath(p, ROOT)
     build_master(paths_by_unit)
     json.dump(log, open(os.path.join(DATA, "build_log.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    не_застосовано = перемалювати_за_оригіналом(paths_by_unit.values())
     tot = collections.Counter()
     for e in log:
         print(f"[{e['key']:>3}] {e['total']:4d}  {e['counts']}  -> {e['out']}")
@@ -1417,6 +1451,8 @@ def main():
         print("ілюстрація %s: %s" % (it["id"], "вставлено %d раз(и)" % FIXES_USED["ілюстрація " + it["id"]] if FIXES_USED["ілюстрація " + it["id"]] else "! не застосовано"))
     for a, *_ in SOURCE_FIXES:
         if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
+    print("перемальовано за оригіналами: %d рисунків у %d місцях%s" % (len({k for k in ПЕРЕМАЛЬОВАНІ}), sum(ПЕРЕМАЛЬОВАНІ.values()),
+          "" if not не_застосовано else " | ! не застосовано: %s" % не_застосовано))
     print("дизайн-система:", dict(ДИЗАЙН), "| рисунків без виміру розміру:", дизайн_завдань.записати_на_вимір(),
           "(виміряти: python3 scripts/дизайн_завдань.py --виміряти, потім зібрати ще раз)")
 
