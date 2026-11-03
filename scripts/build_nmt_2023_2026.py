@@ -15,6 +15,9 @@
 """
 import re
 import unicodedata, os, sys, json, glob, collections, difflib
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import дизайн_завдань                       # дизайн-система рисунків і виразів (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md)
+ДИЗАЙН = collections.Counter()
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARCH = os.path.join(ROOT, "archive", "старий_формат")
@@ -117,7 +120,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+@@ДИЗАЙН@@\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
@@ -285,6 +288,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
+PREAMBLE = PREAMBLE.replace("@@ДИЗАЙН@@", дизайн_завдань.СТИЛІ.lstrip("\n"))
 
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
@@ -1160,6 +1164,7 @@ def prep_2026(t):
     c = insert_year(c, "2026")
     c = fix_cyr_math(c)
     c = fix_figures_tables(c)
+    c = дизайн_завдань.уніфікувати(c, ДИЗАЙН)
     if count_starts(c) != 1: raise SystemExit(f"2026 {t['id']}: {count_starts(c)} стартів завдання")
     return c
 
@@ -1220,6 +1225,7 @@ def build_unit(key, by2026, log):
         c = apply_illustrations(c)
         c = order_cells_by_comment(c)
         c = fix_figures_tables(c)
+        c = дизайн_завдань.уніфікувати(c, ДИЗАЙН)
         c = re.sub(r"(?<!\\begin\{nmtfit\})\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", c)
         c = re.sub(r"\\end\{tikzpicture\}(?!\\end\{nmtfit\})", r"\\end{tikzpicture}\\end{nmtfit}", c)
         # відомі помилкові рядки старих файлів (некоректний синтаксис TikZ; далі координата задана вручну)
@@ -1411,6 +1417,8 @@ def main():
         print("ілюстрація %s: %s" % (it["id"], "вставлено %d раз(и)" % FIXES_USED["ілюстрація " + it["id"]] if FIXES_USED["ілюстрація " + it["id"]] else "! не застосовано"))
     for a, *_ in SOURCE_FIXES:
         if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
+    print("дизайн-система:", dict(ДИЗАЙН), "| рисунків без виміру розміру:", дизайн_завдань.записати_на_вимір(),
+          "(виміряти: python3 scripts/дизайн_завдань.py --виміряти, потім зібрати ще раз)")
 
 if __name__ == "__main__":
     main()
