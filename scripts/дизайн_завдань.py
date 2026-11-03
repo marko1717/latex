@@ -15,7 +15,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 РОЗМІРИ_JSON = os.path.join(HERE, "data", "дизайн_розміри.json")        # виміряні рисунки: ключ -> {w, h} у см
 НА_ВИМІР_JSON = os.path.join(HERE, "data", "дизайн_на_вимір.json")      # ще не виміряні (пише будівник)
 # розміри (правила, розділ «Розмір рисунка»): окремий рисунок, рисунки-варіанти в таблиці, «смуга» (числова пряма)
-ОКРЕМИЙ_H, ОКРЕМИЙ_W = (3.4, 5.6, 4.0), 8.5           # висота: мін, макс, ціль; ширина: макс
+# як у НМТ 2026: піраміда поруч з умовою ~5 x 5 см, широка трапеція по центру ~9,7 x 3,6 см, клітинка сітки 0,5 см
+ОКРЕМИЙ_H, ОКРЕМИЙ_W = (4.0, 6.0, 4.8), 10.0          # висота: мін, макс, ціль; ширина: макс
+КЛІТИНКА, КЛІТИНКА_ВАРІАНТ = 0.5, 0.3                  # см: клітинка сітки (графік, папір у клітинку)
+ШИРИНА_ТЕКСТУ = 17.4                                   # см: A4, поля 1,8 см (преамбула бази)
 ВАРІАНТ_H, ВАРІАНТ_W = (1.9, 3.0, 2.4), 3.4
 СМУГА_W = (5.5, 10.0, 7.0)
 
@@ -23,7 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 СТИЛІ = r"""
 % ===================== ДИЗАЙН-СИСТЕМА РИСУНКІВ (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md, scripts/дизайн_завдань.py) =====================
 \definecolor{nmtInk}{HTML}{1A1A1A}
-\definecolor{nmtGrid}{HTML}{B8B8B8}
+\definecolor{nmtGrid}{HTML}{3A3A3A}      % сітка, як у НМТ 2026: темна й тонка (0,35 pt), клітинка 0,5 см
 \definecolor{nmtBlue}{HTML}{1F6FB2}\definecolor{nmtGreen}{HTML}{2E8B57}\definecolor{nmtRed}{HTML}{C0392B}
 \definecolor{nmtOrange}{HTML}{D9822B}\definecolor{nmtViolet}{HTML}{7D4CA8}
 \definecolor{nmtFillA}{HTML}{D3E5F5}\definecolor{nmtFillB}{HTML}{D8EDD5}\definecolor{nmtFillC}{HTML}{FBE1C8}
@@ -36,13 +39,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
   every picture/.append style={line join=round, line cap=round},
   nmt dot/.style={circle, fill=nmtInk, draw=none, inner sep=0pt, minimum size=3.6pt},
   nmt open dot/.style={circle, fill=white, draw=nmtInk, line width=0.6pt, inner sep=0pt, minimum size=4.2pt},
-  nmt grid/.style={draw=nmtGrid, line width=0.3pt},
+  nmt grid/.style={draw=nmtGrid, line width=0.35pt},
   nmt curve/.style={line width=1.1pt},
 }
 % вирази: ≤ і ≥ -- похилі, як у НМТ (десяткову кому без пробілу вже дає mathastext)
 \let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
-  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.3pt}}}
+  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
 """
 
@@ -193,6 +196,7 @@ def _статементи(картинка, масштаб, звіт, паліт
 
 
 ШРИФТИ = re.compile(r"\\(tiny|scriptsize|footnotesize)(?![A-Za-z])")
+ШРИФТИ_З_SMALL = re.compile(r"\\(tiny|scriptsize|footnotesize|small)(?![A-Za-z])")
 
 
 try:
@@ -206,7 +210,19 @@ def ключ_рисунка(код):
     return hashlib.sha1(re.sub(r"\s+", "", код).encode("utf-8")).hexdigest()[:16]
 
 
-def множник(w, h, варіант):
+def ширина_місця(до):
+    """ширина (см) minipage, у якій стоїть рисунок (текст до рисунка), або None: ширший рисунок \\begin{nmtfit}
+    зменшить разом з підписами, тож розмір обмежуємо цим місцем"""
+    відкриті = []
+    for m in re.finditer(r"\\begin\{minipage\}(?:\[[^\]]*\])*\{([\d.]+)\\(?:textwidth|linewidth)\}|\\end\{minipage\}", до):
+        if m.group(0).startswith("\\end"):
+            if відкриті: відкриті.pop()
+        else:
+            відкриті.append(float(m.group(1)))
+    return відкриті[-1] * ШИРИНА_ТЕКСТУ - 0.4 if відкриті else None
+
+
+def множник(w, h, варіант, wмісця=None):
     """у скільки разів змінити масштаб рисунка з природним розміром w x h см (1 -- не міняти)"""
     if w <= 0 or h <= 0: return 1.0
     if w / h > 3.5 and not варіант:                     # смуга: числова пряма, ряд точок
@@ -215,8 +231,56 @@ def множник(w, h, варіант):
     else:
         (мін, макс, ціль), wмакс = (ВАРІАНТ_H, ВАРІАНТ_W) if варіант else (ОКРЕМИЙ_H, ОКРЕМИЙ_W)
         k = ціль / h if h < мін else (ціль / h if h > макс else 1.0)
+        if wмісця: wмакс = min(wмакс, wмісця)
         if w * k > wмакс: k = min(k, wмакс / w) if k > 1 else wмакс / w
     return 1.0 if abs(k - 1) < 0.08 else k
+
+
+def крок_сітки(відкриття, тіло):
+    """крок сітки в одиницях рисунка (для правила «клітинка 0,5 см») або None: сітки немає чи одиниця не 1 см (x=, y=)"""
+    if re.search(r"(?<![a-z])(x|y)\s*=", відкриття): return None
+    for m in re.finditer(r"\\draw\s*\[([^\]]*)\][^;]*?\bgrid\b", тіло):
+        крок = re.search(r"(?<![a-z])(?:x?step)\s*=\s*([\d.]+)\s*(cm)?", m.group(1))
+        return float(крок.group(1)) if крок else 1.0
+    if re.search(r"\bgrid\b", тіло): return 1.0
+    return None
+
+
+def множник_клітинки(відкриття, тіло, w, варіант, wмісця=None):
+    """масштаб, за якого клітинка сітки -- 0,5 см (у варіантах 0,3), з обмеженням ширини; None -- правило не діє"""
+    крок = крок_сітки(відкриття, тіло)
+    if not крок: return None
+    k = (КЛІТИНКА_ВАРІАНТ if варіант else КЛІТИНКА) / (крок * _масштаб(відкриття))
+    wмакс = ВАРІАНТ_W if варіант else ОКРЕМИЙ_W
+    if wмісця: wмакс = min(wмакс, wмісця)
+    if w and w * k > wмакс: k = wмакс / w
+    return 1.0 if abs(k - 1) < 0.05 else k
+
+
+ВІДСТУП_КУТА, ВІДСТУП_КУТА_ВАРІАНТ = 0.45, 0.34       # см: від дуги до центру підпису кута (\\normalsize / \\small)
+
+
+def _дов(значення, одиниця):
+    return float(значення) * {"cm": 1, "mm": 0.1, "pt": 0.03515, "": 1, None: 1}[одиниця]
+
+
+def підписи_кутів(тіло, масштаб, варіант):
+    """підпис кута (\\pic[..., "$60^\\circ$"] або pic text) -- не на дузі: центр не ближче за радіус дуги + відступ
+    (радіус дуги масштабується разом з рисунком, підпис -- ні)"""
+    відступ = ВІДСТУП_КУТА_ВАРІАНТ if варіант else ВІДСТУП_КУТА
+    def fix(m):
+        опції = m.group(1)
+        if not ('"' in опції or "pic text" in опції): return m.group(0)
+        r = re.search(r"angle radius\s*=\s*([\d.]+)\s*(cm|mm|pt)?", опції)
+        радіус = (_дов(r.group(1), r.group(2)) if r else 0.5) * масштаб
+        e = re.search(r"angle eccentricity\s*=\s*([\d.]+)", опції)
+        ексц = float(e.group(1)) if e else 0.6
+        треба = 1 + відступ / max(радіус, 0.05)
+        if ексц >= треба: return m.group(0)
+        нове = "angle eccentricity=%.2f" % треба
+        опції = опції[:e.start()] + нове + опції[e.end():] if e else опції + ", " + нове
+        return "\\pic[" + опції + "]"
+    return re.sub(r"\\pic\s*\[((?:[^\[\]]|\[[^\[\]]*\])*)\]", fix, тіло)
 
 
 def _масштабувати(відкриття, k):
@@ -254,13 +318,13 @@ def _рисунок(відкриття, тіло, звіт, варіант=False
     if текст:
         звіт["інфографіка"] += 1
         return відкриття, _статементи(тіло, масштаб, звіт, палітра), None
-    # підписи -- \small (у підписах поділок pgfplots -- \footnotesize, задано стилем)
+    # підписи -- розміру тексту умови, як у НМТ 2026 (\normalsize); у малих рисунках-варіантах -- \small
     тіло = re.sub(r"((?:tick label style|ticklabel style|every tick label/.style)\s*=\s*\{[^{}]*?)font\s*=\s*\\[a-z]+",
                   r"\1font=@@ПОДІЛКИ@@", тіло)
-    підпис = "\\footnotesize" if варіант else "\\small"           # у малих рисунках-варіантах -- \footnotesize
-    тіло, n = ШРИФТИ.subn(lambda m: m.group(0) if m.group(0) == підпис else підпис, тіло); звіт["шрифти"] += n
+    підпис, шрифти = ("\\small", ШРИФТИ) if варіант else ("\\normalsize", ШРИФТИ_З_SMALL)
+    тіло, n = шрифти.subn(lambda m: m.group(0) if m.group(0) == підпис else підпис, тіло); звіт["шрифти"] += n
     тіло = тіло.replace("@@ПОДІЛКИ@@", "\\footnotesize")
-    відкриття, n2 = ШРИФТИ.subn(lambda m: m.group(0) if m.group(0) == підпис else підпис, відкриття); звіт["шрифти"] += n2
+    відкриття, n2 = шрифти.subn(lambda m: m.group(0) if m.group(0) == підпис else підпис, відкриття); звіт["шрифти"] += n2
     # опції самої картинки: наконечники й товщини -- глобальні
     m = re.match(r"(\\begin\{tikzpicture\})\s*\[((?:[^\[\]]|\[[^\[\]]*\])*)\]", відкриття)
     if m:
@@ -304,21 +368,27 @@ def уніфікувати(t, звіт=None):
         частини.append(текст)     # текст завдання не міняємо: від нього залежить id (вирази -- стилями преамбули)
         # рисунки-варіанти: три й більше рисунків у завданні або рисунок у клітинці таблиці
         варіант = len(усі) >= 3 or bool(re.search(r"&\s*(\\begin\{nmtfit\}\s*)?$", текст[-60:]))
-        рисунки.append((len(частини), варіант) + _рисунок(m.group(1), m.group(2), звіт, варіант, кольори_зміст))
+        рисунки.append((len(частини), варіант, ширина_місця(t[:m.start()])) + _рисунок(m.group(1), m.group(2), звіт, варіант, кольори_зміст))
         частини.append(None)
         i = m.end()
     частини.append(t[i:])
     # розмір за виміром; рисунки-варіанти одного завдання -- спільний множник (за медіаною), щоб лишалися однакові
-    виміряні = [РОЗМІРИ[к] for _, в, _, _, к in рисунки if в and к in РОЗМІРИ]
+    виміряні = [РОЗМІРИ[к] for _, в, _, _, _, к in рисунки if в and к in РОЗМІРИ]
     спільний = None
     if виміряні:
         hs = sorted(r["h"] for r in виміряні); ws = sorted(r["w"] for r in виміряні)
         спільний = множник(ws[len(ws) // 2], hs[len(hs) // 2], True)
-    for місце, варіант, відкриття, тіло, ключ in рисунки:
+    for місце, варіант, wмісця, відкриття, тіло, ключ in рисунки:
         if ключ in РОЗМІРИ:
-            k = спільний if варіант and спільний is not None else множник(РОЗМІРИ[ключ]["w"], РОЗМІРИ[ключ]["h"], False)
+            w = РОЗМІРИ[ключ]["w"]
+            k = множник_клітинки(відкриття, тіло, w, варіант, wмісця)     # графік / папір у клітинку
+            if k is None:
+                k = спільний if варіант and спільний is not None else множник(w, РОЗМІРИ[ключ]["h"], False, wмісця)
+                if wмісця and w * k > wмісця: k = wмісця / w
             if k != 1.0:
                 відкриття = _масштабувати(відкриття, k); звіт["розмір"] += 1
+        if ключ is not None:                                  # не інфографіка: підписи кутів -- з відступом від дуги
+            тіло = підписи_кутів(тіло, _масштаб(відкриття), варіант)
         частини[місце] = відкриття + тіло
     return "".join(частини)
 
