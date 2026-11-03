@@ -9,7 +9,8 @@
 """
 import re, os, json, html, subprocess
 
-PDF = os.path.expanduser("~/Desktop/НМТ23-25.pdf")
+# оригінали НМТ 2023--2025: копія на Робочому столі буває вивантажена iCloud -- спершу «Завантаження»
+PDF = next((p for p in map(os.path.expanduser, ["~/Downloads/НМТ23-25.pdf", "~/Desktop/НМТ23-25.pdf"]) if os.path.isfile(p)), os.path.expanduser("~/Downloads/НМТ23-25.pdf"))
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ключі_pdf_2024_2025.json")
 MON = {"травня": "05", "червня": "06"}
 
