@@ -1,0 +1,2333 @@
+\documentclass[12pt]{article}
+\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
+\usepackage{fontspec}
+% --- НАЛАШТУВАННЯ ШРИФТІВ ---
+% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
+% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
+\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
+    Path = #1,
+    BoldFont = Schoolbook-Bold.otf,
+    ItalicFont = Schoolbook-Italic.otf,
+    BoldItalicFont = Schoolbook-BoldItalic.otf
+]}
+\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
+ \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
+  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
+   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
+\usepackage[italic]{mathastext}
+\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
+\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
+
+% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
+\newsavebox{\nmtfitbox}
+\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
+  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
+\let\nmtIncludegraphicsOrig\includegraphics
+\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
+
+
+\definecolor{mainGreen}{RGB}{34, 120, 64}
+\definecolor{yearOrange}{RGB}{220, 100, 30}
+\definecolor{yearcolor}{RGB}{220, 100, 30}
+\definecolor{titleBg}{RGB}{225, 240, 220}
+\definecolor{instrBg}{RGB}{255, 240, 220}
+\definecolor{instrBorder}{RGB}{220, 150, 80}
+\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
+
+\setlength{\parindent}{0pt}
+\emergencystretch=1.5em
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[C]{\small\color{gray!80} Вирази: завдання на відповідність}
+\fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
+\fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
+\fancyfoot[C]{\small\color{gray!80}\thepage}
+\fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
+
+% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається;
+% п'ять колонок |m{w}| мають 10 відступів \tabcolsep і 6 вертикальних ліній -- тоді таблиця рівно на \linewidth
+\newlength{\nmtcellw}
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-10\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\answerTable}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
+\hline
+\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\answerTableTall}[5]{%
+\par\nopagebreak\vspace{0.15cm}
+\noindent\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
+\hline
+\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
+\hline
+\end{tabular}
+\par\vspace{0.25cm}
+}
+\newcommand{\instructionBox}[1]{%
+\par\vspace{0.3cm}
+\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
+    left=8pt, right=8pt, top=4pt, bottom=4pt]
+\centering\small\bfseries #1
+\end{tcolorbox}
+\par\vspace{0.15cm}
+}
+\newcommand{\sectionTitle}[1]{%
+\par\vspace{0.4cm}
+\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
+    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
+\end{tcolorbox}
+\par\vspace{0.3cm}
+}
+\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
+% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
+\newcommand{\nmtAnswerBox}{%
+\par\nopagebreak\vspace{0.2cm}\noindent
+Відповідь:\ \
+\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
+\hline
+\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
+\hline
+\end{tabular}
+\par\vspace{0.3cm}
+}
+% --- СІТКА ДЛЯ МАТЧИНГУ ---
+\newsavebox{\nmtgridbox}
+\newcommand{\matchingGrid}{%
+    \sbox{\nmtgridbox}{\matchingGridRaw}%
+    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
+\newcommand{\matchingGridRaw}{%
+    \begingroup
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{4pt}
+    \footnotesize
+    \begin{tabular}{r|c|c|c|c|c|}
+         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
+         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
+         \textbf{2} & & & & & \\ \cline{2-6}
+         \textbf{3} & & & & & \\ \cline{2-6}
+    \end{tabular}
+    \endgroup
+}
+% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
+\newcommand{\taskBlock}[1]{%
+\par\vspace{0.45cm}
+\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
+\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
+}
+\newcounter{zad}
+\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
+\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
+\newcounter{ans}
+\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
+% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
+\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
+% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
+\newcommand{\solution}[1]{%
+\par\vspace{0.12cm}
+\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
+\footnotesize\textbf{Короткий розв'язок.}\ #1
+\end{tcolorbox}
+\par\vspace{0.12cm}
+}
+% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
+\newif\ifshowsolutions
+\showsolutionsfalse
+% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
+\setcounter{tocdepth}{2}
+\newcommand{\chapterTitle}[1]{%
+\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
+\sectionTitle{#1}}
+\newcommand{\typeTitle}[1]{%
+\needspace{6\baselineskip}%
+\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
+\par\vspace{0.3cm}
+\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
+\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
+\raggedbottom
+% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
+% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
+\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
+\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
+% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
+% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
+\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
+\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
+\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
+\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
+\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
+\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
+
+% варіанти відповіді окремими рядками (довгі вирази не влазять у клітинки таблиці)
+\newcommand{\answerRows}[5]{\par\nopagebreak\vspace{0.15cm}%
+\matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}}
+\graphicspath{{./}{1. Числа. Звичайні та десяткові дроби. Модуль числа/}{26. Тригонометричні вирази/}{28. Показникова функція. Показникові рівняння/Показникові функція і вирази/}{3. Степені. Одночлени. стандартний вигляд числа/}{30. Логарифм. Логарифмічна функція/}{4.Многочлени. ФСМ/}{5. дробові раціональні вирази і перетворення/}{7. Квадратні корені. Корені вищих степенів. Раціональний степінь/}}
+
+\begin{document}
+\begingroup\setcounter{zad}{0}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\definecolor{gold}{RGB}{240, 190, 40}
+\definecolor{silver}{RGB}{170, 170, 175}
+\definecolor{bronze}{RGB}{190, 120, 70}
+\definecolor{hexcol}{RGB}{200,110,60}
+\newcommand{\hexthree}[2]{%
+    \draw[hexcol, line width=1.1pt]
+        ($(#1,#2)+(0:30)$) -- ($(#1,#2)+(60:30)$) -- ($(#1,#2)+(120:30)$) --
+        ($(#1,#2)+(180:30)$) -- ($(#1,#2)+(240:30)$) -- ($(#1,#2)+(300:30)$) -- cycle;
+}
+
+% --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
+\providecommand{\trigStyle}[1]{#1}
+\providecommand{\answerTableSmall}[5]{%
+\begingroup\setlength{\tabcolsep}{2pt}\small\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
+\hline
+\rule[-0.2cm]{0pt}{0.6cm}\textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
+\hline
+\rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
+\hline
+\end{tabular}\endgroup}
+\providecommand{\matchingLayout}[3]{%
+    \noindent
+    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.19\textwidth}
+        \vspace{0pt}
+        \begin{flushright}
+        #3
+        \end{flushright}
+    \end{minipage}}
+\providecommand{\matchingLayoutBottom}[2]{%
+    \noindent
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #1
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
+        #2
+    \end{minipage}
+    \vspace{0.5cm}
+    \noindent
+    \matchingGrid}
+\providecommand{\answerListVertical}[5]{%
+    \par\nopagebreak\vspace{0.2cm}
+    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
+        \item[\textbf{А}] #1
+        \item[\textbf{Б}] #2
+        \item[\textbf{В}] #3
+        \item[\textbf{Г}] #4
+        \item[\textbf{Д}] #5
+    \end{itemize}
+    \vspace{0.2cm}}
+
+\graphicspath{{./}{11. Трикутники/}}
+\setcounter{zad}{0}
+
+\chapterTitle{Вирази: завдання на відповідність}
+
+\noindent{\small Збірник містить \textbf{усі 73 завдань} НМТ 2022--2026 років на встановлення відповідності з бази (вирази). \textbf{Частина~1} (5) -- без тригонометрії, показникових виразів і логарифмів, \textbf{частина~2} (68) -- решта. Усередині частин завдання згруповано за типом; біля кожного вказано рік. Відповіді~--- на останній сторінці.\par\vspace{0.15cm}
+За роками: \mbox{2022~--- 1}, \mbox{2023~--- 20}, \mbox{2024~--- 18}, \mbox{2025~--- 17}, \mbox{2026~--- 17}.}\par\vspace{0.45cm}
+
+\begin{samepage}
+\needspace{0.45\textheight}\sectionTitle{Частина 1. Без тригонометрії, показникових виразів і логарифмів}
+\typeTitle{Значення числового виразу}
+% НМТ 2026, сесія 11.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\left|\dfrac{2}{5} - \dfrac{12}{3}\right|$}
+\matchItem{2}{$\dfrac{\sqrt{24}}{\sqrt{6}}$}
+\matchItem{3}{$5^3 \cdot 0{,}2^4$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$0{,}2$}
+\matchItem{Б}{$2$}
+\matchItem{В}{$3{,}6$}
+\matchItem{Г}{$4$}
+\matchItem{Д}{$5$}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Проміжок, якому належить значення числового виразу}
+% Завдання 8 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $a = -0{,}5$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|a|$}
+\matchItem{2}{$a^3$}
+\matchItem{3}{$\dfrac{1}{a}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; -2)$}
+\matchItem{Б}{$[-2; -1)$}
+\matchItem{В}{$[-1; 0)$}
+\matchItem{Г}{$[0; 1)$}
+\matchItem{Д}{$[1; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Твердження про значення виразу:\\ натуральне, ціле, раціональне, ірраціональне}
+% Завдання 20 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$(\sqrt{3} - 1)^2$}
+\matchItem{2}{$\sqrt[3]{-8^2}$}
+\matchItem{3}{$\dfrac{\sqrt{12}}{\sqrt{3}}$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є ірраціональним додатним числом}
+\matchItem{Б}{є ірраціональним від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є натуральним числом}
+\matchItem{Д}{є цілим від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 39 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із твердженням про його значення \mbox{(А--Д)}, що є правильним для цього виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt[3]{-27}$}
+\matchItem{2}{$\dfrac{\sqrt{12}}{\sqrt{300}}$}
+
+\nmtnobreak
+\matchItem{3}{$(\sqrt{3} - 1)^2 + 2\sqrt{3}$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є цілим від'ємним числом}
+\matchItem{Б}{є ірраціональним додатним числом}
+\matchItem{В}{є ірраціональним від'ємним числом}
+\matchItem{Г}{є натуральним числом}
+\matchItem{Д}{є раціональним нецілим числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Тотожно рівний вираз зі змінною}
+% НМТ 2026, сесія 15.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a \neq 0$, $a \neq 1$. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt{a^2}$}
+\matchItem{2}{$a^3 : a^4$}
+\matchItem{3}{$\dfrac{a^2 - a}{1 - a}$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$a$}
+\matchItem{Б}{$2a$}
+\matchItem{В}{$\dfrac{1}{a}$}
+\matchItem{Г}{$-a$}
+\matchItem{Д}{$|a|$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--Д, 2--В, 3--Г
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\sectionTitle{Частина 2. З тригонометрією, показниковими виразами чи логарифмами}
+\typeTitle{Значення числового виразу}
+% Завдання 21 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{3^{-5}}{3^{-6}}$}
+
+\nmtnobreak
+\matchItem{2}{$\log_2 0{,}1 + \log_2 320$}
+\matchItem{3}{$4\cos^2 30° - 4\sin^2 30°$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$1$}
+\matchItem{Б}{$2$}
+\matchItem{В}{$3$}
+\matchItem{Г}{$4$}
+\matchItem{Д}{$5$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 28 (на відповідність)
+\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\log_3 27$}
+\matchItem{2}{$\mathrm{tg}\,\dfrac{2\pi}{3}$}
+\matchItem{3}{$\dfrac{1}{\sqrt{5} - \sqrt{2}} : (\sqrt{5} + \sqrt{2})$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-3$}
+\matchItem{Б}{$\sqrt{3}$}
+\matchItem{В}{$\dfrac{1}{3}$}
+\matchItem{Г}{$-\sqrt{3}$}
+\matchItem{Д}{$3$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 40 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sin\left(-\dfrac{\pi}{6}\right)$}
+\matchItem{2}{$\pi - |\pi + 2|$}
+\matchItem{3}{$\left(-\dfrac{1}{\sqrt{2}}\right)^2$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-\dfrac{1}{2}$}
+\matchItem{Б}{$\dfrac{1}{2}$}
+\matchItem{В}{$2$}
+\matchItem{Г}{$-2$}
+\matchItem{Д}{$\sqrt{2}$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 35 (на відповідність)
+\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\lg 100$}
+\matchItem{2}{$\sin\dfrac{3\pi}{2}$}
+\matchItem{3}{$(2 + \sqrt{3})(2 - \sqrt{3})$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-1$}
+\matchItem{Б}{$0$}
+\matchItem{В}{$1$}
+\matchItem{Г}{$2$}
+\matchItem{Д}{$10$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{3}{3^{-3}}$}
+
+\nmtnobreak
+\matchItem{2}{$\log_8 \sqrt[3]{2}$}
+\matchItem{3}{$2(\cos 30° - 0{,}5)(\cos 30° + 0{,}5)$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$1$}
+\matchItem{Б}{$\dfrac{1}{9}$}
+\matchItem{В}{$\sqrt{3}$}
+\matchItem{Г}{$3$}
+\matchItem{Д}{$81$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 17.06, завдання №16 --- також у темі: Квадратні корені. Корені вищих степенів. Раціональний степінь, Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} з його значенням \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|-2| \cdot 2^0$}
+\matchItem{2}{$\sqrt[3]{-\dfrac{1}{8}}$}
+\matchItem{3}{$3^{-\log_3 2}$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-2$}
+\matchItem{Б}{$-0{,}5$}
+\matchItem{В}{$0$}
+\matchItem{Г}{$0{,}5$}
+\matchItem{Д}{$2$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--Д, 2--Б, 3--Г
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 5.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\left|\,-6 + \cos 4\pi\,\right|$}
+\matchItem{2}{$\sqrt{2}\cdot\sqrt{18}$}
+\matchItem{3}{$\log_{1/2} 32$}
+}{
+\matchHead{Значення}
+\matchItem{А}{$-6$}
+\matchItem{Б}{$-5$}
+\matchItem{В}{$5$}
+\matchItem{Г}{$6$}
+\matchItem{Д}{$7$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~В, 2~--~Г, 3~--~Б
+\ifshowsolutions\solution{$1$: $|-6+\cos4\pi|=|-6+1|=5$ (В); $2$: $\sqrt{2}\cdot\sqrt{18}=\sqrt{36}=6$ (Г); $3$: $\log_{1/2}32=\log_{1/2}2^5=-5$ (Б). Відповідь: \textbf{1~--~В, 2~--~Г, 3~--~Б}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 19.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Доберіть до числового виразу \mbox{(1--3)} його значення \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Числовий вираз}
+\matchItem{1}{$\dfrac{8}{5} : \dfrac{4}{15}$}
+\matchItem{2}{$\sqrt{2} \cdot \left(\sqrt{2}\right)^3$}
+\matchItem{3}{$\log_{16} 2$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-\dfrac{1}{4}$}
+\matchItem{Б}{$4$}
+\matchItem{В}{$\dfrac{1}{4}$}
+\matchItem{Г}{$6$}
+\matchItem{Д}{$\dfrac{1}{6}$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--Г,\ \ 2--Б,\ \ 3--В
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 16.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та його значенням \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\log_2 \dfrac{1}{16}$}
+\matchItem{2}{$\dfrac{2}{\sqrt{0{,}25}}$}
+\matchItem{3}{$(2^{-1})^2$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-4$}
+\matchItem{Б}{$-\dfrac{1}{4}$}
+\matchItem{В}{$\dfrac{1}{4}$}
+\matchItem{Г}{$2$}
+\matchItem{Д}{$4$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--А; 2--Д; 3--В
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 23.05, завдання №17
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та його значенням \mbox{(А--Д)}. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\left|\dfrac{5}{3} - 2\right|$}
+\matchItem{2}{$3^{-2} \cdot \left(\dfrac{1}{3}\right)^{-3}$}
+\matchItem{3}{$\sqrt{3} \cdot \sin\dfrac{\pi}{3}$}
+}{
+\matchHead{Значення}
+\matchItem{А}{$\dfrac{3}{2}$}
+\matchItem{Б}{$3$}
+\matchItem{В}{$\dfrac{1}{3}$}
+\matchItem{Г}{$-\dfrac{1}{3}$}
+\matchItem{Д}{$\dfrac{1}{2}$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~В, 2~--~Б, 3~--~А
+\ifshowsolutions\solution{$1)\ \left|\dfrac{5}{3}-2\right|=\left|-\dfrac{1}{3}\right|=\dfrac{1}{3}$~(В); $2)\ 3^{-2}\cdot 3^{3}=3^{1}=3$~(Б); $3)\ \sqrt{3}\cdot\sin\dfrac{\pi}{3}=\sqrt{3}\cdot\dfrac{\sqrt{3}}{2}=\dfrac{3}{2}$~(А). Відповідь: \textbf{1--В, 2--Б, 3--А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 10.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)}, де $\pi$~--- відома математична константа, та його значенням \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\cos\left(-\dfrac{\pi}{3}\right)$}
+\matchItem{2}{$\log_\pi \dfrac{1}{\pi}$}
+\matchItem{3}{$|1 - \pi| - |\pi - 1|$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-1$}
+\matchItem{Б}{$-0{,}5$}
+\matchItem{В}{$0$}
+\matchItem{Г}{$0{,}5$}
+\matchItem{Д}{$2\pi$}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Значення виразу за заданого значення змінної}
+% Завдання 17 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та значенням \mbox{(А--Д)} цього виразу, якщо $x = \sqrt{5} - 4$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$x^2 + 8x + 16$}
+\matchItem{2}{$\dfrac{x - 1}{\sqrt{5}}$}
+
+\nmtnobreak
+\matchItem{3}{$\lg x^0$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$5$}
+\matchItem{Б}{$\sqrt{5}$}
+\matchItem{В}{$0$}
+\matchItem{Г}{$1 - \sqrt{5}$}
+\matchItem{Д}{$-5$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 37 (на відповідність)
+\zadtask{Доберіть до виразу \mbox{(1--3)} його значення \mbox{(А--Д)}, якщо $a = \sqrt{2}$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$a^6$}
+\matchItem{2}{$(a - 3)(a + 3)$}
+\matchItem{3}{$81^{\log_3 a}$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-7$}
+\matchItem{Б}{$-1$}
+\matchItem{В}{$4$}
+\matchItem{Г}{$8$}
+\matchItem{Д}{$64$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}, якщо $a = \dfrac{3}{4}$. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|a - 1| - a$}
+\matchItem{2}{$\cos(2\pi a)$}
+\matchItem{3}{$\sqrt{\dfrac{a}{3}}$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$-\dfrac{1}{2}$}
+\matchItem{Б}{$0$}
+\matchItem{В}{$\dfrac{1}{2}$}
+\matchItem{Г}{$\dfrac{2}{3}$}
+\matchItem{Д}{$1$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--А,\ \ 2--Б,\ \ 3--В
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 1.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}, якщо $a = 4$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{2a^2 - 12a}{a^2 - 36}$}
+\matchItem{2}{$0{,}04^{\,\log_5 a}$}
+\matchItem{3}{$a^0 - a^{\frac{3}{2}}$}
+}{
+\matchHead{Значення}
+\matchItem{А}{$\dfrac{1}{16}$}
+\matchItem{Б}{$-8$}
+\matchItem{В}{$-7$}
+\matchItem{Г}{$0{,}8$}
+\matchItem{Д}{$-\dfrac{1}{16}$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~Г, 2~--~А, 3~--~В
+\ifshowsolutions\solution{При $a=4$: \textbf{1)} $\dfrac{2a^2-12a}{a^2-36}=\dfrac{2a(a-6)}{(a-6)(a+6)}=\dfrac{2a}{a+6}=\dfrac{8}{10}=0{,}8$ (Г); \textbf{2)} $0{,}04^{\log_5 4}=(5^{-2})^{\log_5 4}=4^{-2}=\dfrac{1}{16}$ (А); \textbf{3)} $a^0-a^{3/2}=1-8=-7$ (В). Відповідь: \textbf{1\,--\,Г, 2\,--\,А, 3\,--\,В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 30.05, завдання №18 --- також у темі: Логарифмічні вирази
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і його значенням \mbox{(А--Д)}, якщо $a = \dfrac{3}{8}$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt[3]{\dfrac{a}{3}}$}
+\matchItem{2}{$\log_2 a + \log_2 \dfrac{16}{3}$}
+\matchItem{3}{$\sin(4\pi a)$}
+}{
+\matchHead{Значення}
+\matchItem{А}{$2$}
+\matchItem{Б}{$1$}
+\matchItem{В}{$\dfrac{1}{2}$}
+\matchItem{Г}{$0$}
+\matchItem{Д}{$-1$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~В, 2~--~Б, 3~--~Д
+\ifshowsolutions\solution{$a=\dfrac38$. \textbf{1}: $\sqrt[3]{\dfrac{a}{3}}=\sqrt[3]{\dfrac18}=\dfrac12$ (В). \textbf{2}: $\log_2\!\left(a\cdot\dfrac{16}{3}\right)=\log_2 2=1$ (Б). \textbf{3}: $\sin\!\left(4\pi\cdot\dfrac38\right)=\sin\dfrac{3\pi}{2}=-1$ (Д). Відповідь: \textbf{1~--~В, 2~--~Б, 3~--~Д}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 4.06, завдання №16 --- також у темі: Показникова функція і показникові вирази, Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}, якщо $a = \dfrac{2}{3}$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$6a$}
+\matchItem{2}{$\sqrt{\left(2^a\right)^3}$}
+\matchItem{3}{$\log_3 (1 - a)$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$4$}
+\matchItem{Б}{$-1$}
+\matchItem{В}{$1$}
+\matchItem{Г}{$\dfrac{20}{3}$}
+\matchItem{Д}{$2$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~А, 2~--~Д, 3~--~Б
+\ifshowsolutions\solution{При $a=\dfrac{2}{3}$: $6a=4$ (А); $\sqrt{(2^a)^3}=\sqrt{2^{3a}}=\sqrt{2^2}=2$ (Д); $\log_3(1-a)=\log_3\dfrac{1}{3}=-1$ (Б). Відповідь: \textbf{1~--~А, 2~--~Д, 3~--~Б}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Число, задане формулою (золотий перетин $\varphi$, срібний перетин $\delta$)}
+% Завдання 14 (на відповідність - золотий перетин)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, що пов'язано з числами Фібоначі. Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\varphi \cdot \dfrac{\sqrt{5} - 1}{2}$}
+
+\nmtnobreak
+\matchItem{2}{$\log_5(2\varphi - \sqrt{5})$}
+\matchItem{3}{$\varphi - 2$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є натуральним числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є раціональним нецілим числом}
+\matchItem{Д}{є ірраціональним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 48 (на відповідність з срібним перетином)
+\zadtask{Число $\delta = \sqrt{2} + 1$ називають срібним перетином. Узгодьте вираз \mbox{(1--3)} та твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{1}{\delta}$}
+\matchItem{2}{$\log_2(\delta - 1)$}
+\matchItem{3}{$\sqrt{2} - \delta$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є натуральним числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{є раціональним нецілим числом}
+\matchItem{Г}{є ірраціональним додатним числом}
+\matchItem{Д}{є ірраціональним від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 32 (на відповідність - золотий перетин з проміжками)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} та проміжок \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\varphi^0$}
+\matchItem{2}{$(\sqrt{5} - 1)\varphi$}
+\matchItem{3}{$\log_{\frac{1}{5}}(2\varphi - 1)$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; -1]$}
+\matchItem{Б}{$(-1; 0]$}
+\matchItem{В}{$(0; 1]$}
+\matchItem{Г}{$(1; 2]$}
+\matchItem{Д}{$(2; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 25 (на відповідність з числовою прямою - золотий перетин)
+\zadtask{Число $\varphi = \dfrac{\sqrt{5} + 1}{2}$ називають золотим перетином, яке тісно пов'язане з послідовністю чисел Фібоначчі. Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{\sqrt{5} - 1}{2} - \varphi$}
+
+\nmtnobreak
+\matchItem{2}{$(1 - \sqrt{5}) \cdot \varphi$}
+\matchItem{3}{$\log_5(2\varphi - \sqrt{5})$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Проміжок, якому належить значення числового виразу}
+% Завдання 403 (НМТ 2022, демоваріант) --- з тематичного збірника «Числа і вирази»
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить його значення. \nmtyear{2022}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|-1{,}6| + 2$}
+\matchItem{2}{$\dfrac{\sqrt{24}}{\sqrt{3}}$}
+
+\nmtnobreak
+\matchItem{3}{$2\cos\dfrac{\pi}{3}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; 0)$}
+\matchItem{Б}{$[0; 1)$}
+\matchItem{В}{$[1; 2)$}
+\matchItem{Г}{$[2; 3)$}
+\matchItem{Д}{$[3; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 18 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt{(-3)^2}$}
+\matchItem{2}{$\sqrt{3} - 1$}
+\matchItem{3}{$\log_{\frac{1}{3}} \sqrt{3}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-3; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 3]$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 7 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt{2} \cdot \sqrt{18}$}
+\matchItem{2}{$|\sqrt{2} - 2|$}
+\matchItem{3}{$\log_{\sqrt{2}} 0{,}5$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; -2)$}
+\matchItem{Б}{$[-2; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 26 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$(-\sqrt{2})^2$}
+\matchItem{2}{$1 - \sqrt{2}$}
+\matchItem{3}{$\left(\dfrac{1}{3}\right)^{\log_3 \sqrt{2}}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-4; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 5)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №16 --- основна тема: Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\log_{0{,}5} 2$}
+\matchItem{2}{$\sqrt{3^2 + (-2)^2}$}
+\matchItem{3}{$\left| 2 \cdot \dfrac{2}{7} - 2\dfrac{2}{7} \right|$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-2; -1)$}
+\matchItem{Б}{$[-1; 1)$}
+\matchItem{В}{$[1; 2)$}
+\matchItem{Г}{$[2; 3)$}
+\matchItem{Д}{$[3; 4)$}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 9.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{\sqrt{200}}{\sqrt{8}}$}
+\matchItem{2}{$\log_8 200$}
+\matchItem{3}{$8 \cos 120^\circ$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-5; 0)$}
+\matchItem{Б}{$[0; 2)$}
+\matchItem{В}{$[2; 4)$}
+\matchItem{Г}{$[4; 6)$}
+\matchItem{Д}{$[6; +\infty)$}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 2.06, завдання №16 --- також у темі: Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} із проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{7}{5} - \dfrac{5}{3}$}
+\matchItem{2}{$\sqrt{3} \cdot \sqrt{5}$}
+\matchItem{3}{$\log_4 8$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-1;\, 0)$}
+\matchItem{Б}{$[0;\, 1)$}
+\matchItem{В}{$[1;\, 2)$}
+\matchItem{Г}{$[2;\, 4)$}
+\matchItem{Д}{$[4;\, +\infty)$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~А, 2~--~Г, 3~--~В
+\ifshowsolutions\solution{$\dfrac{7}{5}-\dfrac{5}{3}=\dfrac{21-25}{15}=-\dfrac{4}{15}\in[-1;0)$ -- \textbf{А}; $\sqrt{3}\cdot\sqrt{5}=\sqrt{15}\approx3{,}87\in[2;4)$ -- \textbf{Г}; $\log_4 8=\dfrac{3}{2}=1{,}5\in[1;2)$ -- \textbf{В}. Відповідь: \textbf{1--А, 2--Г, 3--В}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Проміжок: вирази з числом $\pi$ або $e$}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу, якщо $e \approx 2{,}7$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+\matchHead{Вираз}
+
+\nmtnobreak
+\matchItem{1}{$\ln e$}
+\matchItem{2}{$e - 4$}
+\matchItem{3}{$e^2$}
+}{
+\matchHead{Проміжок}
+
+\nmtnobreak
+\matchItem{А}{$(-\infty; -2]$}
+\matchItem{Б}{$(-2; 0]$}
+\matchItem{В}{$(0; 2]$}
+\matchItem{Г}{$(2; 6]$}
+\matchItem{Д}{$(6; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 10 (Відповідність) ===
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{$\dfrac{\pi}{2}$}
+\matchItem{2}{\trigStyle{$\sin \pi$}}
+\matchItem{3}{$\log_{\pi} \dfrac{1}{\pi}$}
+}{
+\matchHead{Проміжок}
+    \matchItem{А}{$[-2; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 3)$}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\cos \dfrac{\pi}{2}$}
+\matchItem{2}{$|\pi - 5|$}
+\matchItem{3}{$2^\pi$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; 0]$}
+\matchItem{Б}{$(0; 2)$}
+\matchItem{В}{$[2; 4)$}
+\matchItem{Г}{$[4; 8)$}
+\matchItem{Д}{$[8; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 9 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} і проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\ln \dfrac{1}{e}$}
+\matchItem{2}{$|e - 5|$}
+\matchItem{3}{$e^0$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$(-\infty; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$(2; +\infty)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 9 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\mathrm{tg}\,\dfrac{\pi}{3}$}
+\matchItem{2}{$1 - \pi$}
+\matchItem{3}{$\left(\dfrac{1}{2}\right)^{\log_2 \pi}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-5; -2)$}
+\matchItem{Б}{$[-2; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 5)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та проміжком \mbox{(А--Д)}, якому належить значення цього виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\cos \dfrac{\pi}{3}$}
+\matchItem{2}{$2\pi - 5$}
+\matchItem{3}{$\log_3 \pi - \log_3 (3\pi)$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-4; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 5)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 9 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)}, де $\pi$ --- відома математична константа, та проміжком \mbox{(А--Д)}, якому належить його значення. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\cos \dfrac{\pi}{3}$}
+\matchItem{2}{$\pi - 4$}
+\matchItem{3}{$4^{\log_4 \pi}$}
+}{
+\matchHead{Проміжок}
+\matchItem{А}{$[-2; -1)$}
+\matchItem{Б}{$[-1; 0)$}
+\matchItem{В}{$[0; 1)$}
+\matchItem{Г}{$[1; 2)$}
+\matchItem{Д}{$[2; 4)$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Точка на координатній прямій, координата якої --- значення виразу}
+% Завдання 5 (на відповідність з числовою прямою)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу за $a = 0{,}5$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|a - 2{,}5|$}
+\matchItem{2}{$a^0$}
+\matchItem{3}{$\log_2 a$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 19 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$2\pi \cdot \pi^{-1}$}
+\matchItem{2}{$\mathrm{tg}\,\dfrac{5\pi}{4}$}
+\matchItem{3}{$\log_\pi \dfrac{1}{\pi^2}$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення цього виразу. \nmtyear{2024}
+
+\nmtnobreak
+\begin{center}
+    \begin{nmtfit}\begin{tikzpicture}[scale=1.2]
+        \draw[->, >=stealth, thick] (-2.5,0) -- (2.5,0);
+        \foreach \x/\l in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+            \fill (\x,0) circle (1.5pt) node[above] {$\l$};
+            \node[below] at (\x,0) {$\x$};
+        }
+    \end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\sin^2 \dfrac{\pi}{6} + \cos^2 \dfrac{\pi}{6}$}}
+\matchItem{2}{$\dfrac{\pi^2-4}{\pi-2} - \pi$}
+\matchItem{3}{$\log_3 \pi^0$}
+}{
+\matchHead{Точка}
+    \matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 14 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу, якщо $a = -2$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|a|$}
+\matchItem{2}{$a^0$}
+\matchItem{3}{$\mathrm{tg}\,(\pi a)$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 22 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} з точкою \mbox{(А--Д)} на координатній прямій, координатою якої є значення виразу. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2.414/K, -1/L, 0/M, 1/N, 2.414/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+    }
+    \foreach \x in {-1, 0, 1} \node[below] at (\x,-0.15) {$\x$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\log_{\sqrt{2}} \cos 360°$}
+
+\nmtnobreak
+\matchItem{2}{$\dfrac{1}{\sqrt{2} - 1}$}
+
+\nmtnobreak
+\matchItem{3}{$1 - (\sqrt{2})^2$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 2 (на відповідність з числовою прямою)
+\zadtask{Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
+    \draw[->] (-3,0) -- (3,0);
+    \foreach \x/\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+        \draw (\x,0.1) -- (\x,-0.1);
+        \node[above] at (\x,0.15) {$\name$};
+        \node[below] at (\x,-0.15) {$\x$};
+    }
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$2e \cdot \dfrac{1}{e}$}
+\matchItem{2}{$\ln 1$}
+\matchItem{3}{$(e - 1)(e + 1) - e^2$}
+}{
+\matchHead{Точка}
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} й точку \mbox{(А--Д)} на координатній прямій (див. рисунок), координатою якої є значення виразу, де $e \approx 2{,}7$ -- основа натурального логарифма (число Ейлера). \nmtyear{2025}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+\draw[thick, ->] (-2.8,0) -- (2.8,0);
+\foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+}
+\node[above] at (-2,0.1) {\small $-1$};
+\node[above] at (0,0.1) {\small $0$};
+\node[above] at (2,0.1) {\small $1$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{\textit{Вираз}
+
+\nmtnobreak
+\matchItem{1}{$e \cdot \displaystyle\frac{1}{2e}$}
+\matchItem{2}{$\ln 2e - \ln 2$}
+\matchItem{3}{$|1 - e| - e$}
+}{
+\matchHead{Точка}
+
+\nmtnobreak
+\matchItem{А}{$K$}
+\matchItem{Б}{$L$}
+\matchItem{В}{$M$}
+\matchItem{Г}{$N$}
+\matchItem{Д}{$P$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Твердження про значення виразу:\\ натуральне, ціле, раціональне, ірраціональне}
+\noindent\zadnum Установіть відповідність між виразом (1–3) і множиною (А–Д), якій належить значення цього виразу, якщо $a = 5$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{$\log_{0{,}2} a$}
+\matchItem{2}{$2^{-a}$}
+\matchItem{3}{$\displaystyle\frac{10}{a}$}
+}{
+\matchHead{Множина}
+    \matchItem{А}{ірраціональних додатних чисел}
+\matchItem{Б}{натуральних чисел}
+\matchItem{В}{цілих від'ємних чисел}
+\matchItem{Г}{раціональних нецілих чисел}
+\matchItem{Д}{ірраціональних від'ємних чисел}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 23 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\log_\pi 1$}
+\matchItem{2}{$\sin\left(-\dfrac{\pi}{6}\right)$}
+\matchItem{3}{$\pi^3 \cdot \pi^{-4}$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є нецілим додатним числом}
+\matchItem{Б}{є нецілим від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є цілим додатним числом}
+\matchItem{Д}{є цілим від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 22 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $a = 3$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Значення виразу $a^{-1}$}
+\matchItem{2}{Значення виразу $a^0$}
+\matchItem{3}{Значення виразу $\sin(\pi a)$}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{є раціональним нецілим числом.}
+\matchItem{Б}{є ірраціональним числом.}
+\matchItem{В}{є натуральним числом.}
+\matchItem{Г}{дорівнює нулю.}
+\matchItem{Д}{є цілим від'ємним числом.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 8 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sin \dfrac{7\pi}{2}$}
+\matchItem{2}{$\pi^{\cos 90°}$}
+\matchItem{3}{$\dfrac{\pi}{3}$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є раціональним нецілим числом}
+\matchItem{Б}{є ірраціональним числом}
+\matchItem{В}{дорівнює $0$}
+\matchItem{Г}{є натуральним числом}
+\matchItem{Д}{є цілим від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 11 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним, якщо $e \approx 2{,}7$. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$2e \cdot \dfrac{1}{e}$}
+\matchItem{2}{$(e - 1)(e + 1)$}
+\matchItem{3}{$\ln\left(\sqrt{e} \cdot e^{-\frac{1}{2}}\right)$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є простим числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{дорівнює $0$}
+\matchItem{Г}{є нецілим додатним числом}
+\matchItem{Д}{є нецілим від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 13 (на відповідність)
+\zadtask{Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$(\sqrt{2} + 5)(\sqrt{2} - 5)$}
+\matchItem{2}{$2\log_2 \sqrt{8}$}
+\matchItem{3}{$|1 - \sqrt{2}|$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є цілим додатним числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{дорівнює $0$}
+\matchItem{Г}{є нецілим додатним числом}
+\matchItem{Д}{є нецілим від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Установіть відповідність між виразом \mbox{(1--3)} та твердженням про його значення \mbox{(А--Д)}, яке є правильним. \nmtyear{2024}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{\trigStyle{$\cos 2\pi$}}
+\matchItem{2}{$\log_{\pi} \dfrac{1}{\pi}$}
+\matchItem{3}{$\pi^2 - 9$}
+}{
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є цілим додатним числом}
+\matchItem{Б}{є цілим від'ємним числом}
+\matchItem{В}{дорівнює 0}
+\matchItem{Г}{є нецілим додатним числом}
+\matchItem{Д}{є нецілим від'ємним числом}
+}{
+    \matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 27 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу, де $e \approx 2{,}7$ --- основа натурального логарифма (число Ейлера). \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\ln\dfrac{1}{e}$}
+\matchItem{2}{$e + 1$}
+\matchItem{3}{$(e - 1)^2 - e^2 + 2e$}
+}{
+\matchHead{Твердження про значення виразу}
+\matchItem{А}{є додатним цілим числом}
+\matchItem{Б}{є від'ємним цілим числом}
+\matchItem{В}{є додатним нецілим числом}
+\matchItem{Г}{є від'ємним нецілим числом}
+\matchItem{Д}{дорівнює 0}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} і твердження про його значення \mbox{(А--Д)}, яке є правильним для цього виразу. \nmtyear{2025}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+    \matchItem{1}{$(3\pi - 1)^0$}
+\matchItem{2}{$\log_{\pi} \dfrac{1}{\pi^3}$}
+\matchItem{3}{\trigStyle{$\operatorname{tg} \dfrac{\pi}{3}$}}
+}{
+\matchHead{Твердження про значення виразу}
+    \matchItem{А}{є натуральним числом}
+\matchItem{Б}{є цілим недодатним числом}
+\matchItem{В}{є раціональним нецілим числом}
+\matchItem{Г}{є ірраціональним додатним числом}
+\matchItem{Д}{є ірраціональним від'ємним числом}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Тотожно рівний вираз зі змінною}
+% Завдання 17 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq \sqrt{2}$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{a^2 - 2a\sqrt{2} + (\sqrt{2})^2}{a - \sqrt{2}}$}
+
+\nmtnobreak
+\matchItem{2}{$\dfrac{a^2 - 2}{a - \sqrt{2}}$}
+
+\nmtnobreak
+\matchItem{3}{$\log_b b^a + 3$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$a + \sqrt{2}$}
+\matchItem{Б}{$1$}
+\matchItem{В}{$a + 3$}
+\matchItem{Г}{$a + 3b$}
+\matchItem{Д}{$a - \sqrt{2}$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 1 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a \neq 8$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{64 - a^2}{8 - a}$}
+\matchItem{2}{$2^{3a}$}
+\matchItem{3}{$\log_{\sqrt[8]{2}} 2^a$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$8^a$}
+\matchItem{Б}{$8 + a$}
+\matchItem{В}{$8a$}
+\matchItem{Г}{$8 - a$}
+\matchItem{Д}{$\dfrac{a}{8}$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}, якщо $a > 0$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt{4a}$}
+\matchItem{2}{$2^{\log_4 a}$}
+\matchItem{3}{$\left(\dfrac{2}{a}\right)^{-1}$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$-\dfrac{2}{a}$}
+\matchItem{Б}{$2a$}
+\matchItem{В}{$2\sqrt{a}$}
+\matchItem{Г}{$\sqrt{a}$}
+\matchItem{Д}{$\dfrac{a}{2}$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 3.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\noindent\zadnum Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}, якщо $a \neq 0$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\sqrt[3]{\dfrac{27}{a^3}}$}
+\matchItem{2}{$a^{-2}\cdot a^3 \cdot \log_{27} 3$}
+\matchItem{3}{$\dfrac{(a-3)^2 - a^2 - 9}{2}$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$-3a$}
+\matchItem{Б}{$\dfrac{3}{a}$}
+\matchItem{В}{$0$}
+\matchItem{Г}{$\dfrac{a}{3}$}
+\matchItem{Д}{$3a$}
+}{
+\matchingGrid
+}
+% Відповідь: 1~--~Б, 2~--~Г, 3~--~А
+\ifshowsolutions\solution{\textbf{1}: $\sqrt[3]{\dfrac{27}{a^3}} = \dfrac{3}{a}$~--- Б. \textbf{2}: $a^{-2}\cdot a^3\cdot\log_{27}3 = a\cdot\dfrac13 = \dfrac{a}{3}$~--- Г. \textbf{3}: $\dfrac{(a-3)^2 - a^2 - 9}{2} = \dfrac{-6a}{2} = -3a$~--- А. Відповідь: \textbf{1~--~Б, 2~--~Г, 3~--~А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 12.06, завдання №16 --- також у темі: Многочлени. Формули скороченого множення, Логарифмічні вирази
+\zadtask{Узгодьте вираз \mbox{(1--3)} з тотожно рівним йому виразом \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Числовий вираз}
+\matchItem{1}{$\dfrac{1}{n} : \dfrac{1}{2}$}
+\matchItem{2}{$10n^2 - 2n(5n - 1)$}
+\matchItem{3}{$\log_{25} 5^n$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$-2n$}
+\matchItem{Б}{$\dfrac{2}{n}$}
+\matchItem{В}{$\dfrac{n}{2}$}
+\matchItem{Г}{$2n$}
+\matchItem{Д}{$2n^2$}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Числовий вираз, рівний даному: ірраціональність у знаменнику, модуль}
+% Завдання 10 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$|1 - \sqrt{5}| - \sqrt{5} + 1$}
+\matchItem{2}{$\dfrac{2\sqrt{5} - 10}{\sqrt{5}}$}
+
+\nmtnobreak
+\matchItem{3}{$\log_{\sqrt{5}} 5$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$\sqrt{5}$}
+\matchItem{Б}{$0$}
+\matchItem{В}{$2 - 2\sqrt{5}$}
+\matchItem{Г}{$2$}
+\matchItem{Д}{$-8$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 20 (на відповідність)
+\zadtask{До кожного виразу \mbox{(1--3)} доберіть тотожно рівний йому вираз \mbox{(А--Д)}. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{1}{\sqrt{10} - 3}$}
+
+\nmtnobreak
+\matchItem{2}{$|3 - \sqrt{10}|$}
+\matchItem{3}{$\log_5 125$}
+}{
+\matchHead{Тотожно рівний вираз}
+\matchItem{А}{$\sqrt{10} - 3$}
+\matchItem{Б}{$3 - \sqrt{10}$}
+\matchItem{В}{$\sqrt{10} + 3$}
+\matchItem{Г}{$3$}
+\matchItem{Д}{$25$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Початок речення: вираз $a$ через $n$}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{Якщо $\displaystyle\frac{n}{a} = 3$, то}
+\matchItem{2}{Якщо $1 + \log_3 n = \log_3 a$, то}
+\matchItem{3}{Якщо $3^n \cdot 3 = 3^a$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = 3n$.}
+\matchItem{Б}{$a = n + 1$.}
+\matchItem{В}{$a = n + 3$.}
+\matchItem{Г}{$a = \displaystyle\frac{3}{n}$.}
+\matchItem{Д}{$a = \displaystyle\frac{n}{3}$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 3 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n > 0$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Якщо $|-n| = a$, то}
+\matchItem{2}{Якщо $(n - 2)(n + 1) - n^2 = a$, то}
+\matchItem{3}{Якщо $2^{-\lg n} = 2^{\lg a}$, то}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$a = -n - 2$.}
+\matchItem{Б}{$a = \dfrac{1}{n}$.}
+\matchItem{В}{$a = n$.}
+\matchItem{Г}{$a = -2$.}
+\matchItem{Д}{$a = -n$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m$ і $n$ -- натуральне число, $n > 1$, $m > 1$. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\matchingLayout{
+\matchHead{Початок речення}
+
+\nmtnobreak
+\matchItem{1}{Якщо $n^{\log_n m} = a$, то}
+\matchItem{2}{Якщо $\displaystyle\frac{mn^2 - nm^2}{n - m} = a$, то}
+\matchItem{3}{Якщо $n\cos^2 m + n\sin^2 m = a$, то}
+}{
+\matchHead{Закінчення речення}
+
+\nmtnobreak
+\matchItem{А}{$a = m + n$.}
+\matchItem{Б}{$a = m$.}
+\matchItem{В}{$a = m - n$.}
+\matchItem{Г}{$a = mn$.}
+\matchItem{Д}{$a = n$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 7 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m$ і $n$ --- натуральні числа, $n > 1$, $m > 1$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Якщо $n \sin m\pi = a$, то}
+\matchItem{2}{Якщо $\dfrac{2^m}{2^n} = 2^a$, то}
+\matchItem{3}{Якщо $\sqrt[n]{\sqrt[m]{2}} = \sqrt[a]{2}$, то}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$a = mn$.}
+\matchItem{Б}{$a = 0$.}
+\matchItem{В}{$a = m - n$.}
+\matchItem{Г}{$a = n$.}
+\matchItem{Д}{$a = \dfrac{m}{n}$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\noindent\zadnum До кожного початку речення (1–3) доберіть його закінчення (А–Д) так, щоб утворилося правильне твердження. \nmtyear{2023}\par
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{Якщо $3^m \cdot 9^n = 3^a$, то}
+\matchItem{2}{Якщо $(m + n)^2 - m^2 - n^2 = a$, то}
+\matchItem{3}{Якщо $\log_3 27^{mn} = a$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = 0$.}
+\matchItem{Б}{$a = 27^{mn}$.}
+\matchItem{В}{$a = 3mn$.}
+\matchItem{Г}{$a = 2mn$.}
+\matchItem{Д}{$a = m + 2n$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 4 (на відповідність)
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n$ --- натуральне число, $n > 1$. \nmtyear{2023}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Якщо $n \cos 8\pi = a$, то}
+\matchItem{2}{Якщо $\log_2 8 + \log_2 n = \log_2 a$, то}
+\matchItem{3}{Якщо $\sqrt{\sqrt[n]{8}} = \sqrt[a]{8}$, то}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$a = 2n$.}
+\matchItem{Б}{$a = 8n$.}
+\matchItem{В}{$a = 8 + n$.}
+\matchItem{Г}{$a = n$.}
+\matchItem{Д}{$a = 3n$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% === ЗАВДАННЯ 6 (Відповідність) ===
+\noindent\zadnum До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n$ -- натуральне число, $n>1$. \nmtyear{2023}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+
+\nmtnobreak
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+    \matchItem{1}{\trigStyle{Якщо $n \cos 8\pi = a$, то}}
+\matchItem{2}{Якщо $\log_2 8 + \log_2 n = \log_2 a$, то}
+\matchItem{3}{Якщо $\sqrt[n]{\sqrt[3]{8}} = \sqrt[a]{8}$, то}
+}{
+\matchHead{Закінчення речення}
+    \matchItem{А}{$a = 2n$.}
+\matchItem{Б}{$a = 8n$.}
+\matchItem{В}{$a = 8 + n$.}
+\matchItem{Г}{$a = n$.}
+\matchItem{Д}{$a = 3n$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 38 (на відповідність)
+\zadtask{Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $n \neq 0$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Якщо $(m + 1)^2 - 1 = n$, то}
+\matchItem{2}{Якщо $\sqrt{2^m} = 2^n$, то}
+\matchItem{3}{Якщо $\log_{2^n} 4^m = 1$, то}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$n = 2m$.}
+\matchItem{Б}{$n = m^2$.}
+\matchItem{В}{$n = m^2 + 2m$.}
+\matchItem{Г}{$n = \sqrt{m}$.}
+\matchItem{Д}{$n = \dfrac{m}{2}$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+% Завдання 51 (на відповідність)
+\zadtask{Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження, якщо $m > 0$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Якщо $m \cos x \cdot \mathrm{tg}\, x = 2n \sin x$, то}
+\matchItem{2}{Якщо $\sqrt{2m^2} = n$, то}
+\matchItem{3}{Якщо $4^{\log_2 m} = n$, то}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$n = 2m$.}
+\matchItem{Б}{$n = m^2$.}
+\matchItem{В}{$n = 2^m$.}
+\matchItem{Г}{$n = m\sqrt{2}$.}
+\matchItem{Д}{$n = \dfrac{m}{2}$.}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\begin{samepage}
+\needspace{0.45\textheight}\typeTitle{Значення змінної, за якого вираз дорівнює $1$}
+% Завдання 7 (на відповідність)
+\zadtask{Узгодьте вираз \mbox{(1--3)} із значенням $m$ \mbox{(А--Д)}, за якого значення цього виразу дорівнює $1$. \nmtyear{2025}}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$\dfrac{m}{4}$}
+\matchItem{2}{$4^6 : 4^{-m}$}
+\matchItem{3}{$\log_{16} 2 + \log_{16} m$}
+}{
+\matchHead{Значення $m$}
+\matchItem{А}{$\dfrac{1}{4}$}
+\matchItem{Б}{$6$}
+\matchItem{В}{$4$}
+\matchItem{Г}{$-6$}
+\matchItem{Д}{$8$}
+}{
+\matchingGrid
+}
+\par\penalty-20\vspace{0.25cm}
+\end{samepage}
+
+\clearpage
+\sectionTitle{Відповіді}
+
+\noindent{\small\color{gray!80!black}Для кожного завдання -- літери відповідей для пунктів 1, 2, 3. Відповіді обчислено й звірено з офіційними ключами там, де вони є.}\par\vspace{0.3cm}
+
+\noindent\textbf{Частина 1}\par\vspace{0.1cm}
+
+\begin{multicols}{5}\noindent
+\mbox{1~--- ВБА}\par
+\mbox{2~--- ГВБ}\par
+\mbox{3~--- АДГ}\par
+\mbox{4~--- АДГ}\par
+\mbox{5~--- ДВГ}
+\end{multicols}\par\vspace{0.2cm}
+
+\noindent\textbf{Частина 2}\par\vspace{0.1cm}
+
+\begin{multicols}{5}\noindent
+\mbox{6~--- ВДБ}\par
+\mbox{7~--- ДГВ}\par
+\mbox{8~--- АГБ}\par
+\mbox{9~--- ГАВ}\par
+\mbox{10~--- ДБА}\par
+\mbox{11~--- ДБГ}\par
+\mbox{12~--- ВГБ}\par
+\mbox{13~--- ГБВ}\par
+\mbox{14~--- АДВ}\par
+\mbox{15~--- ВБА}\par
+\mbox{16~--- ГАВ}\par
+\mbox{17~--- АГВ}\par
+\mbox{18~--- ГАВ}\par
+\mbox{19~--- АБВ}\par
+\mbox{20~--- ГАВ}\par
+\mbox{21~--- ВБД}\par
+\mbox{22~--- АДБ}\par
+\mbox{23~--- АВД}\par
+\mbox{24~--- ГВБ}\par
+\mbox{25~--- ВГБ}\par
+\mbox{26~--- БАВ}\par
+\mbox{27~--- ДГВ}\par
+\mbox{28~--- ДВБ}\par
+\mbox{29~--- ДВБ}\par
+\mbox{30~--- ДБВ}\par
+\mbox{31~--- БДВ}\par
+\mbox{32~--- ГВА}\par
+\mbox{33~--- АГВ}\par
+\mbox{34~--- ВБД}\par
+\mbox{35~--- ГВБ}\par
+\mbox{36~--- АБД}\par
+\mbox{37~--- БДГ}\par
+\mbox{38~--- ГАВ}\par
+\mbox{39~--- ВГБ}\par
+\mbox{40~--- ВБД}\par
+\mbox{41~--- ДГБ}\par
+\mbox{42~--- ДГА}\par
+\mbox{43~--- ГДВ}\par
+\mbox{44~--- ДГВ}\par
+\mbox{45~--- ВДБ}\par
+\mbox{46~--- ДВБ}\par
+\mbox{47~--- ГДА}\par
+\mbox{48~--- ВГБ}\par
+\mbox{49~--- ВБА}\par
+\mbox{50~--- АВГ}\par
+\mbox{51~--- ДГБ}\par
+\mbox{52~--- АГВ}\par
+\mbox{53~--- БАГ}\par
+\mbox{54~--- АБГ}\par
+\mbox{55~--- БВА}\par
+\mbox{56~--- АБГ}\par
+\mbox{57~--- ДАВ}\par
+\mbox{58~--- БАВ}\par
+\mbox{59~--- ВГД}\par
+\mbox{60~--- БГА}\par
+\mbox{61~--- БГВ}\par
+\mbox{62~--- БВГ}\par
+\mbox{63~--- ВАГ}\par
+\mbox{64~--- ДАБ}\par
+\mbox{65~--- ВАБ}\par
+\mbox{66~--- БГД}\par
+\mbox{67~--- БВА}\par
+\mbox{68~--- ДГВ}\par
+\mbox{69~--- ГБА}\par
+\mbox{70~--- ГБД}\par
+\mbox{71~--- ВДА}\par
+\mbox{72~--- ДГБ}\par
+\mbox{73~--- ВГД}
+\end{multicols}\par\vspace{0.2cm}
+
+\end{document}

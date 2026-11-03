@@ -797,6 +797,18 @@ SOURCE_FIXES = [
     # немає; в оригіналі (с. 110) K(0;0), L(2;0), M(6;0), A(1;4), B(3;4), C(6;4), зеленим AK, BL, CM, AC, KM -> ключ БАГ
     ('    \\draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);\n    % точки: верхній ряд A,B,C; нижній ряд K,L,M\n    \\coordinate (A) at (1,3);\n    \\coordinate (B) at (3,3);\n    \\coordinate (C) at (5,3);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (4,0);\n    \\foreach \\p/\\lab/\\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\node[font=\\scriptsize] at (6.5,3.5) {$1$~см$^2$};\n    \\draw[gray!60] (6,3) rectangle (7,4);',
      '    \\draw[step=1cm, gray!40, thin] (-1.5,-1.5) grid (10.5,5.5);\n    % як в оригіналі (с. 110): висота 4 клітинки, C над M; зеленим -- AK, BL, CM, AC, KM\n    \\coordinate (A) at (1,4);\n    \\coordinate (B) at (3,4);\n    \\coordinate (C) at (6,4);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (6,0);\n    \\draw[thick, green!55!black] (K) -- (A) -- (C) -- (M) -- cycle;\n    \\draw[thick, green!55!black] (L) -- (B);\n    \\foreach \\p/\\lab/\\pos in {A/A/above left, B/B/above, C/C/above, K/K/below left, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\draw[thick] (8,3) rectangle (9,4);\n    \\node[right, font=\\scriptsize] at (9,3.5) {$1$~см$^2$};'),
+    # НМТ 2026, 15.06 №16 (тотожно рівні вирази): в оригіналі (с. 91) умова «a ≠ 0, a ≠ 1»; з «a > 0» у пункті 1 правильні і А (a), і Д (|a|)
+    ('якщо $a > 0$, $a \\neq 1$',
+     'якщо $a \\neq 0$, $a \\neq 1$', 'a^3 : a^4'),
+    # НМТ 2024, 18.05 №18 (точки на прямій): в оригіналі підписано лише -1, 0, 1, а K і P стоять біля ±2,4 (значення √2 + 1 = 2,41 -- точка P)
+    ('\\foreach \\x/\\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {\n        \\draw (\\x,0.1) -- (\\x,-0.1);\n        \\node[above] at (\\x,0.15) {$\\name$};\n        \\node[below] at (\\x,-0.15) {$\\x$};\n    }',
+     '\\foreach \\x/\\name in {-2.414/K, -1/L, 0/M, 1/N, 2.414/P} {\n        \\draw (\\x,0.1) -- (\\x,-0.1);\n        \\node[above] at (\\x,0.15) {$\\name$};\n    }\n    \\foreach \\x in {-1, 0, 1} \\node[below] at (\\x,-0.15) {$\\x$};', '\\log_{\\sqrt{2}} \\cos 360'),
+    # НМТ 2026, 18.06 №17 (графік з трьох частин): на (0; +∞) в оригіналі (с. 110) y = sin x з амплітудою 1, а не 2 sin x
+    ('plot (\\x, {sin(deg(\\x))*2});',
+     'plot (\\x, {sin(deg(\\x))});'),
+    # НМТ 2025, 4.06 №17 (графік з трьох частин): біля поділки 1 на осі y стояла ще й зайва мітка «-1»
+    ('\\node[left] at (0,1) {$-1$}; % На картинці тут -1 позначено як засічка, але насправді це 1, просто риска',
+     '% зайву мітку «-1» біля поділки 1 прибрано'),
 ]
 FIXES_USED = collections.Counter()
 
