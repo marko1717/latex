@@ -309,21 +309,20 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=1.05]
-        % Axes
-        \draw[->] (0,0) -- (0,2) node[left] {$z$};
-        \draw[->] (0,0) -- (2.5,0) node[below] {$y$};
-        \draw[->] (0,0) -- (-1.5,-1.5) node[below] {$x$};
+    \begin{nmtfit}\begin{tikzpicture}
+    % осі -- повні прямі через O, стрілки на додатних напрямках
+    \draw[->] (0,-1.6) -- (0,1.8) node[left] {$z$};
+    \draw[->] (-1.45,0) -- (1.95,0) node[below] {$y$};
+    \draw[->] (1.1,0.94) -- (-1.5,-1.3) node[below] {$x$};
 
-        \coordinate (O) at (0,0);
-        \coordinate (N) at (1.5,0);
+    \coordinate (O) at (0,0);
+    \coordinate (N) at (0.82,0);
 
-        \node[below right] at (O) {$O$};
-        \node[above] at (N) {$N$};
-        \path (O) node[nmt dot] {};
-        \path (N) node[nmt dot] {};
-
-    \end{tikzpicture}\end{nmtfit}
+    \node[below right] at (O) {$O$};
+    \node[above] at (N) {$N$};
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (N) {};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -652,20 +651,17 @@
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[nmt grid, step=1cm] (-2.5,-0.5) grid (3.5,4.5);
-        \draw[->, thick] (-2.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, thick] (0,-0.5) -- (0,4.5) node[left] {$y$};
-
-        \node[below left] at (0,0) {$0$};
-        \draw (1,0.1) -- (1,-0.1) node[below] {$1$};
-        \draw (0.1,1) -- (-0.1,1) node[left] {$1$};
-
-        % Point M at (-1, 2)
-        \coordinate (M) at (-1,2);
-        \path (M) node[nmt dot] {} node[above left] {$M$};
-        \draw[dashed] (-1,0) -- (M) -- (0,2);
-
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt grid, step=1] (-4,-2) grid (5,6);
+    \draw[->, thick] (-4,0) -- (5,0) node[below left] {$x$};
+    \draw[->, thick] (0,-2) -- (0,6) node[left] {$y$};
+    \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,0) {$1$};
+    \node[left] at (0,1) {$1$};
+    \draw[dashed, thick] (-2,4) -- (0,4);
+    \node[nmt dot] at (-2,4) {};
+    \node[above left] at (-2,4) {$M$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -819,49 +815,27 @@
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     % Налаштування 3D: z - вгору, y - вправо, x - вліво-вниз
-    \begin{nmtfit}\begin{tikzpicture}[scale=1.22, x={(-0.6cm,-0.5cm)}, y={(0.9cm,0cm)}, z={(0cm,0.9cm)}, scale=0.6]
-
-        % Параметри
-        \def\xk{1.5} % візуальний розмір по x
-        \def\yk{2.5} % візуальний розмір по y
-        \def\zk{3.5} % візуальний розмір по z
-
-        \coordinate (O) at (0,0,0);
-        \coordinate (K) at (\xk,\yk,\zk);
-
-        % Вершини на осях
-        \coordinate (X) at (\xk,0,0);
-        \coordinate (Y) at (0,\yk,0);
-        \coordinate (Z) at (0,0,\zk);
-
-        % Проміжні вершини
-        \coordinate (XY) at (\xk,\yk,0);
-        \coordinate (XZ) at (\xk,0,\zk);
-        \coordinate (YZ) at (0,\yk,\zk);
-
-        % Осі
-        \draw[->] (0,0,0) -- (\xk+1,0,0) node[below left] {$x$};
-        \draw[->] (0,0,0) -- (0,\yk+1,0) node[right] {$y$};
-        \draw[->] (0,0,0) -- (0,0,\zk+1) node[left] {$z$};
-
-        % Каркас паралелепіпеда
-        % Невидимі лінії (задні)
-        \draw[thick] (X) -- (XY) -- (Y);
-        \draw[thick] (XY) -- (K);
-
-        % Видимі лінії
-        \draw[thick] (O) -- (X) -- (XZ) -- (Z) -- cycle; % Ліва грань
-        \draw[thick] (O) -- (Y) -- (YZ) -- (Z) -- cycle; % Задня (але візуально ліва) грань
-
-        % Домальовуємо передні ребра
-        \draw[thick] (XZ) -- (K);
-        \draw[thick] (YZ) -- (K);
-
-        % Точки
-        \node[below right] at (O) {$O$};
-        \node[right] at (K) {$K$};
-
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    \coordinate (O) at (0,0);
+    \coordinate (X) at (-0.925,-0.95);
+    \coordinate (Y) at (1.75,0);
+    \coordinate (Z) at (0,2.675);
+    \coordinate (XY) at (0.825,-0.95);
+    \coordinate (XZ) at (-0.925,1.725);
+    \coordinate (YZ) at (1.75,2.675);
+    \coordinate (K) at (0.825,1.725);
+    \draw (O) -- (Y) -- (XY) -- (X) -- cycle;
+    \draw (Z) -- (YZ) -- (K) -- (XZ) -- cycle;
+    \draw (O) -- (Z);
+    \draw (Y) -- (YZ);
+    \draw (XY) -- (K);
+    \draw (X) -- (XZ);
+    \draw[->] (Z) -- (0,3.6) node[above] {$z$};
+    \draw[->] (Y) -- (3.1,0) node[right] {$y$};
+    \draw[->] (X) -- (-1.65,-1.4) node[below left] {$x$};
+    \node[above left] at (O) {$O$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -1117,23 +1091,24 @@
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    % Площина
-    \draw[fill=yellow!30!orange!20, draw=black] (-2,-1) -- (4,-1) -- (5.5,1.5) -- (-0.5,1.5) -- cycle;
-    % Осі
-    \draw[->] (2.5,0.5) -- (1,-1.5) node[left] {$x$};
-    \draw[->] (2.5,0.5) -- (5,0.5) node[below] {$y$};
-    \draw[->] (2.5,0.5) -- (2.5,4.5) node[right] {$z$};
-    % Сфера
-    \coordinate (C) at (1, 2.5); % центр сфери
-    \draw[fill=cyan!15, draw=blue!60!black] (C) circle (1.5);
-    \draw[dashed, blue!60!black] (1, 2.5) ellipse (1.5 and 0.4); % екватор
-    % Точки M і N та діаметр
-    \coordinate (M) at (1, 1);
-    \coordinate (N) at (1, 4);
-    \draw[dashed, red!80!black] (M) -- (N);
-    \path (M) node[nmt dot] {} node[left] {$M$};
-    \path (N) node[nmt dot] {} node[left] {$N$};
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    % площина xOy
+    \filldraw[fill=nmtFillC, draw=nmtInk] (-1.9,0.6) -- (2.3,0.6) -- (1.2,-1.16) -- (-2.76,-1.16) -- cycle;
+    % вісь z: видима частина над сферою
+    \draw[->] (0,2.1) -- (0,2.9) node[right] {$z$};
+    % сфера радіуса 4 (дотикається до площини xOy у точці M)
+    \filldraw[fill=nmtFillA, fill opacity=0.65, draw=nmtBlue] (-0.84,1.16) circle (1.26);
+    \draw[thin, nmtBlue] (-2.1,1.16) arc (180:360:1.26 and 0.34);
+    \draw[dashed, thin, nmtBlue] (-2.1,1.16) arc (180:0:1.26 and 0.34);
+    % прихована частина осі z
+    \draw[dashed, thin] (0,0) -- (0,2.1);
+    % осі x і y
+    \draw[->] (0,0) -- (-1.0,-1.06) node[below left] {$x$};
+    \draw[->] (0,0) -- (1.9,0.1) node[above] {$y$};
+    % діаметр MN
+    \draw[dashed, thin, nmtRed] (-0.84,-0.1) -- (-0.84,2.42);
+    \path (-0.84,-0.1) node[nmt dot] {} node[left] {$M$};
+    \path (-0.84,2.42) node[nmt dot] {} node[left] {$N$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1218,21 +1193,20 @@
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick]
-    \draw[nmt grid, step=1cm] (-2,-1) grid (2,3);
-    \draw[->] (-2.3,0) -- (2.3,0) node[right] {$x$};
-    \draw[->] (0,-1.3) -- (0,3.3) node[above] {$y$};
-    \node[below right, font=\normalsize] at (0,0) {$0$};
-    \node[below, font=\normalsize] at (-1,0) {$-1$};
-    \node[below right, font=\normalsize] at (1,0) {$1$};
-    \node[above left, font=\normalsize] at (0,1) {$1$};
-    \node[above left, font=\normalsize] at (0,2) {$2$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \draw[nmt grid, step=1] (-3,-2) grid (3,4);
+    \draw[->] (-3,0) -- (3.4,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,4.4) node[above] {$y$};
     \draw[nmtGreen, very thick] (-1,0) rectangle (1,2);
-    \node[below left, font=\normalsize] at (-1,0) {$K$};
-    \node[above left, font=\normalsize] at (-1,2) {$L$};
-    \node[above right, font=\normalsize] at (1,2) {$M$};
-    \node[below right, font=\normalsize] at (1,0) {$N$};
-
+    \node[below left, xshift=-1pt] at (0,0) {$0$};
+    \node[below, xshift=-6pt] at (-1,0) {$-1$};
+    \node[below, xshift=2pt] at (1,0) {$1$};
+    \node[below right, xshift=1pt] at (0,1) {$1$};
+    \node[below right, xshift=1pt] at (0,2) {$2$};
+    \node[above left] at (-1,0) {$K$};
+    \node[left] at (-1,2) {$L$};
+    \node[right] at (1,2) {$M$};
+    \node[above right] at (1,0) {$N$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}

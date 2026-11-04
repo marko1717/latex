@@ -424,24 +424,21 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
     \coordinate (A) at (0,0);
-    \coordinate (D) at (3,0);
-    \coordinate (C) at (4,1.5);
-    \coordinate (B) at (1,1.5);
-    \coordinate (S) at (2,4);
-
-    \draw[dashed] (S) -- (B);
-    \draw[dashed] (A) -- (B) -- (C);
-
-    \draw[thick] (S) -- (A) -- (D) -- (S) -- (C) -- (D);
-    \draw[thick] (A) -- (D);
-
+    \coordinate (D) at (4,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (5,1.2);
+    \coordinate (S) at (2.5,4.8);
+    \draw[thin, dashed] (S) -- (B);
+    \draw[thin, dashed] (A) -- (B) -- (C);
+    \draw[thick] (S) -- (A) -- (D) -- (C) -- (S);
+    \draw[thick] (S) -- (D);
+    \node[above] at (S) {$S$};
     \node[below left] at (A) {$A$};
     \node[below right] at (D) {$D$};
     \node[right] at (C) {$C$};
-    \node[left] at (B) {$B$};
-    \node[above] at (S) {$S$};
+    \node[below] at ($(B)+(0.05,-0.05)$) {$B$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -491,43 +488,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round, line cap=round, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}] % Налаштування осей для 3D
-
-    % Координати вершин у просторі (x, y, z)
-    % z - висота
-    \coordinate (S) at (1.5, 1.5, 4);   % Вершина
-    \coordinate (C) at (0, 0, 0);       % Задня точка (початок)
-    \coordinate (A) at (3, 0, 0);       % Ліва передня
-    \coordinate (B) at (1.5, 3.5, 0);   % Права точка
-
-    % Центр O (приблизно в площині z=0)
-    \coordinate (O) at (1.5, 1.2, 0);
-
-    % Невидимі лінії (пунктир)
-    \draw[dashed] (C) -- (A);
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C);
-
-    % Додаткові пунктири для завдання (O, B, A на площині)
-    \draw[dashed, gray] (A) -- (O) -- (B); 
-    \draw[dashed, gray] (C) -- (O);
-
-    % Видимі лінії (суцільні)
-    \draw[thick] (A) -- (B);     % Ребро основи спереду
-    \draw[thick] (S) -- (A);     % Бічне ребро
-    \draw[thick] (S) -- (B);     % Бічне ребро
-     \draw[dashed] (S) -- (O);
-
-    % Точки та підписи
-    \node[left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[above left] at (C) {$C$}; % C ззаду
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \coordinate (S) at (3.0,3.5);
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (5.3,0);
+    \coordinate (A) at (3.8,-1.25);
+    \coordinate (O) at (3.0,-0.45);
+    % видимі ребра
+    \draw[thick] (S) -- (C) -- (A) -- cycle;
+    \draw[thick] (S) -- (B) -- (A);
+    % невидимі: ребро CB і відрізок SO
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (S) -- (O);
+    \node[nmt dot] at (O) {};
     \node[above] at (S) {$S$};
-
-    \path (O) node[nmt dot] {} node[below right, yshift=-2pt] {$O$};
-    \path (A) node[nmt dot] {};
-    \path (B) node[nmt dot] {};
-
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
+    \node[left] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -688,31 +666,17 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.774, line join=round, line cap=round, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (3, -1, 0);
-    \coordinate (B) at (1, 3, 0);
-    \coordinate (C) at (-2, 0, 0);
-    \coordinate (S) at (0.5, 1, 4);
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (C) -- (S); % Видимість C-S залежить від ракурсу, тут зробимо пунктир для задньої грані
-    % Але зазвичай SA, SB, SC - ребра. 
-    % Зробимо простіше: основа ABC, вершина S.
-    % Невидиме ребро зазвичай те, що ззаду (AC або BC).
-    % В даному ракурсі (C зліва ззаду, A спереду, B справа): CB невидиме.
-
-    % Перемалюємо чіткіше для відповідності скріншоту
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (S) -- (C);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
-    \draw[dashed] (C) -- (B); 
-
-    % Висота (віртуальна для розуміння)
-    \draw[dashed, gray] (S) -- (0.5, 1, 0); 
-
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    \coordinate (C) at (-1.8,0);
+    \coordinate (B) at (1.8,0);
+    \coordinate (A) at (0.45,-1.4);
+    \coordinate (S) at (0.15,2.9);
+    \draw (S) -- (A);
+    \draw (S) -- (B);
+    \draw (S) -- (C);
+    \draw (A) -- (B);
+    \draw (A) -- (C);
+    \draw[dashed, thin] (C) -- (B);
     \node[below] at (A) {$A$};
     \node[right] at (B) {$B$};
     \node[left] at (C) {$C$};
@@ -905,28 +869,21 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round, x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0.5, 4);
-    \coordinate (M) at ($(C)!0.5!(B)$); % Медіана на BC
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C); % Задня грань
-    \draw[dashed] (A) -- (M); % Медіана AM
-
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
-
-    \node[below left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05, line join=round]
+    \coordinate (S) at (1.95,3.15);
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (4.3,0);
+    \coordinate (C) at (1.5,-1.3);
+    \coordinate (M) at ($(B)!0.5!(C)$);
+    \draw[thick] (S) -- (A) -- (C) -- (B) -- (S);
+    \draw[thick] (S) -- (C);
+    \draw[thin, dashed] (A) -- (B);
+    \draw[thin, dashed] (A) -- (M);
     \node[above] at (S) {$S$};
-    \node[right, font=\normalsize] at (M) {$M$};
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[below] at (C) {$C$};
+    \node[below right] at (M) {$M$};
     \path (M) node[nmt dot] {};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
@@ -957,33 +914,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round, x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0.5, 4);
-    \coordinate (M) at ($(A)!0.5!(B)$); % Апофема на AB
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C);
-    \draw[dashed] (C) -- (M); % Для наочності (не обов'язково)
-
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05, line join=round]
+    \coordinate (S) at (2.2,3.15);
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (4.1,0);
+    \coordinate (A) at (2.5,-1.55);
+    \coordinate (M) at ($(A)!0.5!(B)$);
+    \draw[thick] (S) -- (C) -- (A) -- (B) -- (S);
     \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
     \draw[thick] (S) -- (M);
-
-    % Прямий кут
-    \draw (M) -- ++(-0.2, 0.1) -- ++(0.1, 0.2); 
-
-    \node[below left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
-    \node[above] at (S) {$S$};
-    \node[below right] at (M) {$M$};
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (C) -- (M);
+    \pic[draw, angle radius=0.22cm] {right angle = S--M--B};
     \path (M) node[nmt dot] {};
+    \node[above] at (S) {$S$};
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
+    \node[below right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -1333,23 +1281,20 @@
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.846, thick, line join=round]
-    \draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.38);
-    \draw[thick] (-1.3,0) arc (180:360:1.3 and 0.38);
-    \coordinate (CV) at (0,3);
-    \draw[thick] (CV) -- (-1.3,0);
-    \draw[thick] (CV) -- (1.3,0);
-    \draw[thick, dashed] (CV) -- (0,0);
-    \draw[<-, gray] (0,0) -- (1.3,0);
-    \node[below, font=\normalsize] at (0.7,-0.05) {$R$};
-    \coordinate (A) at (3.2,-0.35);
-    \coordinate (B) at (5.6,-0.35);
-    \coordinate (C) at (4.4,0.45);
-    \coordinate (S) at (4.4,3);
-    \draw[thick] (A) -- (B) -- (S) -- cycle;
-    \draw[thick] (A) -- (S);
-    \draw[thick, dashed] (A) -- (C) -- (B);
-    \draw[thick, dashed] (C) -- (S);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.65, line join=round]
+    % правильна трикутна піраміда (ліворуч), як в оригіналі: видно дві бічні грані, пунктиром лише задня сторона основи
+    \coordinate (S) at (0,5.1);
+    \coordinate (L) at (-3.2,0);
+    \coordinate (R) at (2.85,0);
+    \coordinate (F) at (0.13,-2.2);
+    \draw[thick] (L) -- (S) -- (R) -- (F) -- cycle;
+    \draw[thick] (S) -- (F);
+    \draw[thin, dashed] (L) -- (R);
+    % конус (праворуч)
+    \coordinate (V) at (5.9,5.0);
+    \draw[thick] (3.7,-1.2) -- (V) -- (8.1,-1.2);
+    \draw[thick] (3.7,-1.2) arc (180:360:2.2 and 0.9);
+    \draw[thin, dashed] (3.7,-1.2) arc (180:0:2.2 and 0.9);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \nmtAnswerBox
@@ -1369,26 +1314,27 @@
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.931, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    \path (0,-0.9);
     \coordinate (A) at (0,0);
     \coordinate (B) at (1.8,0);
-    \coordinate (C) at (2.6, 0.7);
-    \coordinate (D) at (0.8, 0.7);
-    \coordinate (A1) at (0,3.8);
-    \coordinate (B1) at (1.8,3.8);
-    \coordinate (C1) at (2.6, 4.5);
-    \coordinate (D1) at (0.8, 4.5);
+    \coordinate (C) at (2.44,0.58);
+    \coordinate (D) at (0.64,0.58);
+    \coordinate (A1) at (0,2.74);
+    \coordinate (B1) at (1.8,2.74);
+    \coordinate (C1) at (2.44,3.32);
+    \coordinate (D1) at (0.64,3.32);
     \draw (A) -- (B) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
     \draw (B) -- (B1) -- (C1);
     \draw (A1) -- (B1);
     \draw[dashed] (A) -- (D) -- (C);
     \draw[dashed] (D) -- (D1);
-    \begin{scope}[shift={(3.8,0)}]
+    \begin{scope}[shift={(2.8,0)}]
         \coordinate (P_A) at (0,0);
-        \coordinate (P_B) at (2.2,0);
-        \coordinate (P_C) at (3.2, 0.9);
-        \coordinate (P_D) at (1.0, 0.9);
-        \coordinate (P_S) at (1.6, 4.0);
+        \coordinate (P_B) at (1.93,0);
+        \coordinate (P_C) at (2.79,0.49);
+        \coordinate (P_D) at (0.86,0.49);
+        \coordinate (P_S) at (1.4,2.7);
         \draw (P_A) -- (P_B) -- (P_C) -- (P_S) -- cycle;
         \draw (P_B) -- (P_S);
         \draw[dashed] (P_A) -- (P_D) -- (P_C);
@@ -1498,22 +1444,20 @@
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.95, thick, line join=round]
-    % правильна трикутна піраміда
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.8,0.6);
-    \coordinate (c) at (1.6,1.5);
-    \coordinate (ap) at (1.3,5);
-    \draw (a) -- (b) -- (ap) -- cycle;
-    \draw (a) -- (c) -- (b);
-    \draw[dashed] (a) -- (c);
-    \draw[dashed] (c) -- (ap);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.35, thick, line join=round]
+    % правильна трикутна піраміда: основа LRF, невидиме лише заднє ребро LR
+    \coordinate (L) at (0,0);
+    \coordinate (R) at (2.2,0);
+    \coordinate (F) at (1.15,-1);
+    \coordinate (P) at (1.1,2.2);
+    \draw (P) -- (L) -- (F) -- (R) -- (P);
+    \draw (P) -- (F);
+    \draw[dashed, thin] (L) -- (R);
     % конус
-    \begin{scope}[shift={(4.6,0)}]
-        \draw (0,0.5) ellipse (1.5 and 0.45);
-        \draw[dashed] (-1.5,0.5) -- (0,4.6);
-        \draw (-1.5,0.5) .. controls (-1.5,0.1) and (1.5,0.1) .. (1.5,0.5);
-        \draw (-1.5,0.5) -- (0,4.6) -- (1.5,0.5);
+    \begin{scope}[shift={(3.6,-0.67)}]
+        \draw[dashed, thin] (-0.97,0) arc (180:0:0.97 and 0.3);
+        \draw (-0.97,0) arc (180:360:0.97 and 0.3);
+        \draw (-0.97,0) -- (0,2.0) -- (0.97,0);
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}

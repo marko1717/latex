@@ -352,56 +352,37 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm} % Піднімаємо вище
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.597] % Збільшений масштаб
-    % Стилі
-    \tikzset{
-        icon/.style={thick, line join=round, line cap=round}
-    }
-
-    % --- ОБОЛОНКА ТА ОРБІТИ ---
-    \draw[thick] (0,0) circle (4.0cm); % Зовнішній контур
-    \draw[dashed, gray!60] (0,0) circle (3.2cm); % Орбіта 3 (Машинки)
-    \draw[dashed, gray!60] (0,0) circle (2.2cm); % Орбіта 2 (Літаки)
-    \draw[dashed, gray!60] (0,0) circle (1.2cm); % Орбіта 1 (Човни)
-    \path (0,0) node[nmt dot] {}; % Центр
-
-    % --- 1. ЗОВНІШНЄ КОЛО: 10 МАШИНОК ---
-    \foreach \i in {1,...,10} {
-        \pgfmathsetmacro{\ang}{\i * 360/10}
-        \begin{scope}[rotate=\ang, shift={(3.2,0)}]
-            % Машинка (повернута по ходу руху +90 градусів)
-            \begin{scope}[rotate=90]
-                \draw[icon, fill=white] (-0.35,-0.2) rectangle (0.35,0.2);
-                \path (-0.25,-0.2) node[nmt open dot] {};
-                \path (0.25,-0.2) node[nmt open dot] {};
-                \draw[icon] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0); % Вікна
-            \end{scope}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, line join=round, line cap=round]
+    % три кола: зовнішнє кільце (машинки), середнє (літаки), внутрішнє (човни)
+    \draw[thick] (0,0) circle (4);
+    \draw[thick] (0,0) circle (2.8);
+    \draw[thick] (0,0) circle (1.6);
+    % 10 машинок
+    \foreach \a in {90,126,...,414} {
+        \begin{scope}[shift={(\a:3.4)}, rotate=\a-90]
+            \draw[thin, fill=white] (-0.8,-0.15) -- (0.8,-0.15) -- (0.8,0.08) -- (0.5,0.2) -- (0.25,0.4) -- (-0.3,0.4) -- (-0.5,0.2) -- (-0.8,0.1) -- cycle;
+            \draw[thin] (-0.25,0.2) -- (-0.12,0.34) -- (0.15,0.34) -- (0.28,0.2) -- cycle;
+            \draw[thin, fill=white] (-0.48,-0.17) circle (0.15);
+            \draw[thin, fill=white] (0.48,-0.17) circle (0.15);
         \end{scope}
     }
-
-    % --- 2. СЕРЕДНЄ КОЛО: 5 ЛІТАКІВ ---
-    \foreach \i in {1,...,5} {
-        \pgfmathsetmacro{\ang}{\i * 360/5}
-        \begin{scope}[rotate=\ang, shift={(2.2,0)}]
-            % Літак (носом до центру або по колу)
-            \begin{scope}[rotate=90] 
-                \draw[icon, fill=white] (0,-0.35) -- (0,0.4); % Фюзеляж
-                \draw[icon, fill=white] (-0.35,0) -- (0.35,0); % Крила
-                \draw[icon] (-0.15,-0.3) -- (0.15,-0.3); % Хвіст
-            \end{scope}
+    % 5 літаків
+    \foreach \a in {90,162,...,378} {
+        \begin{scope}[shift={(\a:2.2)}, rotate=\a+90, scale=0.8]
+            \draw[thin, fill=white] (0.2,0.06) -- (-0.15,0.58) -- (-0.32,0.58) -- (-0.14,0.06) -- cycle;
+            \draw[thin, fill=white] (0.2,-0.06) -- (-0.15,-0.58) -- (-0.32,-0.58) -- (-0.14,-0.06) -- cycle;
+            \draw[thin, fill=white] (-0.42,0.05) -- (-0.55,0.28) -- (-0.68,0.28) -- (-0.6,0.05) -- cycle;
+            \draw[thin, fill=white] (-0.42,-0.05) -- (-0.55,-0.28) -- (-0.68,-0.28) -- (-0.6,-0.05) -- cycle;
+            \draw[thin, fill=white] (0,0) ellipse (0.68 and 0.1);
         \end{scope}
     }
-
-    % --- 3. ВНУТРІШНЄ КОЛО: 4 ЧОВНИ ---
-    \foreach \i in {1,...,4} {
-        \pgfmathsetmacro{\ang}{\i * 360/4 + 45} % Зсув +45, щоб було гарно
-        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
-            % Човен
-            \begin{scope}[rotate=90]
-                 \draw[icon, fill=white] (-0.3,0) arc (180:360:0.3 and 0.25) -- cycle;
-                 \draw[icon] (0,0) -- (0,0.35); % Щогла
-                 \draw[icon] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; % Вітрило
-            \end{scope}
+    % 4 човни (2 x 2)
+    \foreach \cx/\cy in {-0.55/0.6, 0.55/0.6, -0.55/-0.6, 0.55/-0.6} {
+        \begin{scope}[shift={(\cx,\cy-0.24)}, scale=0.85]
+            \draw[thin, fill=white] (-0.55,0) -- (0.55,0) -- (0.32,-0.28) -- (-0.32,-0.28) -- cycle;
+            \draw[thin] (0,0) -- (0,0.85);
+            \draw[thin, fill=white] (0.06,0.08) -- (0.06,0.8) -- (0.48,0.08) -- cycle;
+            \draw[thin, fill=white] (-0.06,0.08) -- (-0.06,0.62) -- (-0.4,0.08) -- cycle;
         \end{scope}
     }
 \end{tikzpicture}\end{nmtfit}
@@ -410,8 +391,8 @@
 % Легенда під малюнком
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    \node[right] at (0,0) {\scriptsize – 4 Човни, 5 Літаків, 10 Машинок};
+\begin{nmtfit}\begin{tikzpicture}
+    \useasboundingbox (0,0) rectangle (0.01,0.01);
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -432,62 +413,36 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.597] % Збільшений масштаб
-    % Стилі
-    \tikzset{icon/.style={thick, line join=round, line cap=round}}
-
-    % --- ОБОЛОНКА ---
-    \draw[thick] (0,0) circle (4.0cm);
-    \draw[dashed, gray!60] (0,0) circle (3.2cm);
-    \draw[dashed, gray!60] (0,0) circle (2.2cm);
-    \draw[dashed, gray!60] (0,0) circle (1.2cm);
-    \path (0,0) node[nmt dot] {};
-
-    % --- 1. ЗОВНІШНЄ КОЛО: 10 ЧОВНІВ ---
-    \foreach \i in {1,...,10} {
-        \pgfmathsetmacro{\ang}{\i * 360/10}
-        \begin{scope}[rotate=\ang, shift={(3.2,0)}]
-            \begin{scope}[rotate=90]
-                 \draw[icon, fill=white] (-0.35,0) arc (180:360:0.35 and 0.25) -- cycle;
-                 \draw[icon] (0,0) -- (0,0.35); 
-                 \draw[icon] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; 
-            \end{scope}
-        \end{scope}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.6, line join=round]
+    \tikzset{
+        boat/.pic={\draw[thin, fill=white] (-0.32,-0.15) -- (0.32,-0.15) -- (0.2,-0.3) -- (-0.2,-0.3) -- cycle;
+                   \draw[thin] (0,-0.15) -- (0,0.4);
+                   \draw[thin, fill=white] (0.03,-0.1) -- (0.28,-0.1) -- (0.03,0.35) -- cycle;
+                   \draw[thin, fill=white] (-0.03,-0.1) -- (-0.25,-0.1) -- (-0.03,0.25) -- cycle;},
+        car/.pic={\draw[thin, fill=white, rounded corners=3pt] (-0.42,-0.17) rectangle (0.42,0.17);
+                  \draw[thin, rounded corners=2pt] (-0.17,-0.12) rectangle (0.22,0.12);
+                  \draw[thin] (-0.3,0.17) -- (-0.3,0.23) -- (-0.14,0.23) -- (-0.14,0.17);
+                  \draw[thin] (0.14,0.17) -- (0.14,0.23) -- (0.3,0.23) -- (0.3,0.17);
+                  \draw[thin] (-0.3,-0.17) -- (-0.3,-0.23) -- (-0.14,-0.23) -- (-0.14,-0.17);
+                  \draw[thin] (0.14,-0.17) -- (0.14,-0.23) -- (0.3,-0.23) -- (0.3,-0.17);},
+        plane/.pic={\draw[thin, fill=white] (0.45,0) -- (0.25,0.06) -- (0.1,0.05) -- (-0.15,0.42) -- (-0.3,0.42) -- (-0.15,0.05) -- (-0.3,0.05) -- (-0.4,0.2) -- (-0.46,0.2) -- (-0.4,0) -- (-0.46,-0.2) -- (-0.4,-0.2) -- (-0.3,-0.05) -- (-0.15,-0.05) -- (-0.3,-0.42) -- (-0.15,-0.42) -- (0.1,-0.05) -- (0.25,-0.06) -- cycle;}
     }
-
-    % --- 2. СЕРЕДНЄ КОЛО: 5 МАШИНОК ---
-    \foreach \i in {1,...,5} {
-        \pgfmathsetmacro{\ang}{\i * 360/5}
-        \begin{scope}[rotate=\ang, shift={(2.2,0)}]
-            \begin{scope}[rotate=90]
-                \draw[icon, fill=white] (-0.35,-0.2) rectangle (0.35,0.2);
-                \path (-0.25,-0.2) node[nmt open dot] {};
-                \path (0.25,-0.2) node[nmt open dot] {};
-                \draw[icon] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0);
-            \end{scope}
-        \end{scope}
-    }
-
-    % --- 3. ВНУТРІШНЄ КОЛО: 4 ЛІТАКИ ---
-    \foreach \i in {1,...,4} {
-        \pgfmathsetmacro{\ang}{\i * 360/4 + 45}
-        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
-            \begin{scope}[rotate=90] 
-                \draw[icon, fill=white] (0,-0.35) -- (0,0.4); 
-                \draw[icon, fill=white] (-0.35,0) -- (0.35,0);
-                \draw[icon] (-0.15,-0.3) -- (0.15,-0.3);
-            \end{scope}
-        \end{scope}
-    }
+    \draw[thick] (0,0) circle (4.0);
+    \draw[thick] (0,0) circle (2.95);
+    \draw[thick] (0,0) circle (1.75);
+    \foreach \i in {0,...,9} {\pgfmathsetmacro{\a}{36*\i}
+        \pic[rotate=\a-90, scale=0.85] at (\a:3.45) {boat};}
+    \foreach \i in {0,...,4} {\pgfmathsetmacro{\a}{90+72*\i}
+        \pic[rotate=\a+90] at (\a:2.35) {car};}
+    \foreach \i in {0,...,3} {\pgfmathsetmacro{\a}{45+90*\i}
+        \pic[rotate=\a, scale=0.62] at (\a:1.0) {plane};}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
 % Легенда під малюнком
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    \node[right] at (0,0) {\scriptsize – 4 Літаки, 5 Машинок, 10 Човнів};
-\end{tikzpicture}\end{nmtfit}
+\begin{nmtfit}\begin{tikzpicture}\path (0,0);\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \end{minipage}
@@ -585,43 +540,36 @@
 
 \nmtnobreak
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55]
-    % Контур вагона
-    \draw[thick, rounded corners=15pt] (0, -2.5) rectangle (15, 2.5);
-    \draw[thick] (2.5, -2.5) -- (2.5, -0.5); % Перегородки
-    \draw[thick] (2.5, 2.5) -- (2.5, 0.5);
-    \draw[thick] (12.5, -2.5) -- (12.5, -0.5);
-    \draw[thick] (12.5, 2.5) -- (12.5, 0.5);
-    % Ніс вагона (ліворуч)
-    \draw[thick] (0, -2.5) to[out=180, in=270] (-2, 0) to[out=90, in=180] (0, 2.5);
-
-    % Стиль сидінь
+\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
     \tikzset{
-        seatBlue/.style={circle, draw=black, fill=headerblue!80, minimum size=0.35cm, inner sep=0pt},
-        seatRed/.style={circle, draw=black, fill=red!70, minimum size=0.5cm, inner sep=0pt},
-        tableRect/.style={draw=black, fill=gray!10, rounded corners=2pt}
+        seatBlue/.style={circle, draw=nmtInk, thin, fill=nmtBlue!70, minimum size=0.34cm, inner sep=0pt},
+        seatRed/.style={circle, draw=nmtInk, thin, fill=nmtRed!70, minimum size=0.34cm, inner sep=0pt},
+        tableRect/.style={draw=nmtInk, thin, fill=nmtFillD, rounded corners=2pt, minimum width=0.34cm, minimum height=0.66cm, inner sep=0pt}
     }
-
-    % --- ЛІВА ЧАСТИНА (Столик) ---
-    \node[tableRect, minimum width=0.8cm, minimum height=1.6cm] at (1.2, 0) {};
-    \node[seatRed] at (0.5, 0.5) {}; \node[seatRed] at (1.9, 0.5) {};
-    \node[seatRed] at (0.5, -0.5) {}; \node[seatRed] at (1.9, -0.5) {};
-
-    % --- ПРАВА ЧАСТИНА (Столик) ---
-    \node[tableRect, minimum width=0.8cm, minimum height=1.6cm] at (13.8, 0) {};
-    \node[seatRed] at (13.1, 0.5) {}; \node[seatRed] at (14.5, 0.5) {};
-    \node[seatRed] at (13.1, -0.5) {}; \node[seatRed] at (14.5, -0.5) {};
-
-    % --- ЦЕНТРАЛЬНА ЧАСТИНА (Сині сидіння) ---
-    % 13 стовпчиків по 4 місця (52 місця)
-    % x від 3.0 до 12.0
-    \foreach \col in {0,...,12} {
-        \pgfmathsetmacro{\x}{3.2 + \col*0.7}
-        \node[seatBlue] at (\x, 1.5) {};
-        \node[seatBlue] at (\x, 0.8) {};
-        \node[seatBlue] at (\x, -0.8) {};
-        \node[seatBlue] at (\x, -1.5) {};
+    % корпус: верхній і нижній борт, задня стінка, ніс
+    \draw[thick] (-2.03,2.12) -- (17,2.12) -- (17,-2.12) -- (-2.03,-2.12);
+    \draw[thick] (-2.03,2.12) .. controls (-5.5,1.6) and (-6.3,0.4) .. (-6.7,0)
+                 .. controls (-6.3,-0.4) and (-5.5,-1.6) .. (-2.03,-2.12);
+    % перегородки
+    \draw[thick] (-2.03,2.12) -- (-2.03,0.53);
+    \draw[thick] (-0.78,2.12) -- (-0.78,0.53);
+    \draw[thick] (-0.78,-0.5) -- (-0.78,-2.12);
+    \draw[thick] (15.75,2.12) -- (15.75,0.53);
+    \draw[thick] (15.75,-0.5) -- (15.75,-2.12);
+    % верхня половина: 13 синіх, червоне, столик, червоне
+    \foreach \r in {1.64,0.64} {
+        \foreach \c in {0,...,12} { \node[seatBlue] at (\c,\r) {}; }
+        \node[seatRed] at (13,\r) {};
+        \node[seatRed] at (15,\r) {};
     }
+    \node[tableRect] at (14,1.14) {};
+    % нижня половина: червоне, столик, червоне, 13 синіх
+    \foreach \r in {-0.64,-1.64} {
+        \node[seatRed] at (0,\r) {};
+        \node[seatRed] at (2,\r) {};
+        \foreach \c in {3,...,15} { \node[seatBlue] at (\c,\r) {}; }
+    }
+    \node[tableRect] at (1,-1.14) {};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -755,61 +703,36 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Фон (пісок/земля)
-    \fill[yellow!10] (0,0) circle (4.0cm);
-    \fill[cyan!10] (0,0) circle (3.2cm); % Вода/небо для внутрішніх кіл
-    \fill[green!5] (0,0) circle (2.0cm); 
-
-    % Контури
-    \draw[thick, gray!40] (0,0) circle (4.0cm);
-    \draw[thick, gray!40] (0,0) circle (3.2cm);
-    \draw[thick, gray!40] (0,0) circle (2.0cm);
-
-    % Стиль іконок (зафарбовані)
-    \tikzset{icon/.style={thick, line join=round}}
-
-    % --- 1. ЗОВНІШНЄ КОЛО: ЧОВНИ (Коричневі) - 10 шт ---
-    \foreach \i in {1,...,10} {
-        \pgfmathsetmacro{\ang}{\i * 360/10}
-        \begin{scope}[rotate=\ang, shift={(3.5,0)}]
-            \begin{scope}[rotate=90]
-                 \draw[icon, fill=brown!80!black] (-0.35,0) arc (180:360:0.35 and 0.25) -- cycle;
-                 \draw[icon, fill=white] (0,0.05) -- (0.25,0.05) -- (0,0.3) -- cycle; 
-            \end{scope}
-        \end{scope}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+    \tikzset{
+        boat/.pic={\draw[thin, fill=nmtOrange!70] (-0.4,0.16) -- (0.18,0.16) -- (0.45,0) -- (0.18,-0.16) -- (-0.4,-0.16) -- cycle;
+                   \draw[thin, fill=white] (-0.25,-0.07) rectangle (0.08,0.07);},
+        car/.pic={\draw[thin, fill=nmtBlue!60, rounded corners=3pt] (-0.4,-0.2) rectangle (0.4,0.2);
+                  \draw[thin, fill=white] (0.08,-0.14) rectangle (0.26,0.14);
+                  \draw[thin, fill=white] (-0.28,-0.14) rectangle (-0.14,0.14);},
+        plane/.pic={\draw[thin, fill=nmtGreen!70] (0.45,0) -- (0.25,0.06) -- (-0.3,0.05) -- (-0.4,0) -- (-0.3,-0.05) -- (0.25,-0.06) -- cycle;
+                    \draw[thin, fill=nmtGreen!70] (0.1,0.05) -- (-0.15,0.42) -- (-0.3,0.42) -- (-0.12,0.05) -- cycle;
+                    \draw[thin, fill=nmtGreen!70] (0.1,-0.05) -- (-0.15,-0.42) -- (-0.3,-0.42) -- (-0.12,-0.05) -- cycle;
+                    \draw[thin, fill=nmtGreen!70] (-0.3,0.05) -- (-0.4,0.2) -- (-0.46,0.2) -- (-0.4,0.02) -- cycle;
+                    \draw[thin, fill=nmtGreen!70] (-0.3,-0.05) -- (-0.4,-0.2) -- (-0.46,-0.2) -- (-0.4,-0.02) -- cycle;}
     }
-
-    % --- 2. СЕРЕДНЄ КОЛО: МАШИНКИ (Сині) - 5 шт ---
-    \foreach \i in {1,...,5} {
-        \pgfmathsetmacro{\ang}{\i * 360/5}
-        \begin{scope}[rotate=\ang, shift={(2.6,0)}]
-            \begin{scope}[rotate=90]
-                \draw[icon, fill=cyan!80!blue] (-0.35,-0.2) rectangle (0.35,0.2);
-                \path (-0.25,-0.2) node[nmt dot] {}; % Колеса
-                \path (0.25,-0.2) node[nmt dot] {};
-                \draw[icon, fill=cyan!30] (-0.2,0) -- (-0.2,0.15) -- (0.2,0.15) -- (0.2,0) -- cycle; % Дах
-            \end{scope}
-        \end{scope}
-    }
-
-    % --- 3. ВНУТРІШНЄ КОЛО: ЛІТАКИ (Зелені) - 4 шт ---
-    \foreach \i in {1,...,4} {
-        \pgfmathsetmacro{\ang}{\i * 360/4 + 45}
-        \begin{scope}[rotate=\ang, shift={(1.2,0)}]
-            \begin{scope}[rotate=90] 
-                \draw[icon, fill=green!60!black] (0,-0.35) -- (0,0.4); % Фюзеляж
-                \draw[icon, fill=green!60!black] (-0.35,0) -- (0.35,0); % Крила
-                \draw[icon, fill=red] (-0.15,-0.3) -- (0.15,-0.3); % Хвіст
-            \end{scope}
-        \end{scope}
-    }
-
-    % Легенда
-    \node[anchor=west, font=\tiny] at (2.9, 3.5) {\textcolor{brown!80!black}{\rule{8pt}{8pt}} човник};
-    \node[anchor=west, font=\tiny] at (2.9, 3.0) {\textcolor{green!60!black}{\rule{8pt}{8pt}} літачок};
-    \node[anchor=west, font=\tiny] at (2.9, 2.5) {\textcolor{cyan!80!blue}{\rule{8pt}{8pt}} машинка};
-
+    % кільця
+    \draw[thin, fill=nmtFillC] (0,0) circle (3.6);
+    \draw[thin, fill=nmtFillA] (0,0) circle (2.75);
+    \draw[thin, fill=nmtFillB] (0,0) circle (1.9);
+    % човники (10), по колу
+    \foreach \i in {0,...,9} {\pgfmathsetmacro{\a}{18+36*\i}
+        \pic[rotate=\a+90] at (\a:3.18) {boat};}
+    % машинки (5)
+    \foreach \i in {0,...,4} {\pgfmathsetmacro{\a}{90+72*\i}
+        \pic[rotate=\a+90] at (\a:2.32) {car};}
+    % літачки (4)
+    \foreach \a in {0,90,180,270} {\pic[rotate=\a, scale=0.75] at (\a:1.15) {plane};}
+    \node[nmt dot] at (0,0) {};
+    % легенда
+    \pic at (4.3,3.2) {boat};   \node[anchor=west] at (4.85,3.2) {\small човник};
+    \pic[scale=0.75] at (4.3,2.5) {plane};  \node[anchor=west] at (4.85,2.5) {\small літачок};
+    \pic at (4.3,1.8) {car};    \node[anchor=west] at (4.85,1.8) {\small машинка};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -829,61 +752,38 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-    % --- Стилі ---
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
     \tikzset{
-        chair/.style={circle, draw=black!50, fill=red!70!black, minimum size=0.5cm, inner sep=0pt},
-        rectChair/.style={rectangle, draw=black!50, fill=red!70!black, minimum width=0.4cm, minimum height=0.6cm, rounded corners=2pt},
-        roundTable/.style={circle, draw=brown!80!black, fill=orange!30, minimum size=1.2cm},
-        rectTable/.style={rectangle, draw=brown!80!black, fill=orange!30, minimum width=1.2cm, minimum height=1.6cm},
-        mat/.style={rectangle, fill=orange!60!red, minimum width=0.6cm, minimum height=0.4cm}
+        chair/.style={rectangle, rounded corners=2pt, draw=black!60, fill=red!60!black, minimum width=0.4cm, minimum height=0.4cm, inner sep=0pt},
+        stool/.style={circle, draw=black!60, fill=red!60!black, minimum size=0.5cm, inner sep=0pt},
+        rtable/.style={circle, draw=brown!80!black, fill=orange!30, minimum size=0.9cm},
+        stable/.style={rectangle, draw=brown!80!black, fill=orange!30, minimum width=0.9cm, minimum height=1.2cm}
     }
-
-    % --- БАРНА СТІЙКА (Верх) ---
-    \draw[fill=red!60!black, rounded corners=5pt] (-0.5, 5.5) rectangle (9.5, 6.2);
-    \node[font=\footnotesize] at (4.5, 6.6) {Барна стійка};
-    % Стільці біля бару (5 шт)
-    \foreach \x in {0.5, 2.5, 4.5, 6.5, 8.5} {
-        \node[chair] at (\x, 4.8) {};
-        % Спинка
-        \draw[thick, red!40!black] (\x-0.2, 4.9) arc (180:360:0.2);
+    % барна стійка і 5 барних стільців
+    \draw[fill=red!60!black, rounded corners=4pt] (-0.4,6.2) rectangle (8.4,6.7);
+    \node at (4,7.1) {Барна стійка};
+    \foreach \x in {0.8, 2.4, 4.0, 5.6, 7.2} {\node[stool] at (\x,5.5) {};}
+    % 3 круглі столи по 4 стільці
+    \foreach \x in {1.3, 4.0, 6.7} {
+        \node[rtable] at (\x,3.5) {};
+        \node[chair] at (\x,4.35) {};
+        \node[chair] at (\x,2.65) {};
+        \node[chair] at (\x-0.85,3.5) {};
+        \node[chair] at (\x+0.85,3.5) {};
     }
-
-    % --- КРУГЛІ СТОЛИ (Середина) - 3 шт ---
-    \foreach \x in {1.5, 4.5, 7.5} {
-        % Стіл
-        \node[roundTable] at (\x, 2.5) {};
-        % Серветки на столі (декор)
-        \fill[orange!60] (\x-0.2, 2.5) rectangle (\x+0.2, 2.9);
-
-        % Стільці (4 навколо)
-        \node[rectChair, rotate=0] at (\x, 3.4) {}; % Верх
-        \node[rectChair, rotate=180] at (\x, 1.6) {}; % Низ
-        \node[rectChair, rotate=90] at (\x-0.9, 2.5) {}; % Ліво
-        \node[rectChair, rotate=-90] at (\x+0.9, 2.5) {}; % Право
+    % 2 прямокутні столи по 4 стільці
+    \foreach \x in {2.65, 5.35} {
+        \node[stable] at (\x,0.9) {};
+        \node[chair] at (\x-0.8,0.6) {};
+        \node[chair] at (\x-0.8,1.2) {};
+        \node[chair] at (\x+0.8,0.6) {};
+        \node[chair] at (\x+0.8,1.2) {};
     }
-
-    % --- ПРЯМОКУТНІ СТОЛИ (Низ) - 2 шт ---
-    \foreach \x in {2.5, 6.5} {
-        % Стіл
-        \node[rectTable] at (\x, -0.5) {};
-        % Серветки
-        \fill[orange!60] (\x-0.3, -0.2) rectangle (\x-0.1, 0.2);
-        \fill[orange!60] (\x+0.1, -0.2) rectangle (\x+0.3, 0.2);
-
-        % Стільці (по 2 з боків)
-        \node[rectChair, rotate=90] at (\x-0.9, -0.2) {}; 
-        \node[rectChair, rotate=90] at (\x-0.9, -0.9) {}; 
-        \node[rectChair, rotate=-90] at (\x+0.9, -0.2) {}; 
-        \node[rectChair, rotate=-90] at (\x+0.9, -0.9) {}; 
-    }
-
-    % --- ВІКНО (Низ) ---
-    \draw[fill=cyan!10, draw=gray] (-0.5, -2.0) rectangle (9.5, -1.7);
-    \draw[fill=gray!20] (3.5, -2.1) rectangle (5.5, -1.6); % Колона
-    \node[font=\footnotesize] at (2.0, -2.4) {Вікно};
-    \node[font=\footnotesize] at (7.0, -2.4) {Вікно};
-
+    % вікна
+    \draw[fill=cyan!10, draw=gray] (-0.4,-0.45) rectangle (8.4,-0.2);
+    \draw[fill=gray!20] (3.5,-0.55) rectangle (4.5,-0.1);
+    \node at (1.8,-0.95) {Вікно};
+    \node at (6.2,-0.95) {Вікно};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -1208,36 +1108,20 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Стилі
-    \tikzset{
-        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
-        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    % крила
+    \draw[thick, fill=white] (3.6,3) -- (5.6,4.9) -- (6.5,4.9) -- (6.2,3);
+    \draw[thick, fill=white] (3.6,0) -- (5.6,-1.9) -- (6.5,-1.9) -- (6.2,0);
+    % фюзеляж
+    \draw[thick, fill=white] (1.6,0) -- (9.4,0) to[out=0, in=-90] (11,1.5) to[out=90, in=0] (9.4,3) -- (1.6,3)
+        to[out=180, in=90] (0,1.5) to[out=-90, in=180] cycle;
+    % прохід
+    \fill[nmtFillA] (1.2,1.3) rectangle (9.8,1.7);
+    % по одному ряду з кожного краю (як в оригіналі), ``\ldots'' посередині
+    \foreach \x in {2.2,8.2}{
+        \foreach \y in {0.2,0.55,0.9}{ \draw[thin, fill=nmtBlue!45] (\x-0.14,\y) rectangle (\x+0.14,\y+0.28); }
+        \foreach \y in {1.82,2.17,2.52}{ \draw[thin, fill=nmtBlue!45] (\x-0.14,\y) rectangle (\x+0.14,\y+0.28); }
     }
-
-    % Легенда
-    \node[seat, scale=0.6] at (0, 1.8) {}; \node[right, font=\footnotesize] at (0.3, 1.8) {– звичайне місце};
-    \node[target, scale=0.6] at (4.5, 1.8) {}; \node[right, font=\footnotesize] at (4.8, 1.8) {– місце в перших 3-х рядах};
-
-    % Лінія проходу
-    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
-
-    % --- РЯДИ 1, 2, 3 (Всі місця - target) ---
-    \foreach \r/\lbl in {0/1, -1/2, -2/3} {
-        \node[left, font=\footnotesize, gray] at (-0.5, \r) {Ряд \lbl};
-        % Лівий блок
-        \node[target] at (0, \r) {}; \node[target] at (0.8, \r) {}; \node[target] at (1.6, \r) {};
-        % Правий блок
-        \node[target] at (4.0, \r) {}; \node[target] at (4.8, \r) {}; \node[target] at (5.6, \r) {};
-    }
-
-    % --- РОЗРИВ ---
-    \node at (2.8, -3.0) {\Huge $\vdots$};
-
-    % --- РЯД n (Звичайні) ---
-    \node[left, font=\footnotesize, gray] at (-0.5, -4.0) {Ряд $n$};
-    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -4.0) {};
-
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -1255,42 +1139,27 @@
 \nopagebreak\nbvspace{0.5cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    \tikzset{
-        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
-        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
+    % крила та двигуни (під фюзеляжем)
+    \draw[thick, fill=nmtFillA] (4.4,1.35) -- (6.9,1.35) -- (7.3,3.6) -- (6.3,3.6) -- cycle;
+    \draw[thick, fill=nmtFillA] (4.4,-1.35) -- (6.9,-1.35) -- (7.3,-3.6) -- (6.3,-3.6) -- cycle;
+    \draw[thick, fill=white] (5.0,2.0) rectangle (5.6,2.7);
+    \draw[thick, fill=white] (5.0,-2.0) rectangle (5.6,-2.7);
+    % фюзеляж
+    \draw[thick, fill=white] (1.8,1.35) -- (10.2,1.35)
+        .. controls (11.2,1.35) and (12,0.6) .. (12,0)
+        .. controls (12,-0.6) and (11.2,-1.35) .. (10.2,-1.35) -- (1.8,-1.35)
+        .. controls (0.8,-1.35) and (0,-0.6) .. (0,0)
+        .. controls (0,0.6) and (0.8,1.35) .. (1.8,1.35) -- cycle;
+    % салон: проходи й зони крісел
+    \fill[nmtFillD] (2.0,0.25) rectangle (10.0,1.1);
+    \fill[nmtFillD] (2.0,-1.1) rectangle (10.0,-0.25);
+    \fill[nmtFillA] (2.0,-0.25) rectangle (10.0,0.25);
+    % крісла: перший і останній ряд, по 3 з кожного боку проходу
+    \foreach \x in {2.3, 9.7} {
+        \foreach \y in {0.40, 0.66, 0.92, -0.40, -0.66, -0.92} {
+            \draw[thin, nmtBlue, fill=nmtBlue!35, rounded corners=1pt] (\x-0.18,\y-0.1) rectangle (\x+0.18,\y+0.1);
+        }
     }
-
-    % Легенда
-    \node[seat, scale=0.6] at (0, 1.5) {}; \node[right, font=\footnotesize] at (0.3, 1.5) {– звичайне місце};
-    \node[target, scale=0.6] at (4.5, 1.5) {}; \node[right, font=\footnotesize] at (4.8, 1.5) {– місце біля проходу (1 або $n$ ряд)};
-
-    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
-
-    % --- РЯД 1 ---
-    \node[left, font=\footnotesize, gray] at (-0.5, 0) {Ряд 1};
-    % Звичайні
-    \node[seat] at (0, 0) {}; \node[seat] at (0.8, 0) {}; 
-    \node[seat] at (4.8, 0) {}; \node[seat] at (5.6, 0) {};
-    % Target (біля проходу)
-    \node[target] at (1.6, 0) {}; 
-    \node[target] at (4.0, 0) {}; 
-
-    % --- РЯД 2 (Звичайний) ---
-    \node[left, font=\footnotesize, gray] at (-0.5, -1) {Ряд 2};
-    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -1) {};
-
-    % --- РОЗРИВ ---
-    \node at (2.8, -2.0) {\Huge $\vdots$};
-
-    % --- РЯД n ---
-    \node[left, font=\footnotesize, gray] at (-0.5, -3.0) {Ряд $n$};
-    % Звичайні
-    \node[seat] at (0, -3.0) {}; \node[seat] at (0.8, -3.0) {}; 
-    \node[seat] at (4.8, -3.0) {}; \node[seat] at (5.6, -3.0) {};
-    % Target
-    \node[target] at (1.6, -3.0) {}; 
-    \node[target] at (4.0, -3.0) {};
-
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -1308,37 +1177,21 @@
 \nopagebreak\nbvspace{0.5cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    \tikzset{
-        seat/.style={rectangle, draw=gray, fill=headerblue!30, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt},
-        target/.style={rectangle, draw=red!80!black, fill=orange!50, line width=1pt, minimum width=0.7cm, minimum height=0.7cm, rounded corners=2pt}
-    }
-
-    % Легенда
-    \node[seat, scale=0.6] at (0, 1.5) {}; \node[right, font=\footnotesize] at (0.3, 1.5) {– звичайне місце};
-    \node[target, scale=0.6] at (4.5, 1.5) {}; \node[right, font=\footnotesize] at (4.8, 1.5) {– місце біля проходу (1 ряд)};
-
-    \node[font=\footnotesize, gray] at (2.8, 0.5) {Прохід};
-
-    % --- РЯД 1 ---
-    \node[left, font=\footnotesize, gray] at (-0.5, 0) {Ряд 1};
-    % Звичайні
-    \node[seat] at (0, 0) {}; \node[seat] at (0.8, 0) {}; 
-    \node[seat] at (4.8, 0) {}; \node[seat] at (5.6, 0) {};
-    % Target
-    \node[target] at (1.6, 0) {}; 
-    \node[target] at (4.0, 0) {}; 
-
-    % --- РЯД 2 ---
-    \node[left, font=\footnotesize, gray] at (-0.5, -1) {Ряд 2};
-    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -1) {};
-
-    % --- РОЗРИВ ---
-    \node at (2.8, -2.0) {\Huge $\vdots$};
-
-    % --- РЯД n ---
-    \node[left, font=\footnotesize, gray] at (-0.5, -3.0) {Ряд $n$};
-    \foreach \x in {0, 0.8, 1.6, 4.0, 4.8, 5.6} \node[seat] at (\x, -3.0) {};
-
+    % крила й хвіст
+    \draw[thin] (4.6,1.7) -- (6.4,4.2) -- (7.4,4.2) -- (6.6,1.7);
+    \draw[thin] (4.6,-1.7) -- (6.4,-4.2) -- (7.4,-4.2) -- (6.6,-1.7);
+    \draw[thin] (10.9,1.7) -- (11.6,2.7) -- (12.3,2.7) -- (11.9,1.7);
+    \draw[thin] (10.9,-1.7) -- (11.6,-2.7) -- (12.3,-2.7) -- (11.9,-1.7);
+    % фюзеляж
+    \draw[thick, fill=white] (2.2,1.7) .. controls (0.6,1.7) and (-0.4,0.7) .. (-0.4,0) .. controls (-0.4,-0.7) and (0.6,-1.7) .. (2.2,-1.7) -- (12.0,-1.7) .. controls (12.8,-1.4) and (13.1,-0.6) .. (13.1,0) .. controls (13.1,0.6) and (12.8,1.4) .. (12.0,1.7) -- cycle;
+    % салон і прохід
+    \draw[thin, fill=nmtFillD] (1.0,-1.5) rectangle (11.6,1.5);
+    \fill[nmtFillA] (1.0,-0.4) rectangle (11.6,0.4);
+    \draw[thin] (1.0,-0.4) rectangle (11.6,0.4);
+    % перший ряд
+    \foreach \y in {0.7,1.05,1.4,-0.7,-1.05,-1.4} \draw[thin, fill=nmtBlue!70] (1.2,\y-0.14) rectangle (1.55,\y+0.14);
+    % останній ряд
+    \foreach \y in {0.7,1.05,1.4,-0.7,-1.05,-1.4} \draw[thin, fill=nmtBlue!70] (11.05,\y-0.14) rectangle (11.4,\y+0.14);
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 

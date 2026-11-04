@@ -566,34 +566,28 @@ III. & Діаметр кола, описаного навколо прямоку
         \coordinate (C) at (6,3);
         \coordinate (D) at (6,0);
         \coordinate (O) at (3,1.5);
-
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
         \draw[thick] (B) -- (D);
-
-        % Midpoints
+        % середини відрізків AO і DO
         \coordinate (M1) at ($(A)!0.5!(O)$);
         \coordinate (M2) at ($(D)!0.5!(O)$);
-
         \draw[thick] (M1) -- (M2) node[midway, below] {$d$};
-        \path (M1) node[nmt dot] {};
-        \path (M2) node[nmt dot] {};
-
-        % Angle beta (AOB)
+        \node[nmt dot] at (M1) {};
+        \node[nmt dot] at (M2) {};
+        % кут beta = AOB
         \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.5cm, angle eccentricity=2.03] {angle = B--O--A};
-
-        % Tick marks for midpoints
-        \draw ($(A)!0.5!(M1)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
-        \draw ($(O)!0.5!(M1)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
-        \draw ($(D)!0.5!(M2)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
-        \draw ($(O)!0.5!(M2)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
-
+        % засічки рівності AM1 = M1O (на AC) і DM2 = M2O (на BD): поперек ліній
+        \draw[thin] ($(A)!0.5!(M1)$) ++(116.57:0.17) -- ++(-63.43:0.34);
+        \draw[thin] ($(O)!0.5!(M1)$) ++(116.57:0.17) -- ++(-63.43:0.34);
+        \draw[thin] ($(D)!0.5!(M2)$) ++(63.43:0.17) -- ++(-116.57:0.34);
+        \draw[thin] ($(O)!0.5!(M2)$) ++(63.43:0.17) -- ++(-116.57:0.34);
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (O) {$O$};
-    \end{tikzpicture}\end{nmtfit}
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -618,30 +612,27 @@ III. & Діаметр кола, описаного навколо прямоку
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.873]
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,3);
-        \coordinate (C) at (6,3);
-        \coordinate (D) at (6,0);
-        \coordinate (K) at (3,0);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K) node[midway, above right] {$d$};
-        \draw[thick] (K) -- (C) node[midway, above left] {$d$};
-
-        % Angle beta
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.6cm, angle eccentricity=1.86] {angle = A--B--K};
-
-        % Ticks on BK and KC
-        \draw ($(B)!0.5!(K)$) ++(-0.1,0.1) -- ++(0.2,-0.2);
-        \draw ($(K)!0.5!(C)$) ++(-0.1,-0.1) -- ++(0.2,0.2);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (K) {$K$};
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\tick#1#2{\draw[thin] ($($(#1)!0.5!(#2)$)!0.12cm!90:(#2)$) -- ($($(#1)!0.5!(#2)$)!0.12cm!-90:(#2)$);}
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,3.1);
+    \coordinate (C) at (5.6,3.1);
+    \coordinate (D) at (5.6,0);
+    \coordinate (K) at (2.8,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K);
+    \draw[thick] (K) -- (C);
+    \tick{B}{K} \tick{K}{C}
+    \node[above right] at ($(B)!0.5!(K)$) {$d$};
+    \node[above left] at ($(K)!0.5!(C)$) {$d$};
+    \pic[draw, angle radius=0.9cm] {angle = A--B--K};
+    \node at ($(B)+(-69:1.45)$) {$\beta$};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -935,58 +926,32 @@ III. & Якщо прямокутники мають рівні діагонал�
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-   \begin{nmtfit}\begin{tikzpicture}[scale=0.977]
+   \begin{nmtfit}\begin{tikzpicture}[scale=1]
         \coordinate (A) at (0,0);
-        \coordinate (B) at (0,3);
-        \coordinate (C) at (5.2,3);
-        \coordinate (D) at (5.2,0);
-        \coordinate (K) at (2.6,0); % Midpoint AD
-
-        \coordinate (M1) at (0,1.5); % Midpoint AB
-        \coordinate (M2) at (3.9, 1.5); % Midpoint KC
-
+        \coordinate (B) at (0,3.64);
+        \coordinate (C) at (4.2,3.64);
+        \coordinate (D) at (4.2,0);
+        \coordinate (K) at (2.1,0);
+        \coordinate (M1) at (0,1.82);
+        \coordinate (M2) at (3.15,1.82);
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (K) -- (C);
-        \draw[thick] (M1) -- (M2) node[midway, below] {$d$};
-
-        % --- ПОЗНАЧКИ РІВНОСТІ ---
-
-        % 1. AM1 = M1B (1 риска)
-        \draw (-0.15, 0.75) -- (0.15, 0.75); % на AM1
-        \draw (-0.15, 2.25) -- (0.15, 2.25); % на M1B
-
-        % 2. AK = KD (2 риски)
-        % Середина AK (1.3, 0)
-        \draw (1.2, -0.1) -- (1.2, 0.1); \draw (1.4, -0.1) -- (1.4, 0.1);
-        % Середина KD (3.9, 0)
-        \draw (3.8, -0.1) -- (3.8, 0.1); \draw (4.0, -0.1) -- (4.0, 0.1);
-
-        % 3. KM2 = M2C (3 риски)
-        % Середина KM2
-        \coordinate (midKM2) at ($(K)!0.5!(M2)$);
-        \draw (midKM2) ++(-0.15,0.1) -- ++(0.1,-0.2); 
-        \draw (midKM2) ++(-0.05,0.1) -- ++(0.1,-0.2); 
-        \draw (midKM2) ++(0.05,0.1) -- ++(0.1,-0.2);
-
-        % Середина M2C
-        \coordinate (midM2C) at ($(M2)!0.5!(C)$);
-        \draw (midM2C) ++(-0.15,0.1) -- ++(0.1,-0.2); 
-        \draw (midM2C) ++(-0.05,0.1) -- ++(0.1,-0.2); 
-        \draw (midM2C) ++(0.05,0.1) -- ++(0.1,-0.2);
-
-        % Кут 60
+        \draw[thin] (M1) -- (M2) node[midway, below] {$d$};
+        % AM1 = M1B: по дві риски
+        \foreach \y in {0.91,2.73} {\draw (-0.12,\y-0.05) -- (0.12,\y-0.05); \draw (-0.12,\y+0.05) -- (0.12,\y+0.05);}
+        % AK = KD: по одній рисці
+        \draw (1.05,-0.12) -- (1.05,0.12);
+        \draw (3.15,-0.12) -- (3.15,0.12);
+        % KM2 = M2C: по три риски
+        \foreach \m in {(2.625,0.91), (3.675,2.73)} \foreach \t in {-1,0,1} \draw[shift={\m}] (0.05*\t-0.1126,0.0866*\t+0.065) -- (0.05*\t+0.1126,0.0866*\t-0.065);
         \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.5cm, angle eccentricity=1.92] {angle = D--K--C};
-
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
-
         \path (K) node[nmt dot] {};
-        \path (M1) node[nmt dot] {};
-        \path (M2) node[nmt dot] {};
-    \end{tikzpicture}\end{nmtfit}
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -1004,35 +969,32 @@ III. & Якщо прямокутники мають рівні діагонал�
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (0,15); % Approx height
-        \coordinate (D) at (10,0); % Shorter width to match diagram? 
-        % Diagram shows height > width. Let's make it tall.
-        \coordinate (C) at (10,15);
+    \begin{nmtfit}\begin{tikzpicture}
+    % AD : AB = 3 : 4 (AD = 12, AB = 16), AL : AD = 1 : 4, AO : OC = 1 : 4
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3.6,0);
+    \coordinate (B) at (0,4.8);
+    \coordinate (C) at (3.6,4.8);
+    \coordinate (L) at (0.9,0);
+    \coordinate (O) at (0.72,0.96);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (L);
+    \draw[thick] (A) -- (C);
 
-        \coordinate (L) at (2,0); % L on AD
-        \draw[thick] (B) -- (L);
-        \draw[thick] (A) -- (C);
+    % кут alpha між діагоналлю AC і більшою стороною CD
+    \pic[draw, pic text={$\alpha$}, angle radius=1cm, angle eccentricity=1.7] {angle = A--C--D};
 
-        \coordinate (O) at (intersection of B--L and A--C);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (L) {$L$};
+    \node[right] at (O) {$O$};
 
-        % Angle alpha at C (with CD)
-        \pic[draw, pic text={\normalsize $\alpha$}, angle radius=1.2cm, angle eccentricity=2.50] {angle = A--C--D};
-        % Image shows angle between AC and vertical side CD.
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (L) {$L$};
-        \node[right] at (O) {$O$};
-
-        \path (O) node[nmt dot] {};
-        \path (L) node[nmt dot] {};
-    \end{tikzpicture}\end{nmtfit}
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (L) {};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -1182,24 +1144,25 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.43\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.552, thick]
-    \coordinate (A) at (-3,0);
-    \coordinate (B) at (0,3);
-    \coordinate (Rt) at (3,0);
-    \coordinate (G) at (0,-3);
-    \coordinate (C) at (1,2);
-    \coordinate (K) at (1,-2);
-    \coordinate (D) at (7,2);
-    \coordinate (E) at (7,-2);
-    \fill[gray!35] (C) -- (Rt) -- (K) -- cycle;
-    \draw (A) -- (B) -- (Rt) -- (G) -- cycle;
-    \draw (C) -- (D) -- (E) -- (K);
-    \draw (C) -- (K);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.45, thick, line join=round]
+    \coordinate (A) at (-4.243,0);
+    \coordinate (B) at (0,4.243);
+    \coordinate (R) at (4.243,0);
+    \coordinate (G) at (0,-4.243);
+    \coordinate (C) at (2.243,2);
+    \coordinate (F) at (2.243,-2);
+    \coordinate (D) at (11.243,2);
+    \coordinate (E) at (11.243,-2);
+    \fill[nmtFillD] (C) -- (R) -- (F) -- cycle;
+    \draw (A) -- (B) -- (R) -- (G) -- cycle;
+    \draw (C) -- (D) -- (E) -- (F);
+    \draw (C) -- (F);
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[above right] at (D) {$D$};
+    \node[above] at (C) {$C$};
+    \node[above] at (D) {$D$};
     \node[below right] at (E) {$E$};
+    \node[below] at (F) {$F$};
     \node[below] at (G) {$G$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -1303,25 +1266,24 @@ III. & Якщо прямокутники мають рівні діагонал�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.256, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.32]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,15);
-    \coordinate (C) at (11,15);
-    \coordinate (D) at (11,0);
-    \coordinate (K) at (11,6);
+    \coordinate (C) at (10.39,15);
+    \coordinate (D) at (10.39,0);
+    \coordinate (K) at (10.39,6);
     \coordinate (M) at (5.2,15);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (K) -- (M) -- cycle;
-    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.7cm] {right angle = A--K--M};
-    \draw[thick] (K) -- (A) -- (D) -- cycle;
-    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.3cm] { angle = D--A--K};
-    \node[below left, font=\normalsize] at (A) {$A$};
-    \node[above left, font=\normalsize] at (B) {$B$};
-    \node[above, font=\normalsize] at (M) {$M$};
-    \node[above right, font=\normalsize] at (C) {$C$};
-    \node[right, font=\normalsize] at (K) {$K$};
-    \node[below right, font=\normalsize] at (D) {$D$};
-    \node[font=\normalsize] at (1.9,0.5) {$30^\circ$};
+    \pic[draw, angle radius=0.3cm] {right angle = A--K--M};
+    \pic[draw, angle radius=0.5cm] {angle = D--A--K};
+    \node at (4.6,1.05) {$30^\circ$};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above] at (M) {$M$};
+    \node[above right] at (C) {$C$};
+    \node[right] at (K) {$K$};
+    \node[below right] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1348,15 +1310,13 @@ III. & Якщо прямокутники мають рівні діагонал�
     \coordinate (Top) at (6.4, 11.8);
     \draw (A) -- (D) -- (C) -- (Top) -- (B) -- cycle;
     \draw[dashed] (B) -- (C);
-    \pic[draw, angle radius=0.3cm] {right angle = A--B--C};
     \pic[draw, angle radius=0.3cm] {right angle = B--A--D};
     \pic[draw, angle radius=0.3cm] {right angle = A--D--C};
-    \pic[draw, angle radius=0.3cm] {right angle = D--C--B};
     \pic[draw, angle radius=0.3cm] {right angle = B--Top--C};
-    \node[left] at (0,3.5) {$7$ м};
-    \node[right] at (10,3.5) {$7$ м};
-    \node[above left] at (3.2, 9.4) {$8$ м};
-    \node[above right] at (8.2, 9.4) {$6$ м};
+    \node[left] at (0,3.5) {$7$~\textit{м}};
+    \node[right] at (10,3.5) {$7$~\textit{м}};
+    \node[above left] at (3.2, 9.4) {$8$~\textit{м}};
+    \node[above right] at (8.2, 9.4) {$6$~\textit{м}};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1375,23 +1335,24 @@ III. & Якщо прямокутники мають рівні діагонал�
 \centering
 \begin{nmtfit}\begin{tikzpicture}[scale=0.34, thick, line join=round]
     \coordinate (A) at (0,0);
-    \coordinate (D) at (15,0);
-    \coordinate (C) at (15,5);
-    \coordinate (B) at (0,5);
-    \coordinate (K) at (10,5);
-    \coordinate (M) at (15,7.5);
+    \coordinate (D) at (20.78,0);
+    \coordinate (C) at (20.78,9);
+    \coordinate (B) at (0,9);
+    \coordinate (K) at (15.59,9);
+    \coordinate (M) at (20.78,12);
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw (A) -- (M);
-    \draw (D) -- (M);
+    \draw (-1.7,-1) -- (M);
+    \draw (D) -- (20.78,-2);
+    \draw (C) -- (M);
     \path (K) node[nmt dot] {};
     \path (M) node[nmt dot] {};
-    \node[left] at (A) {$A$};
+    \node[above left] at (A) {$A$};
     \node[above left] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[right] at (D) {$D$};
+    \node[below right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
     \node[above left] at (K) {$K$};
-    \node[above right] at (M) {$M$};
-    \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=2.65, font=\normalsize] {angle = D--A--M};
+    \node[above left] at (M) {$M$};
+    \pic[draw, angle radius=0.9cm, pic text={$30^\circ$}, angle eccentricity=1.75, font=\normalsize] {angle = D--A--M};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -2178,68 +2139,37 @@ III. & Якщо прямокутники мають рівні діагонал�
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.363]
     \def\h{8} % AB:BC=4:3 => AB=8
-
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,\h);
     \coordinate (C) at (6,\h);
     \coordinate (D) at (6,0);
-
-    % Parallelogram DKLM. KL=6. KM diagonal perp n => KM is vertical.
-    % D=(6,0). K is on top. M is on bottom.
-    % To make KM vertical, K and M share x coord.
-    % This diagram shows D-K-L-M. K is top left of para, L top right.
-    % M bottom right. D bottom left.
-    % KM is diagonal? No, usually diagonal is DM or KL.
-    % Text says "diagonal KM perp n". M is on n. K is on m.
-    % In drawing, K is on m, M is on n. So KM is a vertical segment.
-    % Parallelogram vertices are D, K, L, M.
-    % So sides are DK and LM? No, DK and ML? 
-    % Drawing: Left side slant DK. Top side KL. Right side slant LM?
-    % No, KM is vertical. That means triangle KDM is right angled at M?
-    % Yes, drawing shows KM perp n.
-    % So D-M is base. K-L is top.
-    % KL=6. So DM=6. 
-    % D=(6,0). M=(12,0). K=(12,8). L=(18,8).
-
     \coordinate (K) at (12,\h);
     \coordinate (M) at (12,0);
     \coordinate (L) at (18,\h);
-
-    % Triangle LQP. L=(18,8). LQ perp n => Q=(18,0).
-    % LP=PQ, angle P=60 => Equilateral.
-    % Side LQ = 8. So all sides 8.
-    % P is to the right.
     \coordinate (Q) at (18,0);
-    \coordinate (P) at ($(Q) + (-30:8)$); % No, P is approx (18+4sqrt(3), 4).
-    \coordinate (P) at (24.9, 4); 
-
-    % Colors
+    \coordinate (P) at (24.93,4);
+    % заливки
     \fill[nmtFillA] (A) -- (B) -- (C) -- (D) -- cycle;
     \fill[nmtFillE] (D) -- (K) -- (L) -- (M) -- cycle;
     \fill[nmtFillC] (L) -- (Q) -- (P) -- cycle;
-
-    % Lines
-    \draw[thick] (-1,0) -- (26,0) node[above] {$n$};
-    \draw[thick] (-1,\h) -- (26,\h) node[above] {$m$};
-
-    % Shapes
+    % паралельні прямі
+    \draw[thick] (-1,0) -- (26.5,0) node[above] {$n$};
+    \draw[thick] (-1,\h) -- (26.5,\h) node[above] {$m$};
+    % фігури
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (D) -- (K) -- (L) -- (M) -- cycle;
-    \draw[thick] (K) -- (M); % Diagonal KM
+    \draw[thick] (K) -- (M);
     \draw[thick] (L) -- (Q) -- (P) -- cycle;
-
-    % Right angles
-    \draw (M) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
-    \draw (Q) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0);
-
-    % Angle 60
-    \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.6cm, angle eccentricity=3.07] {angle = L--P--Q};
-
-    % Ticks on triangle
-    \draw ($(L)!0.5!(P)$) ++(120:0.2) -- ++(-60:0.4);
-    \draw ($(Q)!0.5!(P)$) ++(60:0.2) -- ++(-120:0.4);
-
-    % Labels
+    % прямі кути (KM, LQ перпендикулярні до n)
+    \draw[thin] (M) ++(-0.9,0) -- ++(0,0.9) -- ++(0.9,0);
+    \draw[thin] (Q) ++(-0.9,0) -- ++(0,0.9) -- ++(0.9,0);
+    % кут 60 градусів при P: підпис одразу за дугою
+    \pic[draw, angle radius=0.45cm] {angle = L--P--Q};
+    \node at ($(P)+(-3.2,0)$) {\normalsize $60^\circ$};
+    % рівні сторони LP = PQ
+    \draw[thin] ($(L)!0.5!(P)$) ++(120:0.8) -- ++(-60:1.6);
+    \draw[thin] ($(Q)!0.5!(P)$) ++(60:0.8) -- ++(-120:1.6);
+    % вершини
     \node[below] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[above] at (C) {$C$};
@@ -2454,12 +2384,15 @@ III. & Якщо прямокутники мають рівні діагонал�
     \coordinate (D) at (12,0);
     \coordinate (M) at (36,0);
     \coordinate (K) at (24,32);
-    \draw[thick] (A) -- (B) -- (Cc) -- (D) -- cycle;
-    \draw[thick] (A) -- (M);
-    \draw[thick] (D) -- (K) -- (M);
-    \draw[thick] (A) -- (K);
-    \path (K) node[nmt dot] {}; \node[above, font=\normalsize] at (K) {$K$};
-    \node[below left, font=\normalsize] at (A) {$A$};
+    \draw (A) -- (B) -- (Cc) -- (D) -- cycle;
+    \draw (A) -- (M);
+    \draw (D) -- (K) -- (M);
+    \draw (-2.4,-3.2) -- (27,36);
+    % рівні відрізки DK = KM
+    \draw (18,16) ++(-1.2,0.45) -- ++(2.4,-0.9);
+    \draw (30,16) ++(-1.2,-0.45) -- ++(2.4,0.9);
+    \node[above, font=\normalsize] at (K) {$K$};
+    \node[below right, font=\normalsize] at (A) {$A$};
     \node[above left, font=\normalsize] at (B) {$B$};
     \node[above, font=\normalsize] at (Cc) {$C$};
     \node[below, font=\normalsize] at (D) {$D$};
@@ -2536,7 +2469,7 @@ III. & Якщо прямокутники мають рівні діагонал�
 \zadtask{На рисунку точки $K$, $L$, $M$ та $N$~--- середини сторін $AB$, $BC$, $CD$ та $AD$ прямокутника $ABCD$ відповідно. $AB = 12$~см, $BC = 16$~см. Точка $P$~--- середина відрізка $KN$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.338, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.338, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,12);
     \coordinate (C) at (16,12);
@@ -2546,11 +2479,13 @@ III. & Якщо прямокутники мають рівні діагонал�
     \coordinate (M) at (16,6);
     \coordinate (N) at (8,0);
     \coordinate (P) at (4,3);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw (K) -- (L) -- (M) -- (N) -- cycle;
-    \path (P) node[nmt dot] {};
-    \draw (K)--(N);
-    \path (K) -- (N) node[midway, sloped] {\normalsize $|$};
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (K) -- (L) -- (M) -- (N) -- cycle;
+    \draw[thick] (K) -- (N);
+    \node[nmt dot] at (P) {};
+    % KP = PN: по одній засічці на кожній половині (поперек відрізка)
+    \draw[thin] (2,4.5) ++(53.13:0.6) -- ++(233.13:1.2);
+    \draw[thin] (6,1.5) ++(53.13:0.6) -- ++(233.13:1.2);
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2559,7 +2494,7 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[above] at (L) {$L$};
     \node[right] at (M) {$M$};
     \node[below] at (N) {$N$};
-    \node[above left, font=\normalsize] at (P) {$P$};
+    \node[below left] at (P) {$P$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}

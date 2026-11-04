@@ -866,19 +866,19 @@
 \begin{nmtfit}\begin{tikzpicture}[scale=1.2]
 \def\radius{2.5}
 % Комедія 40%
-\filldraw[fill=orange!70, draw=black] (0,0) -- (0:\radius) arc (0:144:\radius) -- cycle;
-\node at (72:1.7) {\small Комедія};
-\node at (72:1.2) {\small 40\,\%};
-% Мелодрама 35%
-\filldraw[fill=pink!70, draw=black] (0,0) -- (144:\radius) arc (144:270:\radius) -- cycle;
-\node at (207:1.7) {\small Мелодрама};
-\node at (207:1.2) {\small 35\,\%};
+\filldraw[fill=nmtFillC, draw=nmtInk] (0,0) -- (0:\radius) arc (0:144:\radius) -- cycle;
+\node at (72:1.7) {Комедія};
+\node at (72:1.2) {40\,\%};
 % Фантастика 15%
-\filldraw[fill=green!70, draw=black] (0,0) -- (270:\radius) arc (270:324:\radius) -- cycle;
-\node at (297:1.7) {\small Фантастика};
+\filldraw[fill=nmtFillB, draw=nmtInk] (0,0) -- (144:\radius) arc (144:198:\radius) -- cycle;
+\node at (171:1.45) {Фантастика};
 % Хоррор 10%
-\filldraw[fill=yellow!70, draw=black] (0,0) -- (324:\radius) arc (324:360:\radius) -- cycle;
-\node at (342:1.9) {\small Хоррор};
+\filldraw[fill=nmtFillE, draw=nmtInk] (0,0) -- (198:\radius) arc (198:234:\radius) -- cycle;
+\node[rotate=36] at (216:1.55) {Хоррор};
+% Мелодрама 35%
+\filldraw[fill=nmtFillD, draw=nmtInk] (0,0) -- (234:\radius) arc (234:360:\radius) -- cycle;
+\node at (297:1.7) {Мелодрама};
+\node at (297:1.2) {35\,\%};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -922,25 +922,56 @@
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1.0]
-    % фон-рамка
-    \draw[gray!40, rounded corners=3pt] (-0.3,-0.4) rectangle (9.2,5.6);
-    % дані: місто / значення / довжина бара (масштаб: 5561 -> 4.2)
-    \def\scale{0.000755}
-    \foreach \i/\city/\val in {0/{аеропорт Лондона}/2502, 1/{аеропорт Монако}/2502, 2/{аеропорт Рейк'явіка}/2780, 3/{аеропорт Осло}/2780, 4/{аеропорт Токіо}/5561} {
-        \pgfmathsetmacro\y{\i*1.05}
-        \pgfmathsetmacro\barlen{\val*\scale}
-        % прапорець-заглушка
-        \filldraw[fill=gray!25, draw=gray!50] (0,\y+0.32) rectangle (0.45,\y+0.62);
-        % назва
-        \node[right, font=\small] at (0.55,\y+0.47) {\city};
-        % бар
-        \filldraw[fill=cyan!45, draw=cyan!60!black] (0.55,\y) rectangle (0.55+\barlen,\y+0.28);
-        \node[right, font=\scriptsize\bfseries, text=white] at (0.7,\y+0.14) {\val};
+    % рамка інфографіки
+    \draw[nmtInk!35, rounded corners=3pt] (-0.25,-0.3) rectangle (9.6,6.05);
+    % прапорці (0,0)-(0.7,0.7), зсув по y
+    % Токіо
+    \begin{scope}[shift={(0,4.8)}, scale=1.2]
+        \fill[white] (0,0) rectangle (0.7,0.7); \draw[nmtInk!35] (0,0) rectangle (0.7,0.7);
+        \fill[nmtRed] (0.35,0.35) circle (0.2);
+    \end{scope}
+    % Осло
+    \begin{scope}[shift={(0,3.6)}, scale=1.2]
+        \begin{scope}\clip (0,0) rectangle (0.7,0.7);
+        \fill[nmtRed] (0,0) rectangle (0.7,0.7);
+        \fill[white] (0.17,0) rectangle (0.37,0.7); \fill[white] (0,0.25) rectangle (0.7,0.45);
+        \fill[nmtBlue] (0.22,0) rectangle (0.32,0.7); \fill[nmtBlue] (0,0.3) rectangle (0.7,0.4);
+        \end{scope}
+    \end{scope}
+    % Рейк'явік
+    \begin{scope}[shift={(0,2.4)}, scale=1.2]
+        \begin{scope}\clip (0,0) rectangle (0.7,0.7);
+        \fill[nmtBlue!85!black] (0,0) rectangle (0.7,0.7);
+        \fill[white] (0.17,0) rectangle (0.37,0.7); \fill[white] (0,0.25) rectangle (0.7,0.45);
+        \fill[nmtRed] (0.22,0) rectangle (0.32,0.7); \fill[nmtRed] (0,0.3) rectangle (0.7,0.4);
+        \end{scope}
+    \end{scope}
+    % Монако
+    \begin{scope}[shift={(0,1.2)}, scale=1.2]
+        \fill[nmtRed] (0,0.35) rectangle (0.7,0.7); \fill[white] (0,0) rectangle (0.7,0.35);
+        \draw[nmtInk!35] (0,0) rectangle (0.7,0.7);
+    \end{scope}
+    % Лондон
+    \begin{scope}[shift={(0,0)}, scale=1.2]
+        \begin{scope}\clip (0,0) rectangle (0.7,0.7);
+        \fill[nmtBlue!85!black] (0,0) rectangle (0.7,0.7);
+        \draw[white, line width=2.2pt] (0,0) -- (0.7,0.7) (0,0.7) -- (0.7,0);
+        \draw[nmtRed, line width=0.8pt] (0,0) -- (0.7,0.7) (0,0.7) -- (0.7,0);
+        \fill[white] (0.25,0) rectangle (0.45,0.7); \fill[white] (0,0.25) rectangle (0.7,0.45);
+        \fill[nmtRed] (0.29,0) rectangle (0.41,0.7); \fill[nmtRed] (0,0.29) rectangle (0.7,0.41);
+        \end{scope}
+    \end{scope}
+    % дані: міста й смуги (масштаб: 5561 -> 4.3 см)
+    \def\k{0.000756}
+    \foreach \i/\city/\val in {4/{аеропорт Токіо}/5561, 3/{аеропорт Осло}/2780, 2/{аеропорт Рейк'явіка}/2780, 1/{аеропорт Монако}/2502, 0/{аеропорт Лондона}/2502} {
+        \pgfmathsetmacro\len{\val*\k}
+        \node[right, inner sep=0pt] at (1.1,\i*1.2+0.74) {\city};
+        \fill[nmtBlue!75] (1.1,\i*1.2+0.04) rectangle ++(\len,0.46);
+        \node[left, inner sep=3pt, text=white] at (1.1+\len,\i*1.2+0.27) {\bfseries\val};
     }
     % легенда
-    \filldraw[fill=cyan!45, draw=cyan!60!black] (6.0,4.55) rectangle (6.35,4.85);
-    \node[right, font=\scriptsize] at (6.4,4.7) {Фіксована вартість};
-    \node[right, font=\scriptsize] at (6.4,4.4) {проїзду, \textit{грн}};
+    \fill[nmtBlue!75] (6.2,3.0) rectangle (6.5,3.3);
+    \node[right, inner sep=0pt, align=left] at (6.65,3.15) {Фіксована вартість\\проїзду, \textit{грн}};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nmtAnswerBox

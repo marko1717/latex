@@ -792,61 +792,24 @@
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.8, transform shape]
-    % Стилі
     \tikzset{
         trunk/.style={brown!70!black, line width=2pt, line cap=round},
-        % Стиль для плодових (яблуня/груша) - світліші, з червоними фруктами
-        fruitTree/.style={cloud, cloud puffs=9, cloud puff arc=110, fill=green!55!lime, draw=green!30!black, thick, inner sep=0pt, minimum size=0.8cm},
-        fruitDot/.style={circle, fill=red!80!orange, inner sep=1.2pt},
-        % Стиль для кісточкових - темніші, з фіолетовими/помаранчевими фруктами
-        stoneTree/.style={cloud, cloud puffs=8, cloud puff arc=120, fill=green!45!teal, draw=green!20!black, thick, inner sep=0pt, minimum size=0.75cm},
-        stoneDot/.style={circle, fill=purple!70!orange, inner sep=1pt}
+        crown/.style={cloud, cloud puffs=9, cloud puff arc=110, draw=green!30!black, thick, inner sep=0pt, minimum size=0.8cm},
+        fruit/.style={circle, inner sep=1.2pt}
     }
-
-    % Функція малювання ряду плодових
-    \newcommand{\drawFruitRow}[1]{
+    % ряд: y, колір крони, колір плодів (кожен ряд — свій вид дерев)
+    \foreach \y/\crown/\fruit in {5/green!55!lime/red!80!orange, 4/green!45!teal/orange!85!yellow, 3/green!45!teal/violet!70!purple, 2/green!45!teal/red!70!black, 1/green!45!teal/pink!80!red, 0/green!55!lime/yellow!90!orange} {
         \foreach \x in {0, 1, 2, 3} {
-            \draw[trunk] (\x, #1-0.4) -- (\x, #1);
-            \node[fruitTree] at (\x, #1) {};
-            % Додаємо "фрукти"
-            \node[fruitDot] at (\x-0.12, #1+0.1) {};
-            \node[fruitDot] at (\x+0.1, #1-0.05) {};
-            \node[fruitDot, fill=yellow!80!red] at (\x+0.05, #1+0.15) {};
+            \draw[trunk] (\x, \y-0.4) -- (\x, \y);
+            \node[crown, fill=\crown] at (\x, \y) {};
+            \node[fruit, fill=\fruit] at (\x-0.12, \y+0.1) {};
+            \node[fruit, fill=\fruit] at (\x+0.1, \y-0.05) {};
+            \node[fruit, fill=\fruit] at (\x+0.05, \y+0.17) {};
         }
     }
-
-    % Функція малювання ряду кісточкових
-    \newcommand{\drawStoneRow}[1]{
-        \foreach \x in {0, 1, 2, 3} {
-            \draw[trunk] (\x, #1-0.4) -- (\x, #1);
-            \node[stoneTree] at (\x, #1) {};
-             % Додаємо "кістянки"
-            \node[stoneDot] at (\x-0.08, #1+0.08) {};
-            \node[stoneDot, fill=orange!80!red] at (\x+0.08, #1-0.08) {};
-        }
-    }
-
-    % --- Малювання рядів ---
-
-    % Ряд 1 (Плодові - верхній)
-    \drawFruitRow{5};
-    \node[anchor=east, font=\footnotesize\bfseries, align=right] at (-0.5, 5) {Ряд 1\\(Плодові)};
-
-    % Ряди 2-5 (Кісточкові)
-    \drawStoneRow{3.8};
-    \drawStoneRow{2.8};
-    \drawStoneRow{1.8};
-    \drawStoneRow{0.8};
-
-    % Фігурна дужка для кісточкових
-    \draw[decorate, decoration={brace, amplitude=5pt, raise=5pt}, thick, gray!40!black] 
-        (-0.5, 0.4) -- (-0.5, 4.2) 
-        node[midway, xshift=-1.5cm, font=\footnotesize\bfseries, align=center] {4 ряди\\Кісточкові};
-
-    % Ряд 6 (Плодові - нижній)
-    \drawFruitRow{-0.4};
-    \node[anchor=east, font=\footnotesize\bfseries, align=right] at (-0.5, -0.4) {Ряд 6\\(Плодові)};
-
+    \node[anchor=east, font=\bfseries] at (-0.6,5) {Плодові};
+    \node[anchor=east, font=\bfseries] at (-0.6,0) {Плодові};
+    \node[anchor=south, rotate=90, font=\bfseries] at (-0.6,2.5) {Кісточкові};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}

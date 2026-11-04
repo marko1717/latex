@@ -1315,10 +1315,8 @@
     \coordinate (B) at (90:1.6);
     \coordinate (K) at (270:1.6);
     \coordinate (A) at (310:1.6);
-    % зафарбований сектор BmK (половина)
-    \filldraw[fill=nmtFillC, draw=black] (O) -- (B) arc (90:270:1.6) -- cycle;
+    \filldraw[fill=nmtFillC] (O) -- (B) arc (90:310:1.6) -- cycle;
     \draw (O) circle (1.6);
-    \draw (O) -- (A);
     \draw[dashed] (O) -- (K);
     \pic[draw, angle radius=0.45cm, pic text={$?$}, angle eccentricity=1.95, font=\normalsize] {angle = K--O--A};
     \path (O) node[nmt dot] {};
@@ -1326,7 +1324,7 @@
     \node[below] at (K) {$K$};
     \node[below right] at (A) {$A$};
     \node[left] at (180:1.75) {$m$};
-    \node[above right, xshift=-0.05cm] at (O) {$O$};
+    \node[above left] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1439,37 +1437,25 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % AC = 40. Center of Rhombus O (mid of AC) is at 20.
-        % K is at 5 from A. A=(0,0), C=(40,0). K=(5,0).
-        % O=(20,0).
-        % Circle on BD as diameter. Center is O.
-        % K is on the circle? No, K is intersection of circle and AC.
-        % So distance OK is radius. OK = 20 - 5 = 15.
-        % Radius = 15. BD = 30. BO = 15.
-        % A=(0,0), O=(20,0), B=(20,15).
-        % AB = sqrt(20^2 + 15^2) = sqrt(400+225) = sqrt(625) = 25.
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (40,0);
+    \coordinate (O) at (20,0);
+    \coordinate (B) at (20,15);
+    \coordinate (D) at (20,-15);
+    \coordinate (K) at (5,0);
 
-        \coordinate (A) at (0,0);
-        \coordinate (C) at (40,0);
-        \coordinate (O) at (20,0);
-        \coordinate (B) at (20,15);
-        \coordinate (D) at (20,-15);
-        \coordinate (K) at (5,0); % Actually on the left side
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (C);
+    \draw (O) circle (15);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (B) -- (D);
-
-        \draw[thick] (O) circle (15cm);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above right] at (K) {$K$};
-        \path (K) node[nmt dot] {};
-    \end{tikzpicture}\end{nmtfit}
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[anchor=south west, inner sep=1pt] at (5.8,0.6) {$K$};
+    \node[nmt dot] at (K) {};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2116,47 +2102,28 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AK = 7, KM = 9. M - точка дотику.
-        % У ромбі точка дотику M ділить сторону.
-        % Центр O проектується в M. OM perp AD.
-        % BK - висота. BK || OM. OM = R. BK = 2R.
-        % У трикутнику OAM...
-        % Нехай це просто рисунок.
-        % A=(0,0). K=(7,0). M=(16,0). (AK+KM=16).
-        % Висота h. B = (7, h).
-        % AB^2 = AK^2 + BK^2 = 49 + h^2.
-        % Також AM = AB - MD? Ні. Властивість дотичної: AM = ...
-        % Для малювання: приймемо h = 24 (наприклад).
-
-        \coordinate (A) at (0,0);
-        \coordinate (K) at (7,0);
-        \coordinate (M) at (10.5,0);
-        \coordinate (D) at (14,0); % AD прибл.
-        \coordinate (B) at (7,12); % Висота прибл.
-        \coordinate (C) at (21,12);
-
-        % Центр O: середина висоти (y=9), по x: M=(16,0) -> O=(16,9).
-        \coordinate (O) at (10.5,6);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K);
-        \draw[thick] (O) circle (6cm);
-
-        % Прямий кут
-        \pic [draw, angle radius=0.3cm] {right angle = B--K--D};
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below] at (K) {$K$};
-        \node[below] at (M) {$M$};
-        \node[right] at (O) {$O$};
-
-        \path (O) node[nmt dot] {};
-        \path (M) node[nmt dot] {};
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (K) at (1.4,0);
+    \coordinate (M) at (3.2,0);
+    \coordinate (D) at (5,0);
+    \coordinate (B) at (1.4,4.8);
+    \coordinate (C) at (6.4,4.8);
+    \coordinate (O) at (3.2,2.4);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K);
+    \draw[thick] (O) circle (2.4cm);
+    \pic[draw, angle radius=0.22cm] {right angle = B--K--D};
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (M) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \node[below] at (M) {$M$};
+    \node[right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2195,31 +2162,23 @@
         \coordinate (B) at (0,10);
         \coordinate (C) at (10,10);
         \coordinate (D) at (10,0);
-
         \coordinate (K) at (5,10);
         \coordinate (M) at (10,5);
-
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (K) -- (M);
-        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
-
-        % Позначки середин
         \draw (2.5, 9.8) -- (2.5, 10.2);
         \draw (7.5, 9.8) -- (7.5, 10.2);
-
         \draw (9.8, 7.5) -- (10.2, 7.5);
         \draw (9.8, 2.5) -- (10.2, 2.5);
-
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (K) {$K$};
         \node[right] at (M) {$M$};
-
         \path (K) node[nmt dot] {};
         \path (M) node[nmt dot] {};
-    \end{tikzpicture}\end{nmtfit}
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2536,38 +2495,31 @@
 \begin{center}
 
 \nmtnobreak
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.189]
-        \def\h{12}
-        \draw[thick] (-2,0) -- (50,0) node[above] {$n$};
-        \draw[thick] (-2,\h) -- (50,\h) node[above] {$m$};
-
-        % Коло
-        \draw[thick] (6,6) circle (6cm);
-
-        % Трикутник
-        \coordinate (K) at (14,0);
-        \coordinate (M) at (24,0); % Схематично
-        \coordinate (L) at (19,\h);
-        \draw[thick] (K) -- (L) -- (M) -- cycle;
-
-        % Ромб
-        % M спільна точка? Ні, точки K, M, Q на прямій.
-        % M - вершина трикутника і ромба? Так, MNPQ.
-        \coordinate (N) at (29,\h);
-        \coordinate (Q) at (37,0); % Сторона 13
-        \coordinate (P) at (42,\h);
-
-        \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
-
-        % Підписи
-        \node[below] at (K) {$K$};
-        \node[above] at (L) {$L$};
-        \node[below] at (M) {$M$};
-        \node[above] at (N) {$N$};
-        \node[above] at (P) {$P$};
-        \node[below] at (Q) {$Q$};
-
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.19]
+    \def\h{12}
+    \draw[thick] (-2,0) -- (52,0);
+    \draw[thick] (-2,\h) -- (52,\h);
+    \node[above] at (-0.5,\h) {$m$};
+    \node[above] at (-0.5,0) {$n$};
+    \draw[thick] (6,6) circle (6cm);
+    % трикутник KLM рівносторонній: висота 12, сторона 8*sqrt(3) ~ 13,86
+    \coordinate (K) at (14.14,0);
+    \coordinate (M) at (28,0);
+    \coordinate (L) at (21.07,\h);
+    \draw[thick] (K) -- (L) -- (M) -- cycle;
+    % ромб MNPQ зі стороною 13
+    \coordinate (N) at (33,\h);
+    \coordinate (P) at (46,\h);
+    \coordinate (Q) at (41,0);
+    \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
+    \foreach \p in {K,L,M,N,P,Q}{\node[nmt dot] at (\p) {};}
+    \node[below] at (K) {$K$};
+    \node[above] at (L) {$L$};
+    \node[below] at (M) {$M$};
+    \node[above] at (N) {$N$};
+    \node[above] at (P) {$P$};
+    \node[below] at (Q) {$Q$};
+\end{tikzpicture}\end{nmtfit}
 \end{center}
 
 \nmtnobreak
@@ -3056,8 +3008,10 @@
     \fill[red!20] (L) -- (M) -- (N) -- (P) -- cycle;
 
     % Лінії m та n
-    \draw[thick] (-2,0) -- (70,0) node[above] {$n$};
-    \draw[thick] (-2,\h) -- (70,\h) node[above] {$m$};
+    \draw[thick] (-6,0) -- (70,0);
+    \node[left] at (-6,0) {$n$};
+    \draw[thick] (-6,\h) -- (70,\h);
+    \node[left] at (-6,\h) {$m$};
 
     % Контури фігур
     \draw[thick] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;
