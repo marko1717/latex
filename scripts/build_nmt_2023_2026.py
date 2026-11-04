@@ -285,6 +285,31 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+% відповідність: два стовпчики пунктів + сітка відповідей природного розміру праворуч (сітка не стискається, стовпчики ділять решту ширини)
+\newlength{\nmtGridW}\newlength{\nmtColA}\newlength{\nmtColB}
+\newcommand{\matchingLayout}[3]{%
+    \par\noindent
+    \sbox{\nmtgridbox}{\matchingGridRaw}\setlength{\nmtGridW}{\wd\nmtgridbox}%
+    \setlength{\nmtColA}{\dimexpr(\linewidth-\nmtGridW-0.8cm)*46/100\relax}%
+    \setlength{\nmtColB}{\dimexpr\linewidth-\nmtGridW-0.8cm-\nmtColA\relax}%
+    \begin{minipage}[t]{\nmtColA}\vspace{0pt}\raggedright #1\end{minipage}\hfill
+    \begin{minipage}[t]{\nmtColB}\vspace{0pt}\raggedright #2\end{minipage}\hfill
+    \begin{minipage}[t]{\nmtGridW}\vspace{0pt}\raggedleft #3\end{minipage}\par}
+% варіанти відповіді п'ять А--Д: не ширші за 1,7 клітинки (довший запис переноситься на два рядки) -- рядок-таблиця (\answerTable; високі формули -- \answerTableTall), довші -- вертикальний
+% список у стилі пунктів відповідності; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
+\newsavebox{\nmtOptBox}\newlength{\nmtOptMaxH}\newif\ifnmtOptFit
+\newcommand{\nmtOptMeasure}[1]{\sbox{\nmtOptBox}{#1}%
+    \ifdim\wd\nmtOptBox>1.7\nmtcellw\nmtOptFitfalse\fi
+    \ifdim\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax>\nmtOptMaxH\setlength{\nmtOptMaxH}{\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax}\fi}
+\newcommand{\nmtOptions}[5]{%
+    \par\nmtSetCell\nmtOptFittrue\setlength{\nmtOptMaxH}{0pt}%
+    \nmtOptMeasure{#1}\nmtOptMeasure{#2}\nmtOptMeasure{#3}\nmtOptMeasure{#4}\nmtOptMeasure{#5}%
+    \ifnmtOptFit
+        \ifdim\nmtOptMaxH>0.62cm \answerTableTall{#1}{#2}{#3}{#4}{#5}\else\answerTable{#1}{#2}{#3}{#4}{#5}\fi
+    \else
+        \par\nopagebreak\vspace{0.1cm}%
+        \matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}%
+    \fi}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
@@ -305,7 +330,7 @@ PREAMBLE = ШАПКА            # скрізь, де раніше підста�
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
-               "matchHead","nmtHeadUnless","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
+               "matchingLayout","nmtOptions","nmtOptMeasure","matchHead","nmtHeadUnless","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
 # старі макроси, які перейменовуємо в тілі на нові
 RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\matchTable\b", r"\\matchingGrid"),
@@ -324,44 +349,7 @@ COMPAT = r"""% --- сумісність зі старою базою (діє, я
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 """
 DROPPED = {"answerTableBig","matchTable","answerGrid","answerGridSmall","answerBox","shortAnswer","answerTableSmall","answerListVertical","trigStyle"}
@@ -910,6 +898,8 @@ SOURCE_FIXES = [
     # НМТ 2024, 25.05 №13 (паралелограм, бісектриса AK): у базі BK:KC = 5:2, AK = c, кут β і варіанти без правильного; в оригіналі (НМТ23-25.pdf, с. 95) 4:3, AK = b, ∠KAD = α, відповідь В
     (r"так, що $BK : KC = 5 : 2$ (див. рисунок). $AK = c$, $\angle KAD = \beta$.", r"так, що $BK : KC = 4 : 3$ (див. рисунок). $AK = b$, $\angle KAD = \alpha$."),
     (замінити_варіанти("answerTableTall", [r"$\dfrac{4b}{11\cos\alpha}$", r"$\dfrac{11b}{4\mathrm{tg}\,\alpha}$", r"$\dfrac{11b}{4\cos\alpha}$", r"$\dfrac{36b}{\cos\alpha}$", r"$\dfrac{11b}{4\sin\alpha}$"]), None, "$AK = b$, $\\angle KAD = \\alpha$."),
+    # старе поле відповіді з \fbox поруч із \nmtAnswerBox -- дубль (24. Арифметична прогресія, завдання про колоди)
+    (r"Відповідь: \fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}, \fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}", ""),
 ]
 FIXES_USED = collections.Counter()
 

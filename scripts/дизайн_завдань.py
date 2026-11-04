@@ -54,6 +54,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 \let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
+% стовпчасті діаграми pgfplots: один вигляд (колір, сітка, поділки); ширину стовпця й розмір осей задає нормалізатор (_діаграма_стовпчики)
+\pgfplotsset{nmt bar/.style={fill=nmtBlue!55!white, draw=nmtInk, line width=0.45pt}}
+\pgfplotsset{nmt bars/.style={ybar, ymin=0, axis x line*=bottom, axis y line*=left, ymajorgrids=true, major grid style={nmtGrid!45, line width=0.35pt},
+  enlarge x limits=0.12,
+  x tick label style={font=\footnotesize, align=center}, y tick label style={font=\footnotesize}, x label style={align=center}, y label style={align=center}}}
 % ===================== кінець дизайн-системи =====================
 % підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
 % Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
@@ -395,6 +400,39 @@ def інфографіка(тіло):
     return bool(слова)
 
 
+def _без_масштабу(відкриття):
+    """діаграма pgfplots: масштаб картинки scale=.. розсуває підписи осей (їхні відступи в pt не масштабуються) -- розмір задають width/height осей"""
+    m = re.match(r"(\\begin\{tikzpicture\})\s*\[((?:[^\[\]]|\[[^\[\]]*\])*)\](.*)", відкриття, re.S)
+    if not m: return відкриття
+    опції = [o for o in _опції(m.group(2)) if not re.fullmatch(r"(?:x|y)?scale\s*=\s*[-\d.]+|transform shape", o.strip())]
+    return m.group(1) + ("[" + ", ".join(опції) + "]" if опції else "") + m.group(3)
+
+
+ВИДАЛИТИ_З_СТОВПЧИКІВ = re.compile(r"(?:bar width|enlarge x limits|enlarge y limits|grid style|major grid style|minor grid style|minor y tick num|"
+                                   r"yminorgrids|ymajorgrids|xmajorgrids|grid|fill|draw|axis lines|axis x line\*?|axis y line\*?|every axis plot/\.append style|"
+                                   r"x label style|xlabel style|y label style|ylabel style|x tick label style|xticklabel style|y tick label style|ybar|ymin|ytick style|tick style|clip)\s*(?:=|$)")
+
+
+def _діаграма_стовпчики(опції):
+    """ybar-діаграма без легенди -> стиль nmt bars + ширина стовпця за кількістю категорій; усі ручні налаштування вигляду (кольори, сітка,
+    положення підписів осей) -- геть, лишаються дані: поділки, підписи осей, межі"""
+    текст = re.sub(r"%[^\n]*", "", опції)
+    if "legend" in текст or "xbar" in текст or "ybar" not in текст: return опції
+    список = _опції(текст.replace("\n", " "))
+    ymin = next((o for o in список if re.match(r"ymin\s*=", o)), None)
+    # кількість категорій: xtick / symbolic x coords / xticklabels
+    n = 0
+    for ключ in (r"symbolic x coords", r"xticklabels", r"xtick"):
+        m = re.search(ключ + r"\s*=\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}", текст)
+        if m: n = len([x for x in re.split(r",", m.group(1)) if x.strip()]); break
+    n = max(n, 1)
+    bw = round(min(1.2, 0.45 * 11.0 / n), 2)
+    нові = [o for o in список if not ВИДАЛИТИ_З_СТОВПЧИКІВ.match(o)]
+    ключові = [o for o in нові if re.match(r"(?:width|height)\s*=", o)]
+    решта = [o for o in нові if o not in ключові]
+    return ",\n    ".join(["nmt bars", "bar width=%gcm" % bw] + ключові + ([ymin] if ymin else []) + решта)
+
+
 def _розмір_діаграми(тіло, wмісця):
     """pgfplots-діаграма: розмір осей -- єдиний (ДІАГРАМА_W x ДІАГРАМА_H); у вузькому місці (minipage) -- пропорційно до місця.
     Шрифти не міняємо (діаграма з текстом), лише width/height осей"""
@@ -405,8 +443,12 @@ def _розмір_діаграми(тіло, wмісця):
         for ключ, знач in (("width", w), ("height", h)):
             n = re.subn(r"(?:(?<=,)|(?<=^))(\s*)%s\s*=\s*[^,\n\]]+" % ключ, lambda mm: "%s%s=%gcm" % (mm.group(1), ключ, знач), опції)
             опції = n[0] if n[1] else опції + ",\n    %s=%gcm" % (ключ, знач)
-        return "\\begin{axis}[" + опції + "]"
-    return re.sub(r"\\begin\{axis\}\[(.*?)\]", фікс, тіло, count=1, flags=re.S)
+        return "\\begin{axis}[" + _діаграма_стовпчики(опції) + "]"
+    нове = re.sub(r"\\begin\{axis\}\[(.*?)\]", фікс, тіло, count=1, flags=re.S)
+    if "nmt bars" in нове:      # стовпці: заливку й контур задає стиль nmt bar (явна опція сильніша за палітру кольорів pgfplots)
+        нове = re.sub(r"\\addplot\s*\[nmt curve\s*(?:,\s*)?([^\]]*)\]", lambda m: "\\addplot[nmt bar%s] " % ((", " + m.group(1)) if m.group(1).strip() else ""), нове)
+        нове = re.sub(r"\\addplot\s+coordinates", "\\addplot[nmt bar] coordinates", нове)
+    return нове
 
 
 def _рисунок(відкриття, тіло, звіт, варіант=False, кольори_зміст=False, wмісця=None):
@@ -508,6 +550,7 @@ def розмір_перемальованих(рисунки, тексти_до,
             if ключ not in РОЗМІРИ: НА_ВИМІР[ключ] = відкриття + тіло + "\\end{tikzpicture}"
         елементи.append((варіант, ширина_місця(до), відкриття, тіло, ключ))
     for (в, w, відк, тіло, к), нове in zip(елементи, _розмір_елементів(елементи, звіт, всього == 1)):
+        if "\\begin{axis}" in тіло and not в and "#" not in тіло: нове = _без_масштабу(нове)
         вихід.append(нове + тіло + "\\end{tikzpicture}")
     return вихід
 
@@ -532,6 +575,7 @@ def уніфікувати(t, звіт=None):
     нові_відкриття = _розмір_елементів([(в, wм, відк, тіло, ключ) for _, в, wм, відк, тіло, ключ in рисунки], звіт, len(усі) == 1)
     for (місце, варіант, wмісця, відкриття, тіло, ключ), нове in zip(рисунки, нові_відкриття):
         відкриття = нове
+        if "\\begin{axis}" in тіло and not варіант and "#" not in тіло: відкриття = _без_масштабу(відкриття)
         if ключ is not None:                                  # не інфографіка: підписи кутів -- біля дуги (\\nmtAngleLabel)
             тіло = кути_біля_дуги(тіло)
         частини[місце] = відкриття + тіло
