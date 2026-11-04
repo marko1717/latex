@@ -9,7 +9,7 @@
 import os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-ПРОПУСТИТИ = {"build_log.json"}
+ПРОПУСТИТИ = {"build_log.json", "завдання_за_оригіналом.json"}     # останній ключується СТАРИМ id (так будівник знаходить завдання, яке замінює)
 
 
 def файли():

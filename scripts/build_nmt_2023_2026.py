@@ -1496,10 +1496,17 @@ def перемалювати_за_оригіналом(шляхи):
     за_id = collections.defaultdict(dict)
     for r in json.load(open(f, encoding="utf-8")):
         за_id[r["id"]][int(r.get("рисунок", 0))] = r["tikz"]
+    замінені = {}                       # id -> цілий блок завдання, перенабраний за оригіналом (scripts/data/завдання_за_оригіналом.json)
+    ff = os.path.join(DATA, "завдання_за_оригіналом.json")
+    if os.path.exists(ff):
+        for r in json.load(open(ff, encoding="utf-8")): замінені[r["id"]] = дизайн_завдань.кути_біля_дуги(r["блок"].strip("\n"))
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
     import спільне as SP
     def блок(m):
         b = m.group(1); i = SP.підпис(b)
+        if i in замінені:
+            ПЕРЕМАЛЬОВАНІ[(i, "блок")] += 1
+            return "\\begin{samepage}\n" + замінені[i] + "\n\\end{samepage}"
         if i not in за_id: return m.group(0)
         k = [-1]
         def рис(mm):
@@ -1514,7 +1521,7 @@ def перемалювати_за_оригіналом(шляхи):
         t = open(повний, encoding="utf-8").read()
         t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
         if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
-    return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)]]
+    return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)] and i not in замінені] + [(i, "блок") for i in замінені if not ПЕРЕМАЛЬОВАНІ[(i, "блок")]]
 
 
 def main():
