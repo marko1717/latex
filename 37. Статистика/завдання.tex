@@ -907,33 +907,18 @@
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Сектор КАРАСІ (Зелений, 90 градусів, 25%)
-    \draw[fill=green!40] (0,0) -- (0:2.5) arc (0:90:2.5) -- cycle;
-    % Позначка прямого кута
+    \def\R{2.5}
+    % карасі: 90 градусів (прямий кут), коропи 10 -- 60, лящі ? -- 30, товстолоби 10 -- 60, окуні 20 -- 120
+    \draw[fill=green!40] (0,0) -- (90:\R) arc (90:0:\R) -- cycle;
+    \draw[fill=yellow!50] (0,0) -- (0:\R) arc (0:-60:\R) -- cycle;
+    \draw[fill=cyan!30] (0,0) -- (-60:\R) arc (-60:-90:\R) -- cycle;
+    \draw[fill=red!40] (0,0) -- (-90:\R) arc (-90:-150:\R) -- cycle;
+    \draw[fill=violet!30] (0,0) -- (-150:\R) arc (-150:-270:\R) -- cycle;
     \draw (0.3,0) -- (0.3,0.3) -- (0,0.3);
-
-    % Сектор ОКУНІ (Фіолетовий, значення 20, найбільший з решти)
-    % Припустимо кут ~135 градусів (від 90 до 225)
-    \draw[fill=violet!30] (0,0) -- (90:2.5) arc (90:225:2.5) -- cycle;
-    \node at (157.5:1.5) {\large 20};
-
-    % Сектор ТОВСТОЛОБИ (Червоний, значення 10)
-    % Припустимо кут ~45 градусів (від 225 до 270)
-    \draw[fill=red!40] (0,0) -- (225:2.5) arc (225:270:2.5) -- cycle;
-    \node at (247.5:1.5) {\large 10};
-
-    % Сектор ЛЯЩІ (Блакитний, ?)
-    % Припустимо кут ~45 градусів (від 270 до 315)
-    \draw[fill=cyan!30] (0,0) -- (270:2.5) arc (270:315:2.5) -- cycle;
-    \node at (292.5:1.5) {\large ?};
-
-    % Сектор КОРОПИ (Жовтий, значення 10)
-    % Решта до 360 (від 315 до 360 = 0)
-    \draw[fill=yellow!50] (0,0) -- (315:2.5) arc (315:360:2.5) -- cycle;
-    \node at (337.5:1.5) {\large 10};
-
-    % Контур кола
-    \draw (0,0) circle (2.5);
+    \node at (-30:1.55) {\large $10$};
+    \node at (-75:1.75) {\large $?$};
+    \node at (-120:1.55) {\large $10$};
+    \node at (150:1.5) {\large $20$};
 \end{tikzpicture}\end{nmtfit}
 
 % Легенда
@@ -1428,28 +1413,16 @@
 
 \nmtnobreak
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        width=14cm, height=6cm,
-        xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
-        y label style={align=center, font=\small},
-        xmin=0, xmax=25,
-        ymin=0, ymax=40,
-        xtick={0,2,4,6,8,10,12,14,16,18,20,22,24},
-        ytick={0,5,10,15,20,25,30,35},
-        grid=both,
-        major grid style={line width=0.4pt,draw=gray!50},
-        axis lines=left,
-        axis line style={-latex},
-    ]
-        % Крива
-        \addplot[nmt curve, smooth, tension=0.7] coordinates {
-            (0,15) (4,10) (10,20) (15,30) (24,15)
-        };
-        % Лінія рівня 25 (для наочності, необов'язково)
-        % \draw[nmtRed, dashed] (axis cs:0,25) -- (axis cs:24,25);
-    \end{axis}
+\begin{nmtfit}\begin{tikzpicture}[x=0.4cm, y=0.1cm]
+    \draw[nmt grid, xstep=2, ystep=5] (0,0) grid (24,40);
+    \draw[->] (0,0) -- (25.5,0);
+    \draw[->] (0,0) -- (0,44);
+    \foreach \x in {2,4,...,24} \node[below=2pt] at (\x,0) {$\x$};
+    \node[below left] at (0,0) {$0$};
+    \foreach \y in {5,10,...,35} \node[left=2pt] at (0,\y) {$\y$};
+    \node[below=0.9cm] at (12,0) {Час, \textit{години}};
+    \node[rotate=90, align=center] at (-4.6,20) {Кількість\\дрібнодисперсного\\пилу, \textit{мкг/м}$^3$};
+    \draw[nmt curve] (0,15) .. controls (1.333,11.667) and (2.667,10) .. (4,10) .. controls (5.333,10) and (6.667,12.692) .. (8,15) .. controls (8.667,16.154) and (9.333,18.333) .. (10,20) .. controls (10.667,21.667) and (11.333,23.649) .. (12,25) .. controls (13,27.027) and (14,30) .. (15,30) .. controls (16,30) and (17,27.027) .. (18,25) .. controls (18.667,23.649) and (19.333,21.154) .. (20,20) .. controls (21.333,17.692) and (22.667,15) .. (24,15);
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 
@@ -1470,27 +1443,20 @@
 \centering
 \begin{nmtfit}\begin{tikzpicture}
 \begin{axis}[
-    width=9cm, height=6cm,
-    xmode=log, log basis x=10,
-    xmin=15, xmax=7000,
-    ymin=0, ymax=85,
+    width=8cm, height=5cm,
+    xmin=0.5, xmax=9.5, ymin=0, ymax=80,
+    xtick={1,2,3,4,5,6,7,8,9},
+    xticklabels={20,100,200,300,500,1000,2000,3000,5000},
     ytick={0,20,40,60,80},
-    xtick={20,100,200,300,500,1000,2000,5000},
-    xticklabels={20,100,200,300,500,1000,2000,5000},
-    xlabel={\small частота (Гц)},
-    ylabel={\small рівень шуму (дБ)},
-    xmajorgrids=true, ymajorgrids=true,
-    major grid style={dashed, gray!30},
-    axis x line*=bottom, axis y line*=left,
-    tick label style={font=\scriptsize},
-    log ticks with fixed point,
+    xlabel={Частота, Гц}, ylabel={Рівень шуму, дБ},
+    grid=both, minor tick num=0,
+    tick label style={font=\small}, xticklabel style={rotate=45, anchor=north east, inner sep=1pt},
+    legend style={at={(0.5,-0.42)}, anchor=north, legend columns=1, draw=none, font=\small},
 ]
-    \addplot[nmt curve, mark=*, nmtGreen, mark options={fill=white}] coordinates {
-        (20,60) (100,53) (200,62) (300,60) (500,57) (1000,62) (2000,65) (5000,67)
-    };
-    \addplot[nmt curve, mark=*, nmtOrange, mark options={fill=white}] coordinates {
-        (20,40) (100,30) (200,20) (300,12) (500,16) (1000,20) (2000,25) (5000,40)
-    };
+    \addplot[nmt curve, nmtOrange, mark=*, mark size=1.5pt] coordinates {(1,63) (2,71) (3,79) (4,62) (5,61) (6,60) (7,67) (8,66) (9,60)};
+    \addlegendentry{Джерело 1}
+    \addplot[nmt curve, nmtGreen, mark=*, mark size=1.5pt] coordinates {(1,60) (2,42) (3,58) (4,37) (5,40) (6,30) (7,22) (8,38) (9,40)};
+    \addlegendentry{Джерело 2}
 \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -2101,22 +2067,15 @@
 \hfill
 \begin{minipage}[c]{0.52\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.859, x=0.3cm, y=0.3cm, thick]
-    \draw[nmt grid, step=2] (0,-4) grid (26,8);
-    \draw[->] (-1,0) -- (27,0) node[right, font=\normalsize] {$t$, год};
-    \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\normalsize] {$T$, $^\circ$C};
-    \node[below left, font=\normalsize] at (0,0) {$0$};
-    \node[below, font=\normalsize] at (2,0) {$2$};
-    \node[below, font=\normalsize] at (6,0) {$6$};
-    \node[below, font=\normalsize] at (10,0) {$10$};
-    \node[below, font=\normalsize] at (16,0) {$16$};
-    \node[below, font=\normalsize] at (24,0) {$24$};
-    \node[left, font=\normalsize] at (0,2) {$2$};
-    \node[left, font=\normalsize] at (0,6) {$6$};
-    \draw[nmt curve, smooth] plot coordinates {(0,2) (2,2) (4,0) (6,-2) (8,-2) (10,0) (14,4) (16,6) (18,5) (22,2) (24,2)};
-    \path (0,2) node[nmt dot] {};
-    \path (16,6) node[nmt dot] {};
-    \path (24,2) node[nmt dot] {};
+\begin{nmtfit}\begin{tikzpicture}[x=0.25cm, y=0.25cm]
+    \draw[nmt grid, step=2] (-2,-4) grid (32,10);
+    \draw[->] (-2,0) -- (32,0) node[below left, fill=white, inner sep=1pt] {$t$, год};
+    \draw[->] (0,-4) -- (0,10) node[below right, fill=white, inner sep=1pt] {$T$, $^\circ$C};
+    \node[below left] at (0,0) {$0$};
+    \foreach \t in {2,6,10,16,24} \node[below=1pt, fill=white, inner sep=1pt] at (\t,0) {$\t$};
+    \foreach \T in {2,6} \node[left] at (0,\T) {$\T$};
+    \draw[nmt curve] (0,2) .. controls (1.333,2) and (2.667,0.923) .. (4,0) .. controls (4.667,-0.462) and (5.333,-2) .. (6,-2) .. controls (7.333,-2) and (8.667,-0.923) .. (10,0) .. controls (10.667,0.462) and (11.333,1.333) .. (12,2) .. controls (13.333,3.333) and (14.667,6) .. (16,6) .. controls (17.333,6) and (18.667,4.667) .. (20,4) .. controls (21.333,3.333) and (22.667,2.667) .. (24,2);
+    \foreach \p in {(0,2),(6,-2),(16,6),(24,2)} \node[nmt dot] at \p {};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
