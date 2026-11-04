@@ -1071,17 +1071,25 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.632, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (8,0);
-    \coordinate (B) at (4,4);
-    \draw[fill=mainGreen!15, draw=mainGreen!80!black, thick] (A) -- (B) -- (C) -- cycle;
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, line join=round]
+    % за оригіналом (НМТ 2026, 2.06, № 3, с. 31): клумба у формі трикутника ABC (AB = BC), поливалки в кутах; квіти -- згенерована картинка (nmt_klumba.jpg), обрізана по контуру трикутника
+    \coordinate (A) at (0,0); \coordinate (C) at (6,0); \coordinate (B) at (3,3);
+    \begin{scope}
+        \clip (A) -- (B) -- (C) -- cycle;
+        \node[inner sep=0] at (3,1.5) {\includegraphics[width=7cm]{nmt_klumba.jpg}};
+    \end{scope}
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \def\spr#1#2{\begin{scope}[shift={(#1)}]
+        \draw[draw=gray!70, fill=gray!30] (-0.1,-0.05) rectangle (0.1,0.26);
+        \draw[draw=gray!70, fill=gray!55] (-0.15,0.26) rectangle (0.15,0.34);
+        \foreach \a in {#2} {\fill[nmtBlue!35] (\a:0.55) ellipse (0.07 and 0.04);\fill[nmtBlue!35] (\a:0.8) ellipse (0.06 and 0.035);}
+        \end{scope}}
+    \spr{A}{15,35,60,150,175}
+    \spr{B}{20,45,135,160,200,225,320}
+    \spr{C}{5,30,120,145,165}
     \node[below left] at (A) {$A$};
-    \node[above] at (B) {$B$};
+    \node[above right, xshift=3pt] at (B) {$B$};
     \node[below right] at (C) {$C$};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = C--A--B};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = B--C--A};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = A--B--C};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1342,21 +1350,32 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{minipage}[c]{0.44\textwidth}
 \centering
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, line join=round, line cap=round]
-    % Лівий квадрат (225)
-    \draw[thick] (0,0) rectangle (-5,5);
-    \node at (-2.5, 2.5) {$225~\text{м}^2$};
-
-    % Трикутник
-    \draw[thick] (0,0) -- (2.4, 1.8) -- (0,5) -- cycle;
-
-    % Правий квадрат (144)
-    \draw[thick] (0,5) -- (3.2, 7.4) -- (5.6, 4.2) -- (2.4, 1.8) -- cycle;
-    \node at (2.8, 4.6) {$144~\text{м}^2$};
-
-    % Коло (фонтан)
-    \draw[thick] (1, 2) circle (1);
-    \node[scale=0.95] at (1, 2) {фонтан};
+\begin{nmtfit}\begin{tikzpicture}[x=0.2cm, y=0.2cm, line join=round]
+    % за оригіналом (НМТ 2026, 12.06, № 14, с. 84): квадрати 225 і 144 м², між ними прямокутний трикутник (катети 9 і 12, гіпотенуза 15), вписане коло r = 3.
+    % Геометрія точна; парк і фонтан -- згенеровані картинки (nmt_park.jpg, nmt_fontan.jpg), обрізані по контурах фігур.
+    \coordinate (O) at (0,0); \coordinate (T) at (0,15); \coordinate (R) at (7.2,5.4);
+    \fill[nmtFillD] (O) -- (T) -- (R) -- cycle;
+    % великий квадрат (225 м²)
+    \begin{scope}
+        \clip (-15,0) rectangle (0,15);
+        \node[inner sep=0] at (-7.5,7.5) {\includegraphics[width=5.2cm]{nmt_park.jpg}};
+    \end{scope}
+    % малий квадрат (144 м²) -- на катеті TR, повернутий
+    \begin{scope}[shift={(T)}, rotate=-53.13]
+        \clip (0,0) rectangle (12,12);
+        \node[inner sep=0] at (6,6) {\includegraphics[width=4.6cm]{nmt_park.jpg}};
+    \end{scope}
+    % фонтан -- коло, вписане в трикутник
+    \begin{scope}
+        \clip (3,6) circle (3);
+        \node[inner sep=0] at (3,6) {\includegraphics[width=3.4cm]{nmt_fontan.jpg}};
+    \end{scope}
+    \draw[thick] (-15,0) rectangle (0,15);
+    \draw[thick] (T) -- (R) -- ($(R)+(9.6,7.2)$) -- ($(T)+(9.6,7.2)$) -- cycle;
+    \draw[thick] (O) -- (R);
+    \draw[thick] (3,6) circle (3);
+    \node[fill=white, fill opacity=0.85, text opacity=1, inner sep=2pt] at (-7.5,7.5) {$225$~\textit{м}$^2$};
+    \node[fill=white, fill opacity=0.85, text opacity=1, inner sep=2pt] at (8.4,13.8) {$144$~\textit{м}$^2$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
