@@ -1506,6 +1506,7 @@ def перемалювати_за_оригіналом(шляхи):
         b = m.group(1); i = SP.підпис(b)
         if i in замінені:
             ПЕРЕМАЛЬОВАНІ[(i, "блок")] += 1
+            if not замінені[i].strip(): return ""            # порожній блок = завдання вилучено з бази
             return "\\begin{samepage}\n" + замінені[i] + "\n\\end{samepage}"
         if i not in за_id: return m.group(0)
         k = [-1]

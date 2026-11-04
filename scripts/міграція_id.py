@@ -36,9 +36,33 @@ def замінити(пари):
                 print("%s -> %s: %s (%d)" % (старий, новий, os.path.relpath(f, ROOT), t.count(старий)))
 
 
+def прибрати(i):
+    """завдання вилучено з бази: прибирає його записи (елементи списків з "id" == i і ключі-id) з data/*.json"""
+    import json
+    for f in файли():
+        if not f.endswith(".json") or os.path.basename(f) in ПРОПУСТИТИ: continue
+        t = open(f, encoding="utf-8").read()
+        if i not in t: continue
+        d = json.loads(t)
+        def обх(o):
+            if isinstance(o, list): return [обх(x) for x in o if not (isinstance(x, dict) and x.get("id") == i)]
+            if isinstance(o, dict): return {k: обх(v) for k, v in o.items() if k != i}
+            return o
+        н = обх(d)
+        компактний = t.startswith("[\n{") and t.count("\n") > 50 and "\n  " not in t[:200]       # формат «по рядку на запис» (SP.зберегти_json)
+        if компактний:
+            with open(f, "w", encoding="utf-8") as g:
+                g.write("[\n" + ",\n".join(json.dumps(r, ensure_ascii=False, separators=(",", ":")) for r in н) + "\n]\n")
+        else:
+            open(f, "w", encoding="utf-8").write(json.dumps(н, ensure_ascii=False, indent=1) + ("\n" if t.endswith("\n") else ""))
+        print("прибрано %s: %s" % (i, os.path.relpath(f, ROOT)))
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if a and a[0] == "--знайти":
+    if a and a[0] == "--прибрати":
+        for i in a[1:]: прибрати(i)
+    elif a and a[0] == "--знайти":
         for f, n in знайти(a[1]): print(n, f)
     else:
         assert len(a) % 2 == 0 and a, __doc__
