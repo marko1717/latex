@@ -39,8 +39,11 @@ def _збалансовано(t, i):
 def плоский(t):
     """зміст без розкладки й рисунків -- для перевірки інваріанта"""
     t = FIG.sub(" ", t)
+    t = ДУБЛЬ_ВІДПОВІДІ.sub("", t)
+    t = t.replace("\\nmtSetCell", "")
+    t = re.sub(r"\\begin\{tabular\}\{\|\*\{5\}\{[^\n]*?\|\}\}", r"\\begin{tabular}", t)
     t = РОЗМІТКА.sub(" ", t)
-    t = re.sub(r"\\(?:zadtask|zadnum|matchingGrid|matchingLayout|nmtOptions)\b", " ", t)
+    t = re.sub(r"\\(?:zadtask|zadnum|matchingGrid|matchingLayout|nmtOptions|nmtStmt)\b", " ", t)
     t = re.sub(r"\\quad", " ", t)
     return re.sub(r"[\s{}]+", "", t)
 
@@ -50,14 +53,24 @@ def _слова(t):
     t = FIG.sub(" ", t)
     t = re.sub(r"%[^\n]*", "", t)
     t = re.sub(r"\\begingroup.*?\\endgroup", " ", t, flags=re.S)
+    t = re.sub(r"\\begin\{tabular\}\{@\{\}l@\{\\hspace\{1cm\}\}l@\{\}\}", " ", t)
     t = re.sub(r"\\(?:begin|end)\{[^}]*\}(?:\[[^\]]*\])?(?:\{[^}]*\})?", " ", t)
     t = re.sub(r"\\(?:mbox|nmtyear|nbvspace|vspace|penalty)(?:\{[^}]*\}|-?\d+)?", " ", t)
     t = re.sub(r"\\\\(?:\[[^\]]*\])?|\\[a-zA-Z]+\*?", " ", t)
     return re.sub(r"[\s{}&\[\]]+", "", t)
 
 
+def _слова_тв(t):
+    """зміст тверджень без розмітки: порівняння до/після єдині_твердження (мітки I., \\textbf{I}, \\item -- не зміст)"""
+    t = плоский(t)
+    t = re.sub(r"\\nmtStmt|\\textbf|\\makebox\[[^\]]*\]\[l\]|\\hangindent=[\d.]+em|\\noindent|\\hspace\{[^}]*\}|\\item|\\quad|\\,|\\\\|&", "", t)
+    return re.sub(r"(?<![A-Za-z])I{1,3}\.?(?=[А-ЯІЇЄA-Z$\\])", "", t)
+
+
 def перевірити_зміст(до, після):
     if плоский(єдині_варіанти(до)) == плоский(після) or плоский(до) == плоский(після): return True
+    if _слова_тв(єдині_твердження(єдині_варіанти(до))) == _слова_тв(після): return True
+    if "\\matchItem" in після and "\\matchItem" not in до: return sorted(_слова(до)) == sorted(_слова(після))      # пункти двох стовпчиків були чергувані по рядках
     return "Початок речення" in до and "\\cline{2-6}" in до and _слова(до) == _слова(після)
 
 
@@ -173,6 +186,22 @@ def _прибрати_порожнє(t):
 МАЛЮЄ = re.compile(r"\\(?:draw|fill|filldraw|node|pic|shade|foreach|addplot|clip|coordinate)\b|\\includegraphics|\\begin\{axis\}")
 
 
+ДУБЛЬ_ВІДПОВІДІ = re.compile(r"\\noindent\\textbf\{Відповідь:\s*\\underline\{\\hspace\{[^}]*\}\}\}[ \t]*\n?(?=\s*\\nmtAnswerBox)")
+
+
+СПЕЦ_ТАБЛИЦІ_РИСУНКІВ = re.compile(r"\\begin\{tabular\}\{\|\*\{5\}\{(?:>\{[^}]*\})?(?:m\{[\d.]+cm\}|c)\|\}\}")
+
+
+def таблиця_рисунків(b):
+    """таблиця п'яти рисунків-варіантів А--Д: клітинки колись мали довільну ширину (2,2--3,2 см) -- тепер завжди на всю ширину рядка (m{\nmtcellw}, як у
+    \nmtOptions), тож усі такі таблиці однакові"""
+    def зам(m):
+        після = b[m.end():m.end() + 6000].split("\\end{tabular}")[0]
+        if "tikzpicture" not in після and "includegraphics" not in після: return m.group(0)
+        return "\\nmtSetCell\n\\begin{tabular}{|*{5}{>{\\centering\\arraybackslash}m{\\nmtcellw}|}}"
+    return СПЕЦ_ТАБЛИЦІ_РИСУНКІВ.sub(зам, b)
+
+
 def без_порожніх_рисунків(b):
     """«рисунок» без жодної команди малювання (заглушка `\\path (0,0);` чи \\useasboundingbox) -- геть разом з обгорткою center
     (колись його масштабувало дизайн-система до 26 см² -- виходила величезна порожнеча між умовою й варіантами)"""
@@ -185,7 +214,7 @@ def без_порожніх_рисунків(b):
 
 def нормалізувати(b, аспект=None):
     """нерухома точка _раз: результат нормалізації сам є нормалізованим (збірка не залежить від кількості проходів)"""
-    b = без_порожніх_рисунків(єдині_варіанти(b))
+    b = таблиця_рисунків(без_порожніх_рисунків(єдині_варіанти(єдині_твердження(ДУБЛЬ_ВІДПОВІДІ.sub("", b)))))
     n, v = _раз(b, аспект)
     for _ in range(3):
         n2, v2 = _раз(n, аспект)
@@ -415,8 +444,35 @@ def _варіанти_enumerate(b):
     return b[:m.start()] + _опції(пункти) + b[к + len("\\end{enumerate}"):]
 
 
+def _відповідність_таблицею(b):
+    """відповідність у tabular{@{}l@{\hspace{1cm}}l@{}}: «\textit{Заголовок} & \textit{Заголовок}», рядки «\textbf{1} \quad … & \textbf{А} \quad …», продовження «\quad\quad …»,
+    сітка окремо -> \matchingLayout"""
+    m = re.search(r"\\begin\{tabular\}\{@\{\}l@\{\\hspace\{1cm\}\}l@\{\}\}(.*?)\\end\{tabular\}", b, re.S)
+    if not m or "\\matchItem" in b: return b
+    рядки = _рядки_таблиці(m.group(1))
+    if len(рядки) < 3: return b
+    гол = [re.fullmatch(r"\\textit\{(.*)\}", c.strip(), re.S) for c in _клітинки(рядки[0])]
+    if len(гол) != 2 or not all(гол): return b
+    ліві, праві = [], []
+    for р in рядки[1:]:
+        кл = _клітинки(р); л = кл[0]; п = кл[1] if len(кл) > 1 else ""
+        ml = re.fullmatch(r"\\textbf\{(\d)\}\s*\\quad\s*(.*)", л, re.S)
+        if ml: ліві.append([ml.group(1), ml.group(2).strip()])
+        elif re.match(r"\\quad\s*\\quad", л) and ліві: ліві[-1][1] += " " + re.sub(r"^(?:\\quad\s*)+", "", л).strip()
+        elif л.strip(): return b
+        mr = re.fullmatch(r"\\textbf\{([А-Д])\}\s*\\quad\s*(.*)", п.strip(), re.S)
+        if mr: праві.append([mr.group(1), mr.group(2).strip()])
+        elif п.strip(): return b
+    if len(ліві) < 2 or len(праві) != 5: return b
+    нова = _список_відповідності([гол[0].group(1), гол[1].group(1)], [tuple(x) for x in ліві], [tuple(x) for x in праві])
+    після = re.compile(r"(?:\s|\\nopagebreak|\\nbvspace\{[^}]*\})*\\matchingGrid(?:\s|\\nbvspace\{[^}]*\})*").match(b, m.end())
+    кінець = після.end() if після else m.end()
+    return b[:m.start()] + нова + "\n" + b[кінець:]
+
+
 def _стара_відповідність(b):
     """рукописна відповідність «\\textit{Початок речення} / \\textbf{1} \\quad ... / tabular{ll} А--Д / ручна сітка» -> \\matchingLayout"""
+    b = _відповідність_таблицею(b)
     if "\\matchItem" in b or "\\textit{Початок речення}" not in b or "\\cline{2-6}" not in b: return b
     а = b.index("\\textit{Початок речення}")
     в = ХВІСТ.search(b)
@@ -453,3 +509,92 @@ def єдині_варіанти(b):
         try: b = f(b)
         except НеВаріанти: pass
     return _без_сміття_перед_варіантами(b)
+
+
+# ------------------------------------------------------------------ єдині твердження I--III
+# Списки тверджень «Які з тверджень правильні? I. … II. … III. …» писали сімома способами (tabular{rl} з ручними \\, enumerate з \Roman*, \hangindent,
+# \makebox, рядки «I. \quad …»): у частині виходили за поле чи налазили на таблицю. Усе зводиться до \nmtStmt{I}{текст}\nmtStmt{II}{…}\nmtStmt{III}{…}
+# (мітка в колонці сталої ширини, текст у parbox -- продовження вирівняне під текстом).
+РИМСЬКІ = ["I", "II", "III", "IV"]
+МІТКА_ТВ = r"(?:\\textbf\{{{n}\.?\}}|\\makebox\[[^\]]*\]\[l\]\{{\\textbf\{{{n}\}}\}}|{n}\.)"
+РОЗДІЛ_МІТКИ = r"(?:\\ |\\quad|\\qquad|\\hspace\{{[^}}]*\}}|\\,|~|&|\s)*"
+ПОЧАТОК_РЯДКА = r"(?:(?<=\n)|(?<=\\\\)|(?<=\\par)|(?<=\A))[ \t]*(?:\\noindent\s*)?(?:\\hspace\{[^}]*\}\s*)?(?:\\hangindent=[\d.]+em\s*)?"
+ТЕРМІНАТОР_ТВ = re.compile(r"\n[ \t]*\n|\\end\{(?:enumerate|tabular|flushleft|minipage|center)\}|%|\\ifshowsolutions|\\par\\penalty|"
+                           r"\\nbvspace|\\nopagebreak|\\nmtnobreak|\\vspace|\\answerTable|\\nmtOptions|\\nmtAnswerBox|\\noindent\s*Які|\\par\s*\\noindent\s*Які")
+
+
+МІЖ_ТВЕРДЖЕННЯМИ = re.compile(r"\n[ \t]*\n|\\end\{(?:enumerate|tabular|flushleft|minipage|center)\}|%|\\ifshowsolutions|\\answerTable|\\nmtOptions|\\nmtAnswerBox")
+
+
+def _таблиця_rl_у_рядки(b):
+    """tabular{rl}, де рядки «I. & текст \\\\ & продовження \\\\ II. & …» -> звичайні рядки «I. текст продовження»"""
+    def зам(m):
+        рядки = _рядки_таблиці(re.sub(r"(?m)^[ \t]*%[^\n]*$", "", m.group(1)))
+        вих = []
+        for р in рядки:
+            кл = _клітинки(р)
+            if len(кл) != 2: return m.group(0)
+            if кл[0].strip():
+                if not re.fullmatch(r"(?:I{1,3}|IV)\.?", кл[0].strip()): return m.group(0)
+                вих.append(кл[0].strip().rstrip(".") + ". " + кл[1].strip())
+            elif вих: вих[-1] += " " + кл[1].strip()
+            else: return m.group(0)
+        return "\n".join(вих) + "\n"
+    return re.sub(r"\\begin\{tabular\}\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}(.*?)\\end\{tabular\}", зам, b, flags=re.S)
+
+
+def _твердження_enumerate(b):
+    m = re.search(r"\\begin\{enumerate\}\[label=(?:\\textbf\{\\Roman\*\.?\}|\\Roman\*\.?)[^\]]*\]", b)
+    if not m: return b
+    к = b.find("\\end{enumerate}", m.end())
+    if к < 0: return b
+    пункти = [x.strip() for x in re.split(r"\\item\b", b[m.end():к])[1:]]
+    if not 2 <= len(пункти) <= 4 or any(not x for x in пункти): return b
+    нова = "\n".join("\\nmtStmt{%s}{%s}" % (РИМСЬКІ[i], re.sub(r"\s+", " ", x)) for i, x in enumerate(пункти))
+    return b[:m.start()] + нова + b[к + len("\\end{enumerate}"):]
+
+
+def _тверд_текст(t):
+    t = re.sub(r"\s*(?:\\\\(?:\[[^\]]*\])?|\\par\b|\\nmtnobreak|\\nopagebreak|\\nbvspace\{[^}]*\}|\\vspace\{[^}]*\})*\s*$", "", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def _твердження_мітки(b):
+    b = _таблиця_rl_у_рядки(b)
+    for m in re.finditer(ПОЧАТОК_РЯДКА + МІТКА_ТВ.format(n="I") + РОЗДІЛ_МІТКИ, b):
+        поч = m.start(); тексти = []; к = m.end(); ok = True; позиції = [m.end()]
+        n = 1
+        while True:
+            наст = РИМСЬКІ[n] if n < 4 else None
+            mm = re.compile(ПОЧАТОК_РЯДКА + МІТКА_ТВ.format(n=наст) + РОЗДІЛ_МІТКИ).search(b, позиції[-1]) if наст else None
+            if mm and МІЖ_ТВЕРДЖЕННЯМИ.search(b, позиції[-1], mm.start()) is None:
+                тексти.append(b[позиції[-1]:mm.start()]); позиції.append(mm.end()); n += 1
+            else: break
+        if n < 2: continue
+        # кінець останнього: термінатор або незбалансована "}" (закриття \zadtask)
+        ост = позиції[-1]; кін = ТЕРМІНАТОР_ТВ.search(b, ост); межа = кін.start() if кін else len(b)
+        гл = 0; кінець = межа
+        for i in range(ост, межа):
+            if b[i] == "\\": continue
+            if b[i] == "{": гл += 1
+            elif b[i] == "}":
+                if гл == 0: кінець = i; break
+                гл -= 1
+        тексти.append(b[ост:кінець])
+        тексти = [_тверд_текст(x) for x in тексти]
+        if any(not x or re.search(r"\\(?:begin|end)\{(?:minipage|center|tikzpicture|tabular)\}|\\textbf\{I{1,3}\}", x) for x in тексти): continue
+        if any(len(x) > 500 for x in тексти): continue
+        нова = "\n".join("\\nmtStmt{%s}{%s}" % (РИМСЬКІ[i], x) for i, x in enumerate(тексти)) + "\n"
+        return b[:поч] + нова + b[кінець:]
+    return b
+
+
+def _збалансовані_середовища(t):
+    return all(len(re.findall(r"\\begin\{%s\}" % e, t)) == len(re.findall(r"\\end\{%s\}" % e, t)) for e in ("tabular", "minipage", "center", "enumerate", "flushleft"))
+
+
+def єдині_твердження(b):
+    if "лише I" not in b and "I, II" not in b and "I та" not in b: return b
+    n = _твердження_enumerate(b)
+    if n == b: n = _твердження_мітки(b)
+    return n if _збалансовані_середовища(n) or not _збалансовані_середовища(b) else b

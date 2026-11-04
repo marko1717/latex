@@ -222,15 +222,29 @@
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
 % відповідність: два стовпчики пунктів + сітка відповідей природного розміру праворуч (сітка не стискається, стовпчики ділять решту ширини)
-\newlength{\nmtGridW}\newlength{\nmtColA}\newlength{\nmtColB}
+\newlength{\nmtGridW}\newlength{\nmtColA}\newlength{\nmtColB}\newlength{\nmtAvail}\newlength{\nmtNatA}\newlength{\nmtNatB}\newlength{\nmtMS}\newcount\nmtRatio
+% природна (однорядкова) ширина найдовшого пункту чи заголовка стовпчика: пункти лише міряємо, нічого не друкуємо
+\newcommand{\nmtMatchNat}[2]{\global#2=0pt \setbox0\vbox{%
+    \renewcommand{\matchHead}[1]{\setbox1\hbox{\let\\\space\itshape ##1}\nmtMS=\wd1 \ifdim\nmtMS>#2\global#2=\nmtMS\fi}%
+    \renewcommand{\matchItem}[2]{\setbox1\hbox{\let\\\space ##2}\nmtMS=\wd1 \advance\nmtMS by\nmtMatchLab \ifdim\nmtMS>#2\global#2=\nmtMS\fi}%
+    #1}}
+% відповідність: два стовпчики пунктів + сітка відповідей природного розміру праворуч (не стискається); решту ширини стовпчики ділять
+% пропорційно довжині свого найдовшого пункту (кожен не менше 35 %), тож довгі початки речень не стискаються у вузьку колонку
 \newcommand{\matchingLayout}[3]{%
     \par\noindent
     \sbox{\nmtgridbox}{\matchingGridRaw}\setlength{\nmtGridW}{\wd\nmtgridbox}%
-    \setlength{\nmtColA}{\dimexpr(\linewidth-\nmtGridW-0.8cm)*46/100\relax}%
-    \setlength{\nmtColB}{\dimexpr\linewidth-\nmtGridW-0.8cm-\nmtColA\relax}%
+    \nmtMatchNat{#1}{\nmtNatA}\nmtMatchNat{#2}{\nmtNatB}%
+    \setlength{\nmtAvail}{\dimexpr\linewidth-\nmtGridW-0.8cm\relax}%
+    \nmtRatio=\numexpr(\nmtNatA/256)*1000/((\nmtNatA+\nmtNatB)/256+1)\relax
+    \ifnum\nmtRatio<350 \nmtRatio=350 \fi \ifnum\nmtRatio>650 \nmtRatio=650 \fi
+    \setlength{\nmtColA}{\dimexpr\nmtAvail*\nmtRatio/1000\relax}%
+    \setlength{\nmtColB}{\dimexpr\nmtAvail-\nmtColA\relax}%
     \begin{minipage}[t]{\nmtColA}\vspace{0pt}\raggedright #1\end{minipage}\hfill
     \begin{minipage}[t]{\nmtColB}\vspace{0pt}\raggedright #2\end{minipage}\hfill
     \begin{minipage}[t]{\nmtGridW}\vspace{0pt}\raggedleft #3\end{minipage}\par}
+% твердження I--III («Які з наведених тверджень правильні?»): мітка в колонці сталої ширини, текст у parbox -- рядок не виходить за поле, продовження під текстом
+\newlength{\nmtStmtLab}\setlength{\nmtStmtLab}{2.1em}
+\newcommand{\nmtStmt}[2]{\par\noindent\makebox[\nmtStmtLab][l]{\textbf{#1}}\parbox[t]{\dimexpr\linewidth-\nmtStmtLab\relax}{\raggedright #2}\par\nopagebreak\vspace{0.1cm}}
 % варіанти відповіді п'ять А--Д: кожен вміщується в клітинку одним рядком -- рядок-таблиця (\nmtAnswerRow; високі формули -- \nmtAnswerRowTall), інакше
 % (запис довелося б переносити всередині клітинки) -- вертикальний список у стилі пунктів відповідності, варіант з нового рядка; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
 \newsavebox{\nmtOptBox}\newlength{\nmtOptMaxH}\newif\ifnmtOptFit

@@ -218,6 +218,19 @@ def _статементи(картинка, масштаб, звіт, паліт
     return "".join(out)
 
 
+ПІДПИС_НА_СІТЦІ = re.compile(r"\\node\s*(?:\[([^\]]*)\])?(\s*at\s*\([^)]*\)\s*)\{(\$(?:-?\d+(?:[.,]\d+)?|-?\\[a-z]+|[A-Z](?:_\{?\d\}?)?)\$)\}")
+
+
+def _підписи_на_сітці(тіло):
+    """числа на осях і літери точок у рисунках на сітці -- на білій підкладці (лінії сітки не перерізають цифри; підкладка тісна: inner sep 1 pt)"""
+    def зам(m):
+        опції = m.group(1)
+        if опції is not None and "fill" in опції: return m.group(0)
+        нові = (опції + ", " if опції else "") + "fill=white, inner sep=1pt"
+        return "\\node[" + нові + "]" + m.group(2) + "{" + m.group(3) + "}"
+    return ПІДПИС_НА_СІТЦІ.sub(зам, тіло)
+
+
 ШРИФТИ = re.compile(r"\\(tiny|scriptsize|footnotesize)(?![A-Za-z])")
 ШРИФТИ_З_SMALL = re.compile(r"\\(tiny|scriptsize|footnotesize|small)(?![A-Za-z])")
 
@@ -479,6 +492,7 @@ def _рисунок(відкриття, тіло, звіт, варіант=False
         опції = [_стрілка(o) for o in _опції(m.group(2)) if not re.fullmatch(r">\s*=\s*.+", o)]
         відкриття = m.group(1) + ("[" + ", ".join(опції) + "]" if опції else "")
     тіло = _статементи(тіло, масштаб, звіт, палітра)
+    if re.search(r"\bgrid\b", тіло) and "\\begin{axis}" not in тіло: тіло = _підписи_на_сітці(тіло)
     if "\\begin{axis}" in тіло or "#" in тіло:      # pgfplots: розмір -- width/height осей; з параметрами #1 -- не виміряти
         return відкриття, тіло, None
     ключ = ключ_рисунка(відкриття + тіло)
