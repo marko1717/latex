@@ -100,7 +100,7 @@
 % п'ять колонок |m{w}| мають 10 відступів \tabcolsep і 6 вертикальних ліній -- тоді таблиця рівно на \linewidth
 \newlength{\nmtcellw}
 \newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-10\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
+\newcommand{\nmtAnswerRow}[5]{%
 \par\nopagebreak\vspace{0.15cm}
 \noindent\nmtSetCell
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
@@ -112,7 +112,7 @@
 \end{tabular}
 \par\vspace{0.25cm}
 }
-\newcommand{\answerTableTall}[5]{%
+\newcommand{\nmtAnswerRowTall}[5]{%
 \par\nopagebreak\vspace{0.15cm}
 \noindent\nmtSetCell
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
@@ -231,20 +231,22 @@
     \begin{minipage}[t]{\nmtColA}\vspace{0pt}\raggedright #1\end{minipage}\hfill
     \begin{minipage}[t]{\nmtColB}\vspace{0pt}\raggedright #2\end{minipage}\hfill
     \begin{minipage}[t]{\nmtGridW}\vspace{0pt}\raggedleft #3\end{minipage}\par}
-% варіанти відповіді п'ять А--Д: не ширші за 1,7 клітинки (довший запис переноситься на два рядки) -- рядок-таблиця (\answerTable; високі формули -- \answerTableTall), довші -- вертикальний
-% список у стилі пунктів відповідності; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
+% варіанти відповіді п'ять А--Д: кожен вміщується в клітинку одним рядком -- рядок-таблиця (\nmtAnswerRow; високі формули -- \nmtAnswerRowTall), інакше
+% (запис довелося б переносити всередині клітинки) -- вертикальний список у стилі пунктів відповідності, варіант з нового рядка; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
 \newsavebox{\nmtOptBox}\newlength{\nmtOptMaxH}\newif\ifnmtOptFit
 \newcommand{\nmtOptMeasure}[1]{\sbox{\nmtOptBox}{#1}%
-    \ifdim\wd\nmtOptBox>1.7\nmtcellw\nmtOptFitfalse\fi
+    \ifdim\wd\nmtOptBox>\nmtcellw\nmtOptFitfalse\fi
     \ifdim\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax>\nmtOptMaxH\setlength{\nmtOptMaxH}{\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax}\fi}
 \newcommand{\nmtOptions}[5]{%
     \par\nmtSetCell\nmtOptFittrue\setlength{\nmtOptMaxH}{0pt}%
     \nmtOptMeasure{#1}\nmtOptMeasure{#2}\nmtOptMeasure{#3}\nmtOptMeasure{#4}\nmtOptMeasure{#5}%
     \ifnmtOptFit
-        \ifdim\nmtOptMaxH>0.62cm \answerTableTall{#1}{#2}{#3}{#4}{#5}\else\answerTable{#1}{#2}{#3}{#4}{#5}\fi
+        \ifdim\nmtOptMaxH>0.62cm \nmtAnswerRowTall{#1}{#2}{#3}{#4}{#5}\else\nmtAnswerRow{#1}{#2}{#3}{#4}{#5}\fi
     \else
         \par\nopagebreak\vspace{0.1cm}%
         \matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}%
     \fi}
+\newcommand{\answerTable}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
+\newcommand{\answerTableTall}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
