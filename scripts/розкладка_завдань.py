@@ -169,9 +169,23 @@ def _прибрати_порожнє(t):
     return t.strip("\n ")
 
 
+ПОРОЖНІЙ_РИСУНОК = re.compile(r"(?:\\begin\{nmtfit\}\s*)?\\begin\{tikzpicture\}((?:(?!\\end\{tikzpicture\}).)*)\\end\{tikzpicture\}(?:\s*\\end\{nmtfit\})?", re.S)
+МАЛЮЄ = re.compile(r"\\(?:draw|fill|filldraw|node|pic|shade|foreach|addplot|clip|coordinate)\b|\\includegraphics|\\begin\{axis\}")
+
+
+def без_порожніх_рисунків(b):
+    """«рисунок» без жодної команди малювання (заглушка `\\path (0,0);` чи \\useasboundingbox) -- геть разом з обгорткою center
+    (колись його масштабувало дизайн-система до 26 см² -- виходила величезна порожнеча між умовою й варіантами)"""
+    n = ПОРОЖНІЙ_РИСУНОК.sub(lambda m: m.group(0) if МАЛЮЄ.search(m.group(1)) else "", b)
+    if n != b:
+        n = re.sub(r"\\begin\{center\}\s*\\end\{center\}", "", n)
+        n = re.sub(r"%\s*Легенда під малюнком\s*\n", "", n)
+    return n
+
+
 def нормалізувати(b, аспект=None):
     """нерухома точка _раз: результат нормалізації сам є нормалізованим (збірка не залежить від кількості проходів)"""
-    b = єдині_варіанти(b)
+    b = без_порожніх_рисунків(єдині_варіанти(b))
     n, v = _раз(b, аспект)
     for _ in range(3):
         n2, v2 = _раз(n, аспект)
