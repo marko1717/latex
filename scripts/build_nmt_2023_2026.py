@@ -290,6 +290,18 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 """
 PREAMBLE = PREAMBLE.replace("@@ДИЗАЙН@@", дизайн_завдань.СТИЛІ.lstrip("\n"))
 
+# ---- єдина преамбула: усе спільне -- у nmtbase.sty (корінь проєкту), а в документі лише \documentclass, підключення стилю й колонтитули
+FANCY_RE = re.compile(r"^\\(?:fancyhead\[[CR]\]|fancyfoot\[[LCR]\])\{[^\n]*\}\n", re.M)
+FANCY_LINES = "".join(FANCY_RE.findall(PREAMBLE))
+STY = ("\\NeedsTeXFormat{LaTeX2e}\\ProvidesPackage{nmtbase}[2026/11/04 Єдина преамбула бази НМТ: шрифти, пакети, дизайн-система рисунків, завдання, таблиці відповідей]\n"
+       "% Файл створює scripts/build_nmt_2023_2026.py з PREAMBLE -- не редагувати вручну. Документ підключає його рядком \\usepackage{nmtbase} (див. ШАПКА).\n"
+       + FANCY_RE.sub("", PREAMBLE.split("\n", 1)[1]))
+ШАПКА = ("\\documentclass[12pt]{article}\n"
+         "% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)\n"
+         "\\IfFileExists{nmtbase.sty}{\\usepackage{nmtbase}}{\\IfFileExists{../nmtbase.sty}{\\usepackage{../nmtbase}}{\\usepackage{../../nmtbase}}}\n"
+         + FANCY_LINES)
+PREAMBLE = ШАПКА            # скрізь, де раніше підставляли довгу преамбулу, тепер коротка шапка (@@HEADER@@ -- колонтитул)
+
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
@@ -1529,6 +1541,7 @@ def перемалювати_за_оригіналом(шляхи):
 
 
 def main():
+    open(os.path.join(ROOT, "nmtbase.sty"), "w", encoding="utf-8").write(STY)
     by2026 = load_2026()
     log = []; paths_by_unit = {}
     for key in UNIT_ORDER:
