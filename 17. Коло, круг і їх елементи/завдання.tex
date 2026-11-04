@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -380,7 +390,8 @@
         \draw[thick] (O) -- (D);
         \draw[thick] (A) -- (C);
         % Angle 60 at O (AOB)
-        \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.4cm, angle eccentricity=1.92] {angle = C--O--A};
+        \pic[draw, angle radius=0.4cm] {angle = C--O--A};
+    \nmtAngleLabel{C}{O}{A}{0.4}{\normalsize $60^\circ$}
 
         \node[below] at (O) {$O$};
         \node[above] at (A) {$A$};
@@ -444,7 +455,8 @@
         % Bold arc AB
         \draw[very thick] (1.5,0) arc (0:60:1.5);
 
-        \pic [draw, pic text={\normalsize $30^\circ$}, angle radius=0.4cm, angle eccentricity=2.4] {angle = B--C--A};
+        \pic[draw, angle radius=0.4cm] {angle = B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.4}{\normalsize $30^\circ$}
 
         \node[above] at (A) {$A$};
         \node[right] at (B) {$B$};
@@ -640,7 +652,8 @@
         \draw[thick] (O) circle (2.4cm); % Приблизно
 
         % Кут бета
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.8cm, angle eccentricity=1.80] {angle = B--C--A};
+        \pic[draw, angle radius=0.8cm] {angle = B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.8}{\normalsize $\beta$}
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -696,11 +709,13 @@
         \draw[thick] (O) -- (B);
 
         % Angle 55
-        \pic[draw, pic text={\normalsize $55^\circ$}, angle radius=0.4cm, angle eccentricity=2.02] {angle = B--O--A};
+        \pic[draw, angle radius=0.4cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.4}{\normalsize $55^\circ$}
 
         % Exterior Angle at B (OBK)
         \coordinate (K_end) at (3.5, 1.5);
-        \pic[draw, pic text={\normalsize ?}, angle radius=0.4cm, angle eccentricity=2.02] {angle = O--B--K_end};
+        \pic[draw, angle radius=0.4cm] {angle = O--B--K_end};
+    \nmtAngleLabel{O}{B}{K_end}{0.4}{\normalsize ?}
         \pic [draw, angle radius=0.3cm, angle eccentricity=1.8] {angle = O--B--K_end};
 
         \node[left] at (O) {$O$};
@@ -864,7 +879,8 @@
         \draw[thick] (O) -- (D);
         \draw[thick] (A) -- (C);
         % Angle 60 at O (AOB)
-        \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.4cm, angle eccentricity=1.92] {angle = C--O--A};
+        \pic[draw, angle radius=0.4cm] {angle = C--O--A};
+    \nmtAngleLabel{C}{O}{A}{0.4}{\normalsize $60^\circ$}
 
         \node[below] at (O) {$O$};
         \node[above] at (A) {$A$};
@@ -1084,8 +1100,8 @@
     }
     \coordinate (P1) at (36:\R);
     \coordinate (P2) at (72:\R);
-    \pic[draw=yearOrange, line width=0.8pt, "$\alpha$", angle radius=0.85cm,
-         angle eccentricity=1.32, font=\normalsize] {angle = P1--O--P2};
+    \pic[draw=yearOrange, line width=0.8pt, angle radius=0.85cm, font=\normalsize] {angle = P1--O--P2};
+    \nmtAngleLabel{P1}{O}{P2}{0.85}{$\alpha$}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1113,8 +1129,8 @@
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (K);
     \path (K) node[nmt dot] {};
-    \pic[draw=yearOrange, line width=0.8pt, "$120^\circ$", angle radius=0.3cm,
-         angle eccentricity=2.38, font=\normalsize] {angle = D--K--B};
+    \pic[draw=yearOrange, line width=0.8pt, angle radius=0.3cm, font=\normalsize] {angle = D--K--B};
+    \nmtAngleLabel{D}{K}{B}{0.3}{$120^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1293,7 +1309,8 @@
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[below] at (K) {$K$};
-    \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=1.86, font=\normalsize] {angle = B--D--K};
+    \pic[draw, angle radius=0.8cm, font=\normalsize] {angle = B--D--K};
+    \nmtAngleLabel{B}{D}{K}{0.8}{$30^\circ$}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1318,7 +1335,8 @@
     \filldraw[fill=nmtFillC] (O) -- (B) arc (90:310:1.6) -- cycle;
     \draw (O) circle (1.6);
     \draw[dashed] (O) -- (K);
-    \pic[draw, angle radius=0.45cm, pic text={$?$}, angle eccentricity=1.95, font=\normalsize] {angle = K--O--A};
+    \pic[draw, angle radius=0.45cm, font=\normalsize] {angle = K--O--A};
+    \nmtAngleLabel{K}{O}{A}{0.45}{$?$}
     \path (O) node[nmt dot] {};
     \node[above] at (B) {$B$};
     \node[below] at (K) {$K$};
@@ -1348,7 +1366,8 @@
     \draw (B) -- (D);
     \draw (O) -- (K);
     \pic[draw, angle radius=0.18cm] {right angle = O--K--A};
-    \pic[draw, angle radius=0.32cm, pic text={$75^\circ$}, angle eccentricity=2.1, font=\normalsize] {angle = C--D--B};
+    \pic[draw, angle radius=0.32cm, font=\normalsize] {angle = C--D--B};
+    \nmtAngleLabel{C}{D}{B}{0.32}{$75^\circ$}
     \path (O) node[nmt dot] {};
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
@@ -1398,7 +1417,8 @@
     \draw (O) -- (K);
     \draw (2,0) ++(0:2) arc (0:180:2);
     \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
-    \pic[draw, angle radius=0.4cm, pic text={\normalsize $120^\circ$}, angle eccentricity=2.29] {angle = K--O--C};
+    \pic[draw, angle radius=0.4cm] {angle = K--O--C};
+    \nmtAngleLabel{K}{O}{C}{0.4}{\normalsize $120^\circ$}
     \node[above left] at (A) {$A$};
     \node[below left] at (C) {$C$};
     \node[below right] at (B) {$B$};
@@ -1690,7 +1710,8 @@
         \draw[thick] ($(K)!0.5!(B)$) ++(120:0.15) -- ++(-60:0.3);
 
         % Angle 24
-        \pic[draw, pic text={\normalsize $24^\circ$}, angle radius=.5cm, angle eccentricity=2.29] {angle = A--B--C};
+        \pic[draw, angle radius=.5cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.5}{\normalsize $24^\circ$}
 
         \node[left] at (A) {$A$};
         \node[left] at (C) {$C$};
@@ -1754,7 +1775,8 @@
         \draw (0,0) rectangle (0.3,0.3);
 
         % Angle 32
-        \pic[draw, pic text={\normalsize $32^\circ$}, angle radius=1.0cm, angle eccentricity=1.42] {angle = A--B--C};
+        \pic[draw, angle radius=1.0cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1}{\normalsize $32^\circ$}
 
         \node[above] at (A) {$A$};
         \node[below] at (C) {$C$};
@@ -2343,7 +2365,8 @@
         \draw[thick] (C) -- (O);
 
         % Angle 50
-        \pic[draw, pic text={\normalsize $50^\circ$}, angle radius=0.4cm, angle eccentricity=1.98] {angle = A--B--C};
+        \pic[draw, angle radius=0.4cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.4}{\normalsize $50^\circ$}
 
         % Marks for AB = BC
         \draw[thick] ($(A)!0.5!(B)$) ++(160:0.1) -- ++(-20:0.2);
@@ -2661,7 +2684,8 @@
     \coordinate (B) at (-1.32,1.669); \coordinate (C) at (1.32,1.669);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (C);
-    \pic[draw, angle radius=0.5cm, pic text={$120^\circ$}, angle eccentricity=2.1] {angle = A--C--D};
+    \pic[draw, angle radius=0.5cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{0.5}{$120^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above] at (C) {$C$};

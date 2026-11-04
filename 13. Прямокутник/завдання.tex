@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -403,7 +413,8 @@ III. & Діаметр кола, описаного навколо прямоку
         \draw[thick] (B) -- (D);
 
         % Кут 60 градусів (тут це гострий кут між діагоналями, що спирається на меншу сторону)
-        \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.6cm, angle eccentricity=1.60] {angle = B--O--A};
+        \pic[draw, angle radius=0.6cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.6}{\normalsize $60^\circ$}
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -434,7 +445,8 @@ III. & Діаметр кола, описаного навколо прямоку
         \draw[thick] (B) -- (D);
 
         % Кут 110 (тупий, знизу)
-        \pic[draw, pic text={\normalsize $110^\circ$}, angle radius=0.5cm, angle eccentricity=2.10] {angle = A--O--D};
+        \pic[draw, angle radius=0.5cm] {angle = A--O--D};
+    \nmtAngleLabel{A}{O}{D}{0.5}{\normalsize $110^\circ$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -475,7 +487,8 @@ III. & Діаметр кола, описаного навколо прямоку
     \coordinate (K) at (2.25,0);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (K) -- (C);
-    \pic[draw, angle radius=0.8cm, pic text={$\beta$}, angle eccentricity=1.7] {angle = A--B--K};
+    \pic[draw, angle radius=0.8cm] {angle = A--B--K};
+    \nmtAngleLabel{A}{B}{K}{0.8}{$\beta$}
     \node[nmt dot] at (K) {};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -521,9 +534,11 @@ III. & Діаметр кола, описаного навколо прямоку
         \draw[thick] (K) -- (C);
 
         % Angles
-        \pic[draw, pic text={\normalsize $\alpha$}, angle radius=0.6cm, angle eccentricity=1.86] {angle = B--K--A};
+        \pic[draw, angle radius=0.6cm] {angle = B--K--A};
+    \nmtAngleLabel{B}{K}{A}{0.6}{\normalsize $\alpha$}
         \pic [draw, angle radius=0.4cm] {angle = B--K--A};
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.6cm, angle eccentricity=1.86] {angle = K--C--D}; % Wait, drawing shows angle at C inside triangle KCD?
+        \pic[draw, angle radius=0.6cm] {angle = K--C--D};
+    \nmtAngleLabel{K}{C}{D}{0.6}{\normalsize $\beta$} % Wait, drawing shows angle at C inside triangle KCD?
         % Let's look closely at image 2. Angle is marked at C, between KC and CD? No, angle KCD.
         % The image shows angle beta at C, specifically angle KCD? 
         % Actually, usually "Angle KCD" means C is vertex. 
@@ -576,7 +591,8 @@ III. & Діаметр кола, описаного навколо прямоку
         \node[nmt dot] at (M1) {};
         \node[nmt dot] at (M2) {};
         % кут beta = AOB
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.5cm, angle eccentricity=2.03] {angle = B--O--A};
+        \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{\normalsize $\beta$}
         % засічки рівності AM1 = M1O (на AC) і DM2 = M2O (на BD): поперек ліній
         \draw[thin] ($(A)!0.5!(M1)$) ++(116.57:0.17) -- ++(-63.43:0.34);
         \draw[thin] ($(O)!0.5!(M1)$) ++(116.57:0.17) -- ++(-63.43:0.34);
@@ -695,7 +711,8 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \draw[thick] (L) -- (K) node[midway, above ] {$d$};
 
         % Angle beta
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.8cm, angle eccentricity=1.45] {angle = D--L--K};
+        \pic[draw, angle radius=0.8cm] {angle = D--L--K};
+    \nmtAngleLabel{D}{L}{K}{0.8}{\normalsize $\beta$}
 
         % Ticks for AL = LD
         \draw ($(A)!0.5!(L)$) ++(0,-0.1) -- ++(0,0.2);
@@ -749,7 +766,8 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \node[above] at (3,3) {$d$};
 
         % Angle beta at C (BCK)
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.8cm, angle eccentricity=1.66] {angle = B--C--K};
+        \pic[draw, angle radius=0.8cm] {angle = B--C--K};
+    \nmtAngleLabel{B}{C}{K}{0.8}{\normalsize $\beta$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -794,7 +812,8 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \draw[thick] (A) -- (C);
 
         % Angle 30
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=0.7cm, angle eccentricity=2.57] {angle = K--A--B};
+        \pic[draw, angle radius=0.7cm] {angle = K--A--B};
+    \nmtAngleLabel{K}{A}{B}{0.7}{\normalsize $30^\circ$}
         % Double arc for bisector part (KAC) - optional, but helps logic
        \pic [draw, angle radius=0.5cm] {angle = C--A--K};
 
@@ -874,7 +893,8 @@ III. & Діагоналі будь-якого прямокутника рівн�
         \draw[thick] (K) -- (M);
 
         % Кут 30 градусів KMN
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=0.8cm, angle eccentricity=1.94] {angle = K--M--N};
+        \pic[draw, angle radius=0.8cm] {angle = K--M--N};
+    \nmtAngleLabel{K}{M}{N}{0.8}{\normalsize $30^\circ$}
 
         \node[left] at (A) {$A$};
         \node[above] at (B) {$B$};
@@ -944,7 +964,8 @@ III. & Якщо прямокутники мають рівні діагонал�
         \draw (3.15,-0.12) -- (3.15,0.12);
         % KM2 = M2C: по три риски
         \foreach \m in {(2.625,0.91), (3.675,2.73)} \foreach \t in {-1,0,1} \draw[shift={\m}] (0.05*\t-0.1126,0.0866*\t+0.065) -- (0.05*\t+0.1126,0.0866*\t-0.065);
-        \pic[draw, pic text={\normalsize $60^\circ$}, angle radius=0.5cm, angle eccentricity=1.92] {angle = D--K--C};
+        \pic[draw, angle radius=0.5cm] {angle = D--K--C};
+    \nmtAngleLabel{D}{K}{C}{0.5}{\normalsize $60^\circ$}
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
@@ -983,7 +1004,8 @@ III. & Якщо прямокутники мають рівні діагонал�
     \draw[thick] (A) -- (C);
 
     % кут alpha між діагоналлю AC і більшою стороною CD
-    \pic[draw, pic text={$\alpha$}, angle radius=1cm, angle eccentricity=1.7] {angle = A--C--D};
+    \pic[draw, angle radius=1cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{1}{$\alpha$}
 
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -1037,7 +1059,8 @@ III. & Якщо прямокутники мають рівні діагонал�
         \draw[thick] (D) -- (K);
 
         % Angle 30 at A
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=.8cm, angle eccentricity=2.97] {angle = K--A--B};
+        \pic[draw, angle radius=.8cm] {angle = K--A--B};
+    \nmtAngleLabel{K}{A}{B}{0.8}{\normalsize $30^\circ$}
 
         % Bisector marks at D
         \pic [draw, double, angle radius=0.8cm] {angle = K--D--A}; % Double arc
@@ -1075,7 +1098,8 @@ III. & Якщо прямокутники мають рівні діагонал�
     \coordinate (K) at (1.732,3.0);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (K);
-    \pic[draw, angle radius=1.0cm, pic text={$30^\circ$}, angle eccentricity=1.75] {angle = K--A--B};
+    \pic[draw, angle radius=1.0cm] {angle = K--A--B};
+    \nmtAngleLabel{K}{A}{B}{1}{$30^\circ$}
     \node[nmt dot] at (K) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -1114,7 +1138,8 @@ III. & Якщо прямокутники мають рівні діагонал�
         \draw[thick] (B) -- (K) -- (C);
 
         % Angle 30
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=0.9cm, angle eccentricity=1.87] {angle = A--B--K};
+        \pic[draw, angle radius=0.9cm] {angle = A--B--K};
+    \nmtAngleLabel{A}{B}{K}{0.9}{\normalsize $30^\circ$}
 
         % Right angle at K (BKC)
         \pic [draw, angle radius=0.3cm] {right angle = B--K--C};
@@ -1352,7 +1377,8 @@ III. & Якщо прямокутники мають рівні діагонал�
     \node[below right] at (D) {$D$};
     \node[above left] at (K) {$K$};
     \node[above left] at (M) {$M$};
-    \pic[draw, angle radius=0.9cm, pic text={$30^\circ$}, angle eccentricity=1.75, font=\normalsize] {angle = D--A--M};
+    \pic[draw, angle radius=0.9cm, font=\normalsize] {angle = D--A--M};
+    \nmtAngleLabel{D}{A}{M}{0.9}{$30^\circ$}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1376,7 +1402,8 @@ III. & Якщо прямокутники мають рівні діагонал�
     \coordinate (D) at (5.2,0);
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (A) -- (C);
-    \pic[draw, angle radius=0.3cm, pic text={$60^\circ$}, angle eccentricity=2.50, font=\normalsize] {angle = C--A--B};
+    \pic[draw, angle radius=0.3cm, font=\normalsize] {angle = C--A--B};
+    \nmtAngleLabel{C}{A}{B}{0.3}{$60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1406,7 +1433,8 @@ III. & Якщо прямокутники мають рівні діагонал�
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (A) -- (K) -- (D);
     \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
-    \pic[draw, angle radius=0.55cm, pic text={\normalsize $60^\circ$}, angle eccentricity=2.47] {angle = D--A--K};
+    \pic[draw, angle radius=0.55cm] {angle = D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.55}{\normalsize $60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1746,7 +1774,8 @@ III. & Якщо прямокутники мають рівні діагонал�
 
     % 45 degrees at M in triangle MQP?
     % Image shows angle 45 at M inside triangle MQP.
-    \pic[draw, pic text={\normalsize $45^\circ$}, angle radius=0.9cm, angle eccentricity=1.83] {angle = Q--M--P};
+    \pic[draw, angle radius=0.9cm] {angle = Q--M--P};
+    \nmtAngleLabel{Q}{M}{P}{0.9}{\normalsize $45^\circ$}
 
 \end{tikzpicture}\end{nmtfit}
 \end{center}

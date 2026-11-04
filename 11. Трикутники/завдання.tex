@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -618,12 +628,15 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
     \coordinate (D) at (4.4,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
     \draw[thick] (C) -- (D);
-    \pic[draw, angle radius=0.7cm, pic text={$40^\circ$}, angle eccentricity=1.7] {angle = C--A--B};
+    \pic[draw, angle radius=0.7cm] {angle = C--A--B};
+    \nmtAngleLabel{C}{A}{B}{0.7}{$40^\circ$}
     \pic[draw, angle radius=0.5cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.6cm, pic text={$30^\circ$}, angle eccentricity=2.2] {angle = A--B--C};
+    \pic[draw, angle radius=0.6cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.6}{$30^\circ$}
     \pic[draw, angle radius=0.4cm] {angle = D--C--B};
     \pic[draw, angle radius=0.5cm] {angle = D--C--B};
-    \pic[draw, angle radius=0.6cm, pic text={$?$}, angle eccentricity=1.8] {angle = D--C--B};
+    \pic[draw, angle radius=0.6cm] {angle = D--C--B};
+    \nmtAngleLabel{D}{C}{B}{0.6}{$?$}
     \node[below left] at (A) {$A$};
     \node[below] at (C) {$C$};
     \node[above] at (B) {$B$};
@@ -832,10 +845,12 @@ III. & Точка перетину серединних перпендикуля
     \draw[thick] ($(A)!0.5!(B)$) ++(155:0.1) -- ++(-25:0.2);
     \draw[thick] ($(B)!0.5!(C)$) ++(205:0.1) -- ++(25:0.2);
     % кут B = 50°
-    \pic[draw, angle radius=0.55cm, pic text={$50^\circ$}, angle eccentricity=2.0] {angle = A--B--C};
+    \pic[draw, angle radius=0.55cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.55}{$50^\circ$}
     % зовнішній кут при A
     \pic[draw, angle radius=0.4cm] {angle = B--A--M};
-    \pic[draw, angle radius=0.5cm, pic text={$?$}, angle eccentricity=2.1] {angle = B--A--M};
+    \pic[draw, angle radius=0.5cm] {angle = B--A--M};
+    \nmtAngleLabel{B}{A}{M}{0.5}{$?$}
     \node[below] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[below] at (C) {$C$};
@@ -1267,9 +1282,12 @@ III. & Діагональ квадрата ділить його на два р�
     \coordinate (C) at (4.5,0);
     \coordinate (B) at (1,2.8);
     \draw (A) -- (B) -- (C) -- cycle;
-    \pic[draw, angle radius=0.5cm, "$30^\circ$"{right, shift={(0.15,0.15)}}, angle eccentricity=1.87] {angle = C--A--B};
-    \pic[draw, angle radius=0.4cm, "$35^\circ$"{below, shift={(0.2,-0.1)}}, angle eccentricity=2.08] {angle = A--B--C};
-    \pic[draw, angle radius=0.5cm, red, "?"{left, shift={(-0.15,0.15)}}, angle eccentricity=1.87] {angle = B--C--A};
+    \pic[draw, angle radius=0.5cm] {angle = C--A--B};
+    \nmtAngleLabel{C}{A}{B}{0.5}{$30^\circ$}
+    \pic[draw, angle radius=0.4cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.4}{$35^\circ$}
+    \pic[draw, angle radius=0.5cm, red] {angle = B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.5}{?}
     \node[below left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[below right] at (C) {$C$};
@@ -1531,7 +1549,8 @@ III. & Діагональ квадрата ділить його на два р�
         \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!-90:(\q)$);
     \foreach \p/\q in {A/M, M/C}
         \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
-    \pic[draw, angle radius=0.4cm, pic text={$120^\circ$}, angle eccentricity=2.4] {angle = A--B--C};
+    \pic[draw, angle radius=0.4cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.4}{$120^\circ$}
     \node[nmt dot] at (M) {};
     \node[above] at (B) {$B$};
     \node[left] at (A) {$A$};
@@ -1677,7 +1696,8 @@ III. & Діагональ квадрата ділить його на два р�
     \draw (O) -- (K);
     \draw (2,0) ++(0:2) arc (0:180:2);
     \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
-    \pic[draw, angle radius=0.4cm, pic text={\normalsize $120^\circ$}, angle eccentricity=2.29] {angle = K--O--C};
+    \pic[draw, angle radius=0.4cm] {angle = K--O--C};
+    \nmtAngleLabel{K}{O}{C}{0.4}{\normalsize $120^\circ$}
     \node[above left] at (A) {$A$};
     \node[below left] at (C) {$C$};
     \node[below right] at (B) {$B$};
@@ -1724,7 +1744,8 @@ III. & Діагональ квадрата ділить його на два р�
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (A) -- (K) -- (D);
     \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
-    \pic[draw, angle radius=0.55cm, pic text={\normalsize $60^\circ$}, angle eccentricity=2.47] {angle = D--A--K};
+    \pic[draw, angle radius=0.55cm] {angle = D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.55}{\normalsize $60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2695,7 +2716,8 @@ III. & Діагональ квадрата ділить його на два р�
     \coordinate (C) at (4.6,0);
     \coordinate (B) at (2.9,0.9);
     \draw (A) -- (B) -- (C) -- cycle;
-    \pic[draw, angle radius=0.12cm, pic text={\small $150^\circ$}, angle eccentricity=6.30] {angle = A--B--C};
+    \pic[draw, angle radius=0.12cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.12}{\small $150^\circ$}
     \node[below left, font=\small] at (A) {$A$};
     \node[above, font=\small] at (B) {$B$};
     \node[below right, font=\small] at (C) {$C$};

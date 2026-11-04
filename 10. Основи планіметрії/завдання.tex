@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -867,9 +877,11 @@ III. & Прямі $AB$ і $CD$ є паралельними. \\
     \node[left] at (L1) {$l$};
     \node[above] at (M2) {$m$};
     \node[above] at (N2) {$n$};
-    \pic[draw, angle radius=0.5cm, pic text={\normalsize $\alpha$}, angle eccentricity=1.9] {angle = MDown--P--L2};
+    \pic[draw, angle radius=0.5cm] {angle = MDown--P--L2};
+    \nmtAngleLabel{MDown}{P}{L2}{0.5}{\normalsize $\alpha$}
     \pic[draw, angle radius=0.4cm] {angle = L2--Q--NUp};
-    \pic[draw, angle radius=0.5cm, pic text={\normalsize $\beta$}, angle eccentricity=1.9] {angle = L2--Q--NUp};
+    \pic[draw, angle radius=0.5cm] {angle = L2--Q--NUp};
+    \nmtAngleLabel{L2}{Q}{NUp}{0.5}{\normalsize $\beta$}
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -1049,9 +1061,12 @@ III. & $\angle 3 + \angle 4 = 180°$. \\
     \node[below] at (D) {\normalsize $D$};
     \node[left] at (K) {\normalsize $K$};
     \node[left] at (C) {\normalsize $C$};
-    \pic[draw, line width=0.5pt, angle radius=0.32cm, "\normalsize $128^\circ$", angle eccentricity=2.22] {angle = D--K--B};
-    \pic[draw, line width=0.5pt, angle radius=0.36cm, "\normalsize $68^\circ$", angle eccentricity=2.09] {angle = K--D--A};
-    \pic[draw, line width=0.5pt, angle radius=0.36cm, "\normalsize $?$", angle eccentricity=2.09] {angle = D--A--B};
+    \pic[draw, line width=0.5pt, angle radius=0.32cm] {angle = D--K--B};
+    \nmtAngleLabel{D}{K}{B}{0.32}{\normalsize $128^\circ$}
+    \pic[draw, line width=0.5pt, angle radius=0.36cm] {angle = K--D--A};
+    \nmtAngleLabel{K}{D}{A}{0.36}{\normalsize $68^\circ$}
+    \pic[draw, line width=0.5pt, angle radius=0.36cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.36}{\normalsize $?$}
 \end{tikzpicture}
 &
 \raisebox{0.1cm}{\includegraphics[height=3.2cm]{nmt_tablet_stand.png}}

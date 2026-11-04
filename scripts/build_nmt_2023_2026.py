@@ -1486,7 +1486,7 @@ def перемалювати_за_оригіналом(шляхи):
             нове = за_id[i].get(k[0])
             if нове is None: return mm.group(0)
             ПЕРЕМАЛЬОВАНІ[(i, k[0])] += 1
-            return нове.strip()
+            return дизайн_завдань.кути_біля_дуги(нове.strip())      # підписи кутів -- біля дуги (\nmtAngleLabel)
         return "\\begin{samepage}" + re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", рис, b, flags=re.S) + "\\end{samepage}"
     for шлях in шляхи:
         повний = os.path.join(ROOT, шлях)

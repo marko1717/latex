@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -365,10 +375,11 @@
     \draw[thick] (M) -- (A);
     \draw[thick] (D) -- (E);
 
-    \pic [draw, pic text={$65^\circ$}, angle radius=0.5cm, angle eccentricity=1.9] {angle = E--D--C};
+    \pic[draw, angle radius=0.5cm] {angle = E--D--C};
+    \nmtAngleLabel{E}{D}{C}{0.5}{$65^\circ$}
 
     \pic [draw, angle radius=0.4cm] {angle = B--A--M};
-    \pic[draw, angle radius=0.5cm, "?" anchor=south east, angle eccentricity=1.56] {angle = B--A--M};
+    \pic [draw, angle radius=0.5cm, "?" anchor=south east] {angle = B--A--M};
 
     \node[below] at (M) {$M$};
     \node[below] at (A) {$A$};
@@ -402,10 +413,10 @@
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (D);
 
-    \pic[draw, angle radius=0.4cm, "\normalsize $50°$" anchor=north, angle eccentricity=1.71] {angle = A--B--D};
+    \pic [draw, angle radius=0.4cm, "\normalsize $50°$" anchor=north] {angle = A--B--D};
 
     \pic [draw, angle radius=0.4cm] {angle = B--D--A};
-    \pic[draw, angle radius=0.5cm, "\normalsize $55°$" anchor=east, angle eccentricity=1.57] {angle = B--D--A};
+    \pic [draw, angle radius=0.5cm, "\normalsize $55°$" anchor=east] {angle = B--D--A};
 
     \node[left] at (0.6,1) {\normalsize 4 \textit{см}};
 
@@ -535,8 +546,10 @@ III. & Більша діагональ паралелограма лежить �
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (B) -- (D);
 
-        \pic[draw, pic text={$48^\circ$}, angle radius=0.6cm, angle eccentricity=1.74] {angle = D--B--C};
-        \pic[draw, pic text={$72^\circ$}, angle radius=0.6cm, angle eccentricity=1.74] {angle = C--D--B};
+        \pic[draw, angle radius=0.6cm] {angle = D--B--C};
+    \nmtAngleLabel{D}{B}{C}{0.6}{$48^\circ$}
+        \pic[draw, angle radius=0.6cm] {angle = C--D--B};
+    \nmtAngleLabel{C}{D}{B}{0.6}{$72^\circ$}
         \pic [draw, angle radius=0.5cm] {angle = C--D--B};
 
         \node[below left] at (A) {$A$};
@@ -575,7 +588,8 @@ III. & Більша діагональ паралелограма лежить �
 
         \draw (K) ++(-0.8,0) -- ++(0,0.8) -- ++(0.8,0);
 
-        \pic[draw, pic text={\normalsize $\alpha$}, angle radius=0.5cm, angle eccentricity=6.49] {angle = K--A--B};
+        \pic[draw, angle radius=0.5cm] {angle = K--A--B};
+    \nmtAngleLabel{K}{A}{B}{0.5}{\normalsize $\alpha$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -670,7 +684,8 @@ III. & Менша діагональ будь-якого ромба ділить
         \draw ($(A)!0.5!(K)$) ++(90:0.1) -- ++(-90:0.2);
         \draw ($(K)!0.5!(D)$) ++(90:0.1) -- ++(-90:0.2);
 
-        \pic[draw, pic text={\normalsize $2\gamma$}, angle radius=0.5cm, angle eccentricity=1.87] {angle = K--A--B};
+        \pic[draw, angle radius=0.5cm] {angle = K--A--B};
+    \nmtAngleLabel{K}{A}{B}{0.5}{\normalsize $2\gamma$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -787,7 +802,8 @@ III. \quad $AC = BD$.
     \draw[thick] (D) -- (M);
     \draw[thick] ($(B)!0.5!(M)$) ++(0,-0.1) -- ++(0,0.2);
     \draw[thick] ($(M)!0.5!(C)$) ++(0,-0.1) -- ++(0,0.2);
-    \pic[draw, angle radius=0.5cm, pic text={$\theta$}, angle eccentricity=1.7] {angle = D--A--B};
+    \pic[draw, angle radius=0.5cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{$\theta$}
     \pic[draw] {right angle = M--D--C};
     \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
@@ -841,9 +857,11 @@ III. & Якщо прямокутники мають рівні діагонал�
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
 
-        \pic [draw, pic text={\normalsize $25^\circ$}, angle radius=0.5cm, angle eccentricity=1.8] {angle = D--A--C};
+        \pic[draw, angle radius=0.5cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{0.5}{\normalsize $25^\circ$}
 
-        \pic[draw, pic text={\normalsize $35^\circ$}, angle radius=0.5cm, angle eccentricity=1.70] {angle = A--C--D};
+        \pic[draw, angle radius=0.5cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{0.5}{\normalsize $35^\circ$}
         \pic [draw, angle radius=0.3cm] {angle = A--C--D};
 
         \node[below left] at (A) {$A$};
@@ -988,7 +1006,8 @@ III. & Існує паралелограм, у якого сума кутів, �
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[below] at (K) {$K$};
-    \pic[draw, angle radius=0.8cm, pic text={$30^\circ$}, angle eccentricity=1.86, font=\normalsize] {angle = B--D--K};
+    \pic[draw, angle radius=0.8cm, font=\normalsize] {angle = B--D--K};
+    \nmtAngleLabel{B}{D}{K}{0.8}{$30^\circ$}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1018,7 +1037,8 @@ III. & Існує паралелограм, у якого сума кутів, �
     \draw (B) -- (M);
     \pic[draw, angle radius=0.18cm] {right angle = B--K--A};
     \pic[draw, angle radius=0.18cm] {right angle = D--M--B};
-    \pic[draw, angle radius=0.4cm, pic text={$60^\circ$}, angle eccentricity=2.15, font=\normalsize] {angle = K--B--M};
+    \pic[draw, angle radius=0.4cm, font=\normalsize] {angle = K--B--M};
+    \nmtAngleLabel{K}{B}{M}{0.4}{$60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1056,7 +1076,7 @@ III. & Існує паралелограм, у якого сума кутів, �
         \coordinate (BD) at ($(B)!0.25cm!(D)$);
         \draw (BA) -- ($(BA)+(BD)-(B)$) -- (BD);
 
-        \pic[draw, angle radius=0.6cm, " $45°$" anchor=south west, angle eccentricity=1.80] {angle = D--A--B};
+        \pic [draw, angle radius=0.6cm, " $45°$" anchor=south west] {angle = D--A--B};
 
         \node[below left] at (A) {$A$};
         \node[above] at (B) {$B$};
@@ -1385,7 +1405,8 @@ III. & Існує паралелограм, у якого сума кутів, �
     \draw (A) -- (K) -- (M) -- (D);
     \draw (B) -- (D);
 
-    \pic[draw, angle radius=0.5cm, pic text=$65^\circ$, angle eccentricity=2.06, font=\normalsize] {angle = D--A--B};
+    \pic[draw, angle radius=0.5cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{$65^\circ$}
     \pic[draw, angle radius=0.3cm] {right angle = A--B--D};
 
     \node[above left] at (A) {$A$};

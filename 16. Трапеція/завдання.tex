@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -618,7 +628,8 @@ III. Існує трапеція, у якої суми протилежних к
         \draw[thick] ($(O)!0.5!(D)$) ++(0.2, -0.3) -- ++(0.2, 0.6); % double
 
         % Angle alpha
-        \pic[draw, pic text={\normalsize $\alpha$}, angle radius=.5cm, angle eccentricity=3.12] {angle = D--A--B};
+        \pic[draw, angle radius=.5cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{\normalsize $\alpha$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -656,7 +667,8 @@ III. Існує трапеція, у якої суми протилежних к
     \draw[thick] (B) -- (K) -- (C);
     \foreach \p/\q in {A/B, D/C}
         \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
-    \pic[draw, angle radius=0.5cm, pic text={$\beta$}, angle eccentricity=1.9] {angle = D--A--B};
+    \pic[draw, angle radius=0.5cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{$\beta$}
     \node[nmt dot] at (K) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -784,7 +796,8 @@ III. Існує прямокутна трапеція, висота якої в�
         \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
     \foreach \p/\q/\o in {A/O/-0.06cm, A/O/0.06cm, O/D/-0.06cm, O/D/0.06cm}
         \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!-90:(\q)$);
-    \pic[draw, angle radius=0.5cm, pic text={$45^\circ$}, angle eccentricity=2.6] {angle = B--O--A};
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
     \node[nmt dot] at (O) {};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -961,7 +974,8 @@ III. Центр кола, описаного навколо трапеції, о
     \draw[thick] ($(A)!0.5!(O)$) ++(0.1,-0.12) -- ++(0,0.24);
     \draw[thick] ($(O)!0.5!(D)$) ++(0,-0.12) -- ++(0,0.24);
     \draw[thick] ($(O)!0.5!(D)$) ++(0.1,-0.12) -- ++(0,0.24);
-    \pic[draw, angle radius=0.5cm, pic text={$45^\circ$}, angle eccentricity=1.9] {angle = B--O--A};
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
     \node[nmt dot] at (O) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -1007,7 +1021,8 @@ III. Центр кола, описаного навколо трапеції, о
     \draw[thick, nmtGreen] (B) -- (P) -- (C);
     \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {right angle = A--B--P};
     \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {right angle = P--C--D};
-    \pic[draw=yearOrange, line width=0.7pt, pic text={\normalsize $60^\circ$}, angle radius=0.3cm, angle eccentricity=6.88] {angle = D--A--B};
+    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.3}{\normalsize $60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1083,7 +1098,8 @@ III. Центр кола, описаного навколо трапеції, о
     \draw (B) -- (K);
     \draw (K) -- (M);
 
-    \pic[draw, angle radius=0.6cm, pic text={$60^\circ$}, angle eccentricity=2.07, font=\normalsize] {angle = D--A--B};
+    \pic[draw, angle radius=0.6cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.6}{$60^\circ$}
 
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -1343,7 +1359,8 @@ III. Центр кола, описаного навколо трапеції, о
         \draw[thick] (A) -- (C);
 
         % Кут 30 градусів
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=0.5cm, angle eccentricity=3.20] {angle = D--A--C};
+        \pic[draw, angle radius=0.5cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{0.5}{\normalsize $30^\circ$}
 
         % Позначки рівності AB=BC=CD
         \draw[thick] ($(A)!0.5!(B)$) ++(150:0.4) -- ++(-30:0.8);
@@ -1562,7 +1579,8 @@ III. Центр кола, описаного навколо трапеції, о
     \foreach \p/\q in {A/B, D/C}
         \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
     \pic[draw, thin, angle radius=0.22cm] {right angle=C--O--D};
-    \pic[draw, angle radius=0.5cm, pic text={$45^\circ$}, angle eccentricity=2.6] {angle = B--O--A};
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below left] at (A) {$A$};
@@ -1719,7 +1737,8 @@ III. Центр кола, описаного навколо трапеції, о
 
     % 45 degrees at M in triangle MQP?
     % Image shows angle 45 at M inside triangle MQP.
-    \pic[draw, pic text={\normalsize $45^\circ$}, angle radius=0.9cm, angle eccentricity=1.83] {angle = Q--M--P};
+    \pic[draw, angle radius=0.9cm] {angle = Q--M--P};
+    \nmtAngleLabel{Q}{M}{P}{0.9}{\normalsize $45^\circ$}
 
 \end{tikzpicture}\end{nmtfit}
 \end{center}
@@ -2029,7 +2048,8 @@ III. Центр кола, описаного навколо трапеції, о
     \coordinate (B) at (-1.32,1.669); \coordinate (C) at (1.32,1.669);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (C);
-    \pic[draw, angle radius=0.5cm, pic text={$120^\circ$}, angle eccentricity=2.1] {angle = A--C--D};
+    \pic[draw, angle radius=0.5cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{0.5}{$120^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above] at (C) {$C$};
@@ -2201,7 +2221,8 @@ III. Центр кола, описаного навколо трапеції, о
     \draw (A) -- (C);
     \pic[draw, angle radius=0.3cm] {right angle = D--A--B};
     \pic[draw, angle radius=0.3cm] {right angle = D--K--C};
-    \pic[draw, angle radius=0.9cm, "$30^\circ$", angle eccentricity=1.45] {angle = C--D--K};
+    \pic[draw, angle radius=0.9cm] {angle = C--D--K};
+    \nmtAngleLabel{C}{D}{K}{0.9}{$30^\circ$}
     \pic[draw, angle radius=0.5cm] {angle = K--C--D};
     \pic[draw, angle radius=0.6cm] {angle = K--C--D};
     \pic[draw, angle radius=0.5cm] {angle = A--C--K};

@@ -45,6 +45,16 @@
 \pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
   tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
 % ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -343,7 +353,8 @@ III. & Радіус кола, вписаного в ромб, удвічі ме�
         \draw[thick] (O) circle (2.4cm); % Приблизно
 
         % Кут бета
-        \pic[draw, pic text={\normalsize $\beta$}, angle radius=0.8cm, angle eccentricity=1.80] {angle = B--C--A};
+        \pic[draw, angle radius=0.8cm] {angle = B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.8}{\normalsize $\beta$}
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -431,7 +442,8 @@ III. & Менша діагональ будь-якого ромба ділить
         \draw[thick] (A) -- (C);
 
         % Кут 20 градусів
-        \pic[draw, pic text={\normalsize $20^\circ$}, angle radius=1.2cm, angle eccentricity=1.34] {angle = D--A--C};
+        \pic[draw, angle radius=1.2cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{1.2}{\normalsize $20^\circ$}
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -530,7 +542,8 @@ III. & Діагоналі будь-якого квадрата перпенди�
         \draw[thick] (K) -- (C) node[midway, above left, xshift=2pt] {$d$}; 
 
         % Тепер тут виведеться саме буква альфа
-        \pic[draw, pic text={\normalsize $\alpha$}, angle radius=0.9cm, angle eccentricity=1.60] {angle = D--K--C};
+        \pic[draw, angle radius=0.9cm] {angle = D--K--C};
+    \nmtAngleLabel{D}{K}{C}{0.9}{\normalsize $\alpha$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -760,7 +773,8 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \draw[thick] (K) -- (M);
 
         % Кут 30 градусів KMN
-        \pic[draw, pic text={\normalsize $30^\circ$}, angle radius=0.8cm, angle eccentricity=1.94] {angle = K--M--N};
+        \pic[draw, angle radius=0.8cm] {angle = K--M--N};
+    \nmtAngleLabel{K}{M}{N}{0.8}{\normalsize $30^\circ$}
 
         \node[left] at (A) {$A$};
         \node[above] at (B) {$B$};
@@ -879,7 +893,8 @@ III. & Висота ромба вдвічі більша за радіус уп�
     \draw (B) -- (D);
     \draw (O) -- (K);
     \pic[draw, angle radius=0.18cm] {right angle = O--K--A};
-    \pic[draw, angle radius=0.32cm, pic text={$75^\circ$}, angle eccentricity=2.1, font=\normalsize] {angle = C--D--B};
+    \pic[draw, angle radius=0.32cm, font=\normalsize] {angle = C--D--B};
+    \nmtAngleLabel{C}{D}{B}{0.32}{$75^\circ$}
     \path (O) node[nmt dot] {};
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
@@ -1558,8 +1573,10 @@ III. & Висота ромба вдвічі більша за радіус уп�
     % мітки рівності бічних сторін
     \draw ($(A)!0.5!(K)$) ++(-0.12,-0.04) -- ++(0.24,0.08);
     \draw ($(D)!0.5!(K)$) ++(-0.12,0.04) -- ++(0.24,-0.08);
-    \pic[draw, angle radius=0.55cm, pic text={$50^\circ$}, angle eccentricity=2.49, font=\normalsize] {angle = D--A--B};
-    \pic[draw, angle radius=0.8cm, pic text={$40^\circ$}, angle eccentricity=2.02, font=\normalsize] {angle = D--K--A};
+    \pic[draw, angle radius=0.55cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.55}{$50^\circ$}
+    \pic[draw, angle radius=0.8cm, font=\normalsize] {angle = D--K--A};
+    \nmtAngleLabel{D}{K}{A}{0.8}{$40^\circ$}
     \node[left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
