@@ -107,24 +107,26 @@ III. & Площа трикутника $MBN$ та чотирикутника $AM
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0]
-    \draw[thick] (0,0) circle (1.9);
-    \coordinate (B) at (90:1.9);
-    \coordinate (A) at (245:1.9);
-    \coordinate (C) at (295:1.9);
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
+    \def\R{1.9}
+    \draw[thick] (0,0) circle (\R);
+    \coordinate (B) at (90:\R);
+    \coordinate (A) at (232:\R);
+    \coordinate (C) at (308:\R);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-    % рівні сторони AB = BC: по одній рисці
-    \path (A) -- (B) node[pos=0.3, sloped, font=\normalsize] {$|$};
-    \path (B) -- (C) node[pos=0.7, sloped, font=\normalsize] {$|$};
-    % кут 20° при B
-    \pic[draw, angle radius=1.1cm] {angle = A--B--C};
-    \node[inner sep=0pt] at ($(B)+(0,-2.15)$) {$20^\circ$};
-    \node[above] at (B) {$B$};
-    \node[below left] at (A) {$A$};
-    \node[below right] at (C) {$C$};
+    \nmtEq{A}{B}{1}
+    \nmtEq{B}{C}{1}
+    \pic[draw, angle radius=1cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1}{$20^\circ$}
     \node[nmt dot] at (A) {};
     \node[nmt dot] at (B) {};
     \node[nmt dot] at (C) {};
+    \node[above] at (B) {$B$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -405,25 +407,24 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}
-    % ∠A = 40°, ∠B = 30°, ∠C = 110°
     \coordinate (A) at (0,0);
-    \coordinate (C) at (2.2,0);
-    \coordinate (B) at (3.167,2.658);
-    \coordinate (D) at (4.4,0);
+    \coordinate (C) at (3.2,0);
+    \coordinate (B) at (4.607,3.866);
+    \coordinate (D) at (4.9,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-    \draw[thick] (C) -- (D);
-    \pic[draw, angle radius=0.7cm] {angle = C--A--B};
-    \nmtAngleLabel{C}{A}{B}{0.7}{$40^\circ$}
-    \pic[draw, angle radius=0.5cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.6cm] {angle = A--B--C};
-    \nmtAngleLabel{A}{B}{C}{0.6}{$30^\circ$}
-    \pic[draw, angle radius=0.4cm] {angle = D--C--B};
-    \pic[draw, angle radius=0.5cm] {angle = D--C--B};
-    \pic[draw, angle radius=0.6cm] {angle = D--C--B};
-    \nmtAngleLabel{D}{C}{B}{0.6}{$?$}
+    \draw[thin] (C) -- (D);
+    \pic[draw, angle radius=0.45cm] {angle = C--A--B};
+    \nmtAngleLabel{C}{A}{B}{0.45}{$40^\circ$}
+    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.53}{$30^\circ$}
+    \pic[draw, angle radius=0.53cm] {angle = A--B--C};
+    \pic[draw, angle radius=0.45cm] {angle = D--C--B};
+    \nmtAngleLabel{D}{C}{B}{0.61}{$?$}
+    \pic[draw, angle radius=0.53cm] {angle = D--C--B};
+    \pic[draw, angle radius=0.61cm] {angle = D--C--B};
     \node[below left] at (A) {$A$};
     \node[below] at (C) {$C$};
-    \node[above] at (B) {$B$};
+    \node[above right] at (B) {$B$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -442,40 +443,25 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.3]
-    % Координати трикутника
-    \coordinate (A) at (1.5,0);
-    \coordinate (C) at (3.5,0);
-    \coordinate (B) at (2.2,2.5);
-
-    % Продовження CA за A
-    \coordinate (D) at (0,0);
-
-    % Трикутник
+\begin{nmtfit}\begin{tikzpicture}
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0.5,3);
+    \coordinate (C) at (4.4,0);
+    \coordinate (D) at (-1.1,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Продовження
-    \draw[thick] (D) -- (A);
-
-    % Кут 100° (зовнішній при A)
-    \pic[draw, angle radius=0.5cm] {angle = B--A--D};
-    \node at (0.75,0.4) {\normalsize $100°$};
-
-    % Кут 20° при C (подвійна дуга)
-    \pic[draw, angle radius=0.4cm] {angle = B--C--A};
-    \pic[draw, angle radius=0.5cm] {angle = B--C--A};
-    \node at (2.8,0.4) {\normalsize $20°$};
-
-    % Кут ? при B (потрійна дуга)
-    \pic[draw, angle radius=0.35cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.55cm] {angle = A--B--C};
-    \node at (2.2,1.7) {\normalsize $?$};
-
-    % Підписи
+    \draw[thin] (D) -- (A);
+    \pic[draw, angle radius=0.45cm] {angle=B--A--D};
+    \nmtAngleLabel{B}{A}{D}{0.45}{$100^\circ$}
+    \pic[draw, angle radius=0.35cm]{angle=B--C--A};
+    \pic[draw, angle radius=0.43cm] {angle=B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.43}{$20^\circ$}
+    \pic[draw, angle radius=0.35cm]{angle=A--B--C};
+    \pic[draw, angle radius=0.43cm]{angle=A--B--C};
+    \pic[draw, angle radius=0.51cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.51}{$?$}
+    \node[above] at (B) {$B$};
     \node[below] at (A) {$A$};
     \node[below right] at (C) {$C$};
-    \node[above] at (B) {$B$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -499,17 +485,12 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Ромб (вертикальна орієнтація)
-    \coordinate (A) at (-1.5,0);
-    \coordinate (B) at (0,2);
-    \coordinate (C) at (1.5,0);
-    \coordinate (D) at (0,-2);
-
-    % Ромб
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round]
+    \coordinate (A) at (-2.7,0);
+    \coordinate (B) at (0,1.46);
+    \coordinate (C) at (2.7,0);
+    \coordinate (D) at (0,-1.46);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Підписи
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[right] at (C) {$C$};
@@ -541,40 +522,24 @@ III. & Висота ромба, проведена з вершини $B$ до с
 \hfill
 \begin{minipage}[t]{0.45\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.24]
-    % Паралелограм ABCD
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (1.2,2);
-    \coordinate (C) at (4.5,2);
-    \coordinate (D) at (3.3,0);
-    \coordinate (K) at (1.2,0);
-
-    % Паралелограм
+    \coordinate (K) at (1.59,0);
+    \coordinate (D) at (4.59,0);
+    \coordinate (B) at (1.59,2.54);
+    \coordinate (C) at (6.18,2.54);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Висота BK
     \draw[thick] (B) -- (K);
-
-    % Відрізок KC
     \draw[thick] (K) -- (C);
-
-    % Прямий кут при K (зліва)
-    \draw (0.95,0) -- (0.95,0.25) -- (1.2,0.25);
-
-    % Одинарна риска рівності на KD
-    \draw[thick] (2.25,-0.15) -- (2.25,0.15);
-
-    % Одинарна риска рівності на CD
-    \draw[thick] (3.85,1.1) -- (4,0.9);
-
-    % Кут alpha при A
-    \draw (0.5,0) arc (0:59:0.5);
-    \node at (0.7,0.35) {\normalsize $\alpha$};
-
-    % Позначення 6 на KD
-    \node[below] at (2.25,0) {\normalsize $6$};
-
-    % Підписи
+    \pic[draw, angle radius=0.26cm]{right angle=D--K--B};
+    \pic[draw, angle radius=0.45cm] {angle=D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.45}{$\alpha$}
+    \nmtEq{K}{D}{1}
+    \nmtEq{D}{C}{1}
+    \node[below] at ($(K)!0.5!(D)$) {$6$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -618,26 +583,21 @@ III. & Точка перетину серединних перпендикуля
 \hfill
 \begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}
+\begin{nmtfit}\begin{tikzpicture}[tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]
     \coordinate (A) at (0,0);
     \coordinate (C) at (3.6,0);
     \coordinate (B) at (1.8,3.86);
-    \coordinate (M) at (-1.4,0);
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-    \draw[thick] (M) -- (A);
-    % рівні сторони AB = BC
-    \draw[thick] ($(A)!0.5!(B)$) ++(155:0.1) -- ++(-25:0.2);
-    \draw[thick] ($(B)!0.5!(C)$) ++(205:0.1) -- ++(25:0.2);
-    % кут B = 50°
-    \pic[draw, angle radius=0.55cm] {angle = A--B--C};
-    \nmtAngleLabel{A}{B}{C}{0.55}{$50^\circ$}
-    % зовнішній кут при A
-    \pic[draw, angle radius=0.4cm] {angle = B--A--M};
-    \pic[draw, angle radius=0.5cm] {angle = B--A--M};
-    \nmtAngleLabel{B}{A}{M}{0.5}{$?$}
-    \node[below] at (A) {$A$};
+    \coordinate (M) at (-1.5,0);
+    \draw[thick] (A) -- (B) node[midway, tick] {} -- (C) node[midway, tick] {} -- cycle;
+    \draw[thin] (M) -- (A);
+    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.45}{$50^\circ$}
+    \pic[draw, angle radius=0.45cm] {angle = B--A--M};
+    \nmtAngleLabel{B}{A}{M}{0.53}{$?$}
+    \pic[draw, angle radius=0.53cm] {angle = B--A--M};
+    \node[below left] at (A) {$A$};
     \node[above] at (B) {$B$};
-    \node[below] at (C) {$C$};
+    \node[below right] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -713,20 +673,22 @@ III. & Середня лінія будь-якої трапеції ділить
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (1.2,2.4);
-    \coordinate (C) at (5.2,2.4);
-    \coordinate (D) at (4,0);
-    \coordinate (P) at (1.2,0);
-    \coordinate (K) at (2.4,2.4);
+    \coordinate (P) at (1.4,0);
+    \coordinate (D) at (4.4,0);
+    \coordinate (B) at (1.4,2.598);
+    \coordinate (K) at (2.9,2.598);
+    \coordinate (C) at (5.8,2.598);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick] (B) -- (P);
+    \draw[thin] (B) -- (P);
     \draw[thick] (P) -- (K) -- (D);
-    \draw (0.95,0) -- (0.95,0.25) -- (1.2,0.25);
-    \pic[draw, angle radius=0.55cm] {angle = A--B--P};
-    \node at (0.98,1.475) {$\alpha$};
-    \node at (2.2,1.0) {$6$};
+    \pic[draw, angle radius=0.26cm]{right angle=B--P--A};
+    \pic[draw, angle radius=0.6cm] {angle=A--B--P};
+    \nmtAngleLabel{A}{B}{P}{0.6}{$\alpha$}
+    \node[nmt dot] at (P) {};
+    \node[nmt dot] at (K) {};
+    \path (P) -- (K) node[midway, above left] {$6$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -802,7 +764,7 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
 \hfill
 \begin{minipage}[t]{0.38\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.1]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round]
     % ромб зі стороною 3: кут A = 60°, M -- середина AD, BM \perp AD
     \coordinate (A) at (0,0);
     \coordinate (M) at (1.5,0);
@@ -811,11 +773,9 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
     \coordinate (C) at (4.5,2.598);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (M);
-    % прямий кут при M
-    \draw (1.5,0.3) -- (1.8,0.3) -- (1.8,0);
-    % рівність AM = MD
-    \draw (0.75,0.1) -- (0.75,-0.1);
-    \draw (2.25,0.1) -- (2.25,-0.1);
+    \pic[draw, angle radius=0.26cm] {right angle = B--M--A};
+    \foreach \p/\q in {A/M, M/D}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
     \node[below left] at (A) {$A$};
     \node[below] at (M) {$M$};
     \node[below right] at (D) {$D$};
@@ -858,27 +818,17 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.02]
-    % Квадрат ABCD
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \coordinate (C) at (3,3);
-    \coordinate (D) at (3,0);
-
-    % Точка K на BC
-    \coordinate (K) at (1.73,3);
-
-    % Квадрат
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (3.6,3.6);
+    \coordinate (D) at (3.6,0);
+    \coordinate (K) at (2.078,3.6);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Відрізок AK
     \draw[thick] (A) -- (K);
-
-    % Кут 30° при A
-    \draw (0,0.6) arc (90:60:0.6);
-    \node at (0.5,1.5) {\normalsize $30°$};
-
-    % Підписи
+    \pic[draw, angle radius=1.1cm] {angle=K--A--B};
+    \nmtAngleLabel{K}{A}{B}{1.1}{$30^\circ$}
+    \node[nmt dot] at (K) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -921,17 +871,16 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[line join=round]
-    % за оригіналом (НМТ 2025, 9.06, № 12, с. 264): прямокутна трапеція, BC : AD = 2 : 5, O -- перетин діагоналей (BO : OD = 2 : 5)
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,2.9);
-    \coordinate (C) at (2.4,2.9);
-    \coordinate (D) at (6.0,0);
+    \coordinate (B) at (0,3.2);
+    \coordinate (C) at (2.4,3.2);
+    \coordinate (D) at (6,0);
     \coordinate (O) at ($(B)!2/7!(D)$);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (C);
     \draw[thick] (B) -- (D);
-    \node at ($(O)+(-0.45,-0.05)$) {$O$};
+    \node at ($(O)+(196:0.42)$) {$O$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1028,20 +977,13 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Ромб ABCD (вертикальний)
-    \coordinate (A) at (-1.5,0);
+\begin{nmtfit}\begin{tikzpicture}
+    \coordinate (A) at (-1.2,0);
     \coordinate (B) at (0,2);
-    \coordinate (C) at (1.5,0);
+    \coordinate (C) at (1.2,0);
     \coordinate (D) at (0,-2);
-
-    % Ромб
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Діагональ AC
     \draw[thick] (A) -- (C);
-
-    % Підписи
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[right] at (C) {$C$};
@@ -1204,18 +1146,18 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.32]
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,15);
-    \coordinate (C) at (10.39,15);
-    \coordinate (D) at (10.39,0);
-    \coordinate (K) at (10.39,6);
-    \coordinate (M) at (5.2,15);
+    \coordinate (B) at (0,4.2);
+    \coordinate (C) at (2.91,4.2);
+    \coordinate (D) at (2.91,0);
+    \coordinate (K) at (2.91,1.68);
+    \coordinate (M) at (1.455,4.2);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (K) -- (M) -- cycle;
-    \pic[draw, angle radius=0.3cm] {right angle = A--K--M};
-    \pic[draw, angle radius=0.5cm] {angle = D--A--K};
-    \node at (4.6,1.05) {$30^\circ$};
+    \pic[draw, angle radius=0.26cm]{right angle=M--K--A};
+    \pic[draw, angle radius=0.9cm] {angle=D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.9}{$30^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above] at (M) {$M$};
@@ -1240,21 +1182,21 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.386, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (D) at (10,0);
-    \coordinate (C) at (10,7);
-    \coordinate (B) at (0,7);
-    \coordinate (Top) at (6.4, 11.8);
-    \draw (A) -- (D) -- (C) -- (Top) -- (B) -- cycle;
-    \draw[dashed] (B) -- (C);
-    \pic[draw, angle radius=0.3cm] {right angle = B--A--D};
-    \pic[draw, angle radius=0.3cm] {right angle = A--D--C};
-    \pic[draw, angle radius=0.3cm] {right angle = B--Top--C};
-    \node[left] at (0,3.5) {$7$~\textit{м}};
-    \node[right] at (10,3.5) {$7$~\textit{м}};
-    \node[above left] at (3.2, 9.4) {$8$~\textit{м}};
-    \node[above right] at (8.2, 9.4) {$6$~\textit{м}};
+    \coordinate (D) at (4,0);
+    \coordinate (C) at (4,2.8);
+    \coordinate (B) at (0,2.8);
+    \coordinate (T) at (2.56,4.72);
+    \draw[thick] (A) -- (D) -- (C) -- (T) -- (B) -- cycle;
+    \draw[dashed, thin] (B) -- (C);
+    \pic[draw, angle radius=0.26cm] {right angle = D--A--B};
+    \pic[draw, angle radius=0.26cm] {right angle = C--D--A};
+    \pic[draw, angle radius=0.26cm] {right angle = B--T--C};
+    \node[left] at ($(A)!0.5!(B)$) {$7$~\textit{м}};
+    \node[right] at ($(D)!0.5!(C)$) {$7$~\textit{м}};
+    \node[above left] at ($(B)!0.5!(T)$) {$8$~\textit{м}};
+    \node[above right] at ($(T)!0.5!(C)$) {$6$~\textit{м}};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1291,16 +1233,16 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (O) at (0,0);
-    \draw (O) circle (2);
-    \coordinate (A) at (-1.732, -1);
-    \coordinate (C) at (1.732, 1);
-    \coordinate (B) at (-0.5, 1.936);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (A) -- (C);
-    \draw (B) -- (O);
-    \path (O) node[nmt dot] {} node[below right] {$O$};
+    \coordinate (A) at (-1.532,-1.286);
+    \coordinate (C) at (1.532,1.286);
+    \coordinate (B) at (-0.845,1.813);
+    \draw[thick] (O) circle (2);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (B) -- (O);
+    \node[nmt dot] at (O) {};
+    \node[below right] at (O) {$O$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1320,8 +1262,7 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[line join=round]
-    % за оригіналом (НМТ 2026, 9.06, № 14, с. 65): AC горизонтально, B над серединою M, K -- середина AB; AK = KB (дві рисочки), AM = MC (одна)
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round]
     \coordinate (A) at (-2.88,0);
     \coordinate (C) at (2.88,0);
     \coordinate (B) at (0,1.663);
@@ -1329,12 +1270,13 @@ III. & Діагональ квадрата ділить його на два р�
     \coordinate (K) at (-1.44,0.8315);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
     \draw[thick] (K) -- (M);
-    \foreach \p/\q/\o in {A/K/-0.07cm, A/K/0.07cm, K/B/-0.07cm, K/B/0.07cm}
-        \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!-90:(\q)$);
+    \foreach \p/\q/\o in {A/K/-0.05cm, A/K/0.05cm, K/B/-0.05cm, K/B/0.05cm}
+        \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.09cm!-90:(\q)$);
     \foreach \p/\q in {A/M, M/C}
-        \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
     \pic[draw, angle radius=0.4cm] {angle = A--B--C};
     \nmtAngleLabel{A}{B}{C}{0.4}{$120^\circ$}
+    \node[nmt dot] at (K) {};
     \node[nmt dot] at (M) {};
     \node[above] at (B) {$B$};
     \node[left] at (A) {$A$};
@@ -1432,21 +1374,18 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[line join=round]
-    \def\s{0.24}
-    \coordinate (B) at (0,{23.18*\s});
-    \coordinate (A) at ({-6.21*\s},0);
-    \coordinate (C) at ({6.21*\s},0);
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    \coordinate (B) at (0,3.8);
+    \coordinate (A) at (-1.018,0);
+    \coordinate (C) at (1.018,0);
     \coordinate (M) at ($(B)!0.75!(A)$);
     \coordinate (K) at ($(B)!0.866!(C)$);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
     \draw[thick] (K) -- (M);
     \draw[thick] (A) -- (K);
-    \pic[draw, angle radius=0.2cm] {right angle = K--M--B};
-    \pic[draw, angle radius=1.4cm] {angle = A--B--C};
-    \node at ($(B)+(270:2.15)$) {$30^\circ$};
-    \node[nmt dot] at (M) {};
-    \node[nmt dot] at (K) {};
+    \pic[draw, angle radius=0.26cm]{right angle=K--M--B};
+    \pic[draw, angle radius=1.1cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1.1}{$30^\circ$}
     \node[below left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[below right] at (C) {$C$};
@@ -1469,19 +1408,17 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.871, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (C) at (0,0);
     \coordinate (B) at (6,0);
-    \coordinate (A) at (0,3.46);
+    \coordinate (A) at (0,3.464);
     \coordinate (O) at (2,0);
-    % K точка дотику на AB
-    \coordinate (K) at ($(A)!(O)!(B)$);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (O) -- (K);
-    \draw (2,0) ++(0:2) arc (0:180:2);
-    \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
-    \pic[draw, angle radius=0.4cm] {angle = K--O--C};
-    \nmtAngleLabel{K}{O}{C}{0.4}{\normalsize $120^\circ$}
+    \coordinate (K) at ($(O)+(60:2)$);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (O) -- (K);
+    \draw[thick] (O) ++(0:2) arc (0:180:2);
+    \pic[draw, angle radius=0.35cm] {angle = K--O--C};
+    \nmtAngleLabel{K}{O}{C}{0.35}{$120^\circ$}
     \node[above left] at (A) {$A$};
     \node[below left] at (C) {$C$};
     \node[below right] at (B) {$B$};
@@ -1519,17 +1456,17 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.555, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (10,4);
-    \coordinate (D) at (10,0);
-    \coordinate (K) at (2.4,4);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw (A) -- (K) -- (D);
-    \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
-    \pic[draw, angle radius=0.55cm] {angle = D--A--K};
-    \nmtAngleLabel{D}{A}{K}{0.55}{\normalsize $60^\circ$}
+    \coordinate (B) at (0,2.598);
+    \coordinate (C) at (6,2.598);
+    \coordinate (D) at (6,0);
+    \coordinate (K) at (1.5,2.598);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K) -- (D);
+    \pic[draw, angle radius=0.26cm]{right angle=A--K--D};
+    \pic[draw, angle radius=0.45cm] {angle=D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.45}{$60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1684,22 +1621,13 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.6]
-    % Вершини трикутника
+\begin{nmtfit}\begin{tikzpicture}[scale=1.6, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (C) at (3,0);
     \coordinate (B) at (1.5,2.2);
-
-    % Трикутник
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Позначки рівних сторін
-    \draw (0.6,1.2) -- (0.75,1.05);
-    \draw (0.65,1.15) -- (0.8,1);
-    \draw (2.4,1.2) -- (2.25,1.05);
-    \draw (2.35,1.15) -- (2.2,1);
-
-    % Підписи
+    \foreach \p/\q in {A/B, B/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
     \node[below left] at (A) {$A$};
     \node[below right] at (C) {$C$};
     \node[above] at (B) {$B$};
@@ -1810,34 +1738,24 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75]
-    % Квадрат
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-
-    % Середини
-    \coordinate (K) at (2,4);
-    \coordinate (M) at (4,2);
-
-    % Квадрат
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (3.6,3.6);
+    \coordinate (D) at (3.6,0);
+    \coordinate (K) at (1.8,3.6);
+    \coordinate (M) at (3.6,1.8);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Відрізок KM
     \draw[thick] (K) -- (M);
-
-    % Риски рівності на BK і KC (одинарні, горизонтальна сторона)
-    \draw[thick] (1,3.85) -- (1,4.15);
-    \draw[thick] (3,3.85) -- (3,4.15);
-
-    % Риски рівності на CM і MD (подвійні, вертикальна сторона)
-    \draw[thick] (3.85,3) -- (4.15,3);
-    \draw[thick] (3.85,3.15) -- (4.15,3.15);
-    \draw[thick] (3.85,1) -- (4.15,1);
-    \draw[thick] (3.85,1.15) -- (4.15,1.15);
-
-    % Підписи
+    \nmtEq{B}{K}{1}
+    \nmtEq{K}{C}{1}
+    \nmtEq{C}{M}{1}
+    \nmtEq{M}{D}{1}
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1881,31 +1799,22 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.22\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.654]
-    % Рівносторонній трикутник: A і C -- основа, B -- угорі (як в оригіналі)
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (C) at (4,0);
-    \coordinate (B) at (2,3.46);
-
-    % K -- середина AB
-    \coordinate (K) at (1,1.73);
-
-    % M -- основа перпендикуляра з K на AC
-    \coordinate (M) at (1,0);
-
-    % Трикутник
+    \coordinate (C) at (5,0);
+    \coordinate (B) at (2.5,4.33);
+    \coordinate (K) at ($(A)!0.5!(B)$);
+    \coordinate (M) at (1.25,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Перпендикуляр KM
     \draw[thick] (K) -- (M);
-
-    % Підписи
+    \pic[draw, angle radius=0.26cm] {right angle = K--M--A};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
     \node[below right] at (C) {$C$};
     \node[above] at (B) {$B$};
-    \node[left] at (K) {$K$};
+    \node[above left] at (K) {$K$};
     \node[below] at (M) {$M$};
-    \pic[draw, angle radius=0.2cm] {right angle = K--M--C};
 \end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
@@ -1939,24 +1848,20 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.31]
-    % AC : CB = 12 : 16
-    \coordinate (A) at (0,12);
-    \coordinate (B) at (16,0);
+\begin{nmtfit}\begin{tikzpicture}
+    \def\nmttick#1#2{\path[draw, thick] let \p1=($(#1)!0.5!(#2)$), \p2=($(#2)-(#1)$), \n1={atan2(\y2,\x2)+90} in (\x1,\y1) ++(\n1:0.09) -- ++(\n1+180:0.18);}
     \coordinate (C) at (0,0);
-    \coordinate (M) at (8,0);
+    \coordinate (B) at (4.8,0);
+    \coordinate (A) at (0,3.6);
+    \coordinate (M) at (2.4,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-    \draw[thick] (A) -- (M);
-    % прямий кут при C
-    \draw (0,1.3) -- (1.3,1.3) -- (1.3,0);
-    % риски рівності CM = MB
-    \draw[thick] (4,-0.5) -- (4,0.5);
-    \draw[thick] (12,-0.5) -- (12,0.5);
-    % точки на M
+    \draw[thin] (A) -- (M);
+    \pic[draw, angle radius=0.26cm]{right angle=B--C--A};
+    \nmttick{C}{M}
+    \nmttick{M}{B}
     \node[nmt dot] at (M) {};
-    % підписи
     \node[above left] at (A) {$A$};
-    \node[right] at (B) {$B$};
+    \node[below right] at (B) {$B$};
     \node[below left] at (C) {$C$};
     \node[below] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
@@ -1993,16 +1898,16 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4.5);
-    \coordinate (C) at (4.5,4.5);
-    \coordinate (D) at (4.5,0);
-    \coordinate (K) at (0,9.9);
+    \coordinate (B) at (0,2);
+    \coordinate (C) at (2,2);
+    \coordinate (D) at (2,0);
+    \coordinate (K) at (0,4.45);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (K) -- (B);
     \draw[thick] (K) -- (C);
-    \pic[draw, angle radius=0.3cm] {right angle = K--B--C};
+    \pic[draw, angle radius=0.26cm] {right angle = K--B--C};
     \node[below left] at (A) {$A$};
     \node[left] at (B) {$B$};
     \node[right] at (C) {$C$};
@@ -2064,25 +1969,21 @@ III. & Діагональ квадрата ділить його на два р�
 }
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.42]
-    % AN = 8, тож AC = CN = 4; AB = BC = CM = MN = 2*sqrt17, висота 8 (точний масштаб)
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (C) at (4,0);
-    \coordinate (N) at (8,0);
-    \coordinate (B) at (2,8);
-    \coordinate (M) at (6,8);
-
-    % Трикутники
+    \coordinate (C) at (2.7,0);
+    \coordinate (N) at (5.4,0);
+    \coordinate (B) at (1.35,3.4);
+    \coordinate (M) at (4.05,3.4);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
     \draw[thick] (C) -- (M) -- (N) -- cycle;
-
-    % Позначки рівних сторін
-    \draw (1.34,3.915) -- (0.66,4.085);
-    \draw (2.66,3.915) -- (3.34,4.085);
-    \draw (5.34,3.915) -- (4.66,4.085);
-    \draw (6.66,3.915) -- (7.34,4.085);
-
-    % Підписи
+    \nmtEq{A}{B}{1}
+    \nmtEq{B}{C}{1}
+    \nmtEq{C}{M}{1}
+    \nmtEq{M}{N}{1}
     \node[below left] at (A) {$A$};
     \node[below] at (C) {$C$};
     \node[below right] at (N) {$N$};
@@ -2116,7 +2017,7 @@ III. & Діагональ квадрата ділить його на два р�
 }
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
+\begin{nmtfit}\begin{tikzpicture}[tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,4);
     \coordinate (C) at (6,4);
@@ -2125,17 +2026,16 @@ III. & Діагональ квадрата ділить його на два р�
     \coordinate (K) at (2,2);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (O) circle (2);
-    \draw[thick] (A) -- (K) -- (B);
-    \draw[thick] (0.86,1.14) -- (1.14,0.86);
-    \draw[thick] (0.86,2.86) -- (1.14,3.14);
-    \pic[draw, angle radius=0.3cm] { right angle = A--K--B};
+    \draw[thick] (A) -- (K) node[midway, tick] {} -- (B) node[midway, tick] {};
+    \pic[draw, angle radius=0.26cm] {right angle = B--K--A};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (O) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[right] at (K) {$K$};
-    \node[above] at (4.3,2) {$O$};
-    \path (O) node[nmt dot] {};
+    \node[above right] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \par\penalty-20\vspace{0.25cm}
@@ -2164,30 +2064,17 @@ III. & Діагональ квадрата ділить його на два р�
 }
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Прямокутник ABCD
+\begin{nmtfit}\begin{tikzpicture}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \coordinate (C) at (4,3);
-    \coordinate (D) at (4,0);
-
-    % Центр O
-    \coordinate (O) at (2,1.5);
-
-    % Точка M (проекція O на AD)
-    \coordinate (M) at (2,0);
-
-    % Прямокутник
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (5.4,3.6);
+    \coordinate (D) at (5.4,0);
+    \coordinate (O) at (2.7,1.8);
+    \coordinate (M) at (2.7,0);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Діагоналі
     \draw[thick] (A) -- (C);
     \draw[thick] (B) -- (D);
-
-    % Перпендикуляр OM
-    \draw[thick] (O) -- (M);
-
-    % Підписи
+    \draw[thin] (O) -- (M);
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2238,20 +2125,20 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[line join=round]
     % за оригіналом: B -- центр сектора на прямій m, C на m, A на n; між C і D, K і M проміжки
-    \coordinate (B) at (0,2.083); \coordinate (A) at (0,0); \coordinate (C) at (2.083,2.083);
-    \coordinate (D) at (1.841,0); \coordinate (K) at (3.013,2.083); \coordinate (L) at (4.185,0);
-    \coordinate (M) at (5.09,2.083); \coordinate (N) at (7.322,2.083); \coordinate (P) at (6.423,0);
-    \fill[nmtFillC] (B) -- (A) arc (-90:0:2.083) -- cycle;
+    \coordinate (B) at (0,2.087); \coordinate (A) at (0,0); \coordinate (C) at (2.087,2.087);
+    \coordinate (D) at (1.851,0); \coordinate (K) at (3.04,2.087); \coordinate (L) at (4.226,0);
+    \coordinate (M) at (5.136,2.087); \coordinate (N) at (7.35,2.087); \coordinate (P) at (6.45,0);
+    \fill[nmtFillC] (B) -- (A) arc (-90:0:2.087) -- cycle;
     \fill[nmtFillA] (D) -- (K) -- (L) -- cycle;
     \fill[nmtFillE] (L) -- (M) -- (N) -- (P) -- cycle;
-    \draw[thick] (-0.632,2.083) -- (8.159,2.083);
-    \draw[thick] (-0.601,0) -- (8.203,0);
+    \draw[thick] (-1.0,2.087) -- (8.2,2.087);
+    \draw[thick] (-1.0,0) -- (8.25,0);
     \draw[thick] (A) -- (B);
-    \draw[thick] (A) arc (-90:0:2.083);
+    \draw[thick] (A) arc (-90:0:2.087);
     \draw[thick] (D) -- (K) -- (L);
     \draw[thick] (L) -- (M) -- (N) -- (P) -- cycle;
-    \node[left] at (-0.632,2.083) {$m$};
-    \node[left] at (-0.601,0) {$n$};
+    \node[above right] at (-1.0,2.087) {$m$};
+    \node[above right] at (-1.0,0) {$n$};
     \node[above] at (B) {$B$};
     \node[above] at (C) {$C$};
     \node[above] at (K) {$K$};
@@ -2289,22 +2176,27 @@ III. & Діагональ квадрата ділить його на два р�
 \zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами \mbox{(1--3)} та їхніми значеннями \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-    \coordinate (K) at (2,6);
-    \coordinate (Mid) at (4,2);
+    \coordinate (B) at (0,2.6);
+    \coordinate (C) at (2.6,2.6);
+    \coordinate (D) at (2.6,0);
+    \coordinate (K) at (1.3,3.9);
+    \coordinate (M) at (2.6,1.3);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (K) -- (C);
-    \path (Mid) node[nmt dot] {};
+    \nmtEq{B}{K}{1}
+    \nmtEq{K}{C}{1}
+    \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[above] at (K) {$K$};
-    \node[right] at (Mid) {$M$};
+    \node[right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2335,26 +2227,26 @@ III. & Діагональ квадрата ділить його на два р�
 \zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.123, thick]
+\begin{nmtfit}\begin{tikzpicture}[tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,16);
-    \coordinate (Cc) at (12,16);
-    \coordinate (D) at (12,0);
-    \coordinate (M) at (36,0);
-    \coordinate (K) at (24,32);
-    \draw (A) -- (B) -- (Cc) -- (D) -- cycle;
-    \draw (A) -- (M);
-    \draw (D) -- (K) -- (M);
-    \draw (-2.4,-3.2) -- (27,36);
-    % рівні відрізки DK = KM
-    \draw (18,16) ++(-1.2,0.45) -- ++(2.4,-0.9);
-    \draw (30,16) ++(-1.2,-0.45) -- ++(2.4,0.9);
-    \node[above, font=\normalsize] at (K) {$K$};
-    \node[below right, font=\normalsize] at (A) {$A$};
-    \node[above left, font=\normalsize] at (B) {$B$};
-    \node[above, font=\normalsize] at (Cc) {$C$};
-    \node[below, font=\normalsize] at (D) {$D$};
-    \node[below right, font=\normalsize] at (M) {$M$};
+    \coordinate (B) at (0,1.92);
+    \coordinate (C) at (1.44,1.92);
+    \coordinate (D) at (1.44,0);
+    \coordinate (M) at (4.32,0);
+    \coordinate (K) at (2.88,3.84);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (M);
+    \draw[thick] (A) -- (K);
+    \draw[thin] (A) -- ++(-0.252,-0.336);
+    \draw[thin] (K) -- ++(0.288,0.384);
+    \draw[thick] (D) -- (K) node[midway, tick] {} ;
+    \draw[thick] (K) -- (M) node[midway, tick] {};
+    \node[above left] at (K) {$K$};
+    \node[below right] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above left] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[below right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2406,27 +2298,27 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick]
-    \coordinate (K) at (-3,3);
-    \coordinate (M) at (1,3);
-    \coordinate (N) at (1,-1);
-    \coordinate (C) at (-1,1);
-    \coordinate (B) at (-1,-3);
-    \coordinate (A) at (3,-3);
-    \draw (K) -- (M) -- (N);
-    \draw (C) -- (B) -- (A);
-    \draw (K) -- (A);
-    \draw (M) ++(-0.4,0) -- ++(0,-0.4) -- ++(0.4,0);
-    \draw (B) ++(0,0.4) -- ++(0.4,0) -- ++(0,-0.4);
-    \draw (-2-0.15, 2-0.15) -- (-2+0.15, 2+0.15);
-    \draw (0-0.15, 0-0.15) -- (0+0.15, 0+0.15);
-    \draw (2-0.15, -2-0.15) -- (2+0.15, -2+0.15);
-    \path (C) node[nmt dot] {};
-    \path (N) node[nmt dot] {};
+\begin{nmtfit}\begin{tikzpicture}
+    \def\nmttick#1#2{\path[draw, thick] let \p1=($(#1)!0.5!(#2)$), \p2=($(#2)-(#1)$), \n1={atan2(\y2,\x2)+90} in (\x1,\y1) ++(\n1:0.09) -- ++(\n1+180:0.18);}
+    \coordinate (K) at (0,0);
+    \coordinate (M) at (2.9,0);
+    \coordinate (N) at (2.9,-2.9);
+    \coordinate (C) at (1.45,-1.45);
+    \coordinate (B) at (1.45,-4.35);
+    \coordinate (A) at (4.35,-4.35);
+    \draw[thick] (K) -- (M) -- (N);
+    \draw[thick] (C) -- (B) -- (A);
+    \draw[thick] (K) -- (A);
+    \pic[draw, angle radius=0.26cm]{right angle=K--M--N};
+    \pic[draw, angle radius=0.26cm]{right angle=A--B--C};
+    \nmttick{C}{N}
+    \nmttick{N}{A}
+    \node[nmt dot] at (C) {};
+    \node[nmt dot] at (N) {};
     \node[above left] at (K) {$K$};
     \node[above right] at (M) {$M$};
-    \node[left] at (-1.1, 0.9) {$C$};
-    \node[right] at (1.1, -0.9) {$N$};
+    \node[below left] at (C) {$C$};
+    \node[above right] at (N) {$N$};
     \node[below left] at (B) {$B$};
     \node[below right] at (A) {$A$};
 \end{tikzpicture}\end{nmtfit}
@@ -2442,7 +2334,7 @@ III. & Діагональ квадрата ділить його на два р�
 \zadnum На рисунку зображено правильний трикутник $ABC$ та прямокутні рівнобедрені трикутники $AKB$ і $BMC$. Установіть відповідність між кутом \mbox{(1--3)} та його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.9, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=2.0, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (C) at (2,0);
     \coordinate (B) at (1,1.732);
@@ -2452,14 +2344,13 @@ III. & Діагональ квадрата ділить його на два р�
     \draw[thick] (A) -- (K) -- (B);
     \draw[thick] (B) -- (M) -- (C);
     \draw[thick] (A) -- (M);
-    \draw[thick] (K) -- (B);
-    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = A--K--B};
-    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = B--M--C};
-    \node[below left, font=\normalsize] at (A) {$A$};
-    \node[above, font=\normalsize] at (B) {$B$};
-    \node[below right, font=\normalsize] at (C) {$C$};
-    \node[left, font=\normalsize] at (K) {$K$};
-    \node[right, font=\normalsize] at (M) {$M$};
+    \pic[draw, angle radius=0.26cm] {right angle = B--K--A};
+    \pic[draw, angle radius=0.26cm] {right angle = C--M--B};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[above left] at (K) {$K$};
+    \node[above right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2495,54 +2386,57 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{minipage}[t]{0.51\textwidth}
 \matchHead{Трикутник $ABC$}
 % 1
-\noindent\textbf{1}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.535, baseline=0cm, scale=0.55, thick, line join=round]
+\noindent\textbf{1}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=1, baseline=0.55cm]
     \coordinate (A) at (0,0);
-    \coordinate (C) at (4.6,0);
-    \coordinate (B) at (2.9,0.9);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \pic[draw, angle radius=0.12cm] {angle = A--B--C};
-    \nmtAngleLabel{A}{B}{C}{0.12}{\small $150^\circ$}
-    \node[below left, font=\small] at (A) {$A$};
-    \node[above, font=\small] at (B) {$B$};
-    \node[below right, font=\small] at (C) {$C$};
-    \node[right, font=\small] at (5.0,0.5) {$AB\cdot BC = 48,\ \angle B = 150^\circ$};
+    \coordinate (B) at (2.5,1.13);
+    \coordinate (C) at (5.6,0);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \pic[draw, angle radius=0.45cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.45}{$150^\circ$}
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[anchor=south west, inner sep=0pt] at (-0.2,1.78) {$AB\cdot BC=48,\ \angle B=150^\circ$};
 \end{tikzpicture}\end{nmtfit}
 \par\nbvspace{0.5cm}
 % 2
-\noindent\textbf{2}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.535, baseline=0cm, scale=0.5, thick, line join=round]
+\noindent\textbf{2}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=1, baseline=1.2cm]
     \coordinate (A) at (0,0);
-    \coordinate (C) at (5,0);
-    \coordinate (H) at (2,0);
-    \coordinate (B) at (2,2.4);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (B) -- (H);
-    \pic[draw, angle radius=0.2cm] {right angle = B--H--C};
-    \node[below left, font=\small] at (A) {$A$};
-    \node[above, font=\small] at (B) {$B$};
-    \node[below right, font=\small] at (C) {$C$};
-    \node[below, font=\small] at (H) {$H$};
-    \node[right, font=\small] at (5.3,1.2) {$BH = 4,\ AC = 9$};
+    \coordinate (H) at (2.33,0);
+    \coordinate (C) at (6,0);
+    \coordinate (B) at (2.33,2.65);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thin] (B) -- (H);
+    \pic[draw, angle radius=0.26cm]{right angle=C--H--B};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[below] at (H) {$H$};
+    \node[anchor=south west, inner sep=0pt] at (-0.2,3.3) {$BH=4,\ AC=9$};
 \end{tikzpicture}\end{nmtfit}
 \par\nbvspace{0.5cm}
 % 3
-\noindent\textbf{3}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.535, baseline=0cm, scale=0.55, thick, line join=round]
+\noindent\textbf{3}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=1, baseline=1.6cm]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (C) at (3.2,0);
     \coordinate (B) at (0,3.2);
+    \coordinate (C) at (4.3,0);
     \coordinate (O) at (0,1.6);
-    \coordinate (K) at (1.6,1.6);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (O) -- (K);
-    \pic[draw, angle radius=0.2cm] {right angle = O--A--C};
-    \pic[draw, angle radius=0.2cm] {right angle = B--O--K};
-    \path (B) -- (K) node[midway, sloped, font=\small] {$|$};
-    \path (K) -- (C) node[midway, sloped, font=\small] {$|$};
-    \node[below left, font=\small] at (A) {$A$};
-    \node[above, font=\small] at (B) {$B$};
-    \node[below right, font=\small] at (C) {$C$};
-    \node[left, font=\small] at (O) {$O$};
-    \node[above right, font=\small] at (K) {$K$};
-    \node[right, font=\small] at (3.4,2.2) {$AO = 3,\ OK = 4$};
+    \coordinate (K) at (2.15,1.6);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thin] (O) -- (K);
+    \pic[draw, angle radius=0.26cm]{right angle=C--A--B};
+    \pic[draw, angle radius=0.26cm]{right angle=A--O--K};
+    \nmtEq{B}{K}{1}
+    \nmtEq{K}{C}{1}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[left] at (O) {$O$};
+    \node[above right] at (K) {$K$};
+    \node[anchor=south west, inner sep=0pt] at (-0.2,3.85) {$AO=3,\ OK=4$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}%
 \hfill
@@ -2569,9 +2463,8 @@ III. & Діагональ квадрата ділить його на два р�
 \zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick, line join=round]
-    \draw[nmt grid, step=1cm] (-1.5,-1.5) grid (10.5,5.5);
-    % як в оригіналі (с. 110): висота 4 клітинки, C над M; зеленим -- AK, BL, CM, AC, KM
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \draw[nmt grid, step=1] (-2,-2) grid (12,6);
     \coordinate (A) at (1,4);
     \coordinate (B) at (3,4);
     \coordinate (C) at (6,4);
@@ -2580,12 +2473,12 @@ III. & Діагональ квадрата ділить його на два р�
     \coordinate (M) at (6,0);
     \draw[thick, nmtGreen] (K) -- (A) -- (C) -- (M) -- cycle;
     \draw[thick, nmtGreen] (L) -- (B);
-    \foreach \p/\lab/\pos in {A/A/above left, B/B/above, C/C/above, K/K/below left, L/L/below, M/M/below} {
-        \path (\p) node[nmt dot] {};
-        \node[\pos, font=\normalsize] at (\p) {$\lab$};
+    \foreach \p/\pos in {A/above left, B/above, C/above, K/below left, L/below, M/below} {
+        \node[nmt dot] at (\p) {};
+        \node[\pos] at (\p) {$\p$};
     }
     \draw[thick] (8,3) rectangle (9,4);
-    \node[right, font=\normalsize] at (9,3.5) {$1$~см$^2$};
+    \node[right] at (9,3.5) {$1$~\textit{см}$^2$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
