@@ -2,7 +2,7 @@
 """Перемальовування рисунка завдання за оригіналом НМТ: показати оригінал і перевірити новий TikZ у контексті завдання.
 
     python3 scripts/перемалювати.py оригінал ID ВИХІД.png              # обріз оригіналу (150 dpi) + чинний TikZ завдання
-    python3 scripts/перемалювати.py перевірити ID НОВИЙ.tex ВИХІД.png [--рисунок K]
+    python3 scripts/перемалювати.py перевірити ID НОВИЙ.tex ВИХІД.png [--рисунок K|imgK]
         # завдання з НОВИМ рисунком (номер K у завданні, від 0) поруч з оригіналом; помилки LaTeX -- у консоль
 
 Готовий рисунок додають у scripts/data/рисунки_за_оригіналом.json: {"id", "рисунок", "tikz", "джерело", "що"} --
@@ -75,8 +75,15 @@ def скласти(ліве, праве, підписи, куди):
     o.paste(a, (0, 30)); o.paste(b, (a.width + 24, 30)); o.save(куди)
 
 
+def нова_id(i):
+    """id після єдиної розкладки (scripts/data/id_після_розкладки.json: id до -> id після); id, яких мапа не знає, лишаємо"""
+    f = os.path.join(HERE, "data", "id_після_розкладки.json")
+    try: return json.load(open(f, encoding="utf-8")).get(i, i)
+    except Exception: return i
+
+
 def main():
-    дія, i = sys.argv[1], sys.argv[2]
+    дія, i = sys.argv[1], нова_id(sys.argv[2])
     tmp = tempfile.mkdtemp(prefix="перемал_")
     if дія == "оригінал":
         куди = sys.argv[3]
@@ -86,13 +93,22 @@ def main():
             print("---- рисунок %d (чинний TikZ) ----\n%s" % (k, р))
         return
     новий, куди = open(sys.argv[3], encoding="utf-8").read().strip(), sys.argv[4]
-    k = int(sys.argv[sys.argv.index("--рисунок") + 1]) if "--рисунок" in sys.argv else 0
+    арг = sys.argv[sys.argv.index("--рисунок") + 1] if "--рисунок" in sys.argv else "0"
     t, (pdf, p) = обріз(i, os.path.join(tmp, "ориг.png"))
     лічильник = [-1]
-    def заміна(m):
-        лічильник[0] += 1
-        return новий if лічильник[0] == k else m.group(0)
-    блок = РИС.sub(заміна, t["блок"])
+    if арг.startswith("img"):                  # растровий рисунок \includegraphics (поза tikzpicture) -> новий TikZ; img0 -- перший
+        k = int(арг[3:] or 0)
+        РОЗТ = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{[^}]*\}")
+        def заміна(m):
+            лічильник[0] += 1
+            return новий if лічильник[0] == k else m.group(0)
+        блок = РОЗТ.sub(заміна, t["блок"])
+    else:
+        k = int(арг)
+        def заміна(m):
+            лічильник[0] += 1
+            return новий if лічильник[0] == k else m.group(0)
+        блок = РИС.sub(заміна, t["блок"])
     pdf_новий, помилки = скомпілювати(блок, i)
     if помилки:
         print("ПОМИЛКИ LaTeX:\n" + "\n".join(помилки[:5])); sys.exit(1)

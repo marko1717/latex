@@ -1507,28 +1507,53 @@ def перемалювати_за_оригіналом(шляхи):
     if not os.path.exists(f): return []
     за_id = collections.defaultdict(dict)
     for r in json.load(open(f, encoding="utf-8")):
-        за_id[r["id"]][int(r.get("рисунок", 0))] = r["tikz"]
+        за_id[r["id"]][r.get("рисунок", 0) if isinstance(r.get("рисунок", 0), str) else int(r.get("рисунок", 0))] = r["tikz"]
     замінені = {}                       # id -> цілий блок завдання, перенабраний за оригіналом (scripts/data/завдання_за_оригіналом.json)
     ff = os.path.join(DATA, "завдання_за_оригіналом.json")
     if os.path.exists(ff):
         for r in json.load(open(ff, encoding="utf-8")): замінені[r["id"]] = дизайн_завдань.кути_біля_дуги(r["блок"].strip("\n"))
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
     import спільне as SP
+    IMG = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{[^}]*\}")
+    TIKZ = re.compile(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", re.S)
+    def розмір_блока(текст):
+        """усі рисунки блока (вони вже нові) -- до єдиного розміру (дизайн_завдань.розмір_перемальованих)"""
+        ms = list(TIKZ.finditer(текст))
+        if not ms: return текст
+        нові = дизайн_завдань.розмір_перемальованих([m.group(0) for m in ms], [текст[:m.start()] for m in ms], len(ms))
+        return "".join(текст[(ms[k - 1].end() if k else 0):m.start()] + нові[k] for k, m in enumerate(ms)) + текст[ms[-1].end():]
     def блок(m):
         b = m.group(1); i = SP.підпис(b)
         if i in замінені:
             ПЕРЕМАЛЬОВАНІ[(i, "блок")] += 1
             if not замінені[i].strip(): return ""            # порожній блок = завдання вилучено з бази
-            return "\\begin{samepage}\n" + замінені[i] + "\n\\end{samepage}"
+            return "\\begin{samepage}\n" + розмір_блока(замінені[i]) + "\n\\end{samepage}"
         if i not in за_id: return m.group(0)
-        k = [-1]
-        def рис(mm):
-            k[0] += 1
-            нове = за_id[i].get(k[0])
-            if нове is None: return mm.group(0)
-            ПЕРЕМАЛЬОВАНІ[(i, k[0])] += 1
-            return дизайн_завдань.кути_біля_дуги(нове.strip())      # підписи кутів -- біля дуги (\nmtAngleLabel)
-        return "\\begin{samepage}" + re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", рис, b, flags=re.S) + "\\end{samepage}"
+        # растрові рисунки (\\includegraphics поза TikZ), замінені на TikZ: ключ "img<k>" -- k-й за порядком
+        поза = TIKZ.sub(lambda mm: " " * len(mm.group(0)), b)
+        for k, mm in enumerate(IMG.finditer(поза)):
+            нове = за_id[i].get("img%d" % k)
+            if нове is None: continue
+            ПЕРЕМАЛЬОВАНІ[(i, "img%d" % k)] += 1
+            нове = дизайн_завдань.розмір_перемальованих([дизайн_завдань.кути_біля_дуги(нове.strip())], [b[:mm.start()]], 1)[0]
+            b = b[:mm.start()] + нове + b[mm.end():]
+            поза = TIKZ.sub(lambda m2: " " * len(m2.group(0)), b)
+            break
+        ms = list(TIKZ.finditer(b)); заміни = {}
+        for k, mm in enumerate(ms):
+            нове = за_id[i].get(k)
+            if нове is None: continue
+            ПЕРЕМАЛЬОВАНІ[(i, k)] += 1
+            заміни[k] = дизайн_завдань.кути_біля_дуги(нове.strip())      # підписи кутів -- біля дуги (\\nmtAngleLabel)
+        if заміни:                                  # розмір -- за єдиними правилами (група: варіанти рисунків мають спільний множник)
+            ключі = sorted(заміни)
+            розм = дизайн_завдань.розмір_перемальованих([заміни[k] for k in ключі], [b[:ms[k].start()] for k in ключі], len(ms))
+            заміни = dict(zip(ключі, розм))
+        вихід, поз = [], 0
+        for k, mm in enumerate(ms):
+            вихід.append(b[поз:mm.start()]); вихід.append(заміни.get(k, mm.group(0))); поз = mm.end()
+        вихід.append(b[поз:])
+        return "\\begin{samepage}" + "".join(вихід) + "\\end{samepage}"
     for шлях in шляхи:
         повний = os.path.join(ROOT, шлях)
         t = open(повний, encoding="utf-8").read()
@@ -1538,6 +1563,58 @@ def перемалювати_за_оригіналом(шляхи):
             t2 = t2.replace("\\chapterTitle{", "\\graphicspath{{./}{%s/}}\n\\chapterTitle{" % тека, 1)
         if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
     return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)] and i not in замінені] + [(i, "блок") for i in замінені if not ПЕРЕМАЛЬОВАНІ[(i, "блок")]]
+
+
+def єдина_розкладка(шляхи):
+    """усі завдання з одним рисунком -- до єдиної розкладки (scripts/розкладка_завдань.py: бічний вид S чи широкий C; відповідність під рисунком;
+    продовження пунктів відповідності зливаються). Текст завдання змінюється, тож id теж: мапа {id до: id після} -> scripts/data/id_після_розкладки.json;
+    застосувати: python3 scripts/міграція_id.py --мапа scripts/data/id_після_розкладки.json (каталог, пробна база, класифікація)."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
+    import спільне as SP
+    import розкладка_завдань as Р
+    мапа, види, зіпсовано = {}, collections.Counter(), []
+    def растр(b, тека):
+        """\\includegraphics поза TikZ -> width= за єдиним правилом розміру; повертає (блок, вид S/C або None)"""
+        поза = re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", lambda mm: " " * len(mm.group(0)), b, flags=re.S)
+        ms = list(re.finditer(r"\\includegraphics(?:\[([^\]]*)\])?\{([^}]*)\}", поза))
+        if len(ms) != 1: return b, None
+        m = ms[0]; r = дизайн_завдань.розмір_растрового(m.group(1), m.group(2), тека)
+        if not r: return b, None
+        нов = "\\includegraphics[%s]{%s}%%@N %s\n" % (r[0], m.group(2), "0x0 " + r[1])
+        return b[:m.start()] + нов + b[m.end():], r[1]
+    # те саме завдання в кількох темах («також у темі») мало різні малюнки (старі файли тем малювали окремо): беремо рисунок першої появи --
+    # тоді розкладка однакова в усіх темах, а id після розкладки збігаються
+    перший = {}
+    for шлях in шляхи:
+        for m in re.finditer(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", open(os.path.join(ROOT, шлях), encoding="utf-8").read(), re.S):
+            блок0 = растр(m.group(1), os.path.dirname(os.path.join(ROOT, шлях)))[0]
+            ф = list(Р.FIG.finditer(блок0))
+            if len(ф) == 1 and not os.environ.get("NMT_NO_ETALON"): перший.setdefault(Р.плоский(Р.злити_продовження(блок0)), ф[0].group(0))
+    тека_файлу = [ROOT]
+    def блок(m):
+        b, _ = растр(m.group(1), тека_файлу[0])
+        ф = list(Р.FIG.finditer(b))
+        if len(ф) == 1:
+            еталон = перший.get(Р.плоский(Р.злити_продовження(b)))
+            if еталон and еталон != ф[0].group(0): b_для = b[:ф[0].start()] + еталон + b[ф[0].end():]
+            else: b_для = b
+        else: b_для = b
+        новий, вид = Р.нормалізувати(b_для)
+        if новий == m.group(1): return m.group(0)
+        if not Р.перевірити_зміст(m.group(1), новий):
+            зіпсовано.append(SP.підпис(m.group(1))); return m.group(0)
+        види[вид or "пункти"] += 1
+        до, після = SP.підпис(m.group(1)), SP.підпис(новий)
+        if до != після: мапа[до] = після
+        return "\\begin{samepage}" + новий + "\\end{samepage}"
+    for шлях in шляхи:
+        повний = os.path.join(ROOT, шлях)
+        тека_файлу[0] = os.path.dirname(повний)
+        t = open(повний, encoding="utf-8").read()
+        t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
+        if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
+    json.dump(мапа, open(os.path.join(DATA, "id_після_розкладки.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    return види, len(мапа), зіпсовано
 
 
 def main():
@@ -1550,6 +1627,7 @@ def main():
     build_master(paths_by_unit)
     json.dump(log, open(os.path.join(DATA, "build_log.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     не_застосовано = перемалювати_за_оригіналом(paths_by_unit.values())
+    розкладка = єдина_розкладка(paths_by_unit.values())
     tot = collections.Counter()
     for e in log:
         print(f"[{e['key']:>3}] {e['total']:4d}  {e['counts']}  -> {e['out']}")
@@ -1564,6 +1642,7 @@ def main():
         if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
     print("перемальовано за оригіналами: %d рисунків у %d місцях%s" % (len({k for k in ПЕРЕМАЛЬОВАНІ}), sum(ПЕРЕМАЛЬОВАНІ.values()),
           "" if not не_застосовано else " | ! не застосовано: %s" % не_застосовано))
+    print("єдина розкладка: %s | id змінено: %d | зміст порушено (лишено як було): %d" % (dict(розкладка[0]), розкладка[1], len(розкладка[2])))
     print("дизайн-система:", dict(ДИЗАЙН), "| рисунків без виміру розміру:", дизайн_завдань.записати_на_вимір(),
           "(виміряти: python3 scripts/дизайн_завдань.py --виміряти, потім зібрати ще раз)")
 
