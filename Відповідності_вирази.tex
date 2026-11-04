@@ -22,6 +22,39 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+% ===================== ДИЗАЙН-СИСТЕМА РИСУНКІВ (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md, scripts/дизайн_завдань.py) =====================
+\definecolor{nmtInk}{HTML}{1A1A1A}
+\definecolor{nmtGrid}{HTML}{3A3A3A}      % сітка, як у НМТ 2026: темна й тонка (0,35 pt), клітинка 0,5 см
+\definecolor{nmtBlue}{HTML}{1F6FB2}\definecolor{nmtGreen}{HTML}{2E8B57}\definecolor{nmtRed}{HTML}{C0392B}
+\definecolor{nmtOrange}{HTML}{D9822B}\definecolor{nmtViolet}{HTML}{7D4CA8}
+\definecolor{nmtFillA}{HTML}{D3E5F5}\definecolor{nmtFillB}{HTML}{D8EDD5}\definecolor{nmtFillC}{HTML}{FBE1C8}
+\definecolor{nmtFillD}{HTML}{E4E4E4}\definecolor{nmtFillE}{HTML}{E7DCF2}
+\tikzset{
+  ultra thin/.style={line width=0.2pt}, very thin/.style={line width=0.3pt}, thin/.style={line width=0.45pt},
+  semithick/.style={line width=0.6pt}, thick/.style={line width=0.75pt}, very thick/.style={line width=1.1pt},
+  ultra thick/.style={line width=1.5pt},
+  >={Stealth[length=2.3mm, width=1.7mm]},
+  every picture/.append style={line join=round, line cap=round},
+  nmt dot/.style={circle, fill=nmtInk, draw=none, inner sep=0pt, minimum size=3.6pt},
+  nmt open dot/.style={circle, fill=white, draw=nmtInk, line width=0.6pt, inner sep=0pt, minimum size=4.2pt},
+  nmt grid/.style={draw=nmtGrid, line width=0.35pt},
+  nmt curve/.style={line width=1.1pt},
+}
+% вирази: ≤ і ≥ -- похилі, як у НМТ (десяткову кому без пробілу вже дає mathastext)
+\let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
+\pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
+  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
+% ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -1397,9 +1430,9 @@
 \nmtnobreak
 \begin{center}
     \begin{nmtfit}\begin{tikzpicture}[scale=1.2]
-        \draw[->, >=stealth, thick] (-2.5,0) -- (2.5,0);
+        \draw[->, thick] (-2.5,0) -- (2.5,0);
         \foreach \x/\l in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-            \fill (\x,0) circle (1.5pt) node[above] {$\l$};
+            \path (\x,0) node[nmt dot] {} node[above] {$\l$};
             \node[below] at (\x,0) {$\x$};
         }
     \end{tikzpicture}\end{nmtfit}
@@ -1553,11 +1586,11 @@
 \begin{nmtfit}\begin{tikzpicture}
 \draw[thick, ->] (-2.8,0) -- (2.8,0);
 \foreach \x/\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {
-    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\small $\label$};
+    \draw[thick] (\x,0.1) -- (\x,-0.1) node[below] {\normalsize $\label$};
 }
-\node[above] at (-2,0.1) {\small $-1$};
-\node[above] at (0,0.1) {\small $0$};
-\node[above] at (2,0.1) {\small $1$};
+\node[above] at (-2,0.1) {\normalsize $-1$};
+\node[above] at (0,0.1) {\normalsize $0$};
+\node[above] at (2,0.1) {\normalsize $1$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 

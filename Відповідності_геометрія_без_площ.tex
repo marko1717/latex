@@ -22,6 +22,39 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+% ===================== ДИЗАЙН-СИСТЕМА РИСУНКІВ (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md, scripts/дизайн_завдань.py) =====================
+\definecolor{nmtInk}{HTML}{1A1A1A}
+\definecolor{nmtGrid}{HTML}{3A3A3A}      % сітка, як у НМТ 2026: темна й тонка (0,35 pt), клітинка 0,5 см
+\definecolor{nmtBlue}{HTML}{1F6FB2}\definecolor{nmtGreen}{HTML}{2E8B57}\definecolor{nmtRed}{HTML}{C0392B}
+\definecolor{nmtOrange}{HTML}{D9822B}\definecolor{nmtViolet}{HTML}{7D4CA8}
+\definecolor{nmtFillA}{HTML}{D3E5F5}\definecolor{nmtFillB}{HTML}{D8EDD5}\definecolor{nmtFillC}{HTML}{FBE1C8}
+\definecolor{nmtFillD}{HTML}{E4E4E4}\definecolor{nmtFillE}{HTML}{E7DCF2}
+\tikzset{
+  ultra thin/.style={line width=0.2pt}, very thin/.style={line width=0.3pt}, thin/.style={line width=0.45pt},
+  semithick/.style={line width=0.6pt}, thick/.style={line width=0.75pt}, very thick/.style={line width=1.1pt},
+  ultra thick/.style={line width=1.5pt},
+  >={Stealth[length=2.3mm, width=1.7mm]},
+  every picture/.append style={line join=round, line cap=round},
+  nmt dot/.style={circle, fill=nmtInk, draw=none, inner sep=0pt, minimum size=3.6pt},
+  nmt open dot/.style={circle, fill=white, draw=nmtInk, line width=0.6pt, inner sep=0pt, minimum size=4.2pt},
+  nmt grid/.style={draw=nmtGrid, line width=0.35pt},
+  nmt curve/.style={line width=1.1pt},
+}
+% вирази: ≤ і ≥ -- похилі, як у НМТ (десяткову кому без пробілу вже дає mathastext)
+\let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
+\pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
+  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
+% ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -352,29 +385,22 @@
 \hfill
 \begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-    % Прямокутний трикутник
-    \coordinate (A) at (0,4);
-    \coordinate (B) at (4,0);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.31]
+    % AC : CB = 12 : 16
+    \coordinate (A) at (0,12);
+    \coordinate (B) at (16,0);
     \coordinate (C) at (0,0);
-
-    % Середина CB
-    \coordinate (M) at (2,0);
-
-    % Трикутник
+    \coordinate (M) at (8,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Прямий кут при C
-    \draw (0,0.4) -- (0.4,0.4) -- (0.4,0);
-
-    % Риски рівності на CM і MB
-    \draw[thick] (0.9,-0.15) -- (0.9,0.15);
     \draw[thick] (A) -- (M);
-    \draw[thick] (1.05,-0.15) -- (1.05,0.15);
-    \draw[thick] (2.95,-0.15) -- (2.95,0.15);
-    \draw[thick] (3.1,-0.15) -- (3.1,0.15);
-
-    % Підписи
+    % прямий кут при C
+    \draw (0,1.3) -- (1.3,1.3) -- (1.3,0);
+    % риски рівності CM = MB
+    \draw[thick] (4,-0.5) -- (4,0.5);
+    \draw[thick] (12,-0.5) -- (12,0.5);
+    % точки на M
+    \node[nmt dot] at (M) {};
+    % підписи
     \node[above left] at (A) {$A$};
     \node[right] at (B) {$B$};
     \node[below left] at (C) {$C$};
@@ -413,7 +439,7 @@
 \hfill
 \begin{minipage}[t]{0.22\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.95]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.654]
     % Рівносторонній трикутник: A і C -- основа, B -- угорі (як в оригіналі)
     \coordinate (A) at (0,0);
     \coordinate (C) at (4,0);
@@ -538,8 +564,8 @@
     \draw (-2-0.15, 2-0.15) -- (-2+0.15, 2+0.15);
     \draw (0-0.15, 0-0.15) -- (0+0.15, 0+0.15);
     \draw (2-0.15, -2-0.15) -- (2+0.15, -2+0.15);
-    \fill (C) circle (2pt);
-    \fill (N) circle (2pt);
+    \path (C) node[nmt dot] {};
+    \path (N) node[nmt dot] {};
     \node[above left] at (K) {$K$};
     \node[above right] at (M) {$M$};
     \node[left] at (-1.1, 0.9) {$C$};
@@ -590,7 +616,8 @@
         \draw[thick] ($(K)!0.5!(B)$) ++(120:0.15) -- ++(-60:0.3);
 
         % Angle 24
-        \pic [draw, pic text={\small $24^\circ$}, angle radius=.5cm, angle eccentricity=1.8] {angle = A--B--C};
+        \pic[draw, angle radius=.5cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.5}{\normalsize $24^\circ$}
 
         \node[left] at (A) {$A$};
         \node[left] at (C) {$C$};
@@ -631,7 +658,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+    \begin{nmtfit}\begin{tikzpicture}[scale=1.07]
         \coordinate (C) at (0,0);
         \coordinate (A) at (0,3);
         \coordinate (B) at (5,0);
@@ -654,7 +681,8 @@
         \draw (0,0) rectangle (0.3,0.3);
 
         % Angle 32
-        \pic [draw, pic text={\small $32^\circ$}, angle radius=1.0cm, angle eccentricity=1.4] {angle = A--B--C};
+        \pic[draw, angle radius=1.0cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1}{\normalsize $32^\circ$}
 
         \node[above] at (A) {$A$};
         \node[below] at (C) {$C$};
@@ -714,7 +742,7 @@
     \draw[thick] (M) -- (D);
 
     % Точка M
-    \fill (M) circle (1.5pt);
+    \path (M) node[nmt dot] {};
 
     % Підписи вершин
     \node[below left=-2pt] at (A) {$A$};
@@ -785,11 +813,11 @@
     \draw[thick] (K) -- (B);
     \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = A--K--B};
     \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = B--M--C};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above, font=\scriptsize] at (B) {$B$};
-    \node[below right, font=\scriptsize] at (C) {$C$};
-    \node[left, font=\scriptsize] at (K) {$K$};
-    \node[right, font=\scriptsize] at (M) {$M$};
+    \node[below left, font=\normalsize] at (A) {$A$};
+    \node[above, font=\normalsize] at (B) {$B$};
+    \node[below right, font=\normalsize] at (C) {$C$};
+    \node[left, font=\normalsize] at (K) {$K$};
+    \node[right, font=\normalsize] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -832,8 +860,10 @@
     % мітки рівності бічних сторін
     \draw ($(A)!0.5!(K)$) ++(-0.12,-0.04) -- ++(0.24,0.08);
     \draw ($(D)!0.5!(K)$) ++(-0.12,0.04) -- ++(0.24,-0.08);
-    \pic[draw, angle radius=0.55cm, pic text={$50^\circ$}, angle eccentricity=1.7, font=\scriptsize] {angle = D--A--B};
-    \pic[draw, angle radius=0.8cm, pic text={$40^\circ$}, angle eccentricity=1.45, font=\scriptsize] {angle = D--K--A};
+    \pic[draw, angle radius=0.55cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.55}{$50^\circ$}
+    \pic[draw, angle radius=0.8cm, font=\normalsize] {angle = D--K--A};
+    \nmtAngleLabel{D}{K}{A}{0.8}{$40^\circ$}
     \node[left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -880,7 +910,8 @@
     \draw (A) -- (K) -- (M) -- (D);
     \draw (B) -- (D);
 
-    \pic[draw, angle radius=0.5cm, pic text=$65^\circ$, angle eccentricity=1.7, font=\scriptsize] {angle = D--A--B};
+    \pic[draw, angle radius=0.5cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{$65^\circ$}
     \pic[draw, angle radius=0.3cm] {right angle = A--B--D};
 
     \node[above left] at (A) {$A$};
@@ -922,7 +953,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
+    \begin{nmtfit}\begin{tikzpicture}[scale=1.21]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
         \coordinate (A) at (-1.5,0);
@@ -946,11 +977,11 @@
         \node[below right] at (K) {$K$};
         \node[above right] at (C) {$C$};
 
-        \fill (O) circle (1.5pt);
-        \fill (A) circle (1.5pt);
-        \fill (B) circle (1.5pt);
-        \fill (K) circle (1.5pt);
-        \fill (C) circle (1.5pt);
+        \path (O) node[nmt dot] {};
+        \path (A) node[nmt dot] {};
+        \path (B) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (C) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -985,7 +1016,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+    \begin{nmtfit}\begin{tikzpicture}[scale=1.15]
         \coordinate (O) at (0,0);
         \draw[thick] (O) circle (1.5cm);
 
@@ -1007,7 +1038,8 @@
         \draw[thick] (C) -- (O);
 
         % Angle 50
-        \pic [draw, pic text={\scriptsize $50^\circ$}, angle radius=0.4cm, angle eccentricity=1.8] {angle = A--B--C};
+        \pic[draw, angle radius=0.4cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.4}{\normalsize $50^\circ$}
 
         % Marks for AB = BC
         \draw[thick] ($(A)!0.5!(B)$) ++(160:0.1) -- ++(-20:0.2);
@@ -1019,10 +1051,10 @@
         \node[below right] at (C) {$C$};
         \node[below] at (O) {$O$};
 
-        \fill (O) circle (1.5pt);
-        \fill (A) circle (1.5pt);
-        \fill (B) circle (1.5pt);
-        \fill (C) circle (1.5pt);
+        \path (O) node[nmt dot] {};
+        \path (A) node[nmt dot] {};
+        \path (B) node[nmt dot] {};
+        \path (C) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -1129,31 +1161,23 @@
         \coordinate (B) at (0,10);
         \coordinate (C) at (10,10);
         \coordinate (D) at (10,0);
-
         \coordinate (K) at (5,10);
         \coordinate (M) at (10,5);
-
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (K) -- (M);
-        \draw[thick] (A) -- (K); % Для краси, хоча в умові не питають, але на рисунку є лінії
-
-        % Позначки середин
         \draw (2.5, 9.8) -- (2.5, 10.2);
         \draw (7.5, 9.8) -- (7.5, 10.2);
-
         \draw (9.8, 7.5) -- (10.2, 7.5);
         \draw (9.8, 2.5) -- (10.2, 2.5);
-
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
         \node[above] at (K) {$K$};
         \node[right] at (M) {$M$};
-
-        \fill (K) circle (5pt);
-        \fill (M) circle (5pt);
-    \end{tikzpicture}\end{nmtfit}
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -1203,27 +1227,16 @@
 \hfill
 \begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-    % Квадрат ABCD (A внизу ліворуч, за годинниковою)
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-
-    % Точка K над B
-    \coordinate (K) at (0,8);
-
-    % Квадрат
+    \coordinate (B) at (0,4.5);
+    \coordinate (C) at (4.5,4.5);
+    \coordinate (D) at (4.5,0);
+    \coordinate (K) at (0,9.9);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Трикутник KBC
     \draw[thick] (K) -- (B);
     \draw[thick] (K) -- (C);
-
-    % Прямий кут при B
-    \draw (0,4.4) -- (0.4,4.4) -- (0.4,4);
-
-    % Підписи
+    \pic[draw, angle radius=0.3cm] {right angle = K--B--C};
     \node[below left] at (A) {$A$};
     \node[left] at (B) {$B$};
     \node[right] at (C) {$C$};
@@ -1279,10 +1292,10 @@
         \node[right] at (P) {$P$};
         \node[above left] at (M) {$M$};
 
-        \fill (M) circle (10pt);
-        \fill (K) circle (10pt);
-        \fill (N) circle (10pt);
-        \fill (P) circle (10pt);
+        \path (M) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
+        \path (P) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -1343,8 +1356,8 @@
         \node[above] at (K) {$K$};
         \node[right] at (M) {$M$};
 
-        \fill (M) circle (15pt);
-        \fill (K) circle (15pt);
+        \path (M) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -1385,7 +1398,7 @@
     \coordinate (Mid) at (4,2);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (K) -- (C);
-    \fill (Mid) circle (2pt);
+    \path (Mid) node[nmt dot] {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1466,7 +1479,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.55]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.51]
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,2);
         \coordinate (C) at (4.8,2);
@@ -1481,9 +1494,9 @@
 
         \draw (0,0.4) -- (0.4,0.4) -- (0.4,0);
 
-        \node[left] at (0,1) {\small 5 \textit{см}};
-        \node[below] at (2.4,0) {\small 12 \textit{см}};
-        \node[above left] at (1.6,3.3) {\small 13 \textit{см}};
+        \node[left] at (0,1) {\normalsize 5 \textit{см}};
+        \node[below] at (2.4,0) {\normalsize 12 \textit{см}};
+        \node[above left] at (1.6,3.3) {\normalsize 13 \textit{см}};
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -1527,7 +1540,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.24]
         % AB=12, BC=16 (MC=8 => BC=16)
         % A(0,0) - ні, нехай B буде верхній лівий, як зазвичай A внизу.
         % За рисунком: A внизу зліва. B зверху зліва.
@@ -1559,8 +1572,8 @@
         \node[left] at (K) {$K$};
         \node[above] at (M) {$M$};
 
-        \fill (K) circle (10pt);
-        \fill (M) circle (10pt);
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -1710,7 +1723,7 @@
 \zadtask{На рисунку точки $K$, $L$, $M$ та $N$~--- середини сторін $AB$, $BC$, $CD$ та $AD$ прямокутника $ABCD$ відповідно. $AB = 12$~см, $BC = 16$~см. Точка $P$~--- середина відрізка $KN$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.338, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,12);
     \coordinate (C) at (16,12);
@@ -1720,11 +1733,13 @@
     \coordinate (M) at (16,6);
     \coordinate (N) at (8,0);
     \coordinate (P) at (4,3);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw (K) -- (L) -- (M) -- (N) -- cycle;
-    \fill (P) circle (3pt);
-    \draw (K)--(N);
-    \path (K) -- (N) node[midway, sloped] {\footnotesize $|$};
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (K) -- (L) -- (M) -- (N) -- cycle;
+    \draw[thick] (K) -- (N);
+    \node[nmt dot] at (P) {};
+    % KP = PN: по одній засічці на кожній половині (поперек відрізка)
+    \draw[thin] (2,4.5) ++(53.13:0.6) -- ++(233.13:1.2);
+    \draw[thin] (6,1.5) ++(53.13:0.6) -- ++(233.13:1.2);
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1733,7 +1748,7 @@
     \node[above] at (L) {$L$};
     \node[right] at (M) {$M$};
     \node[below] at (N) {$N$};
-    \node[above left, font=\scriptsize] at (P) {$P$};
+    \node[below left] at (P) {$P$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -1763,23 +1778,26 @@
 \zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.17, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.123, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,16);
     \coordinate (Cc) at (12,16);
     \coordinate (D) at (12,0);
     \coordinate (M) at (36,0);
     \coordinate (K) at (24,32);
-    \draw[thick] (A) -- (B) -- (Cc) -- (D) -- cycle;
-    \draw[thick] (A) -- (M);
-    \draw[thick] (D) -- (K) -- (M);
-    \draw[thick] (A) -- (K);
-    \fill (K) circle (3pt); \node[above, font=\scriptsize] at (K) {$K$};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above left, font=\scriptsize] at (B) {$B$};
-    \node[above, font=\scriptsize] at (Cc) {$C$};
-    \node[below, font=\scriptsize] at (D) {$D$};
-    \node[below right, font=\scriptsize] at (M) {$M$};
+    \draw (A) -- (B) -- (Cc) -- (D) -- cycle;
+    \draw (A) -- (M);
+    \draw (D) -- (K) -- (M);
+    \draw (-2.4,-3.2) -- (27,36);
+    % рівні відрізки DK = KM
+    \draw (18,16) ++(-1.2,0.45) -- ++(2.4,-0.9);
+    \draw (30,16) ++(-1.2,-0.45) -- ++(2.4,0.9);
+    \node[above, font=\normalsize] at (K) {$K$};
+    \node[below right, font=\normalsize] at (A) {$A$};
+    \node[above left, font=\normalsize] at (B) {$B$};
+    \node[above, font=\normalsize] at (Cc) {$C$};
+    \node[below, font=\normalsize] at (D) {$D$};
+    \node[below right, font=\normalsize] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -1815,7 +1833,7 @@
 \begin{minipage}[t]{0.35\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.355]
         % AB=8. Коло R=4. Центр O(4,4).
         % BC=12. Півколо на CD. R=4. Центр (12,4).
         % Дотикаються в точці (8,4).
@@ -1894,17 +1912,17 @@
         % Circumcircle radius: sqrt(15^2+8^2) = 17.
 
         % Draw Circumcircle (O1) - Green
-        \draw[thick, green!60!black] (O1) circle (17);
+        \draw[thick, nmtGreen] (O1) circle (17);
 
         % Draw Inscribed-like Circle (O2) - Orange
-        \draw[thick, orange!80!black] (O2) circle (8);
+        \draw[thick, nmtOrange] (O2) circle (8);
 
         % Draw Rectangle
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
         % Points
-        \fill (O1) circle (15pt) node[right] {$O_1$};
-        \fill (O2) circle (15pt) node[left] {$O_2$};
+        \path (O1) node[nmt dot] {} node[right] {$O_1$};
+        \path (O2) node[nmt dot] {} node[left] {$O_2$};
 
         % Labels
         \node[below left] at (A) {$A$};
@@ -1963,15 +1981,15 @@
         \coordinate (O2) at (15,15);
 
         % Draw Green Circumcircle (R=25)
-        \draw[green!60!black] (O1) circle (25);
+        \draw[nmtGreen] (O1) circle (25);
 
         % Draw Orange Circle (R=15)
-        \draw[orange!80!black] (O2) circle (15);
+        \draw[nmtOrange] (O2) circle (15);
 
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-        \fill (O1) circle (15pt) node[above right] {$O_1$};
-        \fill (O2) circle (15pt) node[above left] {$O_2$};
+        \path (O1) node[nmt dot] {} node[above right] {$O_1$};
+        \path (O2) node[nmt dot] {} node[above left] {$O_2$};
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -2027,42 +2045,25 @@
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Прямокутник ABCD
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,4);
     \coordinate (C) at (6,4);
     \coordinate (D) at (6,0);
-
-    % Центр кола O (на AD, праворуч)
     \coordinate (O) at (4,2);
-
-    % Точка K (на колі, де дотикається трикутник)
     \coordinate (K) at (2,2);
-
-    % Прямокутник
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Коло
     \draw[thick] (O) circle (2);
-
-    % Трикутник AKB
     \draw[thick] (A) -- (K) -- (B);
-
-    % Діагоналі трикутника (позначки рівних сторін)
-    \draw (0.85,0.85) -- (1.15,1.15);
-    \draw (0.85,3.15) -- (1.15,2.85);
-
-    % Прямий кут при K
+    \draw[thick] (0.86,1.14) -- (1.14,0.86);
+    \draw[thick] (0.86,2.86) -- (1.14,3.14);
     \pic[draw, angle radius=0.3cm] { right angle = A--K--B};
-
-    % Підписи
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[right] at (K) {$K$};
     \node[above] at (4.3,2) {$O$};
-    \fill (O) circle (2pt);
+    \path (O) node[nmt dot] {};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \par\penalty-20\vspace{0.25cm}
@@ -2096,7 +2097,7 @@
 \hfill
 \begin{minipage}[c]{0.45\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.523, thick, line join=round]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,6);
     \coordinate (C) at (12,6);
@@ -2110,7 +2111,7 @@
 
     % Коло в центрі
     \draw (6,3) circle (3);
-    \fill (6,3) circle (2.5pt) node[right=2pt] {$O$};
+    \path (6,3) node[nmt dot] {} node[right=2pt] {$O$};
 
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -2127,7 +2128,7 @@
 \zadtask{Прямокутник $ABCD$ і коло з центром $O$ розташовані так, що коло дотикається до середин бічних сторін $AB$ і $CD$ та перетинає сторону $BC$ у точках $K$ і $M$ (див. рисунок). Відомо, що $BK = 3$ см, $BM = 27$ см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.2, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.159, thick]
     \coordinate (A) at (0,0);
     \coordinate (B) at (0,18);
     \coordinate (C) at (30,18);
@@ -2136,10 +2137,10 @@
     \coordinate (K) at (3,18);
     \coordinate (M) at (27,18);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick, mainGreen] (O) circle (15);
-    \fill (O) circle (4pt); \node[below right] at (O) {$O$};
-    \fill (K) circle (4pt); \node[above] at (K) {$K$};
-    \fill (M) circle (4pt); \node[above] at (M) {$M$};
+    \draw[thick, nmtGreen] (O) circle (15);
+    \path (O) node[nmt dot] {}; \node[below right] at (O) {$O$};
+    \path (K) node[nmt dot] {}; \node[above] at (K) {$K$};
+    \path (M) node[nmt dot] {}; \node[above] at (M) {$M$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2182,9 +2183,9 @@
     \draw[gray!60] (A) circle (6);
     \draw[gray!60] (D) circle (2);
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \fill (A) circle (4pt);
-    \fill (D) circle (4pt);
-    \fill (6,0) circle (3pt);
+    \path (A) node[nmt dot] {};
+    \path (D) node[nmt dot] {};
+    \path (6,0) node[nmt dot] {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2222,7 +2223,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.119]
         \coordinate (A) at (-15,0); % Половина діагоналі
         \coordinate (C) at (15,0);
         \coordinate (B) at (0,20); % Знайдено з пропорцій (12, 15, 20)
@@ -2268,7 +2269,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.2]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.247]
         % Довжина 12pi -> R=6. AD=12. O - центр AD.
         % AK = OA = 6. O=(6,0), A=(0,0), D=(12,0).
         % Трикутник AOK: AO=6, OK=6(радіус), AK=6. Рівносторонній.
@@ -2311,10 +2312,10 @@
         \node[above left] at (K) {$K$};
         \node[below] at (O) {$O$};
 
-        \fill (O) circle (10pt);
-        \fill (K) circle (10pt);
-        \fill (A) circle (10pt);
-        \fill (D) circle (10pt);
+        \path (O) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (A) node[nmt dot] {};
+        \path (D) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -2349,37 +2350,25 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % AC = 40. Center of Rhombus O (mid of AC) is at 20.
-        % K is at 5 from A. A=(0,0), C=(40,0). K=(5,0).
-        % O=(20,0).
-        % Circle on BD as diameter. Center is O.
-        % K is on the circle? No, K is intersection of circle and AC.
-        % So distance OK is radius. OK = 20 - 5 = 15.
-        % Radius = 15. BD = 30. BO = 15.
-        % A=(0,0), O=(20,0), B=(20,15).
-        % AB = sqrt(20^2 + 15^2) = sqrt(400+225) = sqrt(625) = 25.
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.12, thick]
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (40,0);
+    \coordinate (O) at (20,0);
+    \coordinate (B) at (20,15);
+    \coordinate (D) at (20,-15);
+    \coordinate (K) at (5,0);
 
-        \coordinate (A) at (0,0);
-        \coordinate (C) at (40,0);
-        \coordinate (O) at (20,0);
-        \coordinate (B) at (20,15);
-        \coordinate (D) at (20,-15);
-        \coordinate (K) at (5,0); % Actually on the left side
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (C);
+    \draw (O) circle (15);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (B) -- (D);
-
-        \draw[thick] (O) circle (15cm);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above left] at (K) {$K$};
-        \fill (K) circle (15pt);
-    \end{tikzpicture}\end{nmtfit}
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[anchor=south west, inner sep=1pt] at (5.8,0.6) {$K$};
+    \node[nmt dot] at (K) {};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2448,9 +2437,9 @@
         \node[right] at (M) {$M$};
         \node[above left] at (O) {$O$};
 
-        \fill (K) circle (15pt);
-        \fill (M) circle (15pt);
-        \fill (O) circle (15pt);
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
+        \path (O) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -2486,47 +2475,28 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AK = 7, KM = 9. M - точка дотику.
-        % У ромбі точка дотику M ділить сторону.
-        % Центр O проектується в M. OM perp AD.
-        % BK - висота. BK || OM. OM = R. BK = 2R.
-        % У трикутнику OAM...
-        % Нехай це просто рисунок.
-        % A=(0,0). K=(7,0). M=(16,0). (AK+KM=16).
-        % Висота h. B = (7, h).
-        % AB^2 = AK^2 + BK^2 = 49 + h^2.
-        % Також AM = AB - MD? Ні. Властивість дотичної: AM = ...
-        % Для малювання: приймемо h = 24 (наприклад).
-
-        \coordinate (A) at (0,0);
-        \coordinate (K) at (7,0);
-        \coordinate (M) at (10.5,0);
-        \coordinate (D) at (14,0); % AD прибл.
-        \coordinate (B) at (7,12); % Висота прибл.
-        \coordinate (C) at (21,12);
-
-        % Центр O: середина висоти (y=9), по x: M=(16,0) -> O=(16,9).
-        \coordinate (O) at (10.5,6);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K);
-        \draw[thick] (O) circle (6cm);
-
-        % Прямий кут
-        \pic [draw, angle radius=0.3cm] {right angle = B--K--D};
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below] at (K) {$K$};
-        \node[below] at (M) {$M$};
-        \node[right] at (O) {$O$};
-
-        \fill (O) circle (4pt);
-        \fill (M) circle (4pt);
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \coordinate (A) at (0,0);
+    \coordinate (K) at (1.4,0);
+    \coordinate (M) at (3.2,0);
+    \coordinate (D) at (5,0);
+    \coordinate (B) at (1.4,4.8);
+    \coordinate (C) at (6.4,4.8);
+    \coordinate (O) at (3.2,2.4);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K);
+    \draw[thick] (O) circle (2.4cm);
+    \pic[draw, angle radius=0.22cm] {right angle = B--K--D};
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (M) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \node[below] at (M) {$M$};
+    \node[right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2586,7 +2556,7 @@
         \node[above right] at (K) {$K$};
         \node[below] at (O) {$O$};
         \pic [draw, angle radius=0.25cm] {right angle = A--K--B};
-        \fill (O) circle (10pt);
+        \path (O) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
@@ -2622,38 +2592,31 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        \coordinate (A) at (-10, 0);
-        \coordinate (C) at (10, 0);
-        \coordinate (B) at (0, 12); % Схематично
-        \coordinate (D) at (0, -12);
-
-        \coordinate (K) at ($(A)!0.5!(D)$);
-        \coordinate (M) at ($(D)!0.5!(C)$);
-        \coordinate (O) at (0, -6); % Точка перетину BD і KM (середина висоти трикутника ADC знизу)
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M);
-        \draw[thick] (B) -- (D);
-
-        % Позначки середин
-        \draw[thick] ($(A)!0.5!(K)$) ++(60:1) -- ++(-120:2);
-        \draw[thick] ($(K)!0.5!(D)$) ++(60:1) -- ++(-120:2);
-        \draw[thick] ($(D)!0.5!(M)$) ++(-60:1) -- ++(120:2);
-        \draw[thick] ($(M)!0.5!(C)$) ++(-60:1) -- ++(120:2);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below left] at (K) {$K$};
-        \node[below right] at (M) {$M$};
-        \node[above right] at (O) {$O$};
-
-        \fill (K) circle (8pt);
-        \fill (M) circle (8pt);
-        \fill (O) circle (8pt);
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\s{0.2}
+    \def\tick#1#2{\draw[thin] ($($(#1)!0.5!(#2)$)!0.12cm!90:(#2)$) -- ($($(#1)!0.5!(#2)$)!0.12cm!-90:(#2)$);}
+    \coordinate (A) at ({-16*\s},0);
+    \coordinate (C) at ({16*\s},0);
+    \coordinate (B) at (0,{12*\s});
+    \coordinate (D) at (0,{-12*\s});
+    \coordinate (K) at ({-8*\s},{-6*\s});
+    \coordinate (M) at ({8*\s},{-6*\s});
+    \coordinate (O) at (0,{-6*\s});
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (D);
+    \draw[thick] (K) -- (M);
+    \tick{A}{K} \tick{K}{D} \tick{D}{M} \tick{M}{C}
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[nmt dot] at (O) {};
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[below left] at (K) {$K$};
+    \node[below right] at (M) {$M$};
+    \node[above right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2687,7 +2650,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.131]
         \coordinate (A) at (-20, 0); % AO = 20 за масштабом
         \coordinate (C) at (20, 0);
         \coordinate (O) at (0, 0);
@@ -2720,9 +2683,9 @@
         \node[above right] at (K) {$K$};
         \node[right] at (N) {$N$};
 
-        \fill (O) circle (12pt);
-        \fill (K) circle (12pt);
-        \fill (N) circle (12pt);
+        \path (O) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -2759,7 +2722,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.281]
         \coordinate (A) at (0,0);
         \coordinate (K) at (8,0); % AK = 8
         \coordinate (D) at (12,0); % KD = 4, AD = 12
@@ -2810,7 +2773,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.146]
         % P=(0,0). K=(0,12).
         % AP=20 => A=(-20,0).
         % PD=10 => D=(10,0).
@@ -2877,28 +2840,29 @@
 \zadtask{У паралелограмі $ABCD$ на висоті $BM$ вибрано точку $K$ так, що $BK : KM = 4 : 3$ (див. рисунок). $CK = 17$ см, $BK = 8$ см. Прямі $CK$ і $AD$ перетинаються в точці $N$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.95, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (M) at (1.3,0);
-    \coordinate (D) at (5,0);
-    \coordinate (B) at (1.3,2.6);
-    \coordinate (C) at (5,2.6);
-    \coordinate (N) at (-1.1,0);
-    \coordinate (K) at (1.3,1.1);
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    % за оригіналом (НМТ 2026, 1.06, № 18, с. 28): AD ∥ BC, M -- основа висоти з B, N ∈ AD, N--K--C на одній прямій
+    \coordinate (M) at (0,0);
+    \coordinate (B) at (0,4.0);
+    \coordinate (C) at (5.2,4.0);
+    \coordinate (A) at (-1.3,0);
+    \coordinate (D) at (3.9,0);
+    \coordinate (N) at (-3.9,0);
+    \coordinate (K) at (0,1.714);
+    \draw[thick] (N) -- (D);
+    \draw[thick] (A) -- (B) -- (C) -- (D);
     \draw[thick] (B) -- (M);
     \draw[thick] (N) -- (C);
-    \draw[thick] (N) -- (A);
-    \draw[thick] (M)++(0,0.28) -- ++(0.28,0) -- ++(0,-0.28);
-    \fill (K) circle (1.6pt);
-    \fill (N) circle (1.6pt);
+    \pic[draw, thin, angle radius=0.3cm] {right angle=D--M--B};
+    \node[nmt dot] at (N) {};
+    \node[nmt dot] at (K) {};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[above left] at (K) {$K$};
+    \node[below] at (N) {$N$};
     \node[below] at (A) {$A$};
     \node[below] at (M) {$M$};
     \node[below right] at (D) {$D$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below] at (N) {$N$};
-    \node[below right] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -3012,7 +2976,7 @@
         \node[below right] at (D) {$D$};
         \node[below right] at (O) {$O$};
 
-        \fill (O) circle (15pt);
+        \path (O) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -3047,7 +3011,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.41]
         % Рівнобічна трапеція. AB=BC=CD=6.
         % Кут CAD = 30. Оскільки BC || AD, кут BCA = 30.
         % Трикутник ABC рівнобедрений (AB=BC), отже кут BAC = 30.
@@ -3065,7 +3029,8 @@
         \draw[thick] (A) -- (C);
 
         % Кут 30 градусів
-        \pic [draw, pic text={\scriptsize $30^\circ$}, angle radius=0.5cm, angle eccentricity=1.8] {angle = D--A--C};
+        \pic[draw, angle radius=0.5cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{0.5}{\normalsize $30^\circ$}
 
         % Позначки рівності AB=BC=CD
         \draw[thick] ($(A)!0.5!(B)$) ++(150:0.4) -- ++(-30:0.8);
@@ -3110,7 +3075,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.226]
         % Прямокутна трапеція. A=90, B=90.
         % BC=12. AC=15. => AB = sqrt(225-144) = 9.
         % DC=15. Проведемо висоту CH. CH=9. HD = sqrt(225-81)=12.
@@ -3159,7 +3124,7 @@
         \node[below] at (D) {$D$};
         \node[below right] at (O) {$O$};
 
-        \fill (O) circle (12pt);
+        \path (O) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -3194,7 +3159,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.315]
         % BC = 6. CD = 10. BO || CD => BCDO parallelogram => OD=6, BO=10.
         % Isosceles ABCD => AB=CD=10.
         % CO perp AD. Triangle OCD: CD=10. Need CO.
@@ -3271,69 +3236,27 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
-        \coordinate (A) at (-20,0);
-        \coordinate (D) at (18,0); % AD = 38 total width
-        \coordinate (O) at (0,0);  % O is projection of C? No, CO is height.
-        % Text says CO is height. So C is directly above O.
-        % Let's set O as (0,0). C = (0, h).
-        % ABCD isosceles.
-        % Middle line = 23. (BC+AD)/2 = 23 => BC + 38 = 46 => BC = 8.
-        % If BC=8, and O is projection of C, then OD = (AD-BC)/2 is wrong.
-        % In isosceles trapezoid, OD = (AD+BC)/2 = (38+8)/2 = 23? No.
-        % Usually projection of C is H. HD = (AD-BC)/2 = (38-8)/2 = 15.
-        % AH = (AD+BC)/2 = 23.
-        % So if O is the foot of height C, then AO = 23, OD = 15 (if D is right).
-        % Wait, drawing shows O is between A and D.
-        % Angle AOB = 45. B is top left vertex.
-        % Let's construct: O=(0,0). C=(0,h). D=(15,0). A=(-23,0).
-        % B must be at (-15, h).
-        % Connect B to O. Angle AOB is angle between AO (x-axis left) and BO.
-        % If B=(-15, h), and angle(BO, AO) = 45, then B must be on y=x line (relative to O, but A is left).
-        % So angle between (-1,0) and (-15, h) is 45.
-        % This implies height h = 15.
-
-        \coordinate (O) at (0,0);
-        \coordinate (C) at (0,15);
-        \coordinate (D) at (15,0);
-        \coordinate (A) at (-23,0);
-        \coordinate (B) at (-15,15); % BC = 15 - (-15)? No, B is symmetric to C relative to axis? No.
-        % Isosceles trapezoid properties:
-        % Projection of B (let's say B') and C (O) on AD.
-        % B'O = BC. B'A = OD.
-        % O is projection of C. OD = (AD-BC)/2 = 15. Correct.
-        % AO = AD - OD = 38 - 15 = 23. Correct.
-        % B is at x = -8 (relative to O). No, B' is at -8. B is at (-8, 15).
-        % BC = 8.
-        % Check angle AOB = 45?
-        % Vector OA = (-23, 0). Vector OB = (-8, 15).
-        % This does not look like 45 degrees.
-        % Let's look at the drawing "21.52.02".
-        % Visual: O is distinct point on base. C is above O. CO perp AD.
-        % B connects to O. Angle AOB is marked.
-        % Angle is clearly acute. 45 degrees.
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (C) -- (O);
-        \draw[thick] (B) -- (O);
-
-        % Right angle at O
-        \draw (O) rectangle ++(1.5,1.5);
-
-        % Angle 45 at O (AOB)
-        \pic [draw, pic text={\small $45^\circ$}, angle radius=.6cm, angle eccentricity=1.5] {angle = B--O--A};
-
-        % Marks
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.8) -- ++(-30:1.6);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.8) -- ++(-120:1.6);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (O) {$O$};
-
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}[line join=round]
+    % за оригіналом (НМТ 2024, 1.06, № 18, с. 111): AD = 38, BC = 8, OD = 15, AO = 23, висота CO = 8, кут AOB = 45°; одиниця = 0,168 см
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (2.52,1.344);
+    \coordinate (C) at (3.864,1.344);
+    \coordinate (O) at (3.864,0);
+    \coordinate (D) at (6.384,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (C) -- (O);
+    \draw[thick] (B) -- (O);
+    \foreach \p/\q in {A/B, D/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
+    \pic[draw, thin, angle radius=0.22cm] {right angle=C--O--D};
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -3367,7 +3290,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.198]
         % Circumscribed isosceles trapezoid.
         % Sum of bases = Sum of legs = Perimeter / 2 = 50.
         % a + b = 50. a - b = 14.
@@ -3419,7 +3342,7 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.406]
         % R=4, h=8. Midline=10 => a+b=20.
         % Inscribed => a+b = 2c => 2c=20 => c=10.
         % Leg c=10. Height h=8. Projection x=6.
@@ -3528,25 +3451,19 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        \coordinate (A) at (-15,0);
-        \coordinate (D) at (15,0);
-        % Bases 30 and 12. Top base centered.
-        % Coordinates for C approx to look like the image.
-        \coordinate (B) at (-6, 12);
-        \coordinate (C) at (6, 12);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-
-        % Obtuse angle 120 at C (ACD)
-        \pic [draw, pic text={\scriptsize $120^\circ$}, angle radius=0.3cm, angle eccentricity=1.5] {angle = A--C--D};
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}
+    % AD = 30, BC = 12 (одиниця 0,22 см), h = 7.588, ∠ACD = 120°
+    \coordinate (A) at (-3.3,0); \coordinate (D) at (3.3,0);
+    \coordinate (B) at (-1.32,1.669); \coordinate (C) at (1.32,1.669);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \pic[draw, angle radius=0.5cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{0.5}{$120^\circ$}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -3577,20 +3494,23 @@
 \zadtask{На рисунку зображено трапецію $ABCD$, у якій $\angle CDA = 30^\circ$. Висота $CK$, довжина якої дорівнює $2$, є бісектрисою кута $ACD$. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.13, thick]
     \coordinate (A) at (0,0);
-    \coordinate (K) at (4,0);
-    \coordinate (D) at (7.46,0);
-    \coordinate (C) at (4,2);
+    \coordinate (K) at (3.464,0);
+    \coordinate (D) at (6.928,0);
+    \coordinate (C) at (3.464,2);
     \coordinate (B) at (0,2);
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (C) -- (K);
-    \draw[dashed] (A) -- (C);
-    \draw (0,0) -- (0,0.3) -- (0.3,0.3) -- (0.3,0);
-    \draw (4,0) -- (4,0.3) -- (4.3,0.3) -- (4.3,0);
-    \pic [draw, angle radius=0.6cm, "$30^\circ$"{above left, shift={(-0.28,-0.15)}}] {angle = C--D--K};
-    \pic [draw, angle radius=0.45cm] {angle = K--C--D};
-    \pic [draw, angle radius=0.55cm] {angle = A--C--K};
+    \draw (A) -- (C);
+    \pic[draw, angle radius=0.3cm] {right angle = D--A--B};
+    \pic[draw, angle radius=0.3cm] {right angle = D--K--C};
+    \pic[draw, angle radius=0.9cm] {angle = C--D--K};
+    \nmtAngleLabel{C}{D}{K}{0.9}{$30^\circ$}
+    \pic[draw, angle radius=0.5cm] {angle = K--C--D};
+    \pic[draw, angle radius=0.6cm] {angle = K--C--D};
+    \pic[draw, angle radius=0.5cm] {angle = A--C--K};
+    \pic[draw, angle radius=0.6cm] {angle = A--C--K};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above=2pt] at (C) {$C$};
@@ -3702,7 +3622,7 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.0954]
     % Висота між прямими h.
     % Сектор ABC: 1/4 кола. Площа = 64pi => R^2 = 256 => R=16. h=16.
     \def\h{16}
@@ -3739,8 +3659,10 @@
     \fill[red!20] (L) -- (M) -- (N) -- (P) -- cycle;
 
     % Лінії m та n
-    \draw[thick] (-2,0) -- (70,0) node[above] {$n$};
-    \draw[thick] (-2,\h) -- (70,\h) node[above] {$m$};
+    \draw[thick] (-6,0) -- (70,0);
+    \node[left] at (-6,0) {$n$};
+    \draw[thick] (-6,\h) -- (70,\h);
+    \node[left] at (-6,\h) {$m$};
 
     % Контури фігур
     \draw[thick] (B) -- (A) arc [start angle=270, end angle=360, radius=\h] -- cycle;

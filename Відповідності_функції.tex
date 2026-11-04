@@ -22,6 +22,39 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+% ===================== ДИЗАЙН-СИСТЕМА РИСУНКІВ (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md, scripts/дизайн_завдань.py) =====================
+\definecolor{nmtInk}{HTML}{1A1A1A}
+\definecolor{nmtGrid}{HTML}{3A3A3A}      % сітка, як у НМТ 2026: темна й тонка (0,35 pt), клітинка 0,5 см
+\definecolor{nmtBlue}{HTML}{1F6FB2}\definecolor{nmtGreen}{HTML}{2E8B57}\definecolor{nmtRed}{HTML}{C0392B}
+\definecolor{nmtOrange}{HTML}{D9822B}\definecolor{nmtViolet}{HTML}{7D4CA8}
+\definecolor{nmtFillA}{HTML}{D3E5F5}\definecolor{nmtFillB}{HTML}{D8EDD5}\definecolor{nmtFillC}{HTML}{FBE1C8}
+\definecolor{nmtFillD}{HTML}{E4E4E4}\definecolor{nmtFillE}{HTML}{E7DCF2}
+\tikzset{
+  ultra thin/.style={line width=0.2pt}, very thin/.style={line width=0.3pt}, thin/.style={line width=0.45pt},
+  semithick/.style={line width=0.6pt}, thick/.style={line width=0.75pt}, very thick/.style={line width=1.1pt},
+  ultra thick/.style={line width=1.5pt},
+  >={Stealth[length=2.3mm, width=1.7mm]},
+  every picture/.append style={line join=round, line cap=round},
+  nmt dot/.style={circle, fill=nmtInk, draw=none, inner sep=0pt, minimum size=3.6pt},
+  nmt open dot/.style={circle, fill=white, draw=nmtInk, line width=0.6pt, inner sep=0pt, minimum size=4.2pt},
+  nmt grid/.style={draw=nmtGrid, line width=0.35pt},
+  nmt curve/.style={line width=1.1pt},
+}
+% вирази: ≤ і ≥ -- похилі, як у НМТ (десяткову кому без пробілу вже дає mathastext)
+\let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
+\pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
+  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
+% ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -362,24 +395,23 @@
 \begin{minipage}[t]{0.4\textwidth}
 \nbvspace{0pt}
 \begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        % Сітка розширена вгору до 7.5
-        \draw[step=1cm,gray!50,very thin] (0.5,-1.5) grid (9.5,7.5);
-        \draw[->, >=stealth, thick] (0,0) -- (9.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-1.5) -- (0,7.5) node[left] {$y$};
-
-        \node[below left] at (0,0) {$0$};
-        \node[below] at (1,0) {$1$};
-        \node[left] at (0,1) {$1$};
-        \node[below] at (9,0) {$9$};
-
-        % Графік через (1,5) і (3,7)
-        \draw[thick] plot [smooth, tension=0.3] coordinates {(1, 5)  (3, 7) (6, 0) (7, -1) (8, 0) (9, 1)};
-
-        \fill (1,5) circle (3pt);
-        \fill (9,1) circle (3pt);
-        \node[above, fill=white, inner sep=1.5pt] at (3, 7) {$y=f(x)$};
-    \end{tikzpicture}\end{nmtfit}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick]
+    \draw[nmt grid, step=1] (-2,-2) grid (11,8);
+    \draw[->] (-2.3,0) -- (11.3,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,8.3) node[above] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,0) {$1$}; \node[below] at (9,0) {$9$};
+    \node[left] at (0,1) {$1$};
+    \draw[nmt curve] (1,5)
+        .. controls (1.15,6.2) and (2,7) .. (3,7)
+        .. controls (3.8,7) and (4.9,3) .. (5,0)
+        .. controls (5.03,-0.9) and (5.5,-1) .. (6,-1)
+        .. controls (6.5,-1) and (6.9,-0.5) .. (7,0)
+        .. controls (7.1,0.5) and (8,1) .. (9,1);
+    \node[nmt dot] at (1,5) {};
+    \node[nmt dot] at (9,1) {};
+    \node[right, fill=white, inner sep=1.5pt] at (4.0,7.3) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{flushright}
 \end{minipage}
 
@@ -415,9 +447,9 @@
 \nbvspace{0pt}
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (4.5,3.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (4.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3.5) -- (0,3.5) node[left] {$y$};
+        \draw[nmt grid, step=1cm] (-4.5,-3.5) grid (4.5,3.5);
+        \draw[->, thick] (-4.5,0) -- (4.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-3.5) -- (0,3.5) node[left] {$y$};
 
         \node[below left] at (0,0) {$0$};
         \node[below] at (1,0) {$1$};
@@ -425,10 +457,10 @@
         \node[below] at (4,0) {$4$};
         \node[below] at (-4,0) {$-4$};
 
-        \draw[thick] plot [smooth, tension=0.7] coordinates {(-4, -3) (-2, -1) (0, 0) (3, 3) (4, 1)};
+        \draw[nmt curve] plot [smooth, tension=0.7] coordinates {(-4, -3) (-2, -1) (0, 0) (3, 3) (4, 1)};
 
-        \fill (-4,-3) circle (3pt);
-        \fill (4,1) circle (3pt);
+        \path (-4,-3) node[nmt dot] {};
+        \path (4,1) node[nmt dot] {};
 
         \node[left, fill=white, inner sep=1.5pt] at (-1, 1) {$y=f(x)$};
     \end{tikzpicture}\end{nmtfit}
@@ -480,9 +512,9 @@
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         % Сітка та осі
-        \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (4.5,3.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (4.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3.5) -- (0,3.5) node[left] {$y$};
+        \draw[nmt grid, step=1cm] (-4.5,-3.5) grid (4.5,3.5);
+        \draw[->, thick] (-4.5,0) -- (4.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-3.5) -- (0,3.5) node[left] {$y$};
 
         % Підписи осей
         \node[below left] at (0,0) {$0$};
@@ -492,11 +524,11 @@
         \node[below] at (-4,0) {$-4$};
 
         % Графік: старт (-4, -3), через (-2, -1), нуль (0,0), макс (3, 3), кінець (4, 1)
-        \draw[thick] plot [smooth, tension=0.7] coordinates {(-4, -3) (-2, -1) (0, 0) (3, 3) (4, 1)};
+        \draw[nmt curve] plot [smooth, tension=0.7] coordinates {(-4, -3) (-2, -1) (0, 0) (3, 3) (4, 1)};
 
         % Точки на кінцях
-        \fill (-4,-3) circle (3pt);
-        \fill (4,1) circle (3pt);
+        \path (-4,-3) node[nmt dot] {};
+        \path (4,1) node[nmt dot] {};
 
         \node[left, fill=white, inner sep=1.5pt] at (-1, 1) {$y=f(x)$};
     \end{tikzpicture}\end{nmtfit}
@@ -573,9 +605,9 @@
     \nopagebreak\nbvspace{0pt}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[step=1cm,gray!50,very thin] (-6.5,-7.5) grid (5.5,4.5);
-        \draw[->, >=stealth, thick] (-6.5,0) -- (5.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-7.5) -- (0,4.5) node[left] {$y$};
+        \draw[nmt grid, step=1cm] (-6.5,-7.5) grid (5.5,4.5);
+        \draw[->, thick] (-6.5,0) -- (5.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-7.5) -- (0,4.5) node[left] {$y$};
 
         \node[below left] at (0,0) {$0$};
         \node[above] at (1,0) {$1$};
@@ -584,10 +616,10 @@
         \node[below] at (-4,0) {$-4$};
 
         % Графік (хвиля)
-        \draw[thick] plot [smooth, tension=0.44] coordinates {(-4, -6) (-3, -5) (-2, -3)(-1, 0) (0, 1)(1, 0) (2, -3) (3, -4) (5, -1)};
-        \fill (-4,-6) circle (3pt);
-        \fill (5, -1) circle (3pt);
-        \node[below] at (3, -3.5) {\small $y=f(x)$};
+        \draw[nmt curve] plot [smooth, tension=0.44] coordinates {(-4, -6) (-3, -5) (-2, -3)(-1, 0) (0, 1)(1, 0) (2, -3) (3, -4) (5, -1)};
+        \path (-4,-6) node[nmt dot] {};
+        \path (5, -1) node[nmt dot] {};
+        \node[below] at (3, -3.5) {\normalsize $y=f(x)$};
     \end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
@@ -626,22 +658,20 @@
     \nopagebreak\nbvspace{0pt}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[step=1cm,gray!50,very thin] (-6.5,-7.5) grid (5.5,4.5);
-        \draw[->, >=stealth, thick] (-6.5,0) -- (5.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-7.5) -- (0,4.5) node[left] {$y$};
-
-        \node[below left] at (0,0) {$0$};
-        \node[above] at (1,0) {$1$};
-        \node[above left] at (0,1) {$1$};
-        \node[below] at (5,0) {$5$};
-        \node[below] at (-4,0) {$-4$};
-
-        % Графік (хвиля)
-        \draw[thick] plot [smooth, tension=0.44] coordinates {(-4, -6) (-3, -5) (-2, -3)(-1, 0) (0, 1)(1, 0) (2, -3) (3, -4) (5, -1)};
-        \fill (-4,-6) circle (3pt);
-        \fill (5, -1) circle (3pt);
-        \node[below] at (3, -3.5) {\small $y=f(x)$};
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt grid, step=1] (-5,-7) grid (6,3);
+    \draw[->, thick] (-5,0) -- (6.4,0) node[right] {$x$};
+    \draw[->, thick] (0,-7) -- (0,3.4) node[left] {$y$};
+    \draw[thin] (-4,0.12) -- (-4,-0.12); \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (5,0.12) -- (5,-0.12); \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (-4,0) {$-4$};
+    \node[below left] at (1,0) {$1$};
+    \node[below left] at (5,0) {$5$};
+    \node[anchor=south east, yshift=3pt] at (0,1) {$1$};
+    \draw[nmt curve] (-4,-6) .. controls (-3.667,-5.833) and (-3.333,-5.444) .. (-3,-5) .. controls (-2.667,-4.556) and (-2.333,-3.8) .. (-2,-3) .. controls (-1.667,-2.2) and (-1.333,-0.5) .. (-1,0) .. controls (-0.667,0.5) and (-0.333,1) .. (0,1) .. controls (0.333,1) and (0.667,0.5) .. (1,0) .. controls (1.333,-0.5) and (1.667,-2.5) .. (2,-3) .. controls (2.333,-3.5) and (2.667,-4) .. (3,-4) .. controls (3.667,-4) and (4.333,-3.111) .. (5,-1);
+    \node[nmt dot] at (-4,-6) {};
+    \node[nmt dot] at (5,-1) {};
+    \node[fill=white, inner sep=1.5pt] at (3,-5.3) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 \par\penalty-20\vspace{0.25cm}
@@ -1583,15 +1613,15 @@
 \hfill
 \begin{minipage}[t]{0.20\textwidth}
     \nopagebreak\nbvspace{0.5cm}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-        \draw[->, >=stealth] (-2,0) -- (2,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-2) -- (0,2) node[left] {$y$};
-        \node[below left] at (0,0) {$O$};
-        \node at (1,1) {\small I чверть};
-        \node at (-1,1) {\small II чверть};
-        \node at (-1,-1) {\small III чверть};
-        \node at (1,-1) {\small IV чверть};
-    \end{tikzpicture}\end{nmtfit}
+    \begin{nmtfit}\begin{tikzpicture}
+    \draw[->] (-2.0,0) -- (2.0,0) node[right] {$x$};
+    \draw[->] (0,-1.7) -- (0,1.7) node[above] {$y$};
+    \node[below left] at (0,0) {$O$};
+    \node[anchor=west] at (0.12,1.0) {I чверть};
+    \node[anchor=east] at (-0.12,1.0) {II чверть};
+    \node[anchor=east] at (-0.12,-1.0) {III чверть};
+    \node[anchor=west] at (0.12,-1.0) {IV чверть};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
@@ -1924,10 +1954,10 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[x=0.5cm, y=1cm]
+    \begin{nmtfit}\begin{tikzpicture}[scale=1.31, x=0.5cm, y=1cm]
         % Сітка не потрібна, лише осі та прямокутник
-        \draw[->, >=stealth, thick] (-1,0) -- (7.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-1.5) -- (0,1.8) node[left] {$y$};
+        \draw[->, thick] (-1,0) -- (7.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-1.5) -- (0,1.8) node[left] {$y$};
 
         % Ламана
         \coordinate (A) at (0, -1);
@@ -1986,11 +2016,11 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.74]
         % Сітка та осі
 
-        \draw[->, >=stealth, thick] (-3,0) -- (3,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3) -- (0,3) node[left] {$y$};
+        \draw[->, thick] (-3,0) -- (3,0) node[below] {$x$};
+        \draw[->, thick] (0,-3) -- (0,3) node[left] {$y$};
 
         % Коло
         \draw[thick] (0,0) circle (2cm);
@@ -2033,38 +2063,31 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-        % Сітка
-        \draw[step=1cm,gray!30,very thin] (-2.5,-1.5) grid (2.5,1.5);
-        % Осі
-        \draw[->, >=stealth, thick] (-2.5,0) -- (2.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-1.5) -- (0,2) node[left] {$y$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    % одиниця осі x -- 2 клітинки (за оригіналом): π/2 ≈ 3,14 клітинки; одиниця осі y -- 2 клітинки
+    \draw[nmt grid, step=1] (-5,-4) grid (6,5);
+    \draw[->] (-5,0) -- (6,0) node[below left] {$x$};
+    \draw[->] (0,-4) -- (0,5) node[below left] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[above left] at (0,2) {$1$};
+    \node[below left] at (0,-2) {$-1$};
 
-        % Точки ламаної (Rectangle)
-        % pi/2 approx 1.57. Let's align grid to make it look nice.
-        % Scale: 1 unit on grid is 1 unit. Pi/2 is approx 1.57.
-        % The image shows pi/2 exactly on a grid line? No, typically illustrative.
-        % We will place pi/2 at x=1.5 for visuals.
-
-        \coordinate (A) at (-1.5, -1);
-        \coordinate (B) at (-1.5, 1);
-        \coordinate (C) at (1.5, 1);
-        \coordinate (D) at (1.5, -1);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-        \fill (A) circle (2pt) node[below left] {$A$};
-        \fill (B) circle (2pt) node[above left] {$B$};
-        \fill (C) circle (2pt) node[above right] {$C$};
-        \fill (D) circle (2pt) node[below right] {$D$};
-
-        % Labels on axes
-        \node[below left] at (0,0) {$0$};
-        \node[above left] at (0,1) {$1$};
-        \node[below left] at (0,-1) {$-1$};
-        \node[below right] at (1.5, 0) {$\frac{\pi}{2}$};
-        \node[below ] at (-1.5, 0) {$-\frac{\pi}{2}$};
-    \end{tikzpicture}\end{nmtfit}
+    \coordinate (A) at (-3.14,-2);
+    \coordinate (B) at (-3.14,2);
+    \coordinate (C) at (3.14,2);
+    \coordinate (D) at (3.14,-2);
+    \draw[nmt curve] (A) -- (B) -- (C) -- (D) -- cycle;
+    \node[nmt dot] at (A) {};
+    \node[nmt dot] at (B) {};
+    \node[nmt dot] at (C) {};
+    \node[nmt dot] at (D) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below left, xshift=-2pt] at (-3.14,0) {$-\dfrac{\pi}{2}$};
+    \node[below right, xshift=2pt] at (3.14,0) {$\dfrac{\pi}{2}$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2101,17 +2124,17 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-        \draw[step=1cm,gray!30,very thin] (-2.5,-0.5) grid (2.5,2.5);
-        \draw[->, >=stealth, thick] (-2.5,0) -- (2.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-0.5) -- (0,2.5) node[left] {$y$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+        \draw[nmt grid, step=1cm] (-2.5,-0.5) grid (2.5,2.5);
+        \draw[->, thick] (-2.5,0) -- (2.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-0.5) -- (0,2.5) node[left] {$y$};
         \node[below left] at (0,0) {$0$};
 
         \draw[thick] (-2,0) -- (0,1) -- (2,1);
 
-        \fill (-2,0) circle (2pt) node[above left] {$A$};
-        \fill (0,1) circle (2pt) node[above right] {$B$};
-        \fill (2,1) circle (2pt) node[above right] {$C$};
+        \path (-2,0) node[nmt dot] {} node[above left] {$A$};
+        \path (0,1) node[nmt dot] {} node[above right] {$B$};
+        \path (2,1) node[nmt dot] {} node[above right] {$C$};
 
         \node[below] at (-2,0) {$-2$};
         \node[below] at (1,0) {$1$};
@@ -2152,18 +2175,18 @@
 \begin{minipage}[t]{0.4\textwidth}
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=1.2]
+    \begin{nmtfit}\begin{tikzpicture}[scale=2.04]
         % Осі
-        \draw[->, >=stealth, thick] (-1.5,0) -- (1.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-0.5) -- (0,1.5) node[left] {$y$};
+        \draw[->, thick] (-1.5,0) -- (1.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-0.5) -- (0,1.5) node[left] {$y$};
 
         % Ламана (зеленим кольором, як на рисунку)
-        \draw[thick, green!70!black] (-1, 0) -- (0, 1) -- (1, 0) -- cycle;
+        \draw[thick, nmtGreen] (-1, 0) -- (0, 1) -- (1, 0) -- cycle;
 
         % Точки
-        \fill (-1,0) circle (2pt) node[above left] {$A$};
-        \fill (0,1) circle (2pt) node[above right] {$B$};
-        \fill (1,0) circle (2pt) node[above right] {$C$};
+        \path (-1,0) node[nmt dot] {} node[above left] {$A$};
+        \path (0,1) node[nmt dot] {} node[above right] {$B$};
+        \path (1,0) node[nmt dot] {} node[above right] {$C$};
 
         % Підписи координат
         \node[below] at (-1,0) {$-1$};
@@ -2201,22 +2224,23 @@
 \zadtask{У прямокутній системі координат на площині $xy$ зображено відрізок $AB$ (див. рисунок). Увідповідніть функцію \mbox{(1--3)} із кількістю \mbox{(А--Д)} спільних точок її графіка з відрізком $AB$. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]
-    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
-    \draw[->] (-2.5,0) -- (2.5,0) node[right] {$x$};
-    \draw[->] (0,-1.5) -- (0,3.5) node[above] {$y$};
-    \node[below right, font=\small] at (0,0) {$0$};
-    \node[below, font=\small] at (-1,0) {$-1$};
-    \node[below, font=\small] at (1,0) {$1$};
-    \node[right, font=\small, xshift=0.05cm] at (0,1) {$1$};
-    \node[right, font=\small, xshift=0.05cm] at (0,2) {$2$};
-    \draw[dashed, mainGreen!70] (-1,2) -- (-1,0);
-    \draw[dashed, mainGreen!70] (-1,2) -- (0,2);
-    \draw[very thick] (-1,2) -- (0,1);
-    \fill (-1,2) circle (2.5pt);
-    \fill (0,1) circle (2.5pt);
-    \node[left, font=\small] at (-1,2) {$B$};
-    \node[above right, font=\small, xshift=-0.07cm] at (0,1) {$A$};
+\begin{nmtfit}\begin{tikzpicture}[scale=1.1]
+    \draw[->] (-2,0) -- (2,0) node[right] {$x$};
+    \draw[->] (0,-1) -- (0,3) node[above] {$y$};
+    \draw[thin] (-1,0.08) -- (-1,-0.08); \draw[thin] (1,0.08) -- (1,-0.08);
+    \draw[thin] (-0.08,1) -- (0.08,1); \draw[thin] (-0.08,2) -- (0.08,2);
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (-1,0) {$-1$};
+    \node[below] at (1,0) {$1$};
+    \node[right, xshift=2pt] at (0,1) {$1$};
+    \node[right, xshift=2pt] at (0,2) {$2$};
+    \draw[dashed, thin, nmtGreen] (-1,2) -- (-1,0);
+    \draw[dashed, thin, nmtGreen] (-1,2) -- (0,2);
+    \draw[thick] (-1,2) -- (0,1);
+    \node[nmt dot] at (-1,2) {};
+    \node[nmt dot] at (0,1) {};
+    \node[left] at (-1,2) {$B$};
+    \node[below left] at (0,1) {$A$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2251,9 +2275,9 @@
 \begin{flushright}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
         % Сітка розширена вниз до -3.5
-        \draw[step=1cm,gray!50,very thin] (-4.5,-3.5) grid (5.5,4.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (5.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3.5) -- (0,4.5) node[left] {$y$};
+        \draw[nmt grid, step=1cm] (-4.5,-3.5) grid (5.5,4.5);
+        \draw[->, thick] (-4.5,0) -- (5.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-3.5) -- (0,4.5) node[left] {$y$};
 
         \node[below left] at (0,0) {$0$};
         \node[below] at (1,0) {$1$};
@@ -2262,10 +2286,10 @@
         \node[below] at (-4,0) {$-4$};
 
         % Графік строго через точки: (-4, -3), (-1.2, 0), (0, 2.4), (2.5, 4), (5, 2)
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-4, -3) (-1.2, 0) (0, 2.4) (2.5, 4) (5, 2)};
+        \draw[nmt curve] plot [smooth, tension=0.6] coordinates {(-4, -3) (-1.2, 0) (0, 2.4) (2.5, 4) (5, 2)};
 
-        \fill (-4,-3) circle (3pt);
-        \fill (5,2) circle (3pt);
+        \path (-4,-3) node[nmt dot] {};
+        \path (5,2) node[nmt dot] {};
         \node[above, fill=white, inner sep=1.5pt] at (4.2, 4.5) {$y=f(x)$};
     \end{tikzpicture}\end{nmtfit}
 \end{flushright}
@@ -2299,21 +2323,22 @@
 \zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку \mbox{(1--3)} речення доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick]
-    \draw[step=1cm, gray!40, thin] (-3,-4) grid (5,6);
-    \draw[->] (-3.5,0) -- (5.5,0) node[right] {$x$};
-    \draw[->] (0,-4.5) -- (0,6.5) node[above] {$y$};
-    \node[below left, font=\small] at (0,0) {$0$};
-    \node[below right, font=\small] at (1,0) {$1$};
-    \node[above left, font=\small] at (0,1) {$1$};
-    \node[left, font=\small] at (0,5) {$5$};
-    \node[below, font=\small] at (-2,0) {$-2$};
-    \node[below, font=\small] at (4,0) {$4$};
-    \node[right, font=\small] at (0.15,-3) {$-3$};
-    \draw[magenta!80!black, thick, smooth] plot coordinates {(-2,-3) (-1.3,0.3) (-0.6,1.7) (0,2) (0.7,1.5) (1.4,1.1) (2,1) (2.7,1.6) (3.3,3) (4,5)};
-    \fill (-2,-3) circle (3pt);
-    \fill (4,5) circle (3pt);
-    \node[right, font=\small, fill=white, inner sep=1.5pt] at (1.7,3.6) {$y=f(x)$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \draw[nmt grid, step=1] (-3,-4) grid (6,6);
+    \draw[->, thick] (-3,0) -- (6,0) node[below left] {$x$};
+    \draw[->, thick] (0,-4) -- (0,6) node[left] {$y$};
+    \draw[thin] (-2,0.12) -- (-2,-0.12); \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (4,0.12) -- (4,-0.12); \draw[thin] (0.12,1) -- (-0.12,1); \draw[thin] (0.12,5) -- (-0.12,5); \draw[thin] (0.12,-3) -- (-0.12,-3);
+    \node[below left] at (0,0) {$0$};
+    \node[below left] at (-2,0) {$-2$};
+    \node[below] at (1,0) {$1$};
+    \node[below] at (4,0) {$4$};
+    \node[right] at (0,1) {$1$};
+    \node[right] at (0,5) {$5$};
+    \node[left] at (0,-3) {$-3$};
+    \draw[nmt curve] (-2,-3) .. controls (-1.67,-1.6) and (-1.33,-1) .. (-1,0) .. controls (-0.67,1) and (-0.33,1.4) .. (0,2) .. controls (0.33,2.6) and (0.65,3) .. (1,3) .. controls (1.4,3) and (1.7,1) .. (2,1) .. controls (2.8,1) and (3.2,2.44) .. (4,5);
+    \node[nmt dot] at (-2,-3) {};
+    \node[nmt dot] at (4,5) {};
+    \node[fill=white, inner sep=1.5pt] at (4.7,1.6) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2347,31 +2372,22 @@
     \nopagebreak\nbvspace{-0.3cm}
     \begin{flushright}
     \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[step=1cm,gray!50,very thin] (-4.5,-0.5) grid (6.5,8.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
-
+        \draw[nmt grid, step=1] (-4.5,-0.5) grid (6.5,8.5);
+        \draw[->, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
         \node[below left] at (0,0) {$0$};
         \node[below] at (1,0) {$1$};
-        % зайву мітку «-1» біля поділки 1 прибрано
         \node[left] at (0,1) {$1$};
         \node[below] at (6,0) {$6$};
         \node[below] at (-4,0) {$-4$};
-
-        % Графік
-        % [-4; 0] -> y = sqrt(-x). (-4, 2) -> (0,0)
-        \draw[thick] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
-
-        % [0; 2] -> y = x^3. (0,0) -> (2, 8)
-        \draw[thick] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
-
-        % [2; 6] -> y = 12 - 2x. (2, 8) -> (6, 0)
-        \draw[thick] (2, 8) -- (6, 0);
-
-        \fill (-4, 2) circle (3pt);
-        \fill (6, 0) circle (3pt);
-        \node[right, fill=white, inner sep=1.5pt] at (4, 4) {$y=f(x)$};
-    \end{tikzpicture}\end{nmtfit}
+        % [-4; 0]: y = sqrt(-x); (0; 2]: y = x^3; (2; 6]: y = 12 - 2x
+        \draw[nmt curve] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
+        \draw[nmt curve] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
+        \draw[nmt curve] (2, 8) -- (6, 0);
+        \node[nmt dot] at (-4, 2) {};
+        \node[nmt dot] at (6, 0) {};
+        \node[anchor=west, fill=white, inner sep=1.5pt] at (3.7, 6.7) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
     \end{flushright}
 \end{minipage}
 
@@ -2403,20 +2419,18 @@
 \zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $(-\infty;\, +\infty)$. Узгодьте проміжок \mbox{(1--3)} із функцією \mbox{(А--Д)}, що описує графік функції $y = f(x)$ на цьому проміжку. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick]
-    \draw[step=1cm, gray!40, thin] (-5,-3) grid (6,4);
-    \draw[->] (-5.3,0) -- (6.3,0) node[right, font=\scriptsize] {$x$};
-    \draw[->] (0,-3.3) -- (0,4.3) node[above, font=\scriptsize] {$y$};
-    \node[below right, font=\scriptsize] at (0,0) {$0$};
-    \node[below, font=\scriptsize] at (1,0) {$1$};
-    \node[left, font=\scriptsize] at (0,1) {$1$};
-    % (-inf;-1): y=-2/x (спадає, гілка згори)
-    \draw[cyan!70!blue, very thick, domain=-5:-1, samples=40] plot (\x, {-2/\x});
-    % [-1;0]: y=-2x (пряма від (-1,2) до (0,0))
-    \draw[cyan!70!blue, very thick] (-1,2) -- (0,0);
-    % (0;+inf): y=sin x
-    \draw[cyan!70!blue, very thick, domain=0:6, samples=80] plot (\x, {sin(deg(\x))});
-    \node[right, font=\scriptsize, fill=white, inner sep=1.5pt] at (2,2.3) {$y=f(x)$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \draw[nmt grid, step=1] (-6,-2) grid (8,4);
+    \draw[->] (-6.3,0) -- (8.4,0) node[right] {$x$};
+    \draw[->] (0,-2.3) -- (0,4.4) node[above] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \draw[thin] (1,0.12) -- (1,-0.12);
+    \node[below] at (1,0) {$1$};
+    \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[right] at (0,1) {$1$};
+    \draw[nmt curve] plot[domain=-6:-1, samples=50] (\x, {-2/\x}) -- (0,0);
+    \draw[nmt curve] plot[domain=0:7.8540, samples=100] (\x, {sin(deg(\x))});
+    \node[right, fill=white, inner sep=1.5pt] at (1.5,2.4) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
@@ -2454,63 +2468,63 @@
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 1 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+    \draw[nmt grid, step=1] (-5,-5) grid (5,3);
+    \draw[->] (-5,0) -- (5,0) node[above left] {$x$};
+    \draw[->] (0,-5) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,0) {$1$};
+    \node[left] at (0,1) {$1$};
+    \node[left] at (-3,-1) {$-3$};
+    \node[right] at (3,-1) {$3$};
 
-        % Дуга (схожа на півокружність або параболу вниз)
-        \draw[thick] plot [smooth, tension=1.5] coordinates {(-3, -1) (0, -4) (3, -1)};
-        \node[right] at (2, -2.5) {\small $y=f(x)$};
-        \fill (-3,-1) circle (3pt);
-        \fill (3,-1) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt curve] (-3,-1) arc[start angle=180, end angle=360, radius=3];
+    \node[nmt dot] at (-3,-1) {};
+    \node[nmt dot] at (3,-1) {};
+    \node[anchor=north east, inner sep=1.5pt] at (5,-5) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 2 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+    \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+    \draw[->] (-5,0) -- (5,0) node[above left] {$x$};
+    \draw[->] (0,-3) -- (0,5) node[left] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[above right] at (1,0) {$1$};
+    \node[right] at (0,1) {$1$};
+    \node[below] at (-3,0) {$-3$};
+    \node[below] at (3,0) {$3$};
 
-        % "Горб"
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-3, -2) (-1, 3) (1, 0) (3, -1.5)};
-        \node[right] at (1, 2) {\small $y=f(x)$};
-        \fill (-3,-2) circle (3pt);
-        \fill (3,-1.5) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt curve] (-3,0) .. controls (-2.8,2.6) and (-2.1,4) .. (-1.5,4)
+        .. controls (-1.1,4) and (-0.5,1) .. (0,0)
+        .. controls (0.4,-0.9) and (1.4,-1.5) .. (3,-1.75);
+    \node[nmt dot] at (-3,0) {};
+    \node[nmt dot] at (3,-1.75) {};
+    \node[anchor=north east, inner sep=1.5pt, yshift=-3pt] at (5,-3) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 3 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+    \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+    \draw[->] (-5,0) -- (5,0) node[above left] {$x$};
+    \draw[->] (0,-3) -- (0,5) node[left] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[above right] at (1,0) {$1$};
+    \node[right] at (0,1) {$1$};
+    \node[below] at (-3,0) {$-3$};
+    \node[below] at (3,0) {$3$};
 
-        % Спадна функція
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-2.5, 3.5) (-1, 2) (0, 0) (1, -1) (3, -3)};
-        \node[left] at (-2, 2) {\small $y=f(x)$};
-        \fill (3,-3) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt curve] (-3,5) .. controls (-2.9,3.6) and (-2.4,2.4) .. (-2,2) -- (3,-3);
+    \node[nmt dot] at (-3,5) {};
+    \node[nmt dot] at (3,-3) {};
+    \node[anchor=north east, inner sep=1.5pt, yshift=-3pt] at (5,-3) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 
 \nmtnobreak
@@ -2548,65 +2562,59 @@
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 1 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-4.5) grid (4.5,4.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-4.5) -- (0,3.5) node[left] {$y$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+        \draw[->] (-5,0) -- (5.3,0) node[below left] {$x$};
+        \draw[->] (0,-3) -- (0,5.3) node[left] {$y$};
         \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
+        \node[above left] at (0,1) {\small $1$};
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-
-        % Парна, схожа на "пташку" або x^2/3
-        \draw[thick] plot [smooth, tension=1] coordinates {(-3, 3) (-1, 2.5) (0, 1)(1, 2.5) (3, 3)};
-        \node[right] at (2, 2.5) {\small $y=f(x)$};
-        \fill (-3,3) circle (3pt);
-        \fill (3,3) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+        \draw[nmt curve] plot[domain=0:3, samples=40] (\x, {1+1.1547*sqrt(\x)});
+        \draw[nmt curve] plot[domain=-3:0, samples=40] (\x, {1+1.1547*sqrt(-\x)});
+        \path (-3,3) node[nmt dot] {};
+        \path (3,3) node[nmt dot] {};
+        \node[fill=white, inner sep=1pt] at (3.0,3.95) {\small $y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 2 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-4.5) grid (4.5,4.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-4.5) -- (0,3.5) node[left] {$y$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+        \draw[->] (-5,0) -- (5.3,0) node[below left] {$x$};
+        \draw[->] (0,-3) -- (0,5.3) node[left] {$y$};
         \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
+        \node[above left] at (0,1) {\small $1$};
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-
-        % Спадаюча лінійна
-        \draw[thick] (-3, 4) -- (2, 0);
-        \draw[thick] (2, 0) -- (3, -2);
-        \node[right] at (1.5, 3) {\small $y=f(x)$};
-        \fill (-3,4) circle (3pt);
-        \fill (3,-2) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+        \draw[nmt curve] (-3,4) -- (2,0) -- (3,-2);
+        \path (-3,4) node[nmt dot] {};
+        \path (3,-2) node[nmt dot] {};
+        \node[fill=white, inner sep=1pt] at (3.0,3.95) {\small $y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 3 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-4.5) grid (4.5,4.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-4.5) -- (0,3.5) node[left] {$y$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+        \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+        \draw[->] (-5,0) -- (5.3,0) node[below left] {$x$};
+        \draw[->] (0,-3) -- (0,5.3) node[left] {$y$};
         \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
+        \node[above left] at (0,1) {\small $1$};
         \node[below] at (1,0) {\small $1$};
         \node[below] at (3,0) {\small $3$};
         \node[below] at (-3,0) {\small $-3$};
-
-        % Непарна (кубічна?)
-        \draw[thick] plot [smooth, tension=0.5] coordinates {(-3, 2) (-2, -1)(-1, 0) (0, 1) (1, 2) (3, 3)};
-        \node[right] at (2, 2.5) {\small $y=f(x)$};
-        \fill (-3,2) circle (3pt);
-        \fill (3,3) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+        \draw[nmt curve] (-3,2) .. controls (-2.667,0.333) and (-2.333,-1) .. (-2,-1) .. controls (-1.667,-1) and (-1.333,-0.333) .. (-1,0) .. controls (-0.667,0.333) and (-0.333,0.667) .. (0,1) .. controls (0.333,1.333) and (0.667,1.769) .. (1,2) .. controls (1.667,2.462) and (2.333,2.889) .. (3,3);
+        \path (-3,2) node[nmt dot] {};
+        \path (3,3) node[nmt dot] {};
+        \node[fill=white, inner sep=1pt] at (3.0,3.95) {\small $y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 
 \nmtnobreak
@@ -2666,45 +2674,52 @@
 \hline
 \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (2,0) {\tiny $2$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below right] at (2,0) {\small $2$};
+    \node[below right] at (0,-2) {\small $-2$};
+    \draw (-1.2,-3.2) -- (3.3,1.3);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[above right] at (0,1) {\tiny $1$};
-    \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
-    \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \coordinate (O) at (0,0); \coordinate (P) at (0,1); \coordinate (Q) at (1,1);
+    \node[below left] at (0,0) {\small $0$};
+    \node[above left] at (0,1) {\small $1$};
+    \pic[draw, angle radius=0.17cm] {right angle = Q--P--O};
+    \draw (-3.4,1) -- (3.4,1);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below left] at (-1,0) {\tiny $-1$};
-    \draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут
-    \draw[thick] (-1,-2) -- (-1,3); % x = -1
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[right] {$y$};
+    \coordinate (O) at (0,0); \coordinate (P) at (-1,0); \coordinate (Q) at (-1,1);
+    \node[below right] at (0,0) {\small $0$};
+    \node[below left, xshift=-2pt] at (-1,0) {\small $-1$};
+    \pic[draw, angle radius=0.17cm] {right angle = O--P--Q};
+    \draw (-1,-3.2) -- (-1,3.0);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below] at (-2,0) {\tiny $-2$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below left] at (-2,0) {\small $-2$};
+    \node[below left] at (0,-2) {\small $-2$};
+    \draw (-3.2,1.2) -- (1.2,-3.2);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (3,0) {\tiny $3$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[above left] at (3,0) {\small $3$};
+    \node[below right] at (0,-2) {\small $-2$};
+    \draw (-1.2,-2.8) -- (3.6,0.4);
 \end{tikzpicture}\end{nmtfit} \\
 \hline
 \end{tabular}
@@ -2747,43 +2762,43 @@
 \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (2,0) {\tiny $2$};
-    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[->] (-1.5,0) -- (3.5,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below] at (2,0) {\small $2$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
 \end{tikzpicture}\end{nmtfit} &
 \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[above right] at (0,1) {\tiny $1$};
+    \draw[->] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[above right] at (0,1) {\small $1$};
     \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
     \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
 \end{tikzpicture}\end{nmtfit} &
 \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below right] at (1,0) {\tiny $1$};
+    \draw[->] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below right] at (1,0) {\small $1$};
     \draw (1,0) -- (1.2,0) -- (1.2,0.2) -- (1,0.2); % прямий кут
     \draw[thick] (1,-2) -- (1,3); % x = 1
 \end{tikzpicture}\end{nmtfit} &
 \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below] at (-2,0) {\tiny $-2$};
-    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[->] (-3.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below] at (-2,0) {\small $-2$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
 \end{tikzpicture}\end{nmtfit} &
 \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (3,0) {\tiny $3$};
-    \node[left] at (0,-2) {\tiny $-2$};
+    \draw[->] (-1.5,0) -- (4,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below] at (3,0) {\small $3$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
 \end{tikzpicture}\end{nmtfit} \\
 \hline
@@ -2804,7 +2819,7 @@
 \mbox{1~--- ДБГ}\par
 \mbox{2~--- АГБ}\par
 \mbox{3~--- БАВ}\par
-\mbox{4~--- ВАВ}\par
+\mbox{4~--- ВАБ}\par
 \mbox{5~--- АДБ}\par
 \mbox{6~--- АДБ}\par
 \mbox{7~--- ВБГ}\par

@@ -1521,6 +1521,9 @@ def перемалювати_за_оригіналом(шляхи):
         повний = os.path.join(ROOT, шлях)
         t = open(повний, encoding="utf-8").read()
         t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
+        if "\\includegraphics" in t2 and "\\graphicspath" not in t2 and "\\chapterTitle{" in t2:     # рисунок-зображення з заміни/перемальовування: шлях до теки теми
+            тека = unicodedata.normalize("NFC", os.path.dirname(шлях))
+            t2 = t2.replace("\\chapterTitle{", "\\graphicspath{{./}{%s/}}\n\\chapterTitle{" % тека, 1)
         if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
     return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)] and i not in замінені] + [(i, "блок") for i in замінені if not ПЕРЕМАЛЬОВАНІ[(i, "блок")]]
 

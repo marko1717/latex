@@ -22,6 +22,39 @@
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
+% ===================== ДИЗАЙН-СИСТЕМА РИСУНКІВ (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md, scripts/дизайн_завдань.py) =====================
+\definecolor{nmtInk}{HTML}{1A1A1A}
+\definecolor{nmtGrid}{HTML}{3A3A3A}      % сітка, як у НМТ 2026: темна й тонка (0,35 pt), клітинка 0,5 см
+\definecolor{nmtBlue}{HTML}{1F6FB2}\definecolor{nmtGreen}{HTML}{2E8B57}\definecolor{nmtRed}{HTML}{C0392B}
+\definecolor{nmtOrange}{HTML}{D9822B}\definecolor{nmtViolet}{HTML}{7D4CA8}
+\definecolor{nmtFillA}{HTML}{D3E5F5}\definecolor{nmtFillB}{HTML}{D8EDD5}\definecolor{nmtFillC}{HTML}{FBE1C8}
+\definecolor{nmtFillD}{HTML}{E4E4E4}\definecolor{nmtFillE}{HTML}{E7DCF2}
+\tikzset{
+  ultra thin/.style={line width=0.2pt}, very thin/.style={line width=0.3pt}, thin/.style={line width=0.45pt},
+  semithick/.style={line width=0.6pt}, thick/.style={line width=0.75pt}, very thick/.style={line width=1.1pt},
+  ultra thick/.style={line width=1.5pt},
+  >={Stealth[length=2.3mm, width=1.7mm]},
+  every picture/.append style={line join=round, line cap=round},
+  nmt dot/.style={circle, fill=nmtInk, draw=none, inner sep=0pt, minimum size=3.6pt},
+  nmt open dot/.style={circle, fill=white, draw=nmtInk, line width=0.6pt, inner sep=0pt, minimum size=4.2pt},
+  nmt grid/.style={draw=nmtGrid, line width=0.35pt},
+  nmt curve/.style={line width=1.1pt},
+}
+% вирази: ≤ і ≥ -- похилі, як у НМТ (десяткову кому без пробілу вже дає mathastext)
+\let\leq\leqslant \let\le\leqslant \let\geq\geqslant \let\ge\geqslant
+\pgfplotsset{every axis/.append style={axis line style={line width=0.6pt}, tick style={line width=0.45pt},
+  tick label style={font=\footnotesize}, label style={font=\small}, grid style={nmtGrid, line width=0.35pt}}}
+% ===================== кінець дизайн-системи =====================
+% підпис кута біля дуги: \nmtAngleLabel{A}{B}{C}{радіус дуги, см}{підпис} -- кут AB C проти годинникової стрілки, як \pic{angle=A--B--C}.
+% Підпис ставиться на бісектрисі, найближчим краєм на 0,08 см від дуги (радіус дуги масштабується разом з рисунком, підпис -- ні),
+% тож не відлітає від кута, хоч який масштаб рисунка й хоч яка довжина підпису
+\newcommand{\nmtAngleLabel}[5]{%
+  \path let \p1=(#2), \p2=(#1), \p3=(#3), \p4=(0,0), \p5=(1,0),
+    \n1={atan2(\y2-\y1,\x2-\x1)}, \n2={atan2(\y3-\y1,\x3-\x1)},
+    \n3={mod(\n2-\n1+720,360)}, \n4={\n1+\n3/2}, \n5={\n4+180},
+    \n6={veclen(\x5-\x4,\y5-\y4)/28.45274}, \n7={(#4*\n6+0.08)*28.45274}
+  in (#2) node[anchor=\n5, inner sep=1.2pt, shift={(\n4:\n7)}] {#5};}
+
 \usepackage{xcolor,array,fancyhdr,enumitem,multicol}
 \usepackage{colortbl,multirow,diagbox,needspace}
 \usepackage{tcolorbox}
@@ -249,6 +282,8 @@
         \item[\textbf{Д}] #5
     \end{itemize}
     \vspace{0.2cm}}
+
+\graphicspath{{./}{39. Піраміда/}}
 \setcounter{zad}{0}
 
 \chapterTitle{Піраміда}
@@ -409,24 +444,21 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
     \coordinate (A) at (0,0);
-    \coordinate (D) at (3,0);
-    \coordinate (C) at (4,1.5);
-    \coordinate (B) at (1,1.5);
-    \coordinate (S) at (2,4);
-
-    \draw[dashed] (S) -- (B);
-    \draw[dashed] (A) -- (B) -- (C);
-
-    \draw[thick] (S) -- (A) -- (D) -- (S) -- (C) -- (D);
-    \draw[thick] (A) -- (D);
-
+    \coordinate (D) at (4,0);
+    \coordinate (B) at (1,1.2);
+    \coordinate (C) at (5,1.2);
+    \coordinate (S) at (2.5,4.8);
+    \draw[thin, dashed] (S) -- (B);
+    \draw[thin, dashed] (A) -- (B) -- (C);
+    \draw[thick] (S) -- (A) -- (D) -- (C) -- (S);
+    \draw[thick] (S) -- (D);
+    \node[above] at (S) {$S$};
     \node[below left] at (A) {$A$};
     \node[below right] at (D) {$D$};
     \node[right] at (C) {$C$};
-    \node[left] at (B) {$B$};
-    \node[above] at (S) {$S$};
+    \node[below] at ($(B)+(0.05,-0.05)$) {$B$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -476,44 +508,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round, line cap=round,
-    x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}] % Налаштування осей для 3D
-
-    % Координати вершин у просторі (x, y, z)
-    % z - висота
-    \coordinate (S) at (1.5, 1.5, 4);   % Вершина
-    \coordinate (C) at (0, 0, 0);       % Задня точка (початок)
-    \coordinate (A) at (3, 0, 0);       % Ліва передня
-    \coordinate (B) at (1.5, 3.5, 0);   % Права точка
-
-    % Центр O (приблизно в площині z=0)
-    \coordinate (O) at (1.5, 1.2, 0);
-
-    % Невидимі лінії (пунктир)
-    \draw[dashed] (C) -- (A);
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C);
-
-    % Додаткові пунктири для завдання (O, B, A на площині)
-    \draw[dashed, gray] (A) -- (O) -- (B); 
-    \draw[dashed, gray] (C) -- (O);
-
-    % Видимі лінії (суцільні)
-    \draw[thick] (A) -- (B);     % Ребро основи спереду
-    \draw[thick] (S) -- (A);     % Бічне ребро
-    \draw[thick] (S) -- (B);     % Бічне ребро
-     \draw[dashed] (S) -- (O);
-
-    % Точки та підписи
-    \node[left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[above left] at (C) {$C$}; % C ззаду
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \coordinate (S) at (3.0,3.5);
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (5.3,0);
+    \coordinate (A) at (3.8,-1.25);
+    \coordinate (O) at (3.0,-0.45);
+    % видимі ребра
+    \draw[thick] (S) -- (C) -- (A) -- cycle;
+    \draw[thick] (S) -- (B) -- (A);
+    % невидимі: ребро CB і відрізок SO
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (S) -- (O);
+    \node[nmt dot] at (O) {};
     \node[above] at (S) {$S$};
-
-    \fill[black] (O) circle (1.5pt) node[below right, yshift=-2pt] {$O$};
-    \fill[black] (A) circle (1.5pt);
-    \fill[black] (B) circle (1.5pt);
-
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
+    \node[left] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -540,38 +552,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
-    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    % Координати
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0, 3.5);
-    \coordinate (M) at ($(A)!0.5!(B)$); % Середина AB
-
-    % Невидимі лінії
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (C) -- (M); % Частина площини SMC
-    \draw[dashed] (S) -- (C);
-
-    % Площина SMC (заливка)
-    \fill[headerblue!20, opacity=0.5] (S) -- (M) -- (C) -- cycle;
-
-    % Видимі лінії
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (C) -- (A);
-    \draw[thick, red!80!black] (S) -- (M); % Шукана лінія
-
-    % Точки
-    \fill (S) circle (1.5pt) node[above] {$S$};
-    \fill (A) circle (1.5pt) node[below left] {$A$};
-    \fill (B) circle (1.5pt) node[right] {$B$};
-    \fill (C) circle (1.5pt) node[left] {$C$};
-    \fill (M) circle (1.5pt) node[below right] {$M$};
-
+\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round]
+    % за оригіналом (НМТ 2023--2025, 2024): C ліворуч, A спереду внизу, B праворуч; невидимі CB і CM, SM суцільна
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (-0.86,1.0);
+    \coordinate (B) at (3.54,1.0);
+    \coordinate (S) at (0.5,3.9);
+    \coordinate (M) at ($(A)!0.5!(B)$);
+    \draw[thick] (S) -- (A) -- (B) -- cycle;
+    \draw[thick] (S) -- (C) -- (A);
+    \draw[thick] (S) -- (M);
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (C) -- (M);
+    \node[nmt dot] at (M) {};
+    \node[above] at (S) {$S$};
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
+    \node[below right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -601,41 +599,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.2, line join=round, line cap=round,
-    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    % Координати (ті самі, щоб зберегти стиль)
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0, 3.5);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round]
+    % за оригіналом (НМТ 2023--2025, 2024): C ліворуч, A спереду внизу, B праворуч; невидимі CB і CM, SM суцільна
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (-0.86,1.0);
+    \coordinate (B) at (3.54,1.0);
+    \coordinate (S) at (0.5,3.9);
     \coordinate (M) at ($(A)!0.5!(B)$);
-
-    % Невидимі
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C);
-    \draw[dashed] (C) -- (M);
-
-    % Площина
-    \fill[orange!20, opacity=0.5] (S) -- (M) -- (C) -- cycle;
-
-    % Видимі
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (C) -- (A);
+    \draw[thick] (S) -- (A) -- (B) -- cycle;
+    \draw[thick] (S) -- (C) -- (A);
     \draw[thick] (S) -- (M);
-
-    % Виділимо SC (відповідь)
-    \draw[dashed, thick, blue!80!black] (S) -- (C);
-
-    % Точки
-    \fill (S) circle (1.5pt) node[above] {$S$};
-    \fill (A) circle (1.5pt) node[below left] {$A$};
-    \fill (B) circle (1.5pt) node[right] {$B$};
-    \fill (C) circle (1.5pt) node[left] {$C$};
-    \fill (M) circle (1.5pt) node[below right] {$M$};
-
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (C) -- (M);
+    \node[nmt dot] at (M) {};
+    \node[above] at (S) {$S$};
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
+    \node[below right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -695,32 +676,17 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
-    x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (3, -1, 0);
-    \coordinate (B) at (1, 3, 0);
-    \coordinate (C) at (-2, 0, 0);
-    \coordinate (S) at (0.5, 1, 4);
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (C) -- (S); % Видимість C-S залежить від ракурсу, тут зробимо пунктир для задньої грані
-    % Але зазвичай SA, SB, SC - ребра. 
-    % Зробимо простіше: основа ABC, вершина S.
-    % Невидиме ребро зазвичай те, що ззаду (AC або BC).
-    % В даному ракурсі (C зліва ззаду, A спереду, B справа): CB невидиме.
-
-    % Перемалюємо чіткіше для відповідності скріншоту
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (S) -- (C);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
-    \draw[dashed] (C) -- (B); 
-
-    % Висота (віртуальна для розуміння)
-    \draw[dashed, gray] (S) -- (0.5, 1, 0); 
-
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    \coordinate (C) at (-1.8,0);
+    \coordinate (B) at (1.8,0);
+    \coordinate (A) at (0.45,-1.4);
+    \coordinate (S) at (0.15,2.9);
+    \draw (S) -- (A);
+    \draw (S) -- (B);
+    \draw (S) -- (C);
+    \draw (A) -- (B);
+    \draw (A) -- (C);
+    \draw[dashed, thin] (C) -- (B);
     \node[below] at (A) {$A$};
     \node[right] at (B) {$B$};
     \node[left] at (C) {$C$};
@@ -754,34 +720,22 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-    % Координати (класична проекція)
-    \coordinate (A) at (-2, -1);
-    \coordinate (B) at (1.5, -1);
-    \coordinate (C) at (2.5, 0.8);
-    \coordinate (D) at (-1, 0.8);
-    \coordinate (S) at (0.25, 3.5); % Вершина по центру
-
-    % Невидимі лінії (задні)
-    \draw[dashed] (A) -- (D);
-    \draw[dashed] (D) -- (C);
-    \draw[dashed] (S) -- (D);
-
-    % Видимі лінії
-    \draw[thick] (A) -- (B) -- (C); % Основа перед
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (S) -- (C);
-
-    % Пряма через S паралельна AB (синій пунктир)
-    \draw[thick, dashed, blue!80!black] (-1.5, 3.5) -- (2.0, 3.5);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[below right] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[left] at (D) {$D$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, line join=round]
+    % за оригіналом (НМТ 2023--2025, № 6, с. 251): A, D -- спереду, B, C -- позаду; невидимі AB, BC, SB
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (3.4,0);
+    \coordinate (B) at (1.96,1.14);
+    \coordinate (C) at (5.36,1.14);
+    \coordinate (S) at (2.68,4.04);
+    \draw[thick] (S) -- (A) -- (D) -- (C) -- cycle;
+    \draw[thick] (S) -- (D);
+    \draw[thin, dashed] (A) -- (B) -- (C);
+    \draw[thin, dashed] (S) -- (B);
     \node[above] at (S) {$S$};
+    \node[above left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -811,32 +765,23 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
-    x={(-0.5cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (3, -1, 0);
-    \coordinate (B) at (1, 3, 0);
-    \coordinate (C) at (-1, -1, 0);
-    \coordinate (O) at (1, 0.5, 0); % Проекція висоти
-    \coordinate (S) at (1, 0.5, 3.5);
-
-    \draw[dashed] (A) -- (B); % Заднє ребро
-    \draw[dashed] (S) -- (O); % Висота
-    \draw[dashed] (A) -- (O); % Допоміжні
-    \draw[dashed] (B) -- (O);
-    \draw[dashed] (C) -- (O);
-
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, line join=round]
+    % за оригіналом (НМТ 2023--2025, № 5, с. 256): C спереду, невидимі лише AB і SO; O всередині основи, SO -- висота
+    \coordinate (A) at (0,1.54);
+    \coordinate (B) at (4.66,1.54);
+    \coordinate (C) at (2.86,0);
+    \coordinate (S) at (2.26,4.58);
+    \coordinate (O) at (2.26,1.0);
+    \draw[thick] (S) -- (A) -- (C) -- (B) -- cycle;
     \draw[thick] (S) -- (C);
-    \draw[thick] (A) -- (C);
-    \draw[thick] (C) -- (B);
-
+    \draw[thin, dashed] (A) -- (B);
+    \draw[thin, dashed] (S) -- (O);
+    \node[nmt dot] at (O) {};
+    \node[above] at (S) {$S$};
     \node[left] at (A) {$A$};
     \node[right] at (B) {$B$};
     \node[below] at (C) {$C$};
-    \node[above] at (S) {$S$};
-    \fill (O) circle (1.5pt) node[below right, font=\footnotesize] {$O$};
+    \node[left=2pt] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -900,7 +845,7 @@
     \node[right] at (C) {$C$};
     \node[left] at (D) {$D$};
     \node[above] at (S) {$S$};
-    \node[below, font=\footnotesize, yshift=-2pt] at (O) {$O$};
+    \node[below, font=\normalsize, yshift=-2pt] at (O) {$O$};
 
     % Позначення прямого кута біля висоти
     \draw (O) -- ++(0, 0.25) -- ++(0.25, 0);
@@ -934,30 +879,22 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
-    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0.5, 4);
-    \coordinate (M) at ($(C)!0.5!(B)$); % Медіана на BC
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C); % Задня грань
-    \draw[dashed] (A) -- (M); % Медіана AM
-
-    \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
-
-    \node[below left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05, line join=round]
+    \coordinate (S) at (1.95,3.15);
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (4.3,0);
+    \coordinate (C) at (1.5,-1.3);
+    \coordinate (M) at ($(B)!0.5!(C)$);
+    \draw[thick] (S) -- (A) -- (C) -- (B) -- (S);
+    \draw[thick] (S) -- (C);
+    \draw[thin, dashed] (A) -- (B);
+    \draw[thin, dashed] (A) -- (M);
     \node[above] at (S) {$S$};
-    \node[right, font=\footnotesize] at (M) {$M$};
-    \fill (M) circle (1.5pt);
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[below] at (C) {$C$};
+    \node[below right] at (M) {$M$};
+    \path (M) node[nmt dot] {};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -987,34 +924,24 @@
 \begin{minipage}[t]{0.40\textwidth}
 \nopagebreak\nbvspace{-0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round, line cap=round,
-    x={(-0.6cm,-0.3cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
-
-    \coordinate (A) at (2, -1, 0);
-    \coordinate (B) at (0, 3, 0);
-    \coordinate (C) at (-1.5, 0, 0);
-    \coordinate (S) at (0, 0.5, 4);
-    \coordinate (M) at ($(A)!0.5!(B)$); % Апофема на AB
-
-    \draw[dashed] (C) -- (B);
-    \draw[dashed] (S) -- (C);
-    \draw[dashed] (C) -- (M); % Для наочності (не обов'язково)
-
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05, line join=round]
+    \coordinate (S) at (2.2,3.15);
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (4.1,0);
+    \coordinate (A) at (2.5,-1.55);
+    \coordinate (M) at ($(A)!0.5!(B)$);
+    \draw[thick] (S) -- (C) -- (A) -- (B) -- (S);
     \draw[thick] (S) -- (A);
-    \draw[thick] (S) -- (B);
-    \draw[thick] (A) -- (B);
-    \draw[thick] (A) -- (C);
     \draw[thick] (S) -- (M);
-
-    % Прямий кут
-    \draw (M) -- ++(-0.2, 0.1) -- ++(0.1, 0.2); 
-
-    \node[below left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
+    \draw[thin, dashed] (C) -- (B);
+    \draw[thin, dashed] (C) -- (M);
+    \pic[draw, angle radius=0.22cm] {right angle = S--M--B};
+    \path (M) node[nmt dot] {};
     \node[above] at (S) {$S$};
+    \node[left] at (C) {$C$};
+    \node[right] at (B) {$B$};
+    \node[below] at (A) {$A$};
     \node[below right] at (M) {$M$};
-    \fill (M) circle (1.5pt);
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -1033,25 +960,21 @@
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick, line join=round]
-    \coordinate (A) at (1.6,0);
-    \coordinate (B) at (-0.8,1.0);
-    \coordinate (C) at (1.6,1.0);
-    \coordinate (D) at (3.4,0.3);
-    \coordinate (S) at (1.1,3.2);
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    % за оригіналом (НМТ 2026, 23.05, № 5, с. 13): A -- передня ліва вершина основи, D -- передня права, B і C -- задні
+    \coordinate (A) at (1.83,0); \coordinate (D) at (5.07,0);
+    \coordinate (B) at (0,1.34); \coordinate (C) at (3.21,1.34);
+    \coordinate (S) at (2.50,4.80);
     \coordinate (M) at ($(A)!0.55!(B)$);
-    \draw (A) -- (S) -- (D) -- cycle;
-    \draw (A) -- (D);
-    \draw (S) -- (C);
-    \draw (C) -- (D);
-    \draw[dashed] (B) -- (C);
-    \draw (B) -- (S);
-    \draw (A) -- (B);
-    \fill (M) circle (1.5pt);
+    \draw[thick] (B) -- (S) -- (D) -- (A) -- cycle;
+    \draw[thick] (S) -- (A);
+    \draw[thin, dashed] (B) -- (C) -- (D);
+    \draw[thin, dashed] (S) -- (C);
+    \node[nmt dot] at (M) {};
     \node[above] at (S) {$S$};
     \node[left] at (B) {$B$};
     \node[above right] at (C) {$C$};
-    \node[below] at (A) {$A$};
+    \node[below left] at (A) {$A$};
     \node[right] at (D) {$D$};
     \node[below left] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
@@ -1067,25 +990,20 @@
 % НМТ 2026, сесія 30.05, завдання №2
 \noindent
 \begin{minipage}[c]{0.60\textwidth}
-\zadnum На рисунку зображено правильну трикутну піраміду $SABC$ з вершиною $S$. Скільки всього апофем можна провести в цій піраміді, якщо у неї $4$ грані? \nmtyear{2026}
+\zadnum На рисунку зображено правильну піраміду. Скільки всього апофем можна провести в піраміді, що має $4$ грані? \nmtyear{2026}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.38\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
-    \coordinate (S) at (1.2, 3);
-    \coordinate (A) at (1.5, 0);
-    \coordinate (B) at (3, 1);
-    \coordinate (C) at (0, 1);
-    \draw[thick] (A) -- (B) -- (S) -- cycle;
-    \draw[thick] (S) -- (A);
-    \draw[thick, dashed] (C) -- (B);
-    \draw[thick] (C) -- (A);
-    \draw[thick] (C) -- (S);
-    \node[above] at (S) {$S$};
-    \node[below] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
+\begin{nmtfit}\begin{tikzpicture}[scale=1.1, line join=round]
+    % за оригіналом (НМТ 2026, 30.05, № 2, с. 19): правильна піраміда без підписів вершин; невидиме ребро (ліва -- права вершини основи) штрихове
+    \coordinate (S) at (1.5,3.2);
+    \coordinate (A) at (1.5,0);
+    \coordinate (B) at (3,1.2);
+    \coordinate (C) at (0,1.2);
+    \draw[thick] (S) -- (A) -- (B) -- cycle;
+    \draw[thick] (S) -- (C) -- (A);
+    \draw[thin, dashed] (C) -- (B);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1238,9 +1156,9 @@
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}[scale=0.6, x={(-0.5cm,-0.4cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
     % Осі
-    \draw[-latex, gray] (0,0,0) -- (4,0,0) node[left] {$x$};
-    \draw[-latex, gray] (0,0,0) -- (0,4,0) node[right] {$y$};
-    \draw[-latex, gray] (0,0,0) -- (0,0,5) node[left] {$z$};
+    \draw[->, gray] (0,0,0) -- (4,0,0) node[left] {$x$};
+    \draw[->, gray] (0,0,0) -- (0,4,0) node[right] {$y$};
+    \draw[->, gray] (0,0,0) -- (0,0,5) node[left] {$z$};
 
     % Точки (схематично для візуалізації умов)
     \coordinate (S) at (0,0,4); % Масштабовано
@@ -1258,7 +1176,7 @@
     \node[right] at (B) {$B$};
     \node[left] at (A) {$A$};
     \node[below] at (C) {$C$};
-    \node[left, font=\tiny] at (0,0,0) {$O$};
+    \node[left, font=\normalsize] at (0,0,0) {$O$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \end{minipage}
@@ -1368,23 +1286,20 @@
 \hfill
 \begin{minipage}[c]{0.36\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick, line join=round]
-    \draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.38);
-    \draw[thick] (-1.3,0) arc (180:360:1.3 and 0.38);
-    \coordinate (CV) at (0,3);
-    \draw[thick] (CV) -- (-1.3,0);
-    \draw[thick] (CV) -- (1.3,0);
-    \draw[thick, dashed] (CV) -- (0,0);
-    \draw[<-, >=stealth, gray] (0,0) -- (1.3,0);
-    \node[below, font=\scriptsize] at (0.7,-0.05) {$R$};
-    \coordinate (A) at (3.2,-0.35);
-    \coordinate (B) at (5.6,-0.35);
-    \coordinate (C) at (4.4,0.45);
-    \coordinate (S) at (4.4,3);
-    \draw[thick] (A) -- (B) -- (S) -- cycle;
-    \draw[thick] (A) -- (S);
-    \draw[thick, dashed] (A) -- (C) -- (B);
-    \draw[thick, dashed] (C) -- (S);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.65, line join=round]
+    % правильна трикутна піраміда (ліворуч), як в оригіналі: видно дві бічні грані, пунктиром лише задня сторона основи
+    \coordinate (S) at (0,5.1);
+    \coordinate (L) at (-3.2,0);
+    \coordinate (R) at (2.85,0);
+    \coordinate (F) at (0.13,-2.2);
+    \draw[thick] (L) -- (S) -- (R) -- (F) -- cycle;
+    \draw[thick] (S) -- (F);
+    \draw[thin, dashed] (L) -- (R);
+    % конус (праворуч)
+    \coordinate (V) at (5.9,5.0);
+    \draw[thick] (3.7,-1.2) -- (V) -- (8.1,-1.2);
+    \draw[thick] (3.7,-1.2) arc (180:360:2.2 and 0.9);
+    \draw[thin, dashed] (3.7,-1.2) arc (180:0:2.2 and 0.9);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \nmtAnswerBox
@@ -1404,26 +1319,27 @@
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.65, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]
+    \path (0,-0.9);
     \coordinate (A) at (0,0);
     \coordinate (B) at (1.8,0);
-    \coordinate (C) at (2.6, 0.7);
-    \coordinate (D) at (0.8, 0.7);
-    \coordinate (A1) at (0,3.8);
-    \coordinate (B1) at (1.8,3.8);
-    \coordinate (C1) at (2.6, 4.5);
-    \coordinate (D1) at (0.8, 4.5);
+    \coordinate (C) at (2.44,0.58);
+    \coordinate (D) at (0.64,0.58);
+    \coordinate (A1) at (0,2.74);
+    \coordinate (B1) at (1.8,2.74);
+    \coordinate (C1) at (2.44,3.32);
+    \coordinate (D1) at (0.64,3.32);
     \draw (A) -- (B) -- (C) -- (C1) -- (D1) -- (A1) -- cycle;
     \draw (B) -- (B1) -- (C1);
     \draw (A1) -- (B1);
     \draw[dashed] (A) -- (D) -- (C);
     \draw[dashed] (D) -- (D1);
-    \begin{scope}[shift={(3.8,0)}]
+    \begin{scope}[shift={(2.8,0)}]
         \coordinate (P_A) at (0,0);
-        \coordinate (P_B) at (2.2,0);
-        \coordinate (P_C) at (3.2, 0.9);
-        \coordinate (P_D) at (1.0, 0.9);
-        \coordinate (P_S) at (1.6, 4.0);
+        \coordinate (P_B) at (1.93,0);
+        \coordinate (P_C) at (2.79,0.49);
+        \coordinate (P_D) at (0.86,0.49);
+        \coordinate (P_S) at (1.4,2.7);
         \draw (P_A) -- (P_B) -- (P_C) -- (P_S) -- cycle;
         \draw (P_B) -- (P_S);
         \draw[dashed] (P_A) -- (P_D) -- (P_C);
@@ -1445,7 +1361,7 @@
 \hfill
 \begin{minipage}[c]{0.48\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.748, thick, line join=round]
     % ---- Прямокутна призма (зліва) ----
     \def\dx{0.85}\def\dy{0.6}
     \coordinate (F1) at (0,0);
@@ -1500,7 +1416,7 @@
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.94, thick, line join=round]
     % циліндр
     \draw (0,3.6) ellipse (1.4 and 0.4);
     \draw[dashed] (-1.4,0) arc (180:0:1.4 and 0.4);
@@ -1533,22 +1449,20 @@
 \hfill
 \begin{minipage}[c]{0.42\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % правильна трикутна піраміда
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.8,0.6);
-    \coordinate (c) at (1.6,1.5);
-    \coordinate (ap) at (1.3,5);
-    \draw (a) -- (b) -- (ap) -- cycle;
-    \draw (a) -- (c) -- (b);
-    \draw[dashed] (a) -- (c);
-    \draw[dashed] (c) -- (ap);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.35, thick, line join=round]
+    % правильна трикутна піраміда: основа LRF, невидиме лише заднє ребро LR
+    \coordinate (L) at (0,0);
+    \coordinate (R) at (2.2,0);
+    \coordinate (F) at (1.15,-1);
+    \coordinate (P) at (1.1,2.2);
+    \draw (P) -- (L) -- (F) -- (R) -- (P);
+    \draw (P) -- (F);
+    \draw[dashed, thin] (L) -- (R);
     % конус
-    \begin{scope}[shift={(4.6,0)}]
-        \draw (0,0.5) ellipse (1.5 and 0.45);
-        \draw[dashed] (-1.5,0.5) -- (0,4.6);
-        \draw (-1.5,0.5) .. controls (-1.5,0.1) and (1.5,0.1) .. (1.5,0.5);
-        \draw (-1.5,0.5) -- (0,4.6) -- (1.5,0.5);
+    \begin{scope}[shift={(3.6,-0.67)}]
+        \draw[dashed, thin] (-0.97,0) arc (180:0:0.97 and 0.3);
+        \draw (-0.97,0) arc (180:360:0.97 and 0.3);
+        \draw (-0.97,0) -- (0,2.0) -- (0.97,0);
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -1587,7 +1501,7 @@
 \mbox{21~--- Б}\par
 \mbox{22~--- Г}\par
 \mbox{23~--- Д}\par
-\mbox{24~--- Г}\par
+\mbox{24~--- ?}\par
 \mbox{25~--- Г}\par
 \mbox{26~--- А}\par
 \mbox{27~--- А}\par
