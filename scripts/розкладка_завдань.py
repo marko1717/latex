@@ -40,6 +40,7 @@ def плоский(t):
     """зміст без розкладки й рисунків -- для перевірки інваріанта"""
     t = FIG.sub(" ", t)
     t = ДУБЛЬ_ВІДПОВІДІ.sub("", t)
+    t = re.sub(r"\\matchHead\{[^{}]*\}|\\nmtyear\{\d+\}", "", t)
     t = t.replace("\\nmtSetCell", "")
     t = re.sub(r"\\begin\{tabular\}\{\|\*\{5\}\{[^\n]*?\|\}\}", r"\\begin{tabular}", t)
     t = РОЗМІТКА.sub(" ", t)
@@ -68,6 +69,7 @@ def _слова_тв(t):
 
 
 def перевірити_зміст(до, після):
+    if len(re.findall(r"\\nmtyear\{", до)) != len(re.findall(r"\\nmtyear\{", після)): return False
     if плоский(єдині_варіанти(до)) == плоский(після) or плоский(до) == плоский(після): return True
     if _слова_тв(єдині_твердження(єдині_варіанти(до))) == _слова_тв(після): return True
     if "\\matchItem" in після and "\\matchItem" not in до: return sorted(_слова(до)) == sorted(_слова(після))      # пункти двох стовпчиків були чергувані по рядках
@@ -160,10 +162,9 @@ def _без_пунктів(b):
 
 
 def _список_відповідності(заг, ліві, праві):
-    h1 = заг[0] if заг else "Відрізок"
-    h2 = заг[1] if len(заг) > 1 else "Довжина відрізка"
-    л = "\\matchHead{%s}\n" % h1 + "\n".join("\\matchItem{%s}{%s}" % p for p in ліві)
-    п = "\\matchHead{%s}\n" % h2 + "\n".join("\\matchItem{%s}{%s}" % p for p in праві)
+    # заголовків нема -- їх додає заголовки_відповідності за формулюванням умови (не «Відрізок» для будь-чого)
+    л = ("\\matchHead{%s}\n" % заг[0] if заг else "") + "\n".join("\\matchItem{%s}{%s}" % p for p in ліві)
+    п = ("\\matchHead{%s}\n" % заг[1] if len(заг) > 1 else "") + "\n".join("\\matchItem{%s}{%s}" % p for p in праві)
     return "\\matchingLayout{\n%s\n}{\n%s\n}{\n\\matchingGrid\n}" % (л, п)
 
 
@@ -214,13 +215,14 @@ def без_порожніх_рисунків(b):
 
 def нормалізувати(b, аспект=None):
     """нерухома точка _раз: результат нормалізації сам є нормалізованим (збірка не залежить від кількості проходів)"""
+    b = самотня_міністорінка(рік_до_умови(b))
     b = таблиця_рисунків(без_порожніх_рисунків(єдині_варіанти(єдині_твердження(ДУБЛЬ_ВІДПОВІДІ.sub("", b)))))
     n, v = _раз(b, аспект)
     for _ in range(3):
         n2, v2 = _раз(n, аспект)
         if n2 == n: break
         n, v = n2, v2 or v
-    n2 = єдині_варіанти(n)
+    n2 = заголовки_відповідності(єдині_варіанти(n))
     if n2 != n: n, v = n2, v
     return n, v
 
@@ -408,11 +410,11 @@ def _чистий(t):
 
 def _варіанти_мітки(b):
     """\\textbf{А} ... \\textbf{Б} ... \\textbf{Д} ... підряд (вертикально, в рядок через \\qquad, у flushleft) -> \\nmtOptions"""
-    for m in re.finditer(r"\\textbf\{А\}", b):
+    for m in re.finditer(r"\\textbf\{А\)?\}", b):
         поч = m.start(); к = m.end(); частини = []; мітки = [(m.start(), m.end())]
         ok = True
         for л in ЛІТЕРИ[1:]:
-            n = re.compile(r"\\textbf\{%s\}" % л).search(b, к)
+            n = re.compile(r"\\textbf\{%s\)?\}" % л).search(b, к)
             if not n: ok = False; break
             частини.append(b[к:n.start()]); к = n.end(); мітки.append((n.start(), n.end()))
         if not ok: continue
@@ -420,7 +422,7 @@ def _варіанти_мітки(b):
         кінець = кін.start() if кін else len(b)
         частини.append(b[к:кінець])
         частини = [_чистий(x) for x in частини]
-        if any(not x or re.search(r"\\(?:begin|end)\{(?:minipage|center|tikzpicture|tabular|flushleft)\}|\\textbf\{[АБВГД]\}|&|\\hline|nmtfit|\\rule|\\includegraphics", x) for x in частини): continue
+        if any(not x or re.search(r"\\(?:begin|end)\{(?:minipage|center|tikzpicture|tabular|flushleft)\}|\\textbf\{[АБВГД]\)?\}|&|\\hline|nmtfit|\\rule|\\includegraphics", x) for x in частини): continue
         if any(len(x) > 400 for x in частини): continue
         # обгортка flushleft навколо
         поч2, кін2 = поч, кінець
@@ -598,3 +600,75 @@ def єдині_твердження(b):
     n = _твердження_enumerate(b)
     if n == b: n = _твердження_мітки(b)
     return n if _збалансовані_середовища(n) or not _збалансовані_середовища(b) else b
+
+
+# ------------------------------------------------------------------ дрібні нормалізації (рік, самотня міністорінка, заголовки відповідності)
+def рік_до_умови(b):
+    """\nmtyear{...}, що опинився всередині списку відповідності (під першим стовпчиком), -- у кінець умови"""
+    m = re.search(r"\\matchingLayout\s*\{", b)
+    if not m: return b
+    к = _збалансовано(b, m.end() - 1)
+    # увесь \matchingLayout{..}{..}{..}: три групи підряд
+    j = m.end() - 1; кінці = []
+    for _ in range(3):
+        mm = re.compile(r"\s*\{").match(b, j)
+        if not mm: return b
+        кк = _збалансовано(b, mm.end() - 1)
+        if кк < 0: return b
+        кінці.append(кк); j = кк + 1
+    список = b[m.start():j]
+    ys = re.findall(r"\\nmtyear\{\d{4}\}", список)
+    до_списку = b[:m.start()]
+    if not ys or re.search(r"\\nmtyear\{\d{4}\}", до_списку): return b
+    без = re.sub(r"[ \t]*\\nmtyear\{\d{4}\}", "", список)
+    # у кінець умови: перед першим маркером кінця умови, якщо його знайдено, інакше перед списком
+    k = КІНЕЦЬ_УМОВИ.search(до_списку)
+    місце = до_списку.rstrip()
+    # умова закінчується там, де починаються службові рядки (\nmtnobreak, \nopagebreak, \nbvspace) перед списком
+    остання = re.search(r"(?:\s|\\nmtnobreak|\\nopagebreak|\\noindent|\\par\b|\\nbvspace\{[^}]*\})*$", місце)
+    місце = місце[:остання.start()]
+    return місце + " " + ys[0] + "\n" + до_списку[len(місце):].lstrip("\n") + без + b[j:]
+
+
+def самотня_міністорінка(b):
+    """\zadnum \begin{minipage}[t]{0.55\textwidth} умова \end{minipage} без рисунка поруч -- умова на всю ширину"""
+    m = re.search(r"\\zadnum\s*\\begin\{minipage\}(?:\[[^\]]*\])?\{[\d.]+\\textwidth\}", b)
+    if not m: return b
+    к = b.find("\\end{minipage}", m.end())
+    if к < 0 or "\\begin{minipage}" in b[m.end():к]: return b
+    після = re.match(r"\s*(?:%[^\n]*\n\s*)*", b[к + len("\\end{minipage}"):]).end() + к + len("\\end{minipage}")
+    if re.match(r"\\hfill|\\begin\{minipage\}", b[після:]): return b      # поруч є ще колонка -- не самотня
+    умова = b[m.end():к].strip()
+    return b[:m.start()] + "\\zadnum " + умова + b[к + len("\\end{minipage}"):]
+
+
+ЗАГОЛОВКИ_ЗА_УМОВОЮ = [
+    (r"відрізк\w*[^.]*довжин", ("Відрізок", "Довжина відрізка")),
+    (r"початк\w+ речення[^.]*закінчен", ("Початок речення", "Закінчення речення")),
+    (r"фігур\w*[^.]*площ", ("Фігура", "Площа фігури")),
+    (r"кут\w*[^.]*градусн", ("Кут", "Градусна міра")),
+    (r"величин\w*[^.]*значен", ("Величина", "Значення")),
+    (r"функці\w*[^.]*(?:властивіст|твердж)", ("Функція", "Властивість функції")),
+]
+
+
+def заголовки_відповідності(b):
+    """відповідність без \matchHead: заголовки стовпчиків за формулюванням умови (як в оригіналах НМТ)"""
+    m = re.search(r"\\matchingLayout\s*\{", b)
+    if not m or "\\matchHead" in b: return b
+    перед = re.sub(r"\s+", " ", b[:m.start()].split("\\zadnum")[-1].split("\\zadtask")[-1])
+    пара = next((h for р, h in ЗАГОЛОВКИ_ЗА_УМОВОЮ if re.search(р, перед, re.I)), None)
+    if not пара: return b
+    j = m.end() - 1; поз = []
+    for _ in range(3):
+        mm = re.compile(r"\s*\{").match(b, j)
+        if not mm: return b
+        кк = _збалансовано(b, mm.end() - 1)
+        if кк < 0: return b
+        поз.append(mm.end()); j = кк + 1
+    # заголовок -- на початку першої й другої групи
+    вихід, п = [], 0
+    for i, (поч, h) in enumerate(zip(поз[:2], пара)):
+        вихід.append(b[п:поч]); вихід.append("\n\\matchHead{%s}" % h); п = поч
+    вихід.append(b[п:])
+    return "".join(вихід)

@@ -121,7 +121,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
 @@ДИЗАЙН@@\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
+\usepackage{colortbl,multirow,diagbox,needspace,etoolbox}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
@@ -275,6 +275,9 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% рівний проміжок між завданнями: перед кожним завданням (samepage) -- не менше 0,4 см понад те, що лишив кінець попереднього (таблиця, поле відповіді, сітка);
+% проміжок між завданнями помітно більший за проміжки всередині завдання (умова -- рисунок -- варіанти ≈ 0,2--0,35 см), тож завдання не «липнуть» до попередньої таблиці
+\AtBeginEnvironment{samepage}{\par\addvspace{0.4cm}}
 % --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
 % мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
 % вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
@@ -308,7 +311,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
     \begin{minipage}[t]{\nmtGridW}\vspace{0pt}\raggedleft #3\end{minipage}\par}
 % твердження I--III («Які з наведених тверджень правильні?»): мітка в колонці сталої ширини, текст у parbox -- рядок не виходить за поле, продовження під текстом
 \newlength{\nmtStmtLab}\setlength{\nmtStmtLab}{2.1em}
-\newcommand{\nmtStmt}[2]{\par\noindent\makebox[\nmtStmtLab][l]{\textbf{#1}}\parbox[t]{\dimexpr\linewidth-\nmtStmtLab\relax}{\raggedright #2}\par\nopagebreak\vspace{0.1cm}}
+\newcommand{\nmtStmt}[2]{\par\nopagebreak\noindent\makebox[\nmtStmtLab][l]{\textbf{#1}}\parbox[t]{\dimexpr\linewidth-\nmtStmtLab\relax}{\raggedright #2}\par\nopagebreak\vspace{0.1cm}}
 % варіанти відповіді п'ять А--Д: кожен вміщується в клітинку одним рядком -- рядок-таблиця (\nmtAnswerRow; високі формули -- \nmtAnswerRowTall), інакше
 % (запис довелося б переносити всередині клітинки) -- вертикальний список у стилі пунктів відповідності, варіант з нового рядка; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
 \newsavebox{\nmtOptBox}\newlength{\nmtOptMaxH}\newif\ifnmtOptFit
