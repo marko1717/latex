@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 33}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -201,44 +24,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 33. Похідна}
 \noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 43 (НМТ \mbox{2023~--- 11}, \mbox{2024~--- 12}, \mbox{2025~--- 10}, \mbox{2026~--- 10}); \mbox{тестових~--- 15}; \mbox{на відповідність~--- 3}; \mbox{з короткою відповіддю~--- 25}.}\par\vspace{0.2cm}
@@ -246,132 +32,68 @@
 \typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На рисунку зображено графік квадратичної функції. Укажіть точку локального екстремуму цієї функції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік квадратичної функції. Укажіть точку локального екстремуму цієї функції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        % Жорстка фіксація розміру клітинки: 1 од = 0.7 см
-        x=0.7cm, y=0.7cm,
-        axis lines=middle,
-        xmin=-2.5, xmax=3.5,
-        ymin=-2.5, ymax=5.5,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        % Сітка сіра, тонка
-        grid style={line width=.2pt, draw=gray!40},
-        % Тіки (поділки) кожну одиницю
-        xtick={-5,-4,...,5},
-        ytick={-5,-4,...,6},
-        ticklabel style={font=\footnotesize},
-        % Прибираємо зайві підписи на осях, щоб не нагромаджувати
-        xticklabels={,,0,1,,,,}, % показуємо лише 0 і 1
-        yticklabels={,,1,,,,,,}, % показуємо лише 1
-        extra x ticks={0,1},
-        extra y ticks={1},
-        extra tick style={grid=major},
-        clip=false
-    ]
-        % Парабола, вершина (1, 4), проходить через (-1,0) і (3,0)
-        \addplot[thick, smooth, domain=-1.2:3.2, samples=50] {-(x-1)^2 + 4};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.51x5.04 S
 
-        % Підписи 0 і 1 вручну, якщо автоматичні не підходять
-        \node[below left] at (axis cs:0,0) {0};
-        \node[below] at (axis cs:1,0) {1};
-        \node[left] at (axis cs:0,1) {1};
-    \end{axis}
+    \draw[nmt grid, step=1] (-3,-3) grid (5,6);
+    \node[below left, fill=white, inner sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt] at (1,0) {$1$};
+    \node[right, fill=white, inner sep=1pt] at (0,1) {$1$};
+    \draw[->, thick] (-3,0) -- (5.5,0) node[below] {$x$};
+    \draw[->, thick] (0,-3) -- (0,6.5) node[left] {$y$};
+    \draw[nmt curve, domain=-1.62:3.62, samples=60] plot (\x, {4-(\x-1)*(\x-1)});
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$x_0=0$}{$x_0=-1$}{$x_0=4$}{$x_0=1$}{$x_0=3$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = \dfrac{x^2 - 5}{3x}$. \nmtyear{2023}
-
-\nmtnobreak
-\answerListVertical
-{$f'(x)=\dfrac{x^2}{6}-\dfrac{5}{3}\ln|x|$}
-{$f'(x)=\dfrac{x^2-5}{3x^2}$}
-{$f'(x)=\dfrac{x^2+5}{9x^2}$}
-{$f'(x)=\dfrac{x^2+5}{3x^2}$}
-{$f'(x)=\dfrac{2x}{9}$}
+\nmtOptions{$f'(x)=\dfrac{x^2}{6}-\dfrac{5}{3}\ln|x|$}{$f'(x)=\dfrac{x^2-5}{3x^2}$}{$f'(x)=\dfrac{x^2+5}{9x^2}$}{$f'(x)=\dfrac{x^2+5}{3x^2}$}{$f'(x)=\dfrac{2x}{9}$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального максимуму цієї функції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального максимуму цієї функції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        % Жорстка фіксація: 1 клітинка = 0.5 см (щоб влізло 10 клітинок по ширині)
-        x=0.5cm, y=0.5cm,
-        axis lines=middle,
-        xmin=-6, xmax=6,
-        ymin=-3, ymax=6,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        % Ставимо тіки на кожному цілому числі
-        xtick={-6,-5,...,6},
-        ytick={-3,-2,...,6},
-        ticklabel style={font=\footnotesize},
-        % Підписуємо тільки потрібні числа як на фото
-        xticklabels={,-5,,,,,0,1,,,,5,},
-        yticklabels={,,,0,1,,,,,}, 
-        clip=false
-    ]
-        % Плавна крива
-        \addplot[thick, smooth, tension=0.55] coordinates {
-            (-5, -2.5) 
-            (-3.5, 2.5)
-            (-2, 4.8)   % Максимум
-            (-0.5, 2.5)
-            (1, 1)      % Мінімум
-            (3, 3)
-            (5, 5)
-        };
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.03x6.29 S
 
-        % Жирні точки на краях
-        \addplot[only marks, mark=*] coordinates {(-5,-2.5) (5, 5)};
-
-        % Додаткові підписи, якщо треба
-        \node[below left] at (axis cs:0,0) {0};
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:1, 3.5) {$y=f(x)$};
-    \end{axis}
+    \draw[nmt grid, step=1] (-6,-4) grid (6,8);
+    \draw[->, thick] (-6,0) -- (6,0) node[below left] {$x$};
+    \draw[->, thick] (0,-4) -- (0,8) node[left] {$y$};
+    \draw[thin] (-5,0.12) -- (-5,-0.12); \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (5,0.12) -- (5,-0.12); \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (-5,0) {$-5$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (5,0) {$5$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] (-5,-3) .. controls (-4.72,-2.64) and (-4.33,-1.73) .. (-4,0) .. controls (-3.33,3.47) and (-2.67,6) .. (-2,6) .. controls (-1.33,6) and (-0.67,4.83) .. (0,2.7) .. controls (0.33,1.63) and (0.67,1) .. (1,1) .. controls (1.6,1) and (2.33,2) .. (3,3) .. controls (3.67,4) and (4.2,4.76) .. (5,7);
+    \node[nmt dot] at (-5,-3) {};
+    \node[nmt dot] at (5,7) {};
+    \node[fill=white, inner sep=1.5pt] at (1.6,4.1) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$-2; 1$}{$6$}{$-2$}{$5$}{$7$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 3x^2 + \dfrac{2}{x^2} + 4$. \nmtyear{2023}
-
-\nmtnobreak
-\answerListVertical
-{$f'(x)=x^3-\dfrac{1}{x}$}
-{$f'(x)=6x+\dfrac{1}{x}+4$}
-{$f'(x)=6x+\dfrac{2}{x^3}$}
-{$f'(x)=6x-\dfrac{4}{x^3}$}
-{$f'(x)=x^3-\dfrac{1}{x}+4x$}
+\nmtOptions{$f'(x)=x^3-\dfrac{1}{x}$}{$f'(x)=6x+\dfrac{1}{x}+4$}{$f'(x)=6x+\dfrac{2}{x^3}$}{$f'(x)=6x-\dfrac{4}{x^3}$}{$f'(x)=x^3-\dfrac{1}{x}+4x$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -385,55 +107,34 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального \textbf{міні}муму цієї функції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть усі точки локального \textbf{міні}муму цієї функції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        % Жорстка фіксація масштабу (як у завданні 7)
-        x=0.5cm, y=0.5cm,
-        axis lines=middle,
-        xmin=-6, xmax=6,
-        ymin=-4, ymax=7,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        % Тіки (поділки)
-        xtick={-6,-5,...,6},
-        ytick={-4,-3,...,7},
-        ticklabel style={font=\footnotesize},
-        % Підписи лише для ключових точок (-5, 0, 1, 5, 1)
-        xticklabels={,-5,,,,,0,1,,,,5,},
-        yticklabels={,,,0,1,,,,,,},
-        clip=false
-    ]
-        % Плавна крива: мінімум у точці (1; 1)
-        \addplot[thick, smooth, tension=0.6] coordinates {
-            (-5, -3) 
-            (-3.5, 2)
-            (-2, 5)   % Локальний максимум
-            (-0.5, 3)
-            (1, 1)    % Локальний мінімум
-            (3, 3)
-            (5, 6)
-        };
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.44x6.44 S
 
-        % Жирні точки на краях
-        \addplot[only marks, mark=*] coordinates {(-5,-3) (5, 6)};
-
-        % Підпис функції
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:1.5, 4) {$y=f(x)$};
-    \end{axis}
+    \draw[nmt grid, step=1] (-6,-4) grid (6,8);
+    \draw[->, thick] (-6,0) -- (6.3,0) node[below] {$x$};
+    \draw[->, thick] (0,-4) -- (0,8.3) node[left] {$y$};
+    \draw[thick] (-5,-0.15) -- (-5,0.15);
+    \draw[thick] (1,-0.15) -- (1,0.15);
+    \draw[thick] (5,-0.15) -- (5,0.15);
+    \draw[thick] (-0.15,1) -- (0.15,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (-5,0) {$-5$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (5,0) {$5$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] (-5,-3) .. controls (-3.936,-2.753) and (-3.69,6) .. (-2,6) .. controls (-1.249,6) and (-0.738,5.471) .. (0,4) .. controls (0.574,2.856) and (1.283,1) .. (2,1) .. controls (2.484,1) and (3.869,2.868) .. (5,7);
+    \node[nmt dot] at (-5,-3) {};
+    \node[nmt dot] at (5,7) {};
+    \node[fill=white, inner sep=1.5pt] at (2.0,4.4) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$1$}{$-2; 2$}{$-3$}{$2$}{$4$}
 
 \nmtnobreak
@@ -443,19 +144,13 @@
 
 \begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = x + \dfrac{1}{x^2}$. \nmtyear{2024}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical{$f'(x)=1+\dfrac{1}{2x}$}{$f'(x)=x-\dfrac{2}{x^2}$}{$f'(x)=1+\dfrac{2}{x^2}$}{$f'(x)=\dfrac{x^2}{2}-\dfrac{1}{x}$}{$f'(x)=1-\dfrac{2}{x^3}$}
+\nmtOptions{$f'(x)=1+\dfrac{1}{2x}$}{$f'(x)=x-\dfrac{2}{x^2}$}{$f'(x)=1+\dfrac{2}{x^2}$}{$f'(x)=\dfrac{x^2}{2}-\dfrac{1}{x}$}{$f'(x)=1-\dfrac{2}{x^3}$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 6\sqrt{x} - 8$. \nmtyear{2024}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical{$f'(x)=4\sqrt{x^3}-8x$}{$f'(x)=3\sqrt{x}-8$}{$f'(x)=\dfrac{3}{\sqrt{x}}$}{$f'(x)=3\sqrt{x}$}{$f'(x)=\dfrac{3}{\sqrt{x}}-8x$}
+\nmtOptions{$f'(x)=4\sqrt{x^3}-8x$}{$f'(x)=3\sqrt{x}-8$}{$f'(x)=\dfrac{3}{\sqrt{x}}$}{$f'(x)=3\sqrt{x}$}{$f'(x)=\dfrac{3}{\sqrt{x}}-8x$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -469,111 +164,69 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Скільки всього точок екстремуму має ця функція на проміжку $[-5; 5]$? \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Скільки всього точок екстремуму має ця функція на проміжку $[-5; 5]$? \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        % Фіксований масштаб: 1 клітинка = 0.5 см
-        x=0.5cm, y=0.5cm,
-        axis lines=middle,
-        xmin=-6, xmax=6,
-        ymin=-2, ymax=6,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        xtick={-6,-5,...,6},
-        ytick={-2,-1,...,6},
-        ticklabel style={font=\footnotesize},
-        % Підписи лише для ключових точок
-        xticklabels={,-5,,,,,0,1,,,,5,},
-        yticklabels={,,,0,1,,,,,}, 
-        clip=false
-    ]
-        % Плавна крива через точки
-        \addplot[thick, smooth, tension=0.6] coordinates {
-            (-5, -1.5) 
-            (-3.5, 3)
-            (-2, 4.5)   % Максимум
-            (-0.5, 3)
-            (1, 1)      % Мінімум
-            (3, 3)
-            (5, 5)
-        };
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.44x6.44 S
 
-        % Жирні точки на кінцях
-        \addplot[only marks, mark=*] coordinates {(-5,-1.5) (5, 5)};
-
-        % Підпис функції
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:1.5, 4.5) {$y=f(x)$};
-    \end{axis}
+    \draw[nmt grid, step=1] (-6,-4) grid (6,8);
+    \draw[->, thick] (-6,0) -- (6.3,0) node[below] {$x$};
+    \draw[->, thick] (0,-4) -- (0,8.3) node[left] {$y$};
+    \draw[thick] (-5,-0.15) -- (-5,0.15);
+    \draw[thick] (1,-0.15) -- (1,0.15);
+    \draw[thick] (5,-0.15) -- (5,0.15);
+    \draw[thick] (-0.15,1) -- (0.15,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (-5,0) {$-5$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (5,0) {$5$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] (-5,-3) .. controls (-3.673,-0.223) and (-2.993,6) .. (-2,6) .. controls (-1.395,6) and (-0.964,5.996) .. (0,3) .. controls (0.251,2.22) and (0.76,1) .. (1,1) .. controls (1.835,1) and (3.478,3.588) .. (5,7);
+    \node[nmt dot] at (-5,-3) {};
+    \node[nmt dot] at (5,7) {};
+    \node[fill=white, inner sep=1.5pt] at (2.2,6.3) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$5$}{$4$}{$3$}{$1$}{$2$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Знайдіть похідну функції $f(x) = 2 + \dfrac{3}{x}$. \nmtyear{2025}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical{$f'(x)=-\dfrac{3}{x^2}$}{$f'(x)=3$}{$f'(x)=3\ln|x|$}{$f'(x)=2x+3\ln|x|$}{$f'(x)=\dfrac{3}{x^2}$}
+\nmtOptions{$f'(x)=-\dfrac{3}{x^2}$}{$f'(x)=3$}{$f'(x)=3\ln|x|$}{$f'(x)=2x+3\ln|x|$}{$f'(x)=\dfrac{3}{x^2}$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть абсцису $x_0$ точки, у якій дотична до графіка функції, паралельна до осі $x$. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$. Укажіть абсцису $x_0$ точки, у якій дотична до графіка функції, паралельна до осі $x$. \nmtyear{2025}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.5cm, y=0.5cm,
-        axis lines=middle,
-        xmin=-6, xmax=6,
-        ymin=-2, ymax=6,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        xtick={-6,-5,...,6},
-        ytick={-2,-1,...,6},
-        ticklabel style={font=\footnotesize},
-        xticklabels={,-5,,,,,0,1,,,,5,},
-        yticklabels={,,,0,1,,,,,}, 
-        clip=false
-    ]
-        % Плавна крива з мінімумом в точці (1; 1)
-        \addplot[thick, smooth, tension=0.6] coordinates {
-            (-5, -1.5) 
-            (-3.5, 2.5)
-            (-2, 4.2)   % Максимум
-            (-0.5, 2.5)
-            (1, 1)      % Мінімум (дотична паралельна Ox)
-            (3, 3)
-            (5, 5.5)
-        };
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick]%@N 6.82x6.74 C
 
-        \addplot[only marks, mark=*] coordinates {(-5,-1.5) (5, 5.5)};
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:1.5, 4.5) {$y=f(x)$};
-    \end{axis}
+    \draw[nmt grid, step=1] (-6,-4) grid (6,8);
+    \draw[->] (-6.3,0) -- (6.3,0) node[right] {$x$};
+    \draw[->] (0,-4) -- (0,8.3) node[above] {$y$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (-5,0) {$-5$}; \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$}; \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (5,0) {$5$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] (-5,-3)
+        .. controls (-4.667,-2.167) and (-4.333,-1.143) .. (-4,0)
+        .. controls (-3.667,1.143) and (-3.333,3.467) .. (-3,4)
+        .. controls (-2.667,4.533) and (-2.333,5) .. (-2,5)
+        .. controls (-1.333,5) and (-0.667,3.667) .. (0,3)
+        .. controls (0.333,2.667) and (0.667,2) .. (1,2)
+        .. controls (2,2) and (3,3.3) .. (4,5)
+        .. controls (4.333,5.567) and (4.667,6.25) .. (5,7);
+    \node[nmt dot] at (-5,-3) {};
+    \node[nmt dot] at (5,7) {};
+    \node[right, fill=white, inner sep=1.5pt] at (0.5,6.7) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$-3$}{$7$}{$1$}{$3$}{$-1$}
 \par\penalty-20
 \end{samepage}
@@ -605,13 +258,32 @@
 \typeTitle{Завдання на встановлення відповідності}
 
 \begin{samepage}
-\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
 \noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 5]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.51x5.04 S
+
+    \draw[nmt grid, step=1] (-5,-4) grid (7,5);
+    \draw[->, thick] (-5,0) -- (7.5,0) node[below] {$x$};
+    \draw[->, thick] (0,-4) -- (0,5.5) node[left] {$y$};
+    \node[below left, xshift=-3pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (-4,0) {$-4$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (5,0) {$5$};
+    \node[right, xshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] (-4,-3) .. controls (-1.95,-2.15) and (-0.556,1.635) .. (-0.025,2.522)
+        .. controls (0.505,3.407) and (1.507,3.983) .. (2.554,4.009)
+        .. controls (3.602,4.036) and (4.81,2.578) .. (5,2);
+    \node[nmt dot] at (-4,-3) {};
+    \node[nmt dot] at (5,2) {};
+    \node[fill=white, inner sep=1.5pt] at (5.4,4.3) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Нуль функції належить проміжку}
@@ -631,13 +303,30 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
 \noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 4]$. Установіть відповідність між початком речення \mbox{(1--3)} та його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.01x4.54 S
+
+    \draw[nmt grid, step=1] (-5,-4) grid (6,4);
+    \node[below right, fill=white, inner sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt] at (-4,0) {$-4$};
+    \node[below, fill=white, inner sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt] at (4,0) {$4$};
+    \node[left, fill=white, inner sep=1pt] at (0,1) {$1$};
+    \draw[->, thick] (-5,0) -- (6.5,0) node[below] {$x$};
+    \draw[->, thick] (0,-4) -- (0,4.5) node[left] {$y$};
+    \draw[nmt curve] (-4,-3) .. controls (-3.667,-2.973) and (-3.333,-2.94) .. (-3,-2.85) .. controls (-2.667,-2.76) and (-2.333,-2.623) .. (-2,-2.41) .. controls (-1.667,-2.197) and (-1.333,-1.897) .. (-1,-1.5) .. controls (-0.667,-1.103) and (-0.333,-0.62) .. (0,0) .. controls (0.333,0.62) and (0.667,1.123) .. (1,1.51) .. controls (1.333,1.897) and (1.667,2.207) .. (2,2.48) .. controls (2.333,2.753) and (2.667,3) .. (3,3) .. controls (3.167,3) and (3.333,2.925) .. (3.5,2.64) .. controls (3.6,2.469) and (3.7,2.225) .. (3.8,1.86) .. controls (3.867,1.617) and (3.933,1.357) .. (4,1);
+    \node[nmt dot] at (-4,-3) {};
+    \node[nmt dot] at (4,1) {};
+    \node[fill=white, inner sep=1.5pt] at (-2.7,2.0) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Найменше значення функції $y=f(x)$}
@@ -659,28 +348,32 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №17 --- також у темі: Функція та її властивості
-\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку \mbox{(1--3)} речення доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick]
-    \draw[step=1cm, gray!40, thin] (-3,-4) grid (5,6);
-    \draw[->] (-3.5,0) -- (5.5,0) node[right] {$x$};
-    \draw[->] (0,-4.5) -- (0,6.5) node[above] {$y$};
-    \node[below left, font=\small] at (0,0) {$0$};
-    \node[below right, font=\small] at (1,0) {$1$};
-    \node[above left, font=\small] at (0,1) {$1$};
-    \node[left, font=\small] at (0,5) {$5$};
-    \node[below, font=\small] at (-2,0) {$-2$};
-    \node[below, font=\small] at (4,0) {$4$};
-    \node[right, font=\small] at (0.15,-3) {$-3$};
-    \draw[magenta!80!black, thick, smooth] plot coordinates {(-2,-3) (-1.3,0.3) (-0.6,1.7) (0,2) (0.7,1.5) (1.4,1.1) (2,1) (2.7,1.6) (3.3,3) (4,5)};
-    \fill (-2,-3) circle (3pt);
-    \fill (4,5) circle (3pt);
-    \node[right, font=\small, fill=white, inner sep=1.5pt] at (1.7,3.6) {$y=f(x)$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\nbvspace{0.2cm}
 \noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $[-2;\, 4]$. Для будь-якого значення $x$ із проміжку $(-2;\, 4)$ існує похідна $f'(x)$. До кожного початку \mbox{(1--3)} речення доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.01x5.54 S
+
+    \draw[nmt grid, step=1] (-3,-4) grid (6,6);
+    \node[below left, fill=white, inner sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt] at (-2,0) {$-2$};
+    \node[below, fill=white, inner sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt] at (4,0) {$4$};
+    \node[right, fill=white, inner sep=1pt] at (0,5) {$5$};
+    \node[right, fill=white, inner sep=1pt] at (0,1) {$1$};
+    \node[right, fill=white, inner sep=1pt] at (0,-3) {$-3$};
+    \draw[->, thick] (-3,0) -- (6.5,0) node[below] {$x$};
+    \draw[->, thick] (0,-4) -- (0,6.5) node[left] {$y$};
+    \draw[nmt curve] (-2,-3) .. controls (-1.667,-1.79) and (-1.333,-0.823) .. (-1,0) .. controls (-0.667,0.823) and (-0.333,1.467) .. (0,2) .. controls (0.333,2.533) and (0.667,3) .. (1,3) .. controls (1.167,3) and (1.333,2.732) .. (1.5,2.03) .. controls (1.667,1.328) and (1.833,1) .. (2,1) .. controls (2.167,1) and (2.333,1.137) .. (2.5,1.35) .. controls (2.667,1.563) and (2.833,1.818) .. (3,2.13) .. controls (3.167,2.442) and (3.333,2.817) .. (3.5,3.29) .. controls (3.667,3.763) and (3.833,4.297) .. (4,5);
+    \node[nmt dot] at (-2,-3) {};
+    \node[nmt dot] at (4,5) {};
+    \node[fill=white, inner sep=1.5pt] at (4.4,1) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Найбільше значення функції $y=f(x)$ на проміжку $[-2;\, 4]$ дорівнює}
@@ -695,7 +388,6 @@
 \matchItem{Д}{$5$.}
 }{
 \matchingGrid
-}
 }
 \par\penalty-20
 \end{samepage}

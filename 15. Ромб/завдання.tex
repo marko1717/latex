@@ -1,210 +1,14 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 15}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
-
 \begin{document}
 \begingroup\setcounter{zad}{0}
-% --- макроси, перенесені зі старого файлу теми ---
-\newcommand{\matchingLayout}[3]{
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
-        \vspace{0pt} 
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}
-}
-
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -220,44 +24,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 15. Ромб}
 \noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 36 (НМТ \mbox{2023~--- 7}, \mbox{2024~--- 12}, \mbox{2025~--- 12}, \mbox{2026~--- 5}); \mbox{тестових~--- 25}; \mbox{на відповідність~--- 11}.}\par\vspace{0.2cm}
@@ -278,11 +45,11 @@
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує ромб, навколо якого можна описати коло. \\
-II. & Середини сторін будь-якого ромба лежать на вписаному в нього колі. \\
-III. & Радіус кола, вписаного в ромб, удвічі менший за його висоту. \\
-\end{tabular}
+\nmtStmt{I}{Існує ромб, навколо якого можна описати коло.}
+\nmtStmt{II}{Середини сторін будь-якого ромба лежать на вписаному в нього колі.}
+\nmtStmt{III}{Радіус кола, вписаного в ромб, удвічі менший за його висоту.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -291,16 +58,15 @@ III. & Радіус кола, вписаного в ромб, удвічі ме�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб, сторона якого дорівнює $a$, а кут між стороною та меншою діагоналлю --- $\beta$. Визначте радіус кола, вписаного в цей ромб. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб, сторона якого дорівнює $a$, а кут між стороною та меншою діагоналлю --- $\beta$. Визначте радіус кола, вписаного в цей ромб. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.597]%@N 4.23x5.63 S
 
-    % Спроба 2 (як на скріншоті)
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
         \coordinate (O) at (0,0);
         \coordinate (A) at (-3,0); % Лівий
         \coordinate (C) at (3,0);  % Правий
@@ -314,11 +80,13 @@ III. & Радіус кола, вписаного в ромб, удвічі ме�
         \draw[thick] (O) circle (2.4cm); % Приблизно
 
         % Кут бета
-        \pic [draw, pic text={\small $\beta$}, angle radius=0.8cm, angle eccentricity=1.3] {angle = B--C--A};
+        \pic[draw, angle radius=0.8cm] {angle = B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.8}{\normalsize $\beta$}
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+% Спроба 2 (як на скріншоті)
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -331,11 +99,11 @@ III. & Радіус кола, вписаного в ромб, удвічі ме�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує ромб, навколо якого можна описати коло. \\
-II. & Висота будь-якого ромба більша за його сторону. \\
-III. & Діагональ будь-якого ромба ділить його на два однакові трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Існує ромб, навколо якого можна описати коло.}
+\nmtStmt{II}{Висота будь-якого ромба більша за його сторону.}
+\nmtStmt{III}{Діагональ будь-якого ромба ділить його на два однакові трикутники.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -344,22 +112,22 @@ III. & Діагональ будь-якого ромба ділить його �
 \end{samepage}
 
 \begin{samepage}
-\zadtask{Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.582]%@N 4.39x2.80 S
 
-\nmtnobreak
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
     \draw[thick] (0,2) node[above left]{$B$} -- (4,0) node[right]{$C$} -- (0,-2) node[below]{$D$} -- (-4,0) node[left]{$A$} -- cycle;
 \end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{-0.3cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & $\angle ABD = \angle CBD$. \\
-II. & Точки $B$ і $D$ симетричні відносно прямої $AC$. \\
-III. & Висота ромба, проведена з вершини $B$ до сторони $AD$, є бісектрисою трикутника $ABD$. \\
-\end{tabular}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\nmtStmt{I}{$\angle ABD = \angle CBD$.}
+\nmtStmt{II}{Точки $B$ і $D$ симетричні відносно прямої $AC$.}
+\nmtStmt{III}{Висота ромба, проведена з вершини $B$ до сторони $AD$, є бісектрисою трикутника $ABD$.}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -372,11 +140,11 @@ III. & Висота ромба, проведена з вершини $B$ до с
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Будь-який ромб є паралелограмом. \\
-II. & Центр вписаного в будь-який ромб кола лежить на перетині бісектрис його кутів. \\
-III. & Менша діагональ будь-якого ромба ділить його на 2 правильні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Будь-який ромб є паралелограмом.}
+\nmtStmt{II}{Центр вписаного в будь-який ромб кола лежить на перетині бісектрис його кутів.}
+\nmtStmt{III}{Менша діагональ будь-якого ромба ділить його на 2 правильні трикутники.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -385,14 +153,10 @@ III. & Менша діагональ будь-якого ромба ділить
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб, більша діагональ якого утворює зі стороною кут $20^\circ$. Знайдіть градусну міру більшого кута ромба. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\zadtask{На рисунку зображено ромб, більша діагональ якого утворює зі стороною кут $20^\circ$. Знайдіть градусну міру більшого кута ромба. \nmtyear{2024}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.82]%@N 4.83x1.95 C
+
         \coordinate (A) at (-3,0);
         \coordinate (C) at (3,0);
         \coordinate (B) at (0,1.2);
@@ -402,14 +166,12 @@ III. & Менша діагональ будь-якого ромба ділить
         \draw[thick] (A) -- (C);
 
         % Кут 20 градусів
-        \pic [draw, pic text={\small $20^\circ$}, angle radius=1.2cm, angle eccentricity=1.3] {angle = D--A--C};
+        \pic[draw, angle radius=1.2cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{1.2}{\normalsize $20^\circ$}
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$120^\circ$}{$160^\circ$}{$140^\circ$}{$40^\circ$}{$80^\circ$}
 \par\penalty-20
 \end{samepage}
@@ -419,11 +181,11 @@ III. & Менша діагональ будь-якого ромба ділить
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & У будь-яку рівнобічну трапецію можна вписати коло. \\
-II. & Довжина радіуса вписаного в ромб кола дорівнює половині його висоти. \\
-III. & Навколо будь-якої рівнобічної трапеції можна описати коло. \\
-\end{tabular}
+\nmtStmt{I}{У будь-яку рівнобічну трапецію можна вписати коло.}
+\nmtStmt{II}{Довжина радіуса вписаного в ромб кола дорівнює половині його висоти.}
+\nmtStmt{III}{Навколо будь-якої рівнобічної трапеції можна описати коло.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -445,11 +207,11 @@ III. & Навколо будь-якої рівнобічної трапеції 
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує ромб, діагональ якого дорівнює сумі двох протилежних сторін. \\
-II. & Існує ромб, сума протилежних кутів якого дорівнює $20^\circ$. \\
-III. & Існує ромб, діагональ якого ділить його на два правильні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Існує ромб, діагональ якого дорівнює сумі двох протилежних сторін.}
+\nmtStmt{II}{Існує ромб, сума протилежних кутів якого дорівнює $20^\circ$.}
+\nmtStmt{III}{Існує ромб, діагональ якого ділить його на два правильні трикутники.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -462,11 +224,11 @@ III. & Існує ромб, діагональ якого ділить його 
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Діагоналі будь-якого ромба ділять його кути навпіл. \\
-II. & Діагоналі будь-якого чотирикутника точкою перетину діляться навпіл. \\
-III. & Діагоналі будь-якого квадрата перпендикулярні. \\
-\end{tabular}
+\nmtStmt{I}{Діагоналі будь-якого ромба ділять його кути навпіл.}
+\nmtStmt{II}{Діагоналі будь-якого чотирикутника точкою перетину діляться навпіл.}
+\nmtStmt{III}{Діагоналі будь-якого квадрата перпендикулярні.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -475,14 +237,15 @@ III. & Діагоналі будь-якого квадрата перпенди�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На сторонах $AD$ й $BC$ паралелограма $ABCD$ вибрано відповідно точки $K$ й $M$ так, що чотирикутник $KMCD$ є ромбом (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $AK : KD = 1 : 2$, $KC = d$, $\angle CKD = \alpha$. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На сторонах $AD$ й $BC$ паралелограма $ABCD$ вибрано відповідно точки $K$ й $M$ так, що чотирикутник $KMCD$ є ромбом (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $AK : KD = 1 : 2$, $KC = d$, $\angle CKD = \alpha$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.85]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85]%@N 6.64x3.15 S
+
         % Змінив назву змінної, щоб не перекривати символ \alpha
         \def\myAngle{25} 
         \def\sideKD{3} 
@@ -501,7 +264,8 @@ III. & Діагоналі будь-якого квадрата перпенди�
         \draw[thick] (K) -- (C) node[midway, above left, xshift=2pt] {$d$}; 
 
         % Тепер тут виведеться саме буква альфа
-        \pic [draw, pic text={\small $\alpha$}, angle radius=0.9cm, angle eccentricity=1.2] {angle = D--K--C};
+        \pic[draw, angle radius=0.9cm] {angle = D--K--C};
+    \nmtAngleLabel{D}{K}{C}{0.9}{\normalsize $\alpha$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -510,14 +274,11 @@ III. & Діагоналі будь-якого квадрата перпенди�
         \node[above] at (M) {$M$};
         \node[below] at (K) {$K$};
 
-        \fill (K) circle (1.5pt);
-        \fill (M) circle (1.5pt);
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.2cm}
+\par\nbvspace{0.2cm}
 \answerTableTall{$\dfrac{3d^2\tg\alpha}{2}$}{$\dfrac{3d^2}{4\tg\alpha}$}{$\dfrac{3d^2\tg\alpha}{4}$}{$\dfrac{3d^2}{2\tg\alpha}$}{$\dfrac{4d^2\tg\alpha}{3}$}
 \par\penalty-20
 \end{samepage}
@@ -527,11 +288,11 @@ III. & Діагоналі будь-якого квадрата перпенди�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Будь-який ромб є паралелограмом. \\
-II. & Будь-яка висота ромба, проведена з його вершини, проходить через точку перетину діагоналей ромба. \\
-III. & Діагональ ромба ділить його на два рівні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Будь-який ромб є паралелограмом.}
+\nmtStmt{II}{Будь-яка висота ромба, проведена з його вершини, проходить через точку перетину діагоналей ромба.}
+\nmtStmt{III}{Діагональ ромба ділить його на два рівні трикутники.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -540,14 +301,15 @@ III. & Діагональ ромба ділить його на два рівн�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Довжина сторони ромба $ABCD$ (див. рисунок) виражається цілим числом. Якому числу \textit{може} дорівнювати периметр ромба? \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Довжина сторони ромба $ABCD$ (див. рисунок) виражається цілим числом. Якому числу \textit{може} дорівнювати периметр ромба? \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.78]%@N 5.73x3.65 S
+
         \coordinate (A) at (-2,-1.5);
         \coordinate (B) at (0.5,2);
         \coordinate (D) at (2,-1.5);
@@ -560,30 +322,26 @@ III. & Діагональ ромба ділить його на два рівн�
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$56$}{$42$}{$82$}{$65$}{$38$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними?
-\begin{enumerate}[label=\Roman*., nosep, leftmargin=*]
-    \item $BM \perp BC$.
-    \item Трикутник $ABD$ є рівностороннім.
-    \item $\angle BAD$ удвічі менший від $\angle ADC$.
-\end{enumerate}
-\hfill \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними?
+\nmtStmt{I}{$BM \perp BC$.}
+\nmtStmt{II}{Трикутник $ABD$ є рівностороннім.}
+\nmtStmt{III}{$\angle BAD$ удвічі менший від $\angle ADC$.}
+ \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.729]%@N 4.18x2.93 S
+
         % Ромб з кутом 60 градусів (оскільки висота ділить сторону навпіл -> рівносторонній трикутник ABD)
         \coordinate (A) at (0,0);
         \coordinate (D) at (4,0);
@@ -607,11 +365,8 @@ III. & Діагональ ромба ділить його на два рівн�
         \node[below right] at (D) {$D$};
         \node[below] at (M) {$M$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{лише II та III}{лише I}{I, II та III}{лише I та III}{лише I та II}
 \par\penalty-20
 \end{samepage}
@@ -621,11 +376,11 @@ III. & Діагональ ромба ділить його на два рівн�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & У будь-якому ромбі діагоналі точкою перетину діляться навпіл. \\
-II. & Периметр ромба дорівнює сумі його діагоналей. \\
-III. & Висота ромба вдвічі більша за радіус уписаного в нього кола. \\
-\end{tabular}
+\nmtStmt{I}{У будь-якому ромбі діагоналі точкою перетину діляться навпіл.}
+\nmtStmt{II}{Периметр ромба дорівнює сумі його діагоналей.}
+\nmtStmt{III}{Висота ромба вдвічі більша за радіус уписаного в нього кола.}
+
+
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -643,49 +398,44 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У ромбі $ABCD$ проведено діагональ $AC$ (див. рисунок). $\angle CAD = 23^\circ$. Знайдіть градусну міру більшого кута ромба. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У ромбі $ABCD$ проведено діагональ $AC$ (див. рисунок). $\angle CAD = 23^\circ$. Знайдіть градусну міру більшого кута ромба. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-        % Вертикальний ромб
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.622]%@N 3.03x5.40 S
+
         \coordinate (A) at (0,-3);
         \coordinate (C) at (0,3);
-        \coordinate (B) at (-1.3,0); % для візуалізації
+        \coordinate (B) at (-1.3,0);
         \coordinate (D) at (1.3,0);
-
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
-
-        % Кут 23
-        \pic [draw, pic text={\small $23^\circ$}, angle radius=1.5cm, angle eccentricity=1.2] {angle = D--A--C};
-
+        \pic[draw, angle radius=0.9cm] {angle = D--A--C};
+        \node[right] at (0.62,-1.95) {\normalsize $23^\circ$};
         \node[below] at (A) {$A$};
         \node[left] at (B) {$B$};
         \node[above] at (C) {$C$};
         \node[right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$144^\circ$}{$136^\circ$}{$124^\circ$}{$67^\circ$}{$134^\circ$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює $18$ \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює $18$ \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.7]%@N 3.28x4.69 S
+
         % Вертикальний ромб
         \coordinate (A) at (-1.5, 0);
         \coordinate (B) at (0, 2.5);
@@ -700,24 +450,22 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[right] at (C) {$C$};
         \node[below] at (D) {$D$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$26$ \textit{см}}{$13$ \textit{см}}{$36$ \textit{см}}{$52$ \textit{см}}{$40$ \textit{см}}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Вершини прямокутника $KLMN$ лежать на сторонах ромба $ABCD$. $AK : KB = 1 : 3$. Діагональ $KM = 12$ \textit{см} прямокутника утворює зі стороною $NM$ кут $30^\circ$. Визначте площу ромба $ABCD$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Вершини прямокутника $KLMN$ лежать на сторонах ромба $ABCD$. $AK : KB = 1 : 3$. Діагональ $KM = 12$ \textit{см} прямокутника утворює зі стороною $NM$ кут $30^\circ$. Визначте площу ромба $ABCD$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.481]%@N 4.18x5.99 S
+
         \coordinate (A) at (-2.5, 0);
         \coordinate (B) at (0, 4);
         \coordinate (C) at (2.5, 0);
@@ -735,7 +483,8 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \draw[thick] (K) -- (M);
 
         % Кут 30 градусів KMN
-        \pic [draw, pic text={\scriptsize $30^\circ$}, angle radius=0.8cm, angle eccentricity=1.4] {angle = K--M--N};
+        \pic[draw, angle radius=0.8cm] {angle = K--M--N};
+    \nmtAngleLabel{K}{M}{N}{0.8}{\normalsize $30^\circ$}
 
         \node[left] at (A) {$A$};
         \node[above] at (B) {$B$};
@@ -747,100 +496,82 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[below right] at (M) {$M$};
         \node[below left] at (N) {$N$};
 
-        \fill (K) circle (2pt);
-        \fill (L) circle (2pt);
-        \fill (M) circle (2pt);
-        \fill (N) circle (2pt);
+        \path (K) node[nmt dot] {};
+        \path (L) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$384$ \textit{см}$^2$}{$96$ \textit{см}$^2$}{$96\sqrt{3}$ \textit{см}$^2$}{$81\sqrt{3}$ \textit{см}$^2$}{$81$ \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Точки $K$ і $M$ є серединами сторін $BC$ і $CD$ ромба $ABCD$ (див. рисунок). Довжина перпендикуляра, проведеного від точки $C$ до прямої $KM$, дорівнює $6$. Визначте площу ромба $ABCD$, якщо $KM = m$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Точки $K$ і $M$ є серединами сторін $BC$ і $CD$ ромба $ABCD$ (див. рисунок). Довжина перпендикуляра, проведеного від точки $C$ до прямої $KM$, дорівнює $6$. Визначте площу ромба $ABCD$, якщо $KM = m$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-        \coordinate (A) at (-2, 0);
-        \coordinate (B) at (0, 3.5);
-        \coordinate (C) at (2, 0);
-        \coordinate (D) at (0, -3.5);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.492, thick]%@N 5.27x6.64 S
 
-        % Середини
-        \coordinate (K) at ($(B)!0.5!(C)$);
-        \coordinate (M) at ($(C)!0.5!(D)$);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M);
-
-        % Перпендикуляр з C на KM. 
-        % Оскільки трикутник BCD рівнобедрений (у вертикальному ромбі), KM вертикальна лінія.
-        % Тоді перпендикуляр - це горизонтальний відрізок від C до KM.
-        \coordinate (H) at ($(K)!0.5!(M)$);
-        \draw[thick] (C) -- (H) node[midway, above] {\small $6$};
-
-        % Прямий кут
-        \draw (H) rectangle ++(0.2,0.2);
-
-        % Позначки середин
-        \draw[thick] ($(B)!0.5!(K)$) ++(60:0.15) -- ++(-120:0.3);
-        \draw[thick] ($(K)!0.5!(C)$) ++(60:0.15) -- ++(-120:0.3);
-        \draw[thick] ($(C)!0.5!(M)$) ++(60:0.15) -- ++(-120:0.3);
-        \draw[thick] ($(M)!0.5!(D)$) ++(60:0.15) -- ++(-120:0.3);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[right] at (K) {$K$};
-        \node[right] at (M) {$M$};
-        \node[left] at (H) {$m$}; % Підпис m біля відрізка KM
-
-        \fill (K) circle (2pt);
-        \fill (M) circle (2pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \coordinate (A) at (-3,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (3,0);
+    \coordinate (D) at (0,-4);
+    \coordinate (K) at ($(B)!0.5!(C)$);
+    \coordinate (M) at ($(C)!0.5!(D)$);
+    \coordinate (H) at (1.5,0);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (K) -- (M);
+    \draw (C) -- (H);
+    \pic[draw, angle radius=0.25cm] {right angle = C--H--K};
+    % K і M — середини сторін: BK=KC, CM=MD
+    \foreach \p/\q in {B/K, K/C, C/M, M/D} {
+        \path (\p) -- (\q) node[midway, sloped, inner sep=0pt] {\rule[-2.5pt]{0.75pt}{5pt}};
+    }
+    \node[above, inner sep=1pt] at (2.25,0) {$6$};
+    \node[left, inner sep=3pt] at (H) {$m$};
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[above right=-1pt] at (K) {$K$};
+    \node[below right=-1pt] at (M) {$M$};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$24m$}{$12m$}{$48m$}{$36m$}{$6m$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №3
-\noindent
-\begin{minipage}[c]{0.60\textwidth}
-\zadnum Тупий кут ромба дорівнює $140^\circ$. Знайдіть кут, який утворює \textit{більша} діагональ цього ромба з його стороною. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.38\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick]
-    \coordinate (A) at (-2.5, 0);
-    \coordinate (B) at (0, 1.2);
-    \coordinate (C) at (2.5, 0);
-    \coordinate (D) at (0, -1.2);
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick] (A) -- (C);
-    \node[left] at (A) {$A$};
-    \node[above] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[below] at (D) {$D$};
+\zadtask{Тупий кут ромба дорівнює $140^\circ$. Знайдіть кут, який утворює \textit{більша} діагональ цього ромба з його стороною. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=2.21, thick]%@N 5.96x2.19 C
+
+    \coordinate (A) at (-2.47, 0);
+    \coordinate (B) at (0, 0.9);
+    \coordinate (C) at (2.47, 0);
+    \coordinate (D) at (0, -0.9);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (C);
+    % тупий кут 140° при B
+    \pic[draw, angle radius=0.25cm] {angle = A--B--C};
+    \node at ($(B)+(0,-0.52)$) {$140^\circ$};
+    % шуканий кут при A: дві дуги
+    \pic[draw, angle radius=0.7cm] {angle = C--A--B};
+    \pic[draw, angle radius=0.8cm] {angle = C--A--B};
+    \node at ($(A)+(1.0,0.2)$) {$?$};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$20^\circ$}{$40^\circ$}{$50^\circ$}{$70^\circ$}{$110^\circ$}
 % Відповідь: А
 \ifshowsolutions\solution{Гострий кут ромба $180^\circ-140^\circ=40^\circ$. Більша діагональ сполучає вершини тупих кутів і ділить навпіл гострий кут, тому з стороною утворює $40^\circ:2=20^\circ$. Відповідь: \textbf{А} ($20^\circ$).}\fi
@@ -849,10 +580,10 @@ III. & Висота ромба вдвічі більша за радіус уп�
 
 \begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №14 --- також у темі: Коло, круг і їх елементи
-\zadtask{У ромб $ABCD$ вписано коло із центром $O$, відрізок $OK$~--- радіус цього кола, відрізок $BD$~--- діагональ ромба (див. рисунок). Визначте площу ромба $ABCD$, якщо $OK = 6$~см, а $\angle CDB = 75^\circ$. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{У ромб $ABCD$ вписано коло із центром $O$, відрізок $OK$~--- радіус цього кола, відрізок $BD$~--- діагональ ромба (див. рисунок). Визначте площу ромба $ABCD$, якщо $OK = 6$~см, а $\angle CDB = 75^\circ$. \nmtyear{2026}\par}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.1, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.41, thick, line join=round]%@N 8.58x3.18 C
+
     \coordinate (O) at (0,0);
     \coordinate (A) at (-3.36,0);
     \coordinate (C) at (3.36,0);
@@ -863,8 +594,9 @@ III. & Висота ромба вдвічі більша за радіус уп�
     \draw (B) -- (D);
     \draw (O) -- (K);
     \pic[draw, angle radius=0.18cm] {right angle = O--K--A};
-    \pic[draw, angle radius=0.32cm, pic text={$75^\circ$}, angle eccentricity=2.1, font=\scriptsize] {angle = C--D--B};
-    \fill (O) circle (1.2pt);
+    \pic[draw, angle radius=0.32cm, font=\normalsize] {angle = C--D--B};
+    \nmtAngleLabel{C}{D}{B}{0.32}{$75^\circ$}
+    \path (O) node[nmt dot] {};
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[right] at (C) {$C$};
@@ -873,7 +605,7 @@ III. & Висота ромба вдвічі більша за радіус уп�
     \node[below left] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\nopagebreak\nbvspace{0.1cm}}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$144\sqrt{3}$~см$^2$}{$144$~см$^2$}{$96\sqrt{3}$~см$^2$}{$288$~см$^2$}{$288\sqrt{3}$~см$^2$}
 \par\penalty-20
 \end{samepage}
@@ -881,20 +613,14 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №5 --- також у темі: Призма. Паралелепіпед. Куб
 \noindent
-\begin{minipage}[c]{0.58\textwidth}
-\zadnum Через вершину $C$ ромба $ABCD$ проведено перпендикуляр $PC$ до площини ромба. Діагоналі ромба перетинаються в точці $O$. Укажіть пряму, яка перпендикулярна до прямої $PO$. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.2cm}
-\par\noindent\textbf{А}\ \ $BD$
-\par\noindent\textbf{Б}\ \ $CD$
-\par\noindent\textbf{В}\ \ $BC$
-\par\noindent\textbf{Г}\ \ $PC$
-\par\noindent\textbf{Д}\ \ $AC$
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Через вершину $C$ ромба $ABCD$ проведено перпендикуляр $PC$ до площини ромба. Діагоналі ромба перетинаються в точці $O$. Укажіть пряму, яка перпендикулярна до прямої $PO$. \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \par
 \end{minipage}%
 \hfill
-\begin{minipage}[t]{0.45\textwidth}
-\nopagebreak\nbvspace{-0.3cm} % Коригування для вирівнювання графіка з текстом
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, line join=round, line cap=round]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.71, line join=round, line cap=round]%@N 6.15x5.75 S
+
     % Координати вершин
     \coordinate (A) at (0,0);
     \coordinate (D) at (4.2,0);
@@ -920,8 +646,11 @@ III. & Висота ромба вдвічі більша за радіус уп�
     % Точка перетину діагоналей
     \node[below=2pt] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
+\par
+\nmtOptions{$BD$}{$CD$}{$BC$}{$PC$}{$AC$}
+
+\nopagebreak\nbvspace{-0.3cm} % Коригування для вирівнювання графіка з текстом
 
 \nmtnobreak
 \par\nbvspace{0.3cm}
@@ -932,11 +661,9 @@ III. & Висота ромба вдвічі більша за радіус уп�
 % НМТ 2026, сесія 16.06, завдання №9
 \zadtask{Які з наведених тверджень щодо ромба є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Прямі, на яких лежать діагоналі ромба, ділять кути ромба навпіл.
-\item Точка перетину діагоналей ромба рівновіддалена від сторін ромба.
-\item Сума протилежних кутів ромба дорівнює $180^\circ$.
-\end{enumerate}
+\nmtStmt{I}{Прямі, на яких лежать діагоналі ромба, ділять кути ромба навпіл.}
+\nmtStmt{II}{Точка перетину діагоналей ромба рівновіддалена від сторін ромба.}
+\nmtStmt{III}{Сума протилежних кутів ромба дорівнює $180^\circ$.}
 \nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише I}{лише II}{лише I та II}{лише I та III}{I, II та III}
 % Відповідь: В
@@ -946,51 +673,35 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \typeTitle{Завдання на встановлення відповідності}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$ та коло, побудоване на його меншій діагоналі $BD$ так, як на діаметрі. Точка $K$ --- точка перетину цього кола з діагоналлю $AC$, $AK = 5$ \textit{см}, $KC = 35$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$ та коло, побудоване на його меншій діагоналі $BD$ так, як на діаметрі. Точка $K$ --- точка перетину цього кола з діагоналлю $AC$, $AK = 5$ \textit{см}, $KC = 35$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
-        % AC = 40. Center of Rhombus O (mid of AC) is at 20.
-        % K is at 5 from A. A=(0,0), C=(40,0). K=(5,0).
-        % O=(20,0).
-        % Circle on BD as diameter. Center is O.
-        % K is on the circle? No, K is intersection of circle and AC.
-        % So distance OK is radius. OK = 20 - 5 = 15.
-        % Radius = 15. BD = 30. BO = 15.
-        % A=(0,0), O=(20,0), B=(20,15).
-        % AB = sqrt(20^2 + 15^2) = sqrt(400+225) = sqrt(625) = 25.
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.114, thick]%@N 5.99x4.80 S
 
-        \coordinate (A) at (0,0);
-        \coordinate (C) at (40,0);
-        \coordinate (O) at (20,0);
-        \coordinate (B) at (20,15);
-        \coordinate (D) at (20,-15);
-        \coordinate (K) at (5,0); % Actually on the left side
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (40,0);
+    \coordinate (O) at (20,0);
+    \coordinate (B) at (20,15);
+    \coordinate (D) at (20,-15);
+    \coordinate (K) at (5,0);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (B) -- (D);
+    \draw (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw (A) -- (C);
+    \draw (O) circle (15);
 
-        \draw[thick] (O) circle (15cm);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[above left] at (K) {$K$};
-        \fill (K) circle (15pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[anchor=south west, inner sep=1pt] at (5.8,0.6) {$K$};
+    \node[nmt dot] at (K) {};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Величина}
 \matchItem{1}{діаметр заданого кола}
@@ -1010,14 +721,15 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У ромб, менша діагональ якого $30$ \textit{см}, вписано коло радіуса $12$ \textit{см} (див. рисунок). До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У ромб, менша діагональ якого $30$ \textit{см}, вписано коло радіуса $12$ \textit{см} (див. рисунок). До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.119]%@N 4.53x6.03 S
+
         \coordinate (A) at (-15,0); % Половина діагоналі
         \coordinate (C) at (15,0);
         \coordinate (B) at (0,20); % Знайдено з пропорцій (12, 15, 20)
@@ -1030,13 +742,8 @@ III. & Висота ромба вдвічі більша за радіус уп�
         % Діагоналі (тонкі, як на рисунку немає, але для розуміння центру)
         %\draw[gray, thin] (A)--(C); \draw[gray, thin] (B)--(D);
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Величина}
 \matchItem{1}{висота ромба}
@@ -1056,14 +763,15 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Ромб $ABCD$ та коло із центром у точці $O$, довжина якого $12\pi$ \textit{см}, лежать в одній площині (див. рисунок). Сторона ромба $AB$ перетинає коло в точці $K$, $AD$ --- діаметр кола, $AK = OA$. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Ромб $ABCD$ та коло із центром у точці $O$, довжина якого $12\pi$ \textit{см}, лежать в одній площині (див. рисунок). Сторона ромба $AB$ перетинає коло в точці $K$, $AD$ --- діаметр кола, $AK = OA$. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.2]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.237]%@N 4.78x3.88 S
+
         % Довжина 12pi -> R=6. AD=12. O - центр AD.
         % AK = OA = 6. O=(6,0), A=(0,0), D=(12,0).
         % Трикутник AOK: AO=6, OK=6(радіус), AK=6. Рівносторонній.
@@ -1106,18 +814,13 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[above left] at (K) {$K$};
         \node[below] at (O) {$O$};
 
-        \fill (O) circle (10pt);
-        \fill (K) circle (10pt);
-        \fill (A) circle (10pt);
-        \fill (D) circle (10pt);
+        \path (O) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (A) node[nmt dot] {};
+        \path (D) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина радіуса $OA$}
@@ -1137,61 +840,38 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$, у який вписано коло з центром у точці $O$. З тупого кута $B$ на сторону $AD$ проведено висоту $BK$, коло дотикається до сторони $AD$ у точці $M$. $AK = 7$ \textit{см}, $KM = 9$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$, у який вписано коло з центром у точці $O$. З тупого кута $B$ на сторону $AD$ проведено висоту $BK$, коло дотикається до сторони $AD$ у точці $M$. $AK = 7$ \textit{см}, $KM = 9$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % AK = 7, KM = 9. M - точка дотику.
-        % У ромбі точка дотику M ділить сторону.
-        % Центр O проектується в M. OM perp AD.
-        % BK - висота. BK || OM. OM = R. BK = 2R.
-        % У трикутнику OAM...
-        % Нехай це просто рисунок.
-        % A=(0,0). K=(7,0). M=(16,0). (AK+KM=16).
-        % Висота h. B = (7, h).
-        % AB^2 = AK^2 + BK^2 = 49 + h^2.
-        % Також AM = AB - MD? Ні. Властивість дотичної: AM = ...
-        % Для малювання: приймемо h = 24 (наприклад).
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.756, line join=round]%@N 7.58x6.00 S
 
-        \coordinate (A) at (0,0);
-        \coordinate (K) at (7,0);
-        \coordinate (M) at (10.5,0);
-        \coordinate (D) at (14,0); % AD прибл.
-        \coordinate (B) at (7,12); % Висота прибл.
-        \coordinate (C) at (21,12);
-
-        % Центр O: середина висоти (y=9), по x: M=(16,0) -> O=(16,9).
-        \coordinate (O) at (10.5,6);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K);
-        \draw[thick] (O) circle (6cm);
-
-        % Прямий кут
-        \pic [draw, angle radius=0.3cm] {right angle = B--K--D};
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below] at (K) {$K$};
-        \node[below] at (M) {$M$};
-        \node[right] at (O) {$O$};
-
-        \fill (O) circle (4pt);
-        \fill (M) circle (4pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \coordinate (A) at (0,0);
+    \coordinate (K) at (1.4,0);
+    \coordinate (M) at (3.2,0);
+    \coordinate (D) at (5,0);
+    \coordinate (B) at (1.4,4.8);
+    \coordinate (C) at (6.4,4.8);
+    \coordinate (O) at (3.2,2.4);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K);
+    \draw[thick] (O) circle (2.4cm);
+    \pic[draw, angle radius=0.22cm] {right angle = B--K--D};
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (M) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+    \node[below] at (M) {$M$};
+    \node[right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AD$}
@@ -1211,50 +891,36 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L, N, P$ належать прямій $m$, а точки $K, M, Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого $156$. Установіть відповідність між відрізом \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L, N, P$ належать прямій $m$, а точки $K, M, Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого $156$. Установіть відповідність між відрізом \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2024}}
 \begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.203]%@N 10.32x3.55 C
 
-\nmtnobreak
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-        \def\h{12}
-        \draw[thick] (-2,0) -- (50,0) node[above] {$n$};
-        \draw[thick] (-2,\h) -- (50,\h) node[above] {$m$};
-
-        % Коло
-        \draw[thick] (6,6) circle (6cm);
-
-        % Трикутник
-        \coordinate (K) at (14,0);
-        \coordinate (M) at (24,0); % Схематично
-        \coordinate (L) at (19,\h);
-        \draw[thick] (K) -- (L) -- (M) -- cycle;
-
-        % Ромб
-        % M спільна точка? Ні, точки K, M, Q на прямій.
-        % M - вершина трикутника і ромба? Так, MNPQ.
-        \coordinate (N) at (29,\h);
-        \coordinate (Q) at (37,0); % Сторона 13
-        \coordinate (P) at (42,\h);
-
-        \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
-
-        % Підписи
-        \node[below] at (K) {$K$};
-        \node[above] at (L) {$L$};
-        \node[below] at (M) {$M$};
-        \node[above] at (N) {$N$};
-        \node[above] at (P) {$P$};
-        \node[below] at (Q) {$Q$};
-
-    \end{tikzpicture}\end{nmtfit}
+    \def\h{12}
+    \draw[thick] (-2,0) -- (52,0);
+    \draw[thick] (-2,\h) -- (52,\h);
+    \node[above] at (-0.5,\h) {$m$};
+    \node[above] at (-0.5,0) {$n$};
+    \draw[thick] (6,6) circle (6cm);
+    % трикутник KLM рівносторонній: висота 12, сторона 8*sqrt(3) ~ 13,86
+    \coordinate (K) at (14.14,0);
+    \coordinate (M) at (28,0);
+    \coordinate (L) at (21.07,\h);
+    \draw[thick] (K) -- (L) -- (M) -- cycle;
+    % ромб MNPQ зі стороною 13
+    \coordinate (N) at (33,\h);
+    \coordinate (P) at (46,\h);
+    \coordinate (Q) at (41,0);
+    \draw[thick] (M) -- (N) -- (P) -- (Q) -- cycle;
+    \foreach \p in {K,L,M,N,P,Q}{\node[nmt dot] at (\p) {};}
+    \node[below] at (K) {$K$};
+    \node[above] at (L) {$L$};
+    \node[below] at (M) {$M$};
+    \node[above] at (N) {$N$};
+    \node[above] at (P) {$P$};
+    \node[below] at (Q) {$Q$};
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{діаметр круга}
@@ -1274,14 +940,15 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У ромбі $ABCD$ точки $K$ і $M$ є серединами сторін $AD$ і $CD$ відповідно, $BO$ --- перпендикуляр, проведений до відрізка $KM$ (див. рисунок). $BO = 18$ \textit{см}, $KM = 16$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У ромбі $ABCD$ точки $K$ і $M$ є серединами сторін $AD$ і $CD$ відповідно, $BO$ --- перпендикуляр, проведений до відрізка $KM$ (див. рисунок). $BO = 18$ \textit{см}, $KM = 16$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.143]%@N 5.98x4.79 S
+
         \coordinate (A) at (-16,0);
         \coordinate (C) at (16,0);
         \coordinate (B) at (0,12);
@@ -1316,18 +983,13 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[right] at (M) {$M$};
         \node[above left] at (O) {$O$};
 
-        \fill (K) circle (15pt);
-        \fill (M) circle (15pt);
-        \fill (O) circle (15pt);
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
+        \path (O) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BD$}
@@ -1347,9 +1009,7 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum Установіть відповідність між геометричною фігурою \mbox{(1--3)} та радіусом кола \mbox{(А--Д)}, вписаного в цю фігуру. \nmtyear{2024}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -1374,50 +1034,32 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Точка $O$ --- середина діагоналі $AC$ ромба $ABCD$ (див. рисунок). $AK$ --- висота ромба, $AK = 12$ \textit{см}, $BK = 5$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Точка $O$ --- середина діагоналі $AC$ ромба $ABCD$ (див. рисунок). $AK$ --- висота ромба, $AK = 12$ \textit{см}, $BK = 5$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % Сторона 13 (5, 12, 13).
-        % A зліва, C справа. B зверху.
-        % AK висота на BC. K на BC.
-        % B = (x, y). C = (x+13, y)? Ні, це ромб.
-        % Нехай центр (0,0). AC горизонталь? Ні, на малюнку AC горизонталь.
-        % Але AK висота.
-        % Побудуємо за розмірами.
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.174]%@N 4.06x5.51 S
 
-        \coordinate (A) at (-12,0);
-        \coordinate (C) at (12,0);
+        % Ромб зі стороною 13: BK = 5, AK = 12 -> cos B = 5/13, кут B гострий; AC = 4*sqrt13, BD = 6*sqrt13 (як в оригіналі)
         \coordinate (O) at (0,0);
-
-        % Для малюнка схематично:
-        \coordinate (B) at (0, 8); % Приблизно
-        \coordinate (D) at (0,-8);
-
-        % Точка K на стороні BC. AK перпендикулярно BC.
-        % Це складно вирахувати точно для схеми, намалюємо "як бачимо".
-        \coordinate (K) at (4, 5.3); % Точка на BC
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-
-        % Перемальовуємо без BD, додаємо AK
+        \coordinate (A) at (-7.211,0);
+        \coordinate (C) at (7.211,0);
+        \coordinate (B) at (0,10.817);
+        \coordinate (D) at (0,-10.817);
+        % K на BC, BK = 5: K = B + 5/13 (C - B); AK перпендикулярна до BC
+        \coordinate (K) at (2.774,6.656);
 
         \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
         \draw[thick] (A) -- (C);
         \draw[thick] (A) -- (K);
+        \draw[thick] (O) -- (K);
 
-        % Прямий кут AKB? Ні, AK висота -> кут AKB = 90? 
-        % На малюнку K лежить на BC. Кут AKC = 90? Ні, AK perp BC.
-        % Значить кут AKB = 90.
-
-        % Позначки O
-        \draw (-6, -0.5) -- (-6, 0.5); % AO
-        \draw (6, -0.5) -- (6, 0.5);   % OC
+        % позначки AO = OC
+        \draw (-3.606,-0.6) -- (-3.606,0.6);
+        \draw (3.606,-0.6) -- (3.606,0.6);
 
         \node[left] at (A) {$A$};
         \node[above] at (B) {$B$};
@@ -1425,17 +1067,12 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[below] at (D) {$D$};
         \node[above right] at (K) {$K$};
         \node[below] at (O) {$O$};
-        \pic [draw, angle radius=0.3cm] {right angle = A--K--B};
-        \fill (O) circle (10pt);
+        \pic [draw, angle radius=0.25cm] {right angle = A--K--B};
+        \path (O) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{Сторона ромба}
@@ -1455,52 +1092,40 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$. Точки $K$ і $M$ --- середини сторін $AD$ і $DC$ відповідно, діагональ $BD$ перетинає відрізок $KM$ у точці $O$. $AC = 32$ \textit{см}, $DO = 6$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} та його довжину \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$. Точки $K$ і $M$ --- середини сторін $AD$ і $DC$ відповідно, діагональ $BD$ перетинає відрізок $KM$ у точці $O$. $AC = 32$ \textit{см}, $DO = 6$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} та його довжину \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        \coordinate (A) at (-10, 0);
-        \coordinate (C) at (10, 0);
-        \coordinate (B) at (0, 12); % Схематично
-        \coordinate (D) at (0, -12);
-
-        \coordinate (K) at ($(A)!0.5!(D)$);
-        \coordinate (M) at ($(D)!0.5!(C)$);
-        \coordinate (O) at (0, -6); % Точка перетину BD і KM (середина висоти трикутника ADC знизу)
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (K) -- (M);
-        \draw[thick] (B) -- (D);
-
-        % Позначки середин
-        \draw[thick] ($(A)!0.5!(K)$) ++(60:1) -- ++(-120:2);
-        \draw[thick] ($(K)!0.5!(D)$) ++(60:1) -- ++(-120:2);
-        \draw[thick] ($(D)!0.5!(M)$) ++(-60:1) -- ++(120:2);
-        \draw[thick] ($(M)!0.5!(C)$) ++(-60:1) -- ++(120:2);
-
-        \node[left] at (A) {$A$};
-        \node[above] at (B) {$B$};
-        \node[right] at (C) {$C$};
-        \node[below] at (D) {$D$};
-        \node[below left] at (K) {$K$};
-        \node[below right] at (M) {$M$};
-        \node[above right] at (O) {$O$};
-
-        \fill (K) circle (8pt);
-        \fill (M) circle (8pt);
-        \fill (O) circle (8pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\s{0.2}
+    \def\tick#1#2{\draw[thin] ($($(#1)!0.5!(#2)$)!0.12cm!90:(#2)$) -- ($($(#1)!0.5!(#2)$)!0.12cm!-90:(#2)$);}
+    \coordinate (A) at ({-16*\s},0);
+    \coordinate (C) at ({16*\s},0);
+    \coordinate (B) at (0,{12*\s});
+    \coordinate (D) at (0,{-12*\s});
+    \coordinate (K) at ({-8*\s},{-6*\s});
+    \coordinate (M) at ({8*\s},{-6*\s});
+    \coordinate (O) at (0,{-6*\s});
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (D);
+    \draw[thick] (K) -- (M);
+    \tick{A}{K} \tick{K}{D} \tick{D}{M} \tick{M}{C}
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[nmt dot] at (O) {};
+    \node[left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[below left] at (K) {$K$};
+    \node[below right] at (M) {$M$};
+    \node[above right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$KM$}
@@ -1520,14 +1145,15 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено ромб $ABCD$ й коло із центром у точці $O$, побудоване на діагоналі ромба $BD$ як на діаметрі. Точки $K$ й $N$ є точками перетину кола з діагоналлю $AC$ й стороною $CD$ відповідно. $AK = 5$ \textit{см}, $AO = 20$ \textit{см}. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$ й коло із центром у точці $O$, побудоване на діагоналі ромба $BD$ як на діаметрі. Точки $K$ й $N$ є точками перетину кола з діагоналлю $AC$ й стороною $CD$ відповідно. $AK = 5$ \textit{см}, $AO = 20$ \textit{см}. Доберіть до відрізка \mbox{(1--3)} його довжину \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.124]%@N 8.38x6.59 S
+
         \coordinate (A) at (-20, 0); % AO = 20 за масштабом
         \coordinate (C) at (20, 0);
         \coordinate (O) at (0, 0);
@@ -1560,17 +1186,12 @@ III. & Висота ромба вдвічі більша за радіус уп�
         \node[above right] at (K) {$K$};
         \node[right] at (N) {$N$};
 
-        \fill (O) circle (12pt);
-        \fill (K) circle (12pt);
-        \fill (N) circle (12pt);
+        \path (O) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BO$}
@@ -1591,10 +1212,15 @@ III. & Висота ромба вдвічі більша за радіус уп�
 
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №18
-\zadtask{На рисунку зображено ромб $ABCD$ й рівнобедрений трикутник $AKD$, які лежать в одній площині. $\angle BAD = 50^\circ$, $\angle AKD = 40^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$ й рівнобедрений трикутник $AKD$, які лежать в одній площині. $\angle BAD = 50^\circ$, $\angle AKD = 40^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.495, thick, line join=round]%@N 4.35x5.33 S
+
     \coordinate (A) at (0,0);
     \coordinate (D) at (3.5,0);
     \coordinate (B) at (2.25,2.68);
@@ -1606,17 +1232,18 @@ III. & Висота ромба вдвічі більша за радіус уп�
     % мітки рівності бічних сторін
     \draw ($(A)!0.5!(K)$) ++(-0.12,-0.04) -- ++(0.24,0.08);
     \draw ($(D)!0.5!(K)$) ++(-0.12,0.04) -- ++(0.24,-0.08);
-    \pic[draw, angle radius=0.55cm, pic text={$50^\circ$}, angle eccentricity=1.7, font=\scriptsize] {angle = D--A--B};
-    \pic[draw, angle radius=0.8cm, pic text={$40^\circ$}, angle eccentricity=1.45, font=\scriptsize] {angle = D--K--A};
+    \pic[draw, angle radius=0.55cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.55}{$50^\circ$}
+    \pic[draw, angle radius=0.8cm, font=\normalsize] {angle = D--K--A};
+    \nmtAngleLabel{D}{K}{A}{0.8}{$40^\circ$}
     \node[left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[right] at (D) {$D$};
     \node[below] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\nbvspace{0.2cm}
-\noindent
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Кут}
 \matchItem{1}{$\angle KAB$}
@@ -1631,7 +1258,6 @@ III. & Висота ромба вдвічі більша за радіус уп�
 \matchItem{Д}{$160^\circ$}
 }{
 \matchingGrid
-}
 }
 \par\penalty-20
 \end{samepage}

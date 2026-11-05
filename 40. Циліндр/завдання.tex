@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 40}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -210,44 +33,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 40. Циліндр}
 \noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 32 (НМТ \mbox{2023~--- 7}, \mbox{2024~--- 9}, \mbox{2025~--- 5}, \mbox{2026~--- 11}); \mbox{тестових~--- 13}; \mbox{з короткою відповіддю~--- 19}.}\par\vspace{0.2cm}
@@ -262,45 +48,50 @@
 \nopagebreak\nbvspace{0.2cm}
 \answerTable{
     % А: Куля
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.741]%@N 1.20x1.36 S
+
         \shade[ball color=blue!70] (0,0) circle (1.2cm);
         \draw[gray!50] (0,1.2) -- (0,1.5); % Гніт
     \end{tikzpicture}\end{nmtfit}
 }{
-    % Д: Піраміда
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[fill=orange!70] (-1,0) -- (1,0) -- (0,2.5) -- cycle;
-        \draw[fill=orange!50] (1,0) -- (1.5,0.5) -- (0,2.5) -- cycle;
-        \draw[thick, brown] (0,2.5) -- (0,2.9);
-    \end{tikzpicture}\end{nmtfit}
-}{
-    % Г: Конус
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \shade[left color=green!60!black, right color=green!30] (-1,0) arc (180:360:1 and 0.3) -- (0,2.5) -- cycle;
-        \draw[gray] (-1,0) arc (180:360:1 and 0.3);
-        \draw[gray] (-1,0) -- (0,2.5) -- (1,0);
-        \draw[thick, orange] (0,2.5) -- (0,2.9);
+    % Б: Циліндр (Правильна)
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.741]%@N 1.01x1.62 S
+
+        \def\rx{1.0} \def\ry{0.3} \def\h{2.5}
+        \fill[nmtFillC] (-\rx,0) rectangle (\rx,\h);
+        \fill[nmtFillC] (0,\h) ellipse (\rx cm and \ry cm);
+        \fill[nmtFillC] (0,0) ellipse (\rx cm and \ry cm);
+        \draw[gray] (-\rx,0) -- (-\rx,\h);
+        \draw[gray] (\rx,0) -- (\rx,\h);
+        \draw[gray] (0,\h) ellipse (\rx cm and \ry cm);
+        \draw[gray] (-\rx,0) arc (180:360:\rx cm and \ry cm);
+        \draw[thick, nmtOrange] (0,\h) -- (0,\h+0.4);
     \end{tikzpicture}\end{nmtfit}
 }{
     % В: Паралелепіпед
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.741]%@N 1.11x1.67 S
+
         \draw[fill=red!60!black] (0,0) -- (1.5,0) -- (1.5,2.5) -- (0,2.5) -- cycle;
         \draw[fill=red!50] (1.5,0) -- (2.2,0.8) -- (2.2,3.3) -- (1.5,2.5) -- cycle;
         \draw[fill=red!40] (0,2.5) -- (1.5,2.5) -- (2.2,3.3) -- (0.7,3.3) -- cycle;
         \draw[thick, orange] (1.1, 2.9) -- (1.1, 3.3);
     \end{tikzpicture}\end{nmtfit}
 }{
-    % Б: Циліндр (Правильна)
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \def\rx{1.0} \def\ry{0.3} \def\h{2.5}
-        \fill[yellow!10] (-\rx,0) rectangle (\rx,\h);
-        \fill[yellow!10] (0,\h) ellipse (\rx cm and \ry cm);
-        \fill[yellow!10] (0,0) ellipse (\rx cm and \ry cm);
-        \draw[gray] (-\rx,0) -- (-\rx,\h);
-        \draw[gray] (\rx,0) -- (\rx,\h);
-        \draw[gray] (0,\h) ellipse (\rx cm and \ry cm);
-        \draw[gray] (-\rx,0) arc (180:360:\rx cm and \ry cm);
-        \draw[thick, orange] (0,\h) -- (0,\h+0.4);
+    % Г: Конус
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.741]%@N 1.01x1.62 S
+
+        \shade[left color=green!60!black, right color=green!30] (-1,0) arc (180:360:1 and 0.3) -- (0,2.5) -- cycle;
+        \draw[gray] (-1,0) arc (180:360:1 and 0.3);
+        \draw[gray] (-1,0) -- (0,2.5) -- (1,0);
+        \draw[thick, orange] (0,2.5) -- (0,2.9);
+    \end{tikzpicture}\end{nmtfit}
+}{
+    % Д: Піраміда
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.741]%@N 1.26x1.47 S
+
+        \draw[fill=orange!70] (-1,0) -- (1,0) -- (0,2.5) -- cycle;
+        \draw[fill=orange!50] (1,0) -- (1.5,0.5) -- (0,2.5) -- cycle;
+        \draw[thick, brown] (0,2.5) -- (0,2.9);
     \end{tikzpicture}\end{nmtfit}
 }
 \par\penalty-20\vspace{0.25cm}
@@ -308,25 +99,15 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 2 (Обертання прямокутника) ===
-\noindent\zadnum \begin{minipage}[t]{0.65\textwidth}
-Укажіть геометричне тіло, яке утворено внаслідок обертання прямокутника з меншою стороною 8~см навколо прямої $a$ (див. рисунок). \nmtyear{2023}
-
-\nopagebreak\nbvspace{0.3cm}
-\textbf{А} \quad циліндр із діаметром основи 8~см
-
-\textbf{Б} \quad конус із висотою 8~см
-
-\textbf{В} \quad конус із радіусом основи 8~см
-
-\textbf{Г} \quad циліндр із висотою 8~см
-
-\textbf{Д} \quad циліндр із радіусом основи 8~см
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Укажіть геометричне тіло, яке утворено внаслідок обертання прямокутника з меншою стороною 8~см навколо прямої $a$ (див. рисунок). \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.30\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.22]%@N 3.14x2.71 S
+
     \coordinate (A) at (0,0);
     \coordinate (B) at (3,0);
     \coordinate (C) at (3,2);
@@ -340,15 +121,18 @@
     \draw[thick] (3, -0.5) -- (3, 3.0) node[right] {$a$};
 
     % Стрілка обертання
-    \draw[->, >=latex] (3, 2.8) ellipse (0.4 and 0.15);
+    \draw[->] (3, 2.8) ellipse (0.4 and 0.15);
 
     % Розмір 8 см
     \node[left, rotate=90] at (-0.3, 2) {8~см};
     \draw[thin] (-0.2, 0) -- (0,0);
     \draw[thin] (-0.2, 2) -- (0,2);
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
+\par
+\nmtOptions{циліндр із діаметром основи 8~см}{конус із висотою 8~см}{конус із радіусом основи 8~см}{циліндр із висотою 8~см}{циліндр із радіусом основи 8~см}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -362,23 +146,8 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \noindent
-\textbf{А} \quad квадрата навколо його сторони».
+\nmtOptions{квадрата навколо його сторони».}{прямокутника навколо його діагоналі».}{прямокутного трикутника навколо його гіпотенузи».}{прямокутного трикутника навколо його катета».}{квадрата навколо його діагоналі».}
 
-\nmtnobreak
-\noindent
-\textbf{Б} \quad прямокутника навколо його діагоналі».
-
-\nmtnobreak
-\noindent
-\textbf{В} \quad прямокутного трикутника навколо його гіпотенузи».
-
-\nmtnobreak
-\noindent
-\textbf{Г} \quad прямокутного трикутника навколо його катета».
-
-\nmtnobreak
-\noindent
-\textbf{Д} \quad квадрата навколо його діагоналі».
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -417,60 +186,51 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 10 (Циліндр - вказати твірну) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На рисунку зображено циліндр, прямокутник $ABCD$ – його осьовий переріз. Укажіть відрізок, який є твірною цього циліндра. \nmtyear{2024}
-
-\nopagebreak\nbvspace{0.3cm}
-\textbf{А} \quad $BC$
-
-\textbf{Б} \quad $AB$
-
-\textbf{В} \quad $AD$
-
-\textbf{Г} \quad $BD$
-
-\textbf{Д} \quad $AC$
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено циліндр, прямокутник $ABCD$ – його осьовий переріз. Укажіть відрізок, який є твірною цього циліндра. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    \def\rx{1.5} \def\ry{0.5} \def\h{3.5}
-
-    % Нижня основа
-    \draw[dashed] (-\rx,0) arc (180:360:\rx cm and \ry cm);
-    \draw[dashed] (-\rx,0) arc (180:0:\rx cm and \ry cm); % Задня частина
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    %@N 4.01x4.82 S
+\def\rx{1.5} \def\ry{0.5} \def\h{3.2}
+    \coordinate (O1) at (0,0);
+    \coordinate (O2) at (0,\h);
+    \coordinate (D) at (-1.36,\h-0.21);
+    \coordinate (A) at (1.36,\h+0.21);
+    \coordinate (C) at (-1.36,-0.21);
+    \coordinate (B) at (1.36,0.21);
 
     % Верхня основа
-    \draw (0,\h) ellipse (\rx cm and \ry cm);
+    \draw[thick] (O2) ellipse (\rx cm and \ry cm);
+    % Нижня основа: передня дуга видима, задня -- штрихова
+    \draw[thick] (-\rx,0) arc (180:360:\rx cm and \ry cm);
+    \draw[thin, dashed] (-\rx,0) arc (180:0:\rx cm and \ry cm);
+    % Твірні-обриси
+    \draw[thick] (-\rx,0) -- (-\rx,\h);
+    \draw[thick] (\rx,0) -- (\rx,\h);
 
-    % Бічні сторони
-    \draw (-\rx,0) -- (-\rx,\h);
-    \draw (\rx,0) -- (\rx,\h);
+    % Осьовий переріз ABCD
+    \draw[thick] (D) -- (A);
+    \draw[thick] (D) -- (C);
+    \draw[thin, dashed] (A) -- (B) -- (C);
+    % Вісь циліндра
+    \draw[thin, dashed] (O1) -- (O2);
+    \node[nmt dot] at (O1) {};
+    \node[nmt dot] at (O2) {};
 
-    % Осьовий переріз ABCD (наприклад, через діаметр)
-    % A(right top), B(right bottom), C(left bottom), D(left top) - стандартний обхід
-    % На малюнку D зліва зверху, A справа зверху
-    \coordinate (D) at (-\rx, \h);
-    \coordinate (A) at (\rx, \h);
-    \coordinate (B) at (\rx, 0);
-    \coordinate (C) at (-\rx, 0);
-
-    \draw[thick] (D) -- (A) -- (B); 
-    \draw[thick, dashed] (B) -- (C) -- (D);
-
-    % Діагональ AC
-    \draw[thin] (A) -- (C);
-
-    % Підписи
     \node[above right] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[left] at (C) {$C$};
-    \node[above left] at (D) {$D$};
+    \node[right, xshift=3pt] at (B) {$B$};
+    \node[below left] at (C) {$C$};
+    \node[above right] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
+\par
+\nmtOptions{$BC$}{$AB$}{$AD$}{$BD$}{$AC$}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -514,23 +274,8 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \noindent
-\textbf{А} \quad збігаються
+\nmtOptions{збігаються}{паралельні}{мимобіжні}{перетинаються під гострим кутом}{перпендикулярні}
 
-\nmtnobreak
-\noindent
-\textbf{Б} \quad паралельні
-
-\nmtnobreak
-\noindent
-\textbf{В} \quad мимобіжні
-
-\nmtnobreak
-\noindent
-\textbf{Г} \quad перетинаються під гострим кутом
-
-\nmtnobreak
-\noindent
-\textbf{Д} \quad перпендикулярні
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -549,14 +294,7 @@
 \begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №5 --- основна тема: Конус
 \zadtask{У якій просторовій фігурі можна провести твірну? \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
-    \item лише в конусі
-    \item лише в піраміді
-    \item лише в конусі та піраміді
-    \item лише в конусі та циліндрі
-    \item лише в циліндрі
-\end{enumerate}
+\nmtOptions{лише в конусі}{лише в піраміді}{лише в конусі та піраміді}{лише в конусі та циліндрі}{лише в циліндрі}
 \nopagebreak\nbvspace{0.1cm}}
 % Відповідь: Г
 \par\penalty-20
@@ -668,23 +406,31 @@
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №19 --- також у темі: Конус
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
-\zadnum На рисунку зображено циліндр і конус, що мають спільну вісь. Радіус основи конуса вдвічі менший за радіус циліндра. Висота конуса дорівнює $15$~см, а твірна конуса~--- $17$~см. Знайдіть об'єм циліндра (у см$^3$), якщо площа його бічної поверхні дорівнює $640\pi$~см$^2$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Задано циліндр із площею бічної поверхні $640\pi$~см$^2$ та конус (див. рисунок). Радіус основи конуса вдвічі менший за радіус основи циліндра. Висота конуса дорівнює $15$~см, його твірна~--- $17$~см. Знайдіть об'єм $V$ (у см$^3$) циліндра. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    \draw[dashed] (-1.1,0) arc (180:0:1.1 and 0.35);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.34, thick, line join=round]%@N 6.20x3.93 S
+
+    % циліндр
+    \draw[dashed, thin] (-1.1,0) arc (180:0:1.1 and 0.35);
     \draw (-1.1,0) arc (180:360:1.1 and 0.35);
-    \draw (-1.1,0) -- (-1.1,3.2);
-    \draw (1.1,0) -- (1.1,3.2);
-    \draw (0,3.2) ellipse (1.1 and 0.35);
-    \begin{scope}[shift={(3.7,0)}]
-        \draw[dashed] (-0.8,0) arc (180:0:0.8 and 0.25);
-        \draw (-0.8,0) arc (180:360:0.8 and 0.25);
-        \draw (-0.8,0) -- (0,3.5);
-        \draw (0.8,0) -- (0,3.5);
+    \draw (-1.1,0) -- (-1.1,2.3);
+    \draw (1.1,0) -- (1.1,2.3);
+    \draw (0,2.3) ellipse (1.1 and 0.35);
+    \draw[dashed, thin] (0,0) -- (0,2.3);
+    \draw[dashed, thin] (0,0) -- (235:1.1 and 0.35);
+    \node[nmt dot] at (0,0) {};
+    \node[nmt dot] at (0,2.3) {};
+    % конус
+    \begin{scope}[shift={(2.9,0)}]
+        \draw[dashed, thin] (-0.75,0) arc (180:0:0.75 and 0.25);
+        \draw (-0.75,0) arc (180:360:0.75 and 0.25);
+        \draw (-0.75,0) -- (0,1.8) -- (0.75,0);
+        \draw[dashed, thin] (0,0) -- (0,1.8);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -698,33 +444,36 @@
 \begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №21 --- також у темі: Призма. Паралелепіпед. Куб
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку зображено циліндр і прямокутний паралелепіпед. Діаметр основи циліндра дорівнює діагоналі основи паралелепіпеда. Довжина діагоналі паралелепіпеда дорівнює $39$ см, сторони основи~--- $9$ см і $12$ см. Висота циліндра відноситься до висоти паралелепіпеда як $2 : 3$. Визначте об'єм $V$ циліндра (у см$^3$). У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
-    \draw[thick, dashed] (-0.9,0) arc (180:0:0.9 and 0.26);
-    \draw[thick] (-0.9,0) arc (180:360:0.9 and 0.26);
-    \draw[thick] (-0.9,0) -- (-0.9,4.0);
-    \draw[thick] (0.9,0) -- (0.9,4.0);
-    \draw[thick] (0,4.0) ellipse (0.9 and 0.26);
-    \begin{scope}[shift={(3.2,0)}]
-        \coordinate (A) at (0,0);
-        \coordinate (B) at (2,0);
-        \coordinate (C) at (2.7,0.7);
-        \coordinate (D) at (0.7,0.7);
-        \draw[thick] (A) -- (B) -- (C);
-        \draw[thick, dashed] (C) -- (D) -- (A);
-        \draw[thick] (A) -- (0,2.6);
-        \draw[thick] (B) -- (2,2.6);
-        \draw[thick] (C) -- (2.7,3.3);
-        \draw[thick, dashed] (D) -- (0.7,3.3);
-        \draw[thick] (0,2.6) -- (2,2.6) -- (2.7,3.3) -- (0.7,3.3) -- cycle;
+\begin{nmtfit}\begin{tikzpicture}[scale=0.59, line join=round]%@N 5.51x3.28 S
+
+    % за оригіналом (НМТ 2026, 3.06, № 21, с. 42): циліндр нижчий за паралелепіпед (2 : 3), центр нижньої основи -- крапка
+    \begin{scope}[shift={(-3.34,0.78)}]
+        \draw[thick] (-2.34,0) -- (-2.34,3.52);
+        \draw[thick] (2.34,0) -- (2.34,3.52);
+        \draw[thick] (0,3.52) ellipse (2.34 and 0.88);
+        \draw[thick] (-2.34,0) arc (180:360:2.34 and 0.88);
+        \draw[thin, dashed] (-2.34,0) arc (180:0:2.34 and 0.88);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
+    % паралелепіпед
+    \coordinate (A)  at (0,0);    \coordinate (B)  at (3.83,0);
+    \coordinate (A1) at (0,5.28); \coordinate (B1) at (3.83,5.28);
+    \coordinate (D)  at (1.45,1.13); \coordinate (C)  at (5.28,1.13);
+    \coordinate (D1) at (1.45,6.41); \coordinate (C1) at (5.28,6.41);
+    \draw[thick] (A) -- (B) -- (B1) -- (A1) -- cycle;
+    \draw[thick] (A1) -- (D1) -- (C1) -- (B1);
+    \draw[thick] (B) -- (C) -- (C1);
+    \draw[thin, dashed] (A) -- (D) -- (D1);
+    \draw[thin, dashed] (D) -- (C);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $1350$
 \ifshowsolutions\solution{Діагональ основи паралелепіпеда $d = \sqrt{9^2+12^2} = \sqrt{225} = 15$ см~--- це діаметр циліндра, тож $r = 7{,}5$ см. Висота паралелепіпеда $H = \sqrt{39^2 - 15^2} = \sqrt{1296} = 36$ см, а висота циліндра $h = \dfrac23 H = 24$ см. Об'єм $V = \pi r^2 h = \pi\cdot 7{,}5^2\cdot 24 = 1350\pi$, тож $\dfrac{V}{\pi} = 1350$. Відповідь: \textbf{$1350$}.}\fi
@@ -734,13 +483,14 @@
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №21 --- основна тема: Призма. Паралелепіпед. Куб
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку зображено правильну трикутну призму та циліндр. Об'єм циліндра дорівнює $80\pi$~см$^3$, а площа основи призми дорівнює $12\sqrt{3}$~см$^2$. Радіус основи циліндра дорівнює радіусу кола, вписаного в основу призми. Визначте об'єм (у см$^3$) призми, якщо висота призми відноситься до висоти циліндра як $\sqrt{3} : 1$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.38\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.815, thick, line join=round]%@N 4.23x3.33 S
+
     % Призма
     \coordinate (A1) at (0,0);
     \coordinate (B1) at (2,-1);
@@ -776,9 +526,10 @@
 \zadnum На рисунку зображено циліндр і правильну трикутну піраміду. Радіус кола, описаного навколо основи піраміди, дорівнює радіусу основи циліндра. Висоти циліндра й піраміди рівні. Визначте об'єм (у см$^3$) $V$ піраміди, якщо площа основи циліндра дорівнює площі його бічної поверхні та становить $108\pi$~см$^2$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.884, thick, line join=round]%@N 4.41x2.67 S
+
     % циліндр
     \draw (0,3.6) ellipse (1.4 and 0.4);
     \draw[dashed] (-1.4,0) arc (180:0:1.4 and 0.4);
@@ -809,9 +560,10 @@
 \zadnum Задано циліндр та конус, що мають рівні основи (див. рисунок). Радіус основи конуса дорівнює $5$~см, а його твірна дорівнює $13$~см. Визначте, у скільки разів об'єм циліндра більший за об'єм конуса, якщо площа бічної поверхні циліндра дорівнює $150\pi$~см$^2$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.871, thick, line join=round]%@N 3.99x3.09 S
+
     % циліндр
     \draw (0,4.4) ellipse (1.2 and 0.35);
     \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
@@ -839,28 +591,24 @@
 \zadnum На рисунку зображено правильну трикутну призму й циліндр. Радіус основи циліндра дорівнює радіусу кола, описаного навколо основи призми. Висота призми дорівнює периметру її основи. Визначте площу (у см$^2$) бічної поверхні призми, якщо висота циліндра дорівнює $4$~см, а його об'єм~--- $256\pi$~см$^3$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % трикутна призма
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.4,0.5);
-    \coordinate (c) at (1.3,1.4);
-    \coordinate (a2) at (0,4);
-    \coordinate (b2) at (2.4,4.5);
-    \coordinate (c2) at (1.3,5.4);
-    \draw (a) -- (b) -- (c) -- cycle;
-    \draw (a2) -- (b2) -- (c2) -- cycle;
-    \draw (a) -- (a2);
-    \draw (b) -- (b2);
-    \draw[dashed] (c) -- (c2);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.557, line join=round]%@N 6.32x4.78 S
+
+    % правильна трикутна призма (вид зверху-спереду)
+    \coordinate (L)  at (0,0);      \coordinate (R)  at (3.82,0);   \coordinate (F)  at (1.04,-1.38);
+    \coordinate (L2) at (0,6.47);   \coordinate (R2) at (3.82,6.47); \coordinate (F2) at (1.04,5.07);
+    \draw[thick] (L2) -- (R2) -- (F2) -- cycle;
+    \draw[thick] (L2) -- (L) -- (F) -- (R) -- (R2);
+    \draw[thick] (F2) -- (F);
+    \draw[thin, dashed] (L) -- (R);
     % циліндр
-    \begin{scope}[shift={(4.6,0.3)}]
-        \draw (0,2.6) ellipse (1.2 and 0.35);
-        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
-        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
-        \draw (-1.2,0) -- (-1.2,2.6);
-        \draw (1.2,0) -- (1.2,2.6);
+    \begin{scope}[shift={(8,0)}]
+        \draw[thick] (0,2.07) ellipse (2.49 and 0.93);
+        \draw[thick] (-2.49,2.07) -- (-2.49,-0.53);
+        \draw[thick] (2.49,2.07) -- (2.49,-0.53);
+        \draw[thick] (-2.49,-0.53) arc (180:360:2.49 and 0.93);
+        \draw[thin, dashed] (-2.49,-0.53) arc (180:0:2.49 and 0.93);
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -876,23 +624,23 @@
 \zadnum На рисунку зображено циліндр і конус, які мають рівні основи й об'єми. Визначте площу $S$ (у см$^2$) бічної поверхні циліндра, якщо об'єм конуса дорівнює $810\pi$~см$^3$, а діаметр його основи~--- $18$~см. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % циліндр
-    \draw (0,3) ellipse (1.2 and 0.35);
-    \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
-    \draw (-1.2,0) arc (180:360:1.2 and 0.35);
-    \draw (-1.2,0) -- (-1.2,3);
-    \draw (1.2,0) -- (1.2,3);
-    \fill (0,0) circle (1.2pt);
-    % конус
-    \begin{scope}[shift={(4.2,0)}]
-        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
-        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
-        \draw (-1.2,0) -- (0,4.2);
-        \draw (1.2,0) -- (0,4.2);
-        \fill (0,0) circle (1.2pt);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.94, line join=round]%@N 6.03x4.88 S
+
+    % циліндр: радіус 1,2, висота 1,5; конус з тією ж основою, висота 4,5 (втричі більша: рівні об'єми)
+    \draw[thick] (0,1.5) ellipse (1.2 and 0.35);
+    \draw[thin, dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+    \draw[thick] (-1.2,0) arc (180:360:1.2 and 0.35);
+    \draw[thick] (-1.2,0) -- (-1.2,1.5);
+    \draw[thick] (1.2,0) -- (1.2,1.5);
+    \node[nmt dot] at (0,0) {};
+    \begin{scope}[shift={(3.6,0)}]
+        \draw[thin, dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+        \draw[thick] (-1.2,0) arc (180:360:1.2 and 0.35);
+        \draw[thick] (-1.2,0) -- (0,4.5);
+        \draw[thick] (1.2,0) -- (0,4.5);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -909,9 +657,10 @@
 \zadnum На рисунку зображено куб та циліндр. Об'єм циліндра дорівнює $288\pi$~см$^3$, а площа його осьового перерізу дорівнює $72\sqrt{2}$~см$^2$. Діаметр основи циліндра дорівнює діагоналі грані куба. Визначте об'єм (у см$^3$) куба. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.65, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.808, thick, line join=round]%@N 5.23x2.43 S
+
     % Куб
     \begin{scope}[shift={(0,0)}]
         \coordinate (A) at (0,0);
@@ -955,30 +704,28 @@
 \zadnum На рисунку зображено пряму чотирикутну призму та циліндр. Основою призми є рівнобічна трапеція, основи якої дорівнюють $18$~см і $32$~см. У трапецію можна вписати коло. Висота трапеції дорівнює діаметру основи циліндра. Знайдіть об'єм (у см$^3$) $V$ циліндра, якщо площа його бічної поверхні дорівнює $480\pi$~см$^2$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % пряма чотирикутна призма (основа - трапеція)
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.6,0);
-    \coordinate (c) at (2.1,0.7);
-    \coordinate (d) at (0.5,0.7);
-    \coordinate (a2) at (0,4);
-    \coordinate (b2) at (2.6,4);
-    \coordinate (c2) at (2.1,4.7);
-    \coordinate (d2) at (0.5,4.7);
-    \draw (a)--(b)--(c)--(d)--cycle;
-    \draw (a2)--(b2)--(c2)--(d2)--cycle;
-    \draw (a)--(a2); \draw (b)--(b2);
-    \draw (c)--(c2); \draw[dashed] (d)--(d2);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, line join=round]%@N 6.06x4.14 S
+
+    % за оригіналом (НМТ 2026, 18.06, № 21, с. 111): призма -- довша основа трапеції позаду, вузька грань спереду; невидиме лише заднє нижнє ребро
+    \coordinate (P1) at (0,4.94);    \coordinate (P2) at (3.58,4.94);
+    \coordinate (P3) at (2.68,3.78); \coordinate (P4) at (0.94,3.78);
+    \coordinate (Q1) at (0,1.14);    \coordinate (Q2) at (3.58,1.14);
+    \coordinate (Q3) at (2.68,0);    \coordinate (Q4) at (0.94,0);
+    \draw[thick] (P1) -- (P2) -- (P3) -- (P4) -- cycle;
+    \draw[thick] (P1) -- (Q1) -- (Q4) -- (Q3) -- (Q2) -- (P2);
+    \draw[thick] (P4) -- (Q4);
+    \draw[thick] (P3) -- (Q3);
+    \draw[thin, dashed] (Q1) -- (Q2);
     % циліндр
-    \begin{scope}[shift={(4.8,0.2)}]
-        \draw (0,4) ellipse (1.3 and 0.4);
-        \draw[dashed] (-1.3,0) arc (180:0:1.3 and 0.4);
-        \draw (-1.3,0) arc (180:360:1.3 and 0.4);
-        \draw (-1.3,0) -- (-1.3,4);
-        \draw (1.3,0) -- (1.3,4);
-        \fill (0,0) circle (1.2pt);
+    \begin{scope}[shift={(5.94,0.6)}]
+        \draw[thick] (-1.6,0) -- (-1.6,3.94);
+        \draw[thick] (1.6,0) -- (1.6,3.94);
+        \draw[thick] (0,3.94) ellipse (1.6 and 0.6);
+        \draw[thick] (-1.6,0) arc (180:360:1.6 and 0.6);
+        \draw[thin, dashed] (-1.6,0) arc (180:0:1.6 and 0.6);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}

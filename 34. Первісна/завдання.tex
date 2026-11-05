@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 34}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -201,44 +24,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 34. Первісна та інтеграл}
 \noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 52 (НМТ \mbox{2023~--- 14}, \mbox{2024~--- 14}, \mbox{2025~--- 10}, \mbox{2026~--- 14}); \mbox{тестових~--- 17}; \mbox{з короткою відповіддю~--- 35}.}\par\vspace{0.2cm}
@@ -247,71 +33,44 @@
 
 \begin{samepage}
 \noindent\zadnum Визначте загальний вигляд первісних функції $f(x) = 4x - \dfrac{3}{\cos^2 x}$. \nmtyear{2023}
-
-\nmtnobreak
-\answerListVertical
-{$F(x) = 2x^2 - 3\operatorname{tg} x + C$}
-{$F(x) = 4x^2 - 3\operatorname{tg} x + C$}
-{$F(x) = 2x^2 + 3\operatorname{tg} x + C$}
-{$F(x) = x^2 - 3\operatorname{tg} x + C$}
-{$F(x) = 2x^2 - \dfrac{3}{\operatorname{tg} x} + C$}
+\nmtOptions{$F(x) = 2x^2 - 3\operatorname{tg} x + C$}{$F(x) = 4x^2 - 3\operatorname{tg} x + C$}{$F(x) = 2x^2 + 3\operatorname{tg} x + C$}{$F(x) = x^2 - 3\operatorname{tg} x + C$}{$F(x) = 2x^2 - \dfrac{3}{\operatorname{tg} x} + C$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Укажіть для функції $f(x) = 3x + 1$ первісну, графік якої проходить через точку $M(0; 1)$. \nmtyear{2023}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical{$F(x)=3x^2+1$}{$F(x)=\dfrac{3}{2}x^2+x+1$}{$F(x)=\dfrac{3}{2}x^2$}{$F(x)=3$}{$F(x)=3x^2+x$}
+\nmtOptions{$F(x)=3x^2+1$}{$F(x)=\dfrac{3}{2}x^2+x+1$}{$F(x)=\dfrac{3}{2}x^2$}{$F(x)=3$}{$F(x)=3x^2+x$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Укажіть формулу для обчислення площі $S$ фігури, обмеженої графіками функцій $y=2^x$, $y=2$ і $x=0$ (див. рисунок). \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Укажіть формулу для обчислення площі $S$ фігури, обмеженої графіками функцій $y=2^x$, $y=2$ і $x=0$ (див. рисунок). \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=1cm, y=1cm,
-        axis lines=middle,
-        xmin=-1.5, xmax=2,
-        ymin=-0.5, ymax=3,
-        xlabel={$x$}, ylabel={$y$},
-        xtick={0,1},
-        ytick={1,2},
-        clip=false
-    ]
-        % Лінії
-        \addplot[thick, smooth, domain=-1.5:1.5] {2^x};
-        \addplot[thick, domain=-1.5:1.5] {2};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.2]%@N 5.14x4.91 S
 
-        % Заливка
-        \addplot[name path=line, draw=none, domain=0:1] {2};
-        \addplot[name path=curve, draw=none, domain=0:1] {2^x};
-        \addplot[fill=gray!40] fill between[of=line and curve];
-
-        % Підписи
-        \node[above] at (axis cs:-1, 2) {$y=2$};
-        \node[right] at (axis cs:1.2, 2.5) {$y=2^x$};
-        \node[below left] at (axis cs:0,0) {$0$};
-    \end{axis}
+    % заштрихована область: 0 <= x <= 1, між y = 2^x (знизу) і y = 2 (зверху)
+    \fill[nmtFillD] (0,1) -- plot[domain=0:1, samples=30] (\x,{2^\x}) -- (0,2) -- cycle;
+    % осі
+    \draw[->] (-1.9,0) -- (1.9,0) node[below left] {$x$};
+    \draw[->] (0,-0.85) -- (0,3) node[left] {$y$};
+    \draw[thin] (1,0.08) -- (1,-0.08); \draw[thin] (0.08,1) -- (-0.08,1);
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,0) {$1$};
+    \node[above left, inner sep=1pt] at (0,1) {$1$};
+    % графіки
+    \draw[nmt curve] plot[domain=-1.9:1.3, samples=60] (\x,{2^\x});
+    \draw[nmt curve] (-1.75,2) -- (1.8,2);
+    \node[above] at (-1.2,2) {$y=2$};
+    \node[right, fill=white, inner sep=1.5pt] at (1.3,2.5) {$y=2^x$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical
-{$S = \displaystyle\int\limits_0^{1} 2^x dx$}
-{$S = \displaystyle\int\limits_0^{1} (2^x - 2) dx$}
-{$S = \displaystyle\int\limits_1^{2} (2 - 2^x) dx$}
-{$S = \displaystyle\int\limits_0^{1} (2 - 2^x) dx$}
-{$S = \displaystyle\int\limits_1^{2} (2^x - 2) dx$}
+\par
+\nmtOptions{$S = \displaystyle\int\limits_0^{1} 2^x dx$}{$S = \displaystyle\int\limits_0^{1} (2^x - 2) dx$}{$S = \displaystyle\int\limits_1^{2} (2 - 2^x) dx$}{$S = \displaystyle\int\limits_0^{1} (2 - 2^x) dx$}{$S = \displaystyle\int\limits_1^{2} (2^x - 2) dx$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -338,58 +97,42 @@
 
 \begin{samepage}
 \noindent\zadnum Знайдіть загальний вигляд первісних функції $f(x) = \dfrac{12}{x^3} - 4x$. \nmtyear{2024}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerListVertical{$F(x)=-\dfrac{36}{x^2}-2x^2+C$}{$F(x)=-\dfrac{6}{x^2}-2x^2+C$}{$F(x)=\dfrac{4}{x^2}-4+C$}{$F(x)=-\dfrac{36}{x^4}-4+C$}{$F(x)=-\dfrac{6}{x^2}-4+C$}
+\nmtOptions{$F(x)=-\dfrac{36}{x^2}-2x^2+C$}{$F(x)=-\dfrac{6}{x^2}-2x^2+C$}{$F(x)=\dfrac{4}{x^2}-4+C$}{$F(x)=-\dfrac{36}{x^4}-4+C$}{$F(x)=-\dfrac{6}{x^2}-4+C$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. Укажіть правильну подвійну нерівність, якщо $a = \displaystyle\int\limits_{-2}^{0} f(x) dx$, $b = \displaystyle\int\limits_{0}^{2} f(x) dx$, $c = \displaystyle\int\limits_{2}^{4} f(x) dx$. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$. Укажіть правильну подвійну нерівність, якщо $a = \displaystyle\int\limits_{-2}^{0} f(x) dx$, $b = \displaystyle\int\limits_{0}^{2} f(x) dx$, $c = \displaystyle\int\limits_{2}^{4} f(x) dx$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.6cm, y=0.4cm,
-        axis lines=middle,
-        xmin=-3, xmax=5,
-        ymin=-2, ymax=4.5,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        xtick={-2,0,1,2,4},
-        ytick={1},
-        ticklabel style={font=\footnotesize},
-        xticklabels={-2,0,1,2,4},
-        yticklabels={1}, 
-        clip=false
-    ]
-        % Імітація графіка через сплайн
-        \addplot[thick, smooth, tension=0.6] coordinates {
-            (-2.5, -1)
-            (-1.8, 0)
-            (-1, 3.5)
-            (0, 0)
-            (1, 4)
-            (2, 0)
-            (3, 1.2)
-            (4, 0)
-            (4.5, -2)
-        };
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.51x4.01 S
 
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:3, 1.5) {$y=f(x)$};
-    \end{axis}
+    \draw[nmt grid, step=1] (-4,-3) grid (7,5);
+    \draw[->] (-4,0) -- (7,0) node[below left] {$x$};
+    \draw[->] (0,0) -- (0,5) node[below left] {$y$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, xshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (-2,0) {$-2$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (2,0) {$2$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (4,0) {$4$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (-0.4,1) {$1$};
+
+    % левий хвіст, «трикутник» з вершиною (-1;4), два горби, правий хвіст
+    \draw[nmt curve] (-3.7,-1.72) .. controls (-3,-1.25) and (-2.15,-0.6) .. (-2,0)
+        -- (-1,4) -- (0,0)
+        .. controls (0.05,2.6) and (0.4,4) .. (1,4)
+        .. controls (1.6,4) and (1.95,2.6) .. (2,0)
+        .. controls (2.1,0.8) and (2.5,1) .. (3,1)
+        .. controls (3.5,1) and (3.8,0.5) .. (4,0)
+        .. controls (4.25,-0.6) and (4.6,-1.9) .. (4.9,-2.95);
+    \node[anchor=south west, fill=white, inner sep=1.5pt] at (3,1.4) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$b < c < a$}{$c < b < a$}{$b < a < c$}{$a < b < c$}{$c < a < b$}
 \par\penalty-20
 \end{samepage}
@@ -402,40 +145,46 @@
 
 \nmtnobreak
 \begin{center}
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{2.8cm}|}}
+\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
 % Рис А (горизонтальна y=3)
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.508]%@N 2.11x1.89 S
+
     \draw[->] (-2,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2) node[left] {$y$};
     \draw[thick] (-1.8,1) -- (1.8,1);
     \node[below right] at (0,0) {\small $0$};
 \end{tikzpicture}\end{nmtfit} &
 % Рис Б (пряма k>0)
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.508]%@N 2.11x1.89 S
+
     \draw[->] (-2,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2) node[left] {$y$};
     \draw[thick] (-1,-2) -- (1,2);
     \node[below right] at (0,0) {\small $0$};
 \end{tikzpicture}\end{nmtfit} &
 % Рис В (пряма k<0)
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.508]%@N 2.11x1.89 S
+
     \draw[->] (-2,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2) node[left] {$y$};
     \draw[thick] (-1,2) -- (1,-2);
     \node[below right] at (0,0) {\small $0$};
 \end{tikzpicture}\end{nmtfit} &
 % Рис Г (пряма k>0 зміщена)
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.508]%@N 2.11x1.89 S
+
     \draw[->] (-2,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2) node[left] {$y$};
     \draw[thick] (-1.5,-2) -- (1.5,1);
     \node[below right] at (0,0) {\small $0$};
 \end{tikzpicture}\end{nmtfit} &
 % Рис Д (горизонтальна y=-3)
-\begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.508]%@N 2.11x1.89 S
+
     \draw[->] (-2,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-2) -- (0,2) node[left] {$y$};
     \draw[thick] (-1.8,-1) -- (1.8,-1);
@@ -449,14 +198,7 @@
 
 \begin{samepage}
 \noindent\zadnum Яка з наведених функцій є первісною для функції $f(x) = e^x + 2$? \nmtyear{2024}
-
-\nmtnobreak
-\answerListVertical
-{$F(x)=e^x+2x-3$}
-{$F(x)=e^x+1$}
-{$F(x)=2x$}
-{$F(x)=xe^{x-1}+2x+3$}
-{$F(x)=xe^{x-1}$}
+\nmtOptions{$F(x)=e^x+2x-3$}{$F(x)=e^x+1$}{$F(x)=2x$}{$F(x)=xe^{x-1}+2x+3$}{$F(x)=xe^{x-1}$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -471,27 +213,13 @@
 
 \begin{samepage}
 \noindent\zadnum Визначте загальний вигляд первісних для функції $f(x) = 2e^x + 1$. \nmtyear{2025}
-
-\nmtnobreak
-\answerListVertical
-{$F(x) = 2e^x + C$}
-{$F(x) = 2e^x + x + C$}
-{$F(x) = e^{x^2} + C$}
-{$F(x) = e^{x^2} + x + C$}
-{$F(x) = \dfrac{2e^{x+1}}{x+1} + x + C$}
+\nmtOptions{$F(x) = 2e^x + C$}{$F(x) = 2e^x + x + C$}{$F(x) = e^{x^2} + C$}{$F(x) = e^{x^2} + x + C$}{$F(x) = \dfrac{2e^{x+1}}{x+1} + x + C$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 \noindent\zadnum Укажіть первісну функції $f(x) = 3\cos x - x$. \nmtyear{2025}
-
-\nmtnobreak
-\answerListVertical
-{$F(x) = -3\sin x - \dfrac{x^2}{2}$}
-{$F(x) = 3\sin x - 1$}
-{$F(x) = 3\sin x - \dfrac{x^2}{2}$}
-{$F(x) = 3\sin x$}
-{$F(x) = -3\sin x - 1$}
+\nmtOptions{$F(x) = -3\sin x - \dfrac{x^2}{2}$}{$F(x) = 3\sin x - 1$}{$F(x) = 3\sin x - \dfrac{x^2}{2}$}{$F(x) = 3\sin x$}{$F(x) = -3\sin x - 1$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -509,14 +237,9 @@
 \zadtask{Укажіть інтеграл, який має \textit{найменше} значення. \nmtyear{2026}
 
 \nmtnobreak
-\par\nbvspace{0.2cm}
-\begin{flushleft}
-\textbf{А} \quad $\displaystyle\int_0^1 \dfrac{1}{4}\,dx$ \\[0.25cm]
-\textbf{Б} \quad $\displaystyle\int_0^1 \dfrac{1}{3}\,dx$ \\[0.25cm]
-\textbf{В} \quad $\displaystyle\int_0^1 \dfrac{1}{2}\,dx$ \\[0.25cm]
-\textbf{Г} \quad $\displaystyle\int_0^1 1\,dx$ \\[0.25cm]
-\textbf{Д} \quad $\displaystyle\int_0^1 \sqrt{2}\,dx$
-\end{flushleft}
+\par
+\nmtOptions{$\displaystyle\int_0^1 \dfrac{1}{4}\,dx$}{$\displaystyle\int_0^1 \dfrac{1}{3}\,dx$}{$\displaystyle\int_0^1 \dfrac{1}{2}\,dx$}{$\displaystyle\int_0^1 1\,dx$}{$\displaystyle\int_0^1 \sqrt{2}\,dx$}
+
 }
 % Відповідь: А
 \ifshowsolutions\solution{Для сталої $c$ маємо $\int_0^1 c\,dx=c$. Тож значення дорівнюють самим сталим; найменше з $\dfrac14,\dfrac13,\dfrac12,1,\sqrt2$ — це $\dfrac14$. Відповідь: \textbf{А}.}\fi
@@ -535,23 +258,18 @@
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №10
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
-\zadnum Обчисліть площу $S$ заштрихованої фігури, обмеженої графіком функції $y=e^x$, осями координат і прямою $x=1$. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.2cm}
-\par\noindent\textbf{А}\ \ $S = e+1$
-\par\noindent\textbf{Б}\ \ $S = e$
-\par\noindent\textbf{В}\ \ $S = 1$
-\par\noindent\textbf{Г}\ \ $S = 1-e$
-\par\noindent\textbf{Д}\ \ $S = e-1$
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Обчисліть площу $S$ заштрихованої фігури, обмеженої графіком функції $y=e^x$, осями координат і прямою $x=1$. \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \par
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1.5, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.96, thick]%@N 5.77x7.50 S
+
     \draw[->] (-1.5,0) -- (2,0) node[right] {$x$};
     \draw[->] (0,-0.5) -- (0,3) node[above] {$y$};
-    \draw[domain=-1.5:1.5, smooth, variable=\x, black] plot ({\x}, {exp(\x)});
-    \fill[cyan!40] (0,0) -- (1,0) -- (1,{exp(1)}) -- plot[domain=1:0, smooth] ({\x}, {exp(\x)}) -- cycle;
+    \draw[nmt curve, domain=-1.5:1.5, smooth, variable=\x] plot ({\x}, {exp(\x)});
+    \fill[nmtFillA] (0,0) -- (1,0) -- (1,{exp(1)}) -- plot[domain=1:0, smooth] ({\x}, {exp(\x)}) -- cycle;
     \draw (1,0) -- (1,{exp(1)});
     \node[below left] at (0,0) {$0$};
     \node[below] at (1,0) {$1$};
@@ -559,6 +277,9 @@
     \node[right] at (1.2, 2.5) {$y=e^x$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par
+\nmtOptions{$S = e+1$}{$S = e$}{$S = 1$}{$S = 1-e$}{$S = e-1$}
+
 \par\nbvspace{0.3cm}
 \par\penalty-20
 \end{samepage}
@@ -593,12 +314,7 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 3 (ВИПРАВЛЕНО) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На рисунку зображено графіки функцій $y = 3\sqrt{x}$ і $y = \dfrac{3}{2}x$. Обчисліть площу фігури, обмеженої графіками цих функцій. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{На рисунку зображено графіки функцій $y = 3\sqrt{x}$ і $y = \dfrac{3}{2}x$. Обчисліть площу фігури, обмеженої графіками цих функцій. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
@@ -615,18 +331,20 @@
         xticklabels={0,1,,,4,},
         yticklabels={,1,,,,,6,}, 
         clip=false
-    ]
+    ,
+    width=12.5cm,
+    height=6.2cm]
         % 1. Спочатку визначаємо шляхи (name path)
-        \addplot[name path=A, draw=none, domain=0:4.5, samples=100] {3*sqrt(x)};
-        \addplot[name path=B, draw=none, domain=0:4.5] {1.5*x};
+        \addplot[nmt curve, name path=A, draw=none, domain=0:4.5, samples=100] {3*sqrt(x)};
+        \addplot[nmt curve, name path=B, draw=none, domain=0:4.5] {1.5*x};
 
         % 2. Малюємо заливку (важливо: це має бути перед основними лініями, якщо хочете, щоб лінії були зверху)
         % Використовуємо fill=... для явного кольору
-        \addplot[fill=gray!40, fill opacity=0.5, draw=none] fill between[of=A and B, soft clip={domain=0:4}];
+        \addplot[nmt curve, fill=gray!40, fill opacity=0.5, draw=none] fill between[of=A and B, soft clip={domain=0:4}];
 
         % 3. Малюємо самі лінії поверх заливки (щоб вони були чіткими)
-        \addplot[thick, smooth, domain=0:4.5, samples=100] {3*sqrt(x)};
-        \addplot[thick, smooth, domain=0:4.5] {1.5*x};
+        \addplot[nmt curve, smooth, domain=0:4.5, samples=100] {3*sqrt(x)};
+        \addplot[nmt curve, smooth, domain=0:4.5] {1.5*x};
 
         % Підписи
         \node[right] at (axis cs:0.2, 5.8) {$y=3\sqrt{x}$};
@@ -639,10 +357,7 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -676,12 +391,7 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 10 (ВИПРАВЛЕНО) ===
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі геометричних фігур $A$, $B$ і $C$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $6{,}3$ кв. од., $5{,}4$ кв. од. та $4$ кв. од. відповідно. Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 4) dx$. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі геометричних фігур $A$, $B$ і $C$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $6{,}3$ кв. од., $5{,}4$ кв. од. та $4$ кв. од. відповідно. Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 4) dx$. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
@@ -692,18 +402,20 @@
         xlabel={$x$}, ylabel={$y$},
         ticks=none,
         clip=false
-    ]
+    ,
+    width=12.5cm,
+    height=6.2cm]
         % Спочатку визначаємо шляхи, але не малюємо їх (draw=none)
-        \addplot[name path=F, draw=none, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
+        \addplot[nmt curve, name path=F, draw=none, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
         \path[name path=axis] (axis cs:0,0) -- (axis cs:5,0);
 
         % Заливка областей (fill opacity робить їх напівпрозорими, щоб не перекривати осі)
-        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=0.01:2}];
-        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=2:4}];
-        \addplot[fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=4:5}];
+        \addplot[nmt curve, fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=0.01:2}];
+        \addplot[nmt curve, fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=2:4}];
+        \addplot[nmt curve, fill=gray!30, fill opacity=0.8] fill between[of=F and axis, soft clip={domain=4:5}];
 
         % Тепер малюємо сам графік поверх заливки
-        \addplot[thick, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
+        \addplot[nmt curve, smooth, tension=0.7] coordinates {(0,0) (1,3) (2,0) (3,-2.5) (4,0) (4.5,1.5) (5,0)};
 
         % Підписи
         \node at (axis cs:1,1.5) {$A$};
@@ -715,10 +427,7 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -733,43 +442,25 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$, паралельний осі $x$ (див. рисунок). Площа зафарбованої фігури дорівнює 8 кв. од. Обчисліть $\displaystyle\int\limits_{-3}^{3} f(x) dx$. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Графік функції $y=f(x)$, визначеної на проміжку $(-\infty; +\infty)$, паралельний осі $x$ (див. рисунок). Площа зафарбованої фігури дорівнює 8 кв. од. Обчисліть $\displaystyle\int\limits_{-3}^{3} f(x) dx$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.7cm, y=0.7cm,
-        axis lines=middle,
-        xmin=-4, xmax=2,
-        ymin=-2, ymax=1.5,
-        xlabel={$x$}, ylabel={$y$},
-        xtick={-3,0},
-        ytick={0},
-        clip=false
-    ]
-        % Пряма f(x)
-        \addplot[thick, domain=-4:2] {-1.3};
-        \node[below, fill=white, inner sep=1.5pt] at (axis cs:2, -1.3) {$y=f(x)$};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.878]%@N 5.55x3.89 S
 
-        % Заливка (прямокутник)
-        \fill[gray!40] (axis cs:-3,0) rectangle (axis cs:0,-1.3);
-        \draw (axis cs:-3,0) -- (axis cs:-3,-1.3);
-
-        % Явний підпис -3
-        \node[above] at (axis cs:-3,0) {$-3$};
-        \node[above left] at (axis cs:0,0) {$0$};
-    \end{axis}
-
+    \filldraw[fill=nmtFillD, draw=nmtInk, thin] (-3,0) rectangle (0,-2);
+    \draw[->] (-4,0) -- (2.6,0) node[below] {$x$};
+    \draw[->] (0,-2.8) -- (0,1.7) node[left] {$y$};
+    \draw[nmt curve] (-4,-2) -- (2.6,-2);
+    \node[above left] at (-3,0) {$-3$};
+    \node[above left] at (0,0) {$0$};
+    \node[above, inner sep=2pt] at (1.5,-2) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -819,44 +510,11 @@
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-% Ілюстрація до завдання 22 (необов'язкова, але корисна для перевірки)
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.6cm, y=0.3cm,
-        axis lines=middle,
-        xmin=-1, xmax=4,
-        ymin=-1, ymax=10,
-        xlabel={$x$}, ylabel={$y$},
-        xtick={3}, ytick={9},
-        clip=false
-    ]
-        % Графіки
-        \addplot[thick, smooth, domain=0:3.2] {x^3/3};
-        \addplot[thick, domain=-0.5:3.5] {9};
-
-        % Заливка області
-        \addplot[name path=curve, draw=none, domain=0:3] {x^3/3};
-        \addplot[name path=line, draw=none, domain=0:3] {9};
-        \addplot[fill=gray!40] fill between[of=line and curve];
-
-        \node[right] at (axis cs:3, 9) {$y=\frac{x^3}{3}$};
-        \node[above left] at (axis cs:1, 9) {$y=9$};
-    \end{axis}
-\end{tikzpicture}\end{nmtfit}
-\end{center}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $f(x) = \begin{cases} 1, & x \in (-\infty; 0], \\ 2, & x \in (0; +\infty). \end{cases}$
-
-Обчисліть $\displaystyle\int\limits_{-4}^{-1} f(x) dx + 2\displaystyle\int\limits_{1}^{8} f(x) dx$. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{На рисунку зображено графік функції $f(x) = \begin{cases} 1, & x \in (-\infty; 0], \\ 2, & x \in (0; +\infty). \end{cases}$}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
@@ -867,21 +525,26 @@
         xlabel={$x$}, ylabel={$y$},
         xtick={0}, ytick={1,2},
         clip=false
-    ]
+    ,
+    width=12.5cm,
+    height=6.2cm]
         % Лінія y=1
         \draw[thick] (axis cs:-5,1) -- (axis cs:0,1);
-        \fill (axis cs:0,1) circle (1.5pt); 
+        \path (axis cs:0,1) node[nmt dot] {}; 
 
         % Лінія y=2
         \draw[thick] (axis cs:0,2) -- (axis cs:5,2);
-        \fill[white] (axis cs:0,2) circle (1.5pt);
-        \draw (axis cs:0,2) circle (1.5pt); 
+        \path (axis cs:0,2) node[nmt dot] {};
+        \path (axis cs:0,2) node[nmt open dot] {}; 
 
         \node[below left] at (axis cs:0,0) {$0$};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
+\nopagebreak\nbvspace{0.2cm}
+Обчисліть $\displaystyle\int\limits_{-4}^{-1} f(x) dx + 2\displaystyle\int\limits_{1}^{8} f(x) dx$. \nmtyear{2024}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -890,12 +553,7 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Обчисліть $\displaystyle\int\limits_{0}^{7} f(x) dx$, використавши зображений на рисунку графік лінійної функції $y=f(x)$. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{Обчисліть $\displaystyle\int\limits_{0}^{7} f(x) dx$, використавши зображений на рисунку графік лінійної функції $y=f(x)$. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
@@ -906,9 +564,11 @@
         xlabel={$x$}, ylabel={$y$},
         xtick={0,7}, ytick={3,8},
         clip=false
-    ]
+    ,
+    width=12.5cm,
+    height=6.2cm]
         % Графік прямої через (0,3) і (7,8)
-        \addplot[thick, domain=-1.5:8] {(5/7)*x + 3};
+        \addplot[nmt curve, domain=-1.5:8] {(5/7)*x + 3};
 
         % Пунктири
         \draw[dashed] (axis cs:0,8) -- (axis cs:7,8) -- (axis cs:7,0);
@@ -918,10 +578,7 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -936,51 +593,34 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$, фрагментом якої є півколо. Обчисліть $\dfrac{1}{\pi} \displaystyle\int\limits_{-5}^{5} f(x) dx$. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-5; 5]$, фрагментом якої є півколо. Обчисліть $\dfrac{1}{\pi} \displaystyle\int\limits_{-5}^{5} f(x) dx$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.4cm, y=0.4cm,
-        axis lines=middle,
-        xmin=-6, xmax=6,
-        ymin=-1, ymax=6,
-        xlabel={$x$}, ylabel={$y$},
-        xtick={-5,0,5}, ytick={5},
-        clip=false
-    ]
-        % Півколо
-        \addplot[thick, domain=-5:5, samples=100] {sqrt(25-x^2)};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.446]%@N 5.55x3.77 S
 
-        \fill (axis cs:-5,0) circle (1.5pt);
-        \fill (axis cs:5,0) circle (1.5pt);
-
-        \node[right, fill=white, inner sep=1.5pt] at (axis cs:2.5, 4.5) {$y=f(x)$};
-        \node[below left] at (axis cs:0,0) {$0$};
-    \end{axis}
+    \draw[->] (-6,0) -- (6.6,0) node[right] {$x$};
+    \draw[->] (0,-1.2) -- (0,6.6) node[above] {$y$};
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (-5,0) {$-5$};
+    \node[below] at (5,0) {$5$};
+    \node[anchor=south east, xshift=-2pt, yshift=2pt] at (0,5) {$5$};
+    \draw[nmt curve] (-5,0) arc (180:0:5);
+    \node[nmt dot] at (-5,0) {};
+    \node[nmt dot] at (5,0) {};
+    \node[fill=white, inner sep=1.5pt] at (3.6,5.7) {$y=f(x)$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі фігур $A$ і $B$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $7{,}2$ кв. од. і $6{,}1$ кв. од. відповідно.
-
-Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 6) dx$. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
+\zadtask{На рисунку зображено графік неперервної на відрізку $[0; 5]$ функції $y=f(x)$. Площі фігур $A$ і $B$, обмежених віссю $x$ та графіком цієї функції, дорівнюють $7{,}2$ кв. од. і $6{,}1$ кв. од. відповідно.}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
@@ -991,9 +631,11 @@
         xlabel={$x$}, ylabel={$y$},
         ticks=none,
         clip=false
-    ]
+    ,
+    width=12.5cm,
+    height=6.2cm]
         % Визначаємо форму графіка (два "пагорби")
-        \addplot[name path=curve, smooth, tension=0.7, draw=none] coordinates {
+        \addplot[nmt curve, name path=curve, smooth, tension=0.7, draw=none] coordinates {
             (0,0) (1.2, 3) (2.5, 0) (3.8, 2.5) (5,0)
         };
 
@@ -1001,11 +643,11 @@
         \path[name path=axis] (axis cs:0,0) -- (axis cs:5,0);
 
         % Заливка (fill opacity=0.3, щоб було схоже на оригінал)
-        \addplot[fill=gray!30] fill between[of=curve and axis];
+        \addplot[nmt curve, fill=gray!30] fill between[of=curve and axis];
 
         % Малюємо контур графіка
 
-     \addplot[thick, smooth, tension=0.7] coordinates {
+     \addplot[nmt curve, smooth, tension=0.7] coordinates {
     (0,0) (1.2, 3) (2.5, 0) (3.8, 2.5) (5,0) (5.3, -1)
 };
 
@@ -1017,7 +659,10 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\end{minipage}
+\nopagebreak\nbvspace{0.2cm}
+Обчисліть $\displaystyle\int\limits_0^{5} (f(x) + 6) dx$. \nmtyear{2024}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -1029,58 +674,43 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Графіки функцій $y=f(x)$ й $y=x^2-2x+3$ перетинаються в точках з абсцисами $x_1=0$ й $x_2=3$ (див. рисунок). Обчисліть площу зафарбованої фігури, якщо $\displaystyle\int\limits_0^3 f(x) dx = 14{,}1$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Графіки функцій $y=f(x)$ й $y=x^2-2x+3$ перетинаються в точках з абсцисами $x_1=0$ й $x_2=3$ (див. рисунок). Обчисліть площу зафарбованої фігури, якщо $\displaystyle\int\limits_0^3 f(x) dx = 14{,}1$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.8cm, y=0.5cm,
-        axis lines=middle,
-        xmin=-0.5, xmax=4.5,
-        ymin=-0.5, ymax=7.5,
-        xlabel={$x$}, ylabel={$y$},
-        grid=both,
-        grid style={line width=.2pt, draw=gray!40},
-        xtick={0,1,3},
-        ytick={1,2,3,6}, % Додав основні точки на осі Y
-        ticklabel style={font=\footnotesize},
-        clip=false
-    ]
-        % Парабола y = x^2 - 2x + 3
-        \addplot[name path=parabola, thick, domain=-0.5:3.5, samples=100] {x^2 - 2*x + 3};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.03x5.79 S
 
-        % Функція f(x) побудована через точки
-        \addplot[name path=func, thick, smooth, tension=0.6] coordinates {
-            (-1, 1)
-            (0, 3)
-         (1, 4.5) (2, 5.5)
-            (3, 6) (4, 6.8)
-        };
-
-        % Заливка між графіками від x=0 до x=3
-        \addplot[fill=orange!70, fill opacity=0.8] fill between[of=func and parabola, soft clip={domain=0:3}];
-
-        % Підписи
-        \node[above, fill=white, inner sep=1.5pt] at (axis cs:3, 6) {$y=f(x)$};
-        \node[right] at (axis cs:1.2, 2.2) {$y=x^2-2x+3$};
-
-        \node[below left] at (axis cs:0,0) {$0$};
-
-        % Точки перетину та ключові точки (опціонально)
-        \fill (axis cs:0,3) circle (1.5pt);
-        \fill (axis cs:3,6) circle (1.5pt);
-        \fill (axis cs:1,2) circle (1.5pt);
-    \end{axis}
+    \draw[nmt grid, step=1] (-2,-2) grid (8,9);
+    \draw[->, thick] (-2,0) -- (8,0) node[below left] {$x$};
+    \draw[->, thick] (0,-2) -- (0,9) node[right] {$y$};
+    \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (3,0.12) -- (3,-0.12); \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (3,0) {$3$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    % зафарбована фігура між графіками на [0; 3]
+    \fill[nmtFillC] (0,3) .. controls (0.333,3.473) and (0.667,3.751) .. (1,4.1)
+        .. controls (1.333,4.449) and (1.667,4.784) .. (2,5.1)
+        .. controls (2.333,5.416) and (2.667,5.772) .. (3,6)
+        -- plot[domain=3:0, samples=40, variable=\x] ({\x},{\x*\x-2*\x+3}) -- cycle;
+    % парабола y = x^2 - 2x + 3
+    \draw[nmt curve, domain=-1.3:3.3, samples=60, smooth, variable=\x] plot ({\x},{\x*\x-2*\x+3});
+    % графік f: монотонна гладка крива через (-1;1), (0;3), (3;6) і далі вправо
+    \draw[nmt curve] (-1,1) .. controls (-0.667,1.817) and (-0.333,2.527) .. (0,3)
+        .. controls (0.333,3.473) and (0.667,3.751) .. (1,4.1)
+        .. controls (1.333,4.449) and (1.667,4.784) .. (2,5.1)
+        .. controls (2.333,5.416) and (2.667,5.772) .. (3,6)
+        .. controls (3.333,6.228) and (3.667,6.407) .. (4,6.55)
+        .. controls (4.333,6.693) and (4.667,6.815) .. (5,6.9)
+        .. controls (5.333,6.985) and (5.667,7.058) .. (6,7.1);
+    \node[anchor=south, fill=white, inner sep=1.5pt] at (5.4,7.4) {$y=f(x)$};
+    \node[anchor=west, fill=white, inner sep=1.5pt] at (1.9,1.1) {$y=x^2-2x+3$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -1096,46 +726,30 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графіки функцій $y=x^3+1$ та $y=9$. Обчисліть площу зафарбованої фігури, обмеженої графіками функцій $y=x^3+1$ і $y=9$ та прямою $x=0$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графіки функцій $y=x^3+1$ та $y=9$. Обчисліть площу зафарбованої фігури, обмеженої графіками функцій $y=x^3+1$ і $y=9$ та прямою $x=0$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.40\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        x=0.8cm, y=0.4cm,
-        axis lines=middle,
-        xmin=-1, xmax=2.5,
-        ymin=-1, ymax=11,
-        xlabel={$x$}, ylabel={$y$},
-        xtick={0,1},
-        ytick={1},
-        clip=false
-    ]
-        % Крива x^3+1
-        \addplot[name path=curve, thick, smooth, domain=-0.5:2.2] {x^3+1};
-        % Пряма y=9
-        \addplot[name path=line, thick, domain=-1:2.5] {9};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.658, x=0.5cm, y=0.5cm]%@N 3.87x7.29 S
 
-        % Заливка між x=0, кривою та y=9
-        % Тут хитрість: заливка між прямою y=9 і кривою y=x^3+1 на проміжку [0, 2]
-        % (Точка перетину: x^3+1=9 => x=2)
-        \path[name path=yaxis] (axis cs:0,0) -- (axis cs:0,9);
-        \addplot[fill=violet!30] fill between[of=line and curve, soft clip={domain=0:2}];
-
-        % Підписи
-        \node[above] at (axis cs:2, 9) {$y=9$};
-        \node[right] at (axis cs:1.2, 4) {$y=x^3+1$};
-        \node[below left] at (axis cs:0,0) {$0$};
-    \end{axis}
+    \fill[nmtFillE] (0,9) -- (0,1) -- plot[domain=0:2, samples=21] (\x,{\x*\x*\x+1}) -- cycle;
+    \draw[->] (-1.8,0) -- (4.0,0) node[below left] {$x$};
+    \draw[->] (0,-2.8) -- (0,11.2) node[left] {$y$};
+    \draw[thin] (1,0.15) -- (1,-0.15);
+    \draw[thin] (0.15,1) -- (-0.15,1);
+    \node[below left] at (0,0) {$0$};
+    \node[below] at (1,-0.1) {$1$};
+    \node[above left, xshift=2pt, yshift=1pt] at (0,1) {$1$};
+    \draw[nmt curve, domain=-1.45:2.12, samples=40] plot (\x,{\x*\x*\x+1});
+    \draw[thick] (-1.8,9) -- (4.0,9);
+    \node[above right, xshift=-2pt] at (2.5,9) {$y=9$};
+    \node[anchor=west, inner sep=2pt] at (1.85,4.2) {$y=x^3+1$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.5cm}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}

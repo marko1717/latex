@@ -1,191 +1,18 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 28b}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
-
 \begin{document}
 \begingroup\setcounter{zad}{0}
+% --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
 % --- сумісність зі старою базою (діє, якщо тема не має власного визначення) ---
 \providecommand{\trigStyle}[1]{#1}
 \providecommand{\answerTableSmall}[5]{%
@@ -197,47 +24,10 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 28b. Показникова функція і показникові вирази}
-\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 31 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 8}, \mbox{2025~--- 7}); \mbox{тестових~--- 2}; \mbox{на відповідність~--- 29}.}\par\vspace{0.2cm}
+\noindent{\small\color{gray!80} Розділ 3. Функції \quad\textbullet\quad Усього завдань: 38 (НМТ \mbox{2023~--- 16}, \mbox{2024~--- 8}, \mbox{2025~--- 7}, \mbox{2026~--- 7}); \mbox{тестових~--- 2}; \mbox{на відповідність~--- 36}.}\par\vspace{0.2cm}
 
 \typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
@@ -271,7 +61,7 @@
 \matchHead{Вираз}
     \matchItem{1}{$\displaystyle\frac{64 - a^2}{8 - a}$}
 \matchItem{2}{$2^{3a}$}
-\matchItem{3}{$\log_{\sqrt[3]{2}} 2^a$}
+\matchItem{3}{$\log_{\sqrt[8]{2}} 2^a$}
 }{
 \matchHead{Тотожно рівний вираз}
     \matchItem{А}{$8^a$}
@@ -382,18 +172,19 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині зображено коло $x^2+y^2=4$. Установіть відповідність між функцією (1–3) та кількістю (А – Д) спільних точок, які має графік цієї функції із заданим колом. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині зображено коло $x^2+y^2=4$. Установіть відповідність між функцією (1–3) та кількістю (А – Д) спільних точок, які має графік цієї функції із заданим колом. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.692]%@N 5.02x3.89 S
+
         % Сітка та осі
 
-        \draw[->, >=stealth, thick] (-3,0) -- (3,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-3) -- (0,3) node[left] {$y$};
+        \draw[->, thick] (-3,0) -- (3,0) node[below] {$x$};
+        \draw[->, thick] (0,-3) -- (0,3) node[left] {$y$};
 
         % Коло
         \draw[thick] (0,0) circle (2cm);
@@ -402,14 +193,8 @@
         \node[below left] at (0,0) {$0$};
         \node[above right] at (1.4, 1.4) {$x^2+y^2=4$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
-\noindent
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Функція}
     \matchItem{1}{$y=x+4$}
@@ -825,63 +610,75 @@
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 1 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.03x4.21 S
 
-        % Дуга (схожа на півокружність або параболу вниз)
-        \draw[thick] plot [smooth, tension=1.5] coordinates {(-3, -1) (0, -4) (3, -1)};
-        \node[right] at (2, -2.5) {\small $y=f(x)$};
-        \fill (-3,-1) circle (3pt);
-        \fill (3,-1) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt grid, step=1] (-5,-5) grid (5,3);
+    \draw[->, thick] (-5,0) -- (5,0);
+    \draw[->, thick] (0,-5) -- (0,3);
+    % відступ зверху, щоб підпис над рисунком не торкався стрілки осі y
+    \path (0,3.4);
+    \node at (4.5,-0.58) {$x$};
+    \node at (-0.58,2.5) {$y$};
+    \node[below left, xshift=-3pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[right, xshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \node[above, yshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (-3,0) {$-3$};
+    \node[above, yshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (3,0) {$3$};
+    \draw[nmt curve] (-3,-1) arc[start angle=180, end angle=360, radius=3];
+    \node[nmt dot] at (-3,-1) {};
+    \node[nmt dot] at (3,-1) {};
+    \node[fill=white, inner xsep=3pt, inner ysep=1.5pt, anchor=east] at (4.75,2) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 2 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.03x4.21 S
 
-        % "Горб"
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-3, -2) (-1, 3) (1, 0) (3, -1.5)};
-        \node[right] at (1, 2) {\small $y=f(x)$};
-        \fill (-3,-2) circle (3pt);
-        \fill (3,-1.5) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+    \draw[->, thick] (-5,0) -- (5,0);
+    \draw[->, thick] (0,-3) -- (0,5);
+    % відступ зверху, щоб підпис над рисунком не торкався стрілки осі y
+    \path (0,5.4);
+    \node at (4.5,-0.58) {$x$};
+    \node at (-0.58,4.5) {$y$};
+    \node[below left, xshift=-3pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below right, xshift=2.5pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[right, xshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (-3,0) {$-3$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (3,0) {$3$};
+    \draw[nmt curve] (-3,0) .. controls (-2.78,1.43) and (-2.3,4) .. (-1.56,4)
+        .. controls (-0.83,4) and (-0.77,0.95) .. (0,0)
+        .. controls (0.75,-0.97) and (1.47,-1.41) .. (3,-1.8);
+    \node[nmt dot] at (-3,0) {};
+    \node[nmt dot] at (3,-1.8) {};
+    \node[fill=white, inner xsep=3pt, inner ysep=1.5pt, anchor=east] at (4.75,4) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.32\textwidth}\nbvspace{0pt}
     \centering
     Рис. 3 \\
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-        \draw[step=1cm,gray!50,very thin] (-3.5,-3.5) grid (3.5,3.5);
-        \draw[->, >=stealth] (-3.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth] (0,-3.5) -- (0,3.5) node[left] {$y$};
-        \node[below left] at (0,0) {\small $0$};
-        \node[left] at (0,1) {\small $1$};
-        \node[below] at (1,0) {\small $1$};
-        \node[below] at (3,0) {\small $3$};
-        \node[below] at (-3,0) {\small $-3$};
+    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.03x4.26 S
 
-        % Спадна функція
-        \draw[thick] plot [smooth, tension=0.6] coordinates {(-2.5, 3.5) (-1, 2) (0, 0) (1, -1) (3, -3)};
-        \node[left] at (-2, 2) {\small $y=f(x)$};
-        \fill (3,-3) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
+    \draw[nmt grid, step=1] (-5,-3) grid (5,5);
+    \draw[->, thick] (-5,0) -- (5,0);
+    \draw[->, thick] (0,-3) -- (0,5);
+    % відступ зверху, щоб підпис над рисунком не торкався стрілки осі y
+    \path (0,5.4);
+    \node at (4.5,-0.58) {$x$};
+    \node at (-0.58,4.5) {$y$};
+    \node[below left, xshift=-3pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below right, xshift=2.5pt, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[right, xshift=3pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (-3,0) {$-3$};
+    \node[below, yshift=-3pt, fill=white, inner sep=1pt, outer sep=1pt] at (3,0) {$3$};
+    \draw[nmt curve] (-3,5) .. controls (-2.81,3.95) and (-2.46,2.38) .. (-2,2) -- (3,-3);
+    \node[nmt dot] at (-3,5) {};
+    \node[nmt dot] at (3,-3) {};
+    \node[fill=white, inner xsep=3pt, inner ysep=1.5pt, anchor=east] at (4.75,4) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
 
 \nmtnobreak
@@ -937,49 +734,62 @@
 \begin{center}
 \begingroup
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{|*{5}{c|}}
+\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (2,0) {\tiny $2$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]%@N 2.77x2.28 S
+
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below right] at (2,0) {\small $2$};
+    \node[below right] at (0,-2) {\small $-2$};
+    \draw (-1.2,-3.2) -- (3.3,1.3);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[above right] at (0,1) {\tiny $1$};
-    \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
-    \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]%@N 2.77x2.28 S
+
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \coordinate (O) at (0,0); \coordinate (P) at (0,1); \coordinate (Q) at (1,1);
+    \node[below left] at (0,0) {\small $0$};
+    \node[above left] at (0,1) {\small $1$};
+    \pic[draw, angle radius=0.17cm] {right angle = Q--P--O};
+    \draw (-3.4,1) -- (3.4,1);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below left] at (-1,0) {\tiny $-1$};
-    \draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут
-    \draw[thick] (-1,-2) -- (-1,3); % x = -1
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]%@N 2.77x2.28 S
+
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[right] {$y$};
+    \coordinate (O) at (0,0); \coordinate (P) at (-1,0); \coordinate (Q) at (-1,1);
+    \node[below right] at (0,0) {\small $0$};
+    \node[below left, xshift=-2pt] at (-1,0) {\small $-1$};
+    \pic[draw, angle radius=0.17cm] {right angle = O--P--Q};
+    \draw (-1,-3.2) -- (-1,3.0);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below] at (-2,0) {\tiny $-2$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]%@N 2.77x2.28 S
+
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below left] at (-2,0) {\small $-2$};
+    \node[below left] at (0,-2) {\small $-2$};
+    \draw (-3.2,1.2) -- (1.2,-3.2);
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (3,0) {\tiny $3$};
-    \node[left] at (0,-2) {\tiny $-2$};
-    \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
+\begin{nmtfit}\begin{tikzpicture}[scale=0.33, thick]%@N 2.77x2.28 S
+
+    \useasboundingbox (-3.8,-3.4) rectangle (4.6,3.5);
+    \draw[->] (-3.4,0) -- (4.2,0) node[below] {$x$};
+    \draw[->] (0,-3.2) -- (0,3.0) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[above left] at (3,0) {\small $3$};
+    \node[below right] at (0,-2) {\small $-2$};
+    \draw (-1.2,-2.8) -- (3.6,0.4);
 \end{tikzpicture}\end{nmtfit} \\
 \hline
 \end{tabular}
@@ -1062,47 +872,33 @@
 
 \begin{samepage}
 % рік визначено за сусідніми завданнями (у старому файлі тег року відсутній)
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Узгодьте проміжок \mbox{(1--3)} із функцією \mbox{(А--Д)}, що описує графік функції $y=f(x)$ на цьому проміжку. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \draw[step=1cm,gray!50,very thin] (-4.5,-0.5) grid (6.5,8.5);
-        \draw[->, >=stealth, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
-
-        \node[below left] at (0,0) {$0$};
-        \node[below] at (1,0) {$1$};
-        \node[left] at (0,1) {$-1$}; % На картинці тут -1 позначено як засічка, але насправді це 1, просто риска
-        \node[left] at (0,1) {$1$};
-        \node[below] at (6,0) {$6$};
-        \node[below] at (-4,0) {$-4$};
-
-        % Графік
-        % [-4; 0] -> y = sqrt(-x). (-4, 2) -> (0,0)
-        \draw[thick] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
-
-        % [0; 2] -> y = x^3. (0,0) -> (2, 8)
-        \draw[thick] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
-
-        % [2; 6] -> y = 12 - 2x. (2, 8) -> (6, 0)
-        \draw[thick] (2, 8) -- (6, 0);
-
-        \fill (-4, 2) circle (3pt);
-        \fill (6, 0) circle (3pt);
-        \node[right, fill=white, inner sep=1.5pt] at (4, 4) {$y=f(x)$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
 \noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік функції $y=f(x)$, визначеної на проміжку $[-4; 6]$. Узгодьте проміжок \mbox{(1--3)} із функцією \mbox{(А--Д)}, що описує графік функції $y=f(x)$ на цьому проміжку. \nmtyear{2025}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.76x5.03 S
+
+        \draw[nmt grid, step=1] (-4.5,-0.5) grid (6.5,8.5);
+        \draw[->, thick] (-4.5,0) -- (6.5,0) node[below] {$x$};
+        \draw[->, thick] (0,-0.5) -- (0,8.5) node[left] {$y$};
+        \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (6,0) {$6$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (-4,0) {$-4$};
+        % [-4; 0]: y = sqrt(-x); (0; 2]: y = x^3; (2; 6]: y = 12 - 2x
+        \draw[nmt curve] plot [smooth, domain=-4:0] (\x, {sqrt(-\x)});
+        \draw[nmt curve] plot [smooth, domain=0:2] (\x, {\x*\x*\x});
+        \draw[nmt curve] (2, 8) -- (6, 0);
+        \node[nmt dot] at (-4, 2) {};
+        \node[nmt dot] at (6, 0) {};
+        \node[anchor=west, fill=white, inner sep=1.5pt] at (3.7, 6.7) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Проміжок}
     \matchItem{1}{$[-4; 0]$}
@@ -1151,48 +947,54 @@
 \begin{center}
 \begingroup
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{|*{5}{c|}}
+\nmtSetCell
+\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
 \hline
 \textbf{А} & \textbf{Б} & \textbf{В} & \textbf{Г} & \textbf{Д} \\
 \hline
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (3.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (2,0) {\tiny $2$};
-    \node[left] at (0,-2) {\tiny $-2$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]%@N 2.17x2.04 S
+
+    \draw[->] (-1.5,0) -- (3.5,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below] at (2,0) {\small $2$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-0.5,-2.5) -- (2.5,0.5); % y = x - 2
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[above right] at (0,1) {\tiny $1$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]%@N 2.01x2.04 S
+
+    \draw[->] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[above right] at (0,1) {\small $1$};
     \draw (0.1,1) -- (0,1) -- (0.2,1.2) -- (0.2,1); % прямий кут
     \draw[thick] (-2.5,1) -- (2.5,1); % y = 1
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-2.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-2) -- (0,3) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below left] at (-1,0) {\tiny $-1$};
-    \draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут
-    \draw[thick] (-1,-2) -- (-1,3); % x = -1
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]%@N 2.00x2.04 S
+
+    \draw[->] (-2.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-2) -- (0,3) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below right] at (1,0) {\small $1$};
+    \draw (1,0) -- (1.2,0) -- (1.2,0.2) -- (1,0.2); % прямий кут
+    \draw[thick] (1,-2) -- (1,3); % x = 1
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-3.5,0) -- (2.5,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,2) node[left] {$y$};
-    \node[below right] at (0,0) {\tiny $0$};
-    \node[below] at (-2,0) {\tiny $-2$};
-    \node[left] at (0,-2) {\tiny $-2$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]%@N 2.35x2.04 S
+
+    \draw[->] (-3.5,0) -- (2.5,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,2) node[left] {$y$};
+    \node[below right] at (0,0) {\small $0$};
+    \node[below] at (-2,0) {\small $-2$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-2.5,0.5) -- (0.5,-2.5); % y = -x - 2
 \end{tikzpicture}\end{nmtfit} &
-\begin{nmtfit}\begin{tikzpicture}[scale=0.35]
-    \draw[->, >=stealth] (-1.5,0) -- (4,0) node[below] {$x$};
-    \draw[->, >=stealth] (0,-3) -- (0,3) node[left] {$y$};
-    \node[below left] at (0,0) {\tiny $0$};
-    \node[below] at (3,0) {\tiny $3$};
-    \node[left] at (0,-2) {\tiny $-2$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.35]%@N 2.34x2.39 S
+
+    \draw[->] (-1.5,0) -- (4,0) node[below] {$x$};
+    \draw[->] (0,-3) -- (0,3) node[left] {$y$};
+    \node[below left] at (0,0) {\small $0$};
+    \node[below] at (3,0) {\small $3$};
+    \node[left] at (0,-2) {\small $-2$};
     \draw[thick] (-1,-2.66) -- (4,0.66); % y = 2/3 x - 2
 \end{tikzpicture}\end{nmtfit} \\
 \hline
@@ -1201,6 +1003,211 @@
 \end{center}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 1.06, завдання №17 --- основна тема: Графіки елементарних функцій, їх побудова та перетворення
+\zadtask{Увідповідніть початок речення \mbox{(1--3)} із його закінченням \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Графік функції $y = \dfrac{2}{x} + 3$}
+\matchItem{2}{Графік функції $y = 4^x$}
+\matchItem{3}{Графік функції $y = \mathrm{tg}\,x$}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{симетричний відносно початку координат.}
+\matchItem{Б}{симетричний відносно осі $y$.}
+\matchItem{В}{перетинає лише вісь $x$.}
+\matchItem{Г}{перетинає лише вісь $y$.}
+\matchItem{Д}{перетинає графік функції $y = x$ лише в одній точці.}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~В, 2~--~Г, 3~--~А
+\ifshowsolutions\solution{\textbf{1)} $y=\dfrac{2}{x}+3$ ($x\ne0$): осі $y$ не перетинає, а вісь $x$ перетинає при $x=-\dfrac{2}{3}$ --- лише вісь $x$ (В); \textbf{2)} $y=4^x>0$: перетинає лише вісь $y$ у точці $(0;1)$ (Г); \textbf{3)} $y=\mathrm{tg}\,x$ --- непарна, симетрична відносно початку координат (А). Відповідь: \textbf{1\,--\,В, 2\,--\,Г, 3\,--\,А}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 4.06, завдання №16 --- основна тема: Квадратні корені. Корені вищих степенів. Раціональний степінь
+\zadtask{Узгодьте вираз \mbox{(1--3)} із його значенням \mbox{(А--Д)}, якщо $a = \dfrac{2}{3}$. \nmtyear{2026}
+
+\nmtnobreak
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Вираз}
+\matchItem{1}{$6a$}
+\matchItem{2}{$\sqrt{\left(2^a\right)^3}$}
+\matchItem{3}{$\log_3 (1 - a)$}
+}{
+\matchHead{Значення виразу}
+\matchItem{А}{$4$}
+\matchItem{Б}{$-1$}
+\matchItem{В}{$1$}
+\matchItem{Г}{$\dfrac{20}{3}$}
+\matchItem{Д}{$2$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1~--~А, 2~--~Д, 3~--~Б
+\ifshowsolutions\solution{При $a=\dfrac{2}{3}$: $6a=4$ (А); $\sqrt{(2^a)^3}=\sqrt{2^{3a}}=\sqrt{2^2}=2$ (Д); $\log_3(1-a)=\log_3\dfrac{1}{3}=-1$ (Б). Відповідь: \textbf{1~--~А, 2~--~Д, 3~--~Б}.}\fi
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 8.06, завдання №17 --- основна тема: Функція та її властивості
+\zadtask{Доберіть до функції \mbox{(1--3)} її властивість \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Функція}
+\matchItem{1}{$y = \lg x$}
+\matchItem{2}{$y = 0{,}2^x - 1$}
+\matchItem{3}{$y = x^2 - 4x + 5$}
+}{
+\matchHead{Властивість}
+\matchItem{А}{є зростаючою}
+\matchItem{Б}{є спадною}
+\matchItem{В}{не має нулів}
+\matchItem{Г}{має лише два нулі}
+\matchItem{Д}{є парною}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 12.06, завдання №17 --- основна тема: Функція та її властивості
+\zadtask{Доберіть до функції \mbox{(1--3)} її властивість \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Функція}
+\matchItem{1}{$y = \sqrt{x - 3}$}
+\matchItem{2}{$y = x^2 + 3$}
+\matchItem{3}{$y = 3^x$}
+}{
+\matchHead{Властивість функції}
+\matchItem{А}{областю значень є проміжок $[3; +\infty)$}
+\matchItem{Б}{областю визначення є проміжок $[3; +\infty)$}
+\matchItem{В}{областю визначення є проміжок $[-3; +\infty)$}
+\matchItem{Г}{зростає на множині всіх дійсних чисел}
+\matchItem{Д}{є непарною}
+}{
+\matchingGrid
+}
+}
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 15.06, завдання №17 --- основна тема: Графіки елементарних функцій, їх побудова та перетворення
+\zadtask{До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Початок речення}
+\matchItem{1}{Графіки функцій $y = 2^x$ та $y = 0{,}5^x$ перетинаються в точці}
+\matchItem{2}{Пряма $y = x - 1$ перетинає вісь $x$ у точці}
+\matchItem{3}{Графік функції $y = (x + 2)^2$ дотикається осі $x$ у точці}
+}{
+\matchHead{Закінчення речення}
+\matchItem{А}{$(1; 0)$.}
+\matchItem{Б}{$(0; 1)$.}
+\matchItem{В}{$(2; 0)$.}
+\matchItem{Г}{$(-2; 0)$.}
+\matchItem{Д}{$(-1; 0)$.}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--Б, 2--А, 3--Г
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 16.06, завдання №17 --- основна тема: Графіки елементарних функцій, їх побудова та перетворення
+\zadtask{Доберіть до функції \mbox{(1--3)} властивість її графіка \mbox{(А--Д)}. \nmtyear{2026}\par
+\nopagebreak\nbvspace{0.3cm}
+\noindent
+\matchingLayout{
+\matchHead{Функція}
+\matchItem{1}{$y = \sqrt{x-2} + 1$}
+\matchItem{2}{$y = -5^x$}
+\matchItem{3}{$y = x^3$}
+}{
+\matchHead{Властивість графіка функції}
+\matchItem{А}{симетричний відносно початку координат}
+\matchItem{Б}{симетричний відносно осі $y$}
+\matchItem{В}{розміщений лише в ІІІ та IV координатних чвертях}
+\matchItem{Г}{розміщений лише в І координатній чверті}
+\matchItem{Д}{проходить через точку $(0; 1)$}
+}{
+\matchingGrid
+}
+}
+% Відповідь: 1--Г; 2--В; 3--А
+\par\penalty-20
+\end{samepage}
+
+\begin{samepage}
+% НМТ 2026, сесія 18.06, завдання №17 --- основна тема: Графіки елементарних функцій, їх побудова та перетворення
+\zadtask{На рисунку зображено графік функції $y = f(x)$, визначеної на проміжку $(-\infty;\, +\infty)$. Узгодьте проміжок \mbox{(1--3)} із функцією \mbox{(А--Д)}, що описує графік функції $y = f(x)$ на цьому проміжку. \nmtyear{2026}\par}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 7.86x3.93 C
+
+    \draw[nmt grid, step=1] (-6,-2) grid (8,4);
+    \draw[->] (-6.3,0) -- (8.4,0) node[right] {$x$};
+    \draw[->] (0,-2.3) -- (0,4.4) node[above] {$y$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \draw[thin] (1,0.12) -- (1,-0.12);
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[right, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[nmt curve] plot[domain=-6:-1, samples=50] (\x, {-2/\x}) -- (0,0);
+    \draw[nmt curve] plot[domain=0:7.8540, samples=100] (\x, {sin(deg(\x))});
+    \node[right, fill=white, inner sep=1.5pt] at (1.5,2.4) {$y=f(x)$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\matchingLayout{
+\matchHead{Проміжок}
+\matchItem{1}{$(-\infty;\, -1)$}
+\matchItem{2}{$[-1;\, 0]$}
+\matchItem{3}{$(0;\, +\infty)$}
+}{
+\matchHead{Функція}
+\matchItem{А}{$y = \cos x$}
+\matchItem{Б}{$y = 2^x$}
+\matchItem{В}{$y = -\dfrac{2}{x}$}
+\matchItem{Г}{$y = \sin x$}
+\matchItem{Д}{$y = -2x$}
+}{
+\matchingGrid
+}
+
+% Відповідь: 1--В,\ \ 2--Д,\ \ 3--Г
+\par\penalty-20
+\end{samepage}
+
+\ifshowsolutions
+\sectionTitle{ВІДПОВІДІ ДО ЗАВДАНЬ НМТ 2026}
+\begin{multicols}{3}\noindent
+\noindent\textbf{32.}~1~--~В, 2~--~Г, 3~--~А \ {\scriptsize\color{gray}(1.06, №17)}\par
+\noindent\textbf{33.}~1~--~А, 2~--~Д, 3~--~Б \ {\scriptsize\color{gray}(4.06, №16)}\par
+\noindent\textbf{36.}~1--Б, 2--А, 3--Г \ {\scriptsize\color{gray}(15.06, №17)}\par
+\noindent\textbf{37.}~1--Г; 2--В; 3--А \ {\scriptsize\color{gray}(16.06, №17)}\par
+\noindent\textbf{38.}~1--В,\ \ 2--Д,\ \ 3--Г \ {\scriptsize\color{gray}(18.06, №17)}\par
+\end{multicols}
+\fi
 
 \endgroup
 \end{document}

@@ -15,6 +15,9 @@
 """
 import re
 import unicodedata, os, sys, json, glob, collections, difflib
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import дизайн_завдань                       # дизайн-система рисунків і виразів (scripts/ПРАВИЛА_ОФОРМЛЕННЯ.md)
+ДИЗАЙН = collections.Counter()
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARCH = os.path.join(ROOT, "archive", "старий_формат")
@@ -117,12 +120,15 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{fillbetween}
 \usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
+@@ДИЗАЙН@@\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
+\usepackage{colortbl,multirow,diagbox,needspace,etoolbox}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
 \usepackage[hidelinks]{hyperref}
+% водяний знак; щоб зібрати без нього (версія для вчителів), перед \documentclass пишуть \def\nmtnowatermark{}
+\ifdefined\nmtnowatermark\else
 \usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
+\fi
 
 % --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
 \newsavebox{\nmtfitbox}
@@ -154,10 +160,11 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
 % --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
+% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається;
+% п'ять колонок |m{w}| мають 10 відступів \tabcolsep і 6 вертикальних ліній -- тоді таблиця рівно на \linewidth
 \newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
+\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-10\tabcolsep-6\arrayrulewidth)/5\relax}}
+\newcommand{\nmtAnswerRow}[5]{%
 \par\nopagebreak\vspace{0.15cm}
 \noindent\nmtSetCell
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
@@ -169,7 +176,7 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 \end{tabular}
 \par\vspace{0.25cm}
 }
-\newcommand{\answerTableTall}[5]{%
+\newcommand{\nmtAnswerRowTall}[5]{%
 \par\nopagebreak\vspace{0.15cm}
 \noindent\nmtSetCell
 \begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
@@ -268,22 +275,81 @@ PREAMBLE = r"""\documentclass[12pt]{article}
 % і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
 \newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
 \newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
+% рівний проміжок між завданнями: перед кожним завданням (samepage) -- не менше 0,4 см понад те, що лишив кінець попереднього (таблиця, поле відповіді, сітка);
+% проміжок між завданнями помітно більший за проміжки всередині завдання (умова -- рисунок -- варіанти ≈ 0,2--0,35 см), тож завдання не «липнуть» до попередньої таблиці
+\AtBeginEnvironment{samepage}{\par\addvspace{0.4cm}}
 % --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
 % мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
 % вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
 \newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
 \newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
 \newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
+% шаблонний заголовок стовпця зі старого макета -- лише коли завдання не має власного \matchHead
+\makeatletter\newcommand{\nmtHeadUnless}[2]{\in@{\matchHead}{#1}\ifin@\else#2\fi}\makeatother
 \newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
 \parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
+% відповідність: два стовпчики пунктів + сітка відповідей природного розміру праворуч (сітка не стискається, стовпчики ділять решту ширини)
+\newlength{\nmtGridW}\newlength{\nmtColA}\newlength{\nmtColB}\newlength{\nmtAvail}\newlength{\nmtNatA}\newlength{\nmtNatB}\newlength{\nmtMS}\newcount\nmtRatio
+% природна (однорядкова) ширина найдовшого пункту чи заголовка стовпчика: пункти лише міряємо, нічого не друкуємо
+\newcommand{\nmtMatchNat}[2]{\global#2=0pt \setbox0\vbox{%
+    \renewcommand{\matchHead}[1]{\setbox1\hbox{\let\\\space\itshape ##1}\nmtMS=\wd1 \ifdim\nmtMS>#2\global#2=\nmtMS\fi}%
+    \renewcommand{\matchItem}[2]{\setbox1\hbox{\let\\\space ##2}\nmtMS=\wd1 \advance\nmtMS by\nmtMatchLab \ifdim\nmtMS>#2\global#2=\nmtMS\fi}%
+    #1}}
+% відповідність: два стовпчики пунктів + сітка відповідей природного розміру праворуч (не стискається); решту ширини стовпчики ділять
+% пропорційно довжині свого найдовшого пункту (кожен не менше 35 %), тож довгі початки речень не стискаються у вузьку колонку
+\newcommand{\matchingLayout}[3]{%
+    \par\noindent
+    \sbox{\nmtgridbox}{\matchingGridRaw}\setlength{\nmtGridW}{\wd\nmtgridbox}%
+    \nmtMatchNat{#1}{\nmtNatA}\nmtMatchNat{#2}{\nmtNatB}%
+    \setlength{\nmtAvail}{\dimexpr\linewidth-\nmtGridW-0.8cm\relax}%
+    \nmtRatio=\numexpr(\nmtNatA/256)*1000/((\nmtNatA+\nmtNatB)/256+1)\relax
+    \ifnum\nmtRatio<350 \nmtRatio=350 \fi \ifnum\nmtRatio>650 \nmtRatio=650 \fi
+    \setlength{\nmtColA}{\dimexpr\nmtAvail*\nmtRatio/1000\relax}%
+    \setlength{\nmtColB}{\dimexpr\nmtAvail-\nmtColA\relax}%
+    \begin{minipage}[t]{\nmtColA}\vspace{0pt}\raggedright #1\end{minipage}\hfill
+    \begin{minipage}[t]{\nmtColB}\vspace{0pt}\raggedright #2\end{minipage}\hfill
+    \begin{minipage}[t]{\nmtGridW}\vspace{0pt}\raggedleft #3\end{minipage}\par}
+% твердження I--III («Які з наведених тверджень правильні?»): мітка в колонці сталої ширини, текст у parbox -- рядок не виходить за поле, продовження під текстом
+\newlength{\nmtStmtLab}\setlength{\nmtStmtLab}{2.1em}
+\newcommand{\nmtStmt}[2]{\par\nopagebreak\noindent\makebox[\nmtStmtLab][l]{\textbf{#1}}\parbox[t]{\dimexpr\linewidth-\nmtStmtLab\relax}{\raggedright #2}\par\nopagebreak\vspace{0.1cm}}
+% варіанти відповіді п'ять А--Д: кожен вміщується в клітинку одним рядком -- рядок-таблиця (\nmtAnswerRow; високі формули -- \nmtAnswerRowTall), інакше
+% (запис довелося б переносити всередині клітинки) -- вертикальний список у стилі пунктів відповідності, варіант з нового рядка; вибір робить TeX за виміром, тож однотипні завдання виглядають однаково (scripts/розкладка_завдань.py: єдині_варіанти)
+\newsavebox{\nmtOptBox}\newlength{\nmtOptMaxH}\newif\ifnmtOptFit
+\newcommand{\nmtOptMeasure}[1]{\sbox{\nmtOptBox}{#1}%
+    \ifdim\wd\nmtOptBox>\nmtcellw\nmtOptFitfalse\fi
+    \ifdim\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax>\nmtOptMaxH\setlength{\nmtOptMaxH}{\dimexpr\ht\nmtOptBox+\dp\nmtOptBox\relax}\fi}
+\newcommand{\nmtOptions}[5]{%
+    \par\nmtSetCell\nmtOptFittrue\setlength{\nmtOptMaxH}{0pt}%
+    \nmtOptMeasure{#1}\nmtOptMeasure{#2}\nmtOptMeasure{#3}\nmtOptMeasure{#4}\nmtOptMeasure{#5}%
+    \ifnmtOptFit
+        \ifdim\nmtOptMaxH>0.62cm \nmtAnswerRowTall{#1}{#2}{#3}{#4}{#5}\else\nmtAnswerRow{#1}{#2}{#3}{#4}{#5}\fi
+    \else
+        \par\nopagebreak\vspace{0.1cm}%
+        \matchItem{А}{#1}\matchItem{Б}{#2}\matchItem{В}{#3}\matchItem{Г}{#4}\matchItem{Д}{#5}%
+    \fi}
+\newcommand{\answerTable}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
+\newcommand{\answerTableTall}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 \newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
 \newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 """
+PREAMBLE = PREAMBLE.replace("@@ДИЗАЙН@@", дизайн_завдань.СТИЛІ.lstrip("\n"))
+
+# ---- єдина преамбула: усе спільне -- у nmtbase.sty (корінь проєкту), а в документі лише \documentclass, підключення стилю й колонтитули
+FANCY_RE = re.compile(r"^\\(?:fancyhead\[[CR]\]|fancyfoot\[[LCR]\])\{[^\n]*\}\n", re.M)
+FANCY_LINES = "".join(FANCY_RE.findall(PREAMBLE))
+STY = ("\\NeedsTeXFormat{LaTeX2e}\\ProvidesPackage{nmtbase}[2026/11/04 Єдина преамбула бази НМТ: шрифти, пакети, дизайн-система рисунків, завдання, таблиці відповідей]\n"
+       "% Файл створює scripts/build_nmt_2023_2026.py з PREAMBLE -- не редагувати вручну. Документ підключає його рядком \\usepackage{nmtbase} (див. ШАПКА).\n"
+       + FANCY_RE.sub("", PREAMBLE.split("\n", 1)[1]))
+ШАПКА = ("\\documentclass[12pt]{article}\n"
+         "% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)\n"
+         "\\IfFileExists{nmtbase.sty}{\\usepackage{nmtbase}}{\\IfFileExists{../nmtbase.sty}{\\usepackage{../nmtbase}}{\\usepackage{../../nmtbase}}}\n"
+         + FANCY_LINES)
+PREAMBLE = ШАПКА            # скрізь, де раніше підставляли довгу преамбулу, тепер коротка шапка (@@HEADER@@ -- колонтитул)
 
 # макроси нового преамбула (їх зі старих файлів НЕ переносимо)
 NEW_DEFINED = {"answerTable","answerTableTall","instructionBox","sectionTitle","task","nmtAnswerBox","matchingGrid",
                "taskBlock","zadtask","zadnum","ansitem","nmtyear","solution","chapterTitle","typeTitle","ansTheme","ansType",
-               "matchHead","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
+               "matchingLayout","nmtMatchNat","nmtStmt","nmtAnswerRow","nmtAnswerRowTall","nmtOptions","nmtOptMeasure","matchHead","nmtHeadUnless","matchItem","nmtMatchLab","nmtMatchSep","nmtSchoolbook","ifshowsolutions","showsolutionstrue","showsolutionsfalse","nbvspace","nmtnobreak"}
 # старі макроси, які перейменовуємо в тілі на нові
 RENAMES = [(r"\\answerTableBig\b", r"\\answerTableTall"),
            (r"\\matchTable\b", r"\\matchingGrid"),
@@ -302,44 +368,7 @@ COMPAT = r"""% --- сумісність зі старою базою (діє, я
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 """
 DROPPED = {"answerTableBig","matchTable","answerGrid","answerGridSmall","answerBox","shortAnswer","answerTableSmall","answerListVertical","trigStyle"}
@@ -742,6 +771,197 @@ def widen_grid_minipage(t):
         begins = list(re.finditer(r"\\begin\{minipage\}(\[[a-z]\])?\{(0\.\d+)\\textwidth\}", t))
     return t
 
+# помилки набору в джерелах, звірені з оригіналами (PDF сесій): (було, стало)
+def переставити_варіанти(команда, порядок):
+    """виправлення «варіанти в іншому порядку, ніж в оригіналі»: п'ять аргументів команди (answerTable/answerTableTall)
+    переставляються так, що новий k-й аргумент -- старий порядок[k] (від 0); дужки рахуються з урахуванням вкладених"""
+    def f(t):
+        i = t.index("\\" + команда + "{"); j = i + len(команда) + 1; арг = []
+        while len(арг) < len(порядок):
+            while t[j] in " \n\t": j += 1
+            assert t[j] == "{", (команда, t[j:j + 20])
+            глиб, k = 0, j
+            while True:
+                if t[k] == "\\": k += 2; continue
+                if t[k] == "{": глиб += 1
+                elif t[k] == "}":
+                    глиб -= 1
+                    if not глиб: break
+                k += 1
+            арг.append(t[j:k + 1]); j = k + 1
+        нове = "\\" + команда + "".join(арг[o] for o in порядок)
+        return t[:i] + нове + t[j:]
+    return f
+
+def прибрати_від(початок, кінець):
+    """виправлення «зайвий елемент, якого немає в оригіналі»: видаляє текст від першого `початок` до першого `кінець`
+    після нього (включно з `кінець`), разом із порожніми рядками навколо"""
+    def f(t):
+        i = t.index(початок); j = t.index(кінець, i) + len(кінець)
+        return re.sub(r"\n{3,}", "\n\n", t[:i].rstrip() + "\n" + t[j:])
+    return f
+
+def замінити_варіанти(команда, нові):
+    """виправлення «варіанти не як в оригіналі»: п'ять аргументів команди (answerTable/answerTableTall) -> нові (рядки LaTeX)"""
+    def f(t):
+        i = t.index("\\" + команда + "{"); j = i + len(команда) + 1; кінець = j
+        for _ in range(5):
+            while t[кінець] in " \n\t": кінець += 1
+            г, k = 0, кінець
+            while True:
+                if t[k] == "\\": k += 2; continue
+                if t[k] == "{": г += 1
+                elif t[k] == "}":
+                    г -= 1
+                    if not г: break
+                k += 1
+            кінець = k + 1
+        return t[:i] + "\\" + команда + "".join("{" + a + "}" for a in нові) + t[кінець:]
+    return f
+
+SOURCE_FIXES = [
+    # НМТ 2025 (рівні рівнобедрені трикутники ABC і CMN, AN = 8, AB = 2√17): висота мала бути 8, а не 2,5 -- точний масштаб
+    ('\\begin{tikzpicture}[scale=0.8]\n    % Точки\n    \\coordinate (A) at (0,0);\n    \\coordinate (C) at (4,0);\n    \\coordinate (N) at (8,0);\n    \\coordinate (B) at (2,2.5);\n    \\coordinate (M) at (6,2.5);\n\n    % Трикутники\n    \\draw[thick] (A) -- (B) -- (C) -- cycle;\n    \\draw[thick] (C) -- (M) -- (N) -- cycle;\n\n    % Позначки рівних сторін (трикутник ABC)\n    \\draw (0.85,1.35) -- (1.05,1.15);\n    \\draw (3.15,1.35) -- (2.95,1.15);\n\n    % Позначки рівних сторін (трикутник CMN)\n    \\draw (4.85,1.35) -- (5.05,1.15);\n    \\draw (7.15,1.35) -- (6.95,1.15);\n\n    % Підписи\n    \\node[below left] at (A) {$A$};\n    \\node[below] at (C) {$C$};\n    \\node[below right] at (N) {$N$};\n    \\node[above] at (B) {$B$};\n    \\node[above] at (M) {$M$};\n\\end{tikzpicture}',
+     '\\begin{tikzpicture}[scale=0.42]\n    % AN = 8, тож AC = CN = 4; AB = BC = CM = MN = 2*sqrt17, висота 8 (точний масштаб)\n    \\coordinate (A) at (0,0);\n    \\coordinate (C) at (4,0);\n    \\coordinate (N) at (8,0);\n    \\coordinate (B) at (2,8);\n    \\coordinate (M) at (6,8);\n\n    % Трикутники\n    \\draw[thick] (A) -- (B) -- (C) -- cycle;\n    \\draw[thick] (C) -- (M) -- (N) -- cycle;\n\n    % Позначки рівних сторін\n    \\draw (1.34,3.915) -- (0.66,4.085);\n    \\draw (2.66,3.915) -- (3.34,4.085);\n    \\draw (5.34,3.915) -- (4.66,4.085);\n    \\draw (6.66,3.915) -- (7.34,4.085);\n\n    % Підписи\n    \\node[below left] at (A) {$A$};\n    \\node[below] at (C) {$C$};\n    \\node[below right] at (N) {$N$};\n    \\node[above] at (B) {$B$};\n    \\node[above] at (M) {$M$};\n\\end{tikzpicture}'),
+    # НМТ 2026 (рівні паралелограми ABCD і AKMD, BD ⟂ AB, ∠BAD = 65°): прямий кут ABD було намальовано ≈73° -- точні координати
+    ('\\begin{tikzpicture}[scale=0.7, thick, line join=round]\n    \\coordinate (A) at (0,0);\n    \\coordinate (D) at (5,0);\n    \\coordinate (B) at (1.5, 3.21); % 65 deg\n    \\coordinate (C) at (6.5, 3.21);\n    \\coordinate (K) at (1.5, -3.21);\n    \\coordinate (M) at (6.5, -3.21);\n\n    \\draw (-1,0) -- (7,0); % Line AD extends\n    \\draw (A) -- (B) -- (C) -- (D);\n    \\draw (A) -- (K) -- (M) -- (D);\n    \\draw (B) -- (D);\n\n    \\pic[draw, angle radius=0.5cm, pic text=$65^\\circ$, angle eccentricity=1.7, font=\\scriptsize] {angle = D--A--B};\n    \\pic[draw, angle radius=0.3cm] {right angle = A--B--D};\n\n    \\node[above left] at (A) {$A$};\n    \\node[above left] at (B) {$B$};\n    \\node[above right] at (C) {$C$};\n    \\node[above right] at (D) {$D$};\n    \\node[below left] at (K) {$K$};\n    \\node[below right] at (M) {$M$};\n\\end{tikzpicture}',
+     '\\begin{tikzpicture}[scale=0.85, thick, line join=round]\n    \\coordinate (A) at (0,0);\n    \\coordinate (D) at (5,0);\n    \\coordinate (B) at (0.893, 1.915); % AB = AD cos 65°, тож BD ⟂ AB\n    \\coordinate (C) at (5.893, 1.915);\n    \\coordinate (K) at (0.893, -1.915);\n    \\coordinate (M) at (5.893, -1.915);\n\n    \\draw (-1,0) -- (7,0); % Line AD extends\n    \\draw (A) -- (B) -- (C) -- (D);\n    \\draw (A) -- (K) -- (M) -- (D);\n    \\draw (B) -- (D);\n\n    \\pic[draw, angle radius=0.5cm, pic text=$65^\\circ$, angle eccentricity=1.7, font=\\scriptsize] {angle = D--A--B};\n    \\pic[draw, angle radius=0.3cm] {right angle = A--B--D};\n\n    \\node[above left] at (A) {$A$};\n    \\node[above left] at (B) {$B$};\n    \\node[above right] at (C) {$C$};\n    \\node[above right] at (D) {$D$};\n    \\node[below left] at (K) {$K$};\n    \\node[below right] at (M) {$M$};\n\\end{tikzpicture}'),
+    # НМТ 2023 (коло, діаметр AB, дотична в C, дуга AC = 130°): C було намальовано під кутом ≈65° замість 50°, а K -- не на дотичній
+    ('\\begin{tikzpicture}[scale=0.9]\n        \\coordinate (O) at (0,0);\n        \\draw[thick] (O) circle (1.5cm);\n        \\coordinate (L) at (-1.5,2);\n        \\coordinate (A) at (-1.5,0);\n        \\coordinate (B) at (1.5,0);\n        \\coordinate (K) at (3.5,0);\n\n        % Tangent from K.\n        % OK = 3.5, R=1.5. Angle COK = arccos(1.5/3.5) approx 64.6 deg.\n        % C is at (1.5*cos(64.6), 1.5*sin(64.6)).\n        \\coordinate (C) at (64.6:1.5);\n\n        \\draw[thick] (A) -- (K);\n        \\draw[thick] (L) -- (C);\n        \\draw[thick] (C) -- (K) node[midway, above right] {$a$};\n        \\draw[thick] (O) -- (C);\n\n        % Bold arc AC\n        \\draw[very thick] (A) arc (180:64.6:1.5);\n\n        \\node[left] at (A) {$A$};\n        \\node[below right] at (B) {$B$}; % B is slightly covered by line\n        \\node[below] at (O) {$O$};\n        \\node[above] at (K) {$K$};\n        \\node[above right] at (C) {$C$};\n\n        \\fill (O) circle (1.5pt);\n        \\fill (A) circle (1.5pt);\n        \\fill (B) circle (1.5pt);\n        \\fill (K) circle (1.5pt);\n        \\fill (C) circle (1.5pt);\n    \\end{tikzpicture}',
+     '\\begin{tikzpicture}[scale=0.9]\n        \\coordinate (O) at (0,0);\n        \\draw[thick] (O) circle (1.5cm);\n        \\coordinate (A) at (-1.5,0);\n        \\coordinate (B) at (1.5,0);\n        % дуга AC = 130°, тож ∠COB = 50°; дотична в C перетинає пряму AB у K: OK = R / cos 50°\n        \\coordinate (C) at (50:1.5);\n        \\coordinate (K) at (2.334,0);\n        \\coordinate (L) at (-0.568,2.435);\n\n        \\draw[thick] (A) -- (K);\n        \\draw[thick] (L) -- (C);\n        \\draw[thick] (C) -- (K) node[midway, above right] {$a$};\n        \\draw[thick] (O) -- (C);\n\n        % дуга AC\n        \\draw[very thick] (A) arc (180:50:1.5);\n\n        \\node[left] at (A) {$A$};\n        \\node[below left] at (B) {$B$};\n        \\node[below] at (O) {$O$};\n        \\node[below right] at (K) {$K$};\n        \\node[above right] at (C) {$C$};\n\n        \\fill (O) circle (1.5pt);\n        \\fill (A) circle (1.5pt);\n        \\fill (B) circle (1.5pt);\n        \\fill (K) circle (1.5pt);\n        \\fill (C) circle (1.5pt);\n    \\end{tikzpicture}'),
+    # НМТ 2025, 3.06 №16 (ромб, AK = 12, BK = 5): рисунок було намальовано «на око» з тупим кутом B і без OK; в оригіналі
+    # (НМТ23-25.pdf, с. 241) кут B гострий (cos B = 5/13), проведено OK -- точні координати
+    ('\\begin{tikzpicture}[scale=0.25]\n        % Сторона 13 (5, 12, 13).\n        % A зліва, C справа. B зверху.\n        % AK висота на BC. K на BC.\n        % B = (x, y). C = (x+13, y)? Ні, це ромб.\n        % Нехай центр (0,0). AC горизонталь? Ні, на малюнку AC горизонталь.\n        % Але AK висота.\n        % Побудуємо за розмірами.\n\n        \\coordinate (A) at (-12,0);\n        \\coordinate (C) at (12,0);\n        \\coordinate (O) at (0,0);\n\n        % Для малюнка схематично:\n        \\coordinate (B) at (0, 8); % Приблизно\n        \\coordinate (D) at (0,-8);\n\n        % Точка K на стороні BC. AK перпендикулярно BC.\n        % Це складно вирахувати точно для схеми, намалюємо "як бачимо".\n        \\coordinate (K) at (4, 5.3); % Точка на BC\n\n        \\draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;\n        \\draw[thick] (A) -- (C);\n\n        % Перемальовуємо без BD, додаємо AK\n\n        \\draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;\n        \\draw[thick] (A) -- (C);\n        \\draw[thick] (A) -- (K);\n\n        % Прямий кут AKB? Ні, AK висота -> кут AKB = 90? \n        % На малюнку K лежить на BC. Кут AKC = 90? Ні, AK perp BC.\n        % Значить кут AKB = 90.\n\n        % Позначки O\n        \\draw (-6, -0.5) -- (-6, 0.5); % AO\n        \\draw (6, -0.5) -- (6, 0.5);   % OC\n\n        \\node[left] at (A) {$A$};\n        \\node[above] at (B) {$B$};\n        \\node[right] at (C) {$C$};\n        \\node[below] at (D) {$D$};\n        \\node[above right] at (K) {$K$};\n        \\node[below] at (O) {$O$};\n        \\pic [draw, angle radius=0.3cm] {right angle = A--K--B};\n        \\fill (O) circle (10pt);',
+     '\\begin{tikzpicture}[scale=0.2]\n        % Ромб зі стороною 13: BK = 5, AK = 12 -> cos B = 5/13, кут B гострий; AC = 4*sqrt13, BD = 6*sqrt13 (як в оригіналі)\n        \\coordinate (O) at (0,0);\n        \\coordinate (A) at (-7.211,0);\n        \\coordinate (C) at (7.211,0);\n        \\coordinate (B) at (0,10.817);\n        \\coordinate (D) at (0,-10.817);\n        % K на BC, BK = 5: K = B + 5/13 (C - B); AK перпендикулярна до BC\n        \\coordinate (K) at (2.774,6.656);\n\n        \\draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;\n        \\draw[thick] (A) -- (C);\n        \\draw[thick] (A) -- (K);\n        \\draw[thick] (O) -- (K);\n\n        % позначки AO = OC\n        \\draw (-3.606,-0.6) -- (-3.606,0.6);\n        \\draw (3.606,-0.6) -- (3.606,0.6);\n\n        \\node[left] at (A) {$A$};\n        \\node[above] at (B) {$B$};\n        \\node[right] at (C) {$C$};\n        \\node[below] at (D) {$D$};\n        \\node[above right] at (K) {$K$};\n        \\node[below] at (O) {$O$};\n        \\pic [draw, angle radius=0.25cm] {right angle = A--K--B};\n        \\fill (O) circle (10pt);'),
+    # НМТ 2024, 07.06 №18 (рівносторонній трикутник, AB = 24): на рисунку вершину C було підписано як B, K стояла не посередині AB,
+    # а перпендикуляр KM ішов до AB; в оригіналі (НМТ23-25.pdf, с. 142) A і C -- основа, K -- середина AB, KM ⟂ AC
+    ('    % Рівносторонній трикутник\n    \\coordinate (A) at (0,0);\n    \\coordinate (B) at (4,0);\n    \\coordinate (C) at (2,3.46);\n\n    % Середина AB\n    \\coordinate (K) at (0.75,0);\n\n    % Точка M на AC (проекція K)\n    \\coordinate (M) at (0.75,1.3);\n\n    % Трикутник\n    \\draw[thick] (A) -- (B) -- (C) -- cycle;\n\n    % Перпендикуляр KM\n    \\draw[thick] (K) -- (M);\n\n    % Підписи\n    \\node[below left] at (A) {$A$};\n    \\node[below right] at (B) {$B$};\n    \\node[above] at (C) {$B$};\n    \\node[below] at (K) {$K$};\n    \\node[left] at (M) {$M$};\n    \\pic[draw, angle radius=0.2cm] {right angle = A--K--M};',
+     '    % Рівносторонній трикутник: A і C -- основа, B -- угорі (як в оригіналі)\n    \\coordinate (A) at (0,0);\n    \\coordinate (C) at (4,0);\n    \\coordinate (B) at (2,3.46);\n\n    % K -- середина AB\n    \\coordinate (K) at (1,1.73);\n\n    % M -- основа перпендикуляра з K на AC\n    \\coordinate (M) at (1,0);\n\n    % Трикутник\n    \\draw[thick] (A) -- (B) -- (C) -- cycle;\n\n    % Перпендикуляр KM\n    \\draw[thick] (K) -- (M);\n\n    % Підписи\n    \\node[below left] at (A) {$A$};\n    \\node[below right] at (C) {$C$};\n    \\node[above] at (B) {$B$};\n    \\node[left] at (K) {$K$};\n    \\node[below] at (M) {$M$};\n    \\pic[draw, angle radius=0.2cm] {right angle = K--M--C};'),
+    (r"\log_{\sqrt[3]{2}} 2^a", r"\log_{\sqrt[8]{2}} 2^a"),                                   # НМТ 2023: корінь 8-го степеня (НМТ23-25.pdf, с. 7)
+    (r"\ln \left(\sqrt{e} \cdot e^{\frac{1}{2}}\right)", r"\ln \left(\sqrt{e} \cdot e^{-\frac{1}{2}}\right)"),  # НМТ 2024: степінь -1/2 (с. 87)
+    (r"\log_3 \sqrt[3]{2}", r"\log_8 \sqrt[3]{2}"),                                           # НМТ 2025, 24.05 №18: основа 8 (с. 18)
+    (r"(\log_3 1 - 2)(3x - 6) \leqslant -6", r"(\log_3 1 - 2)(3x - 6) < -6"),                 # НМТ 2026, 17.06 №15: строга нерівність
+    (r"$y = \dfrac{1}{x} - 2$", r"$y = \dfrac{1}{x - 2}$"),                                   # НМТ 2026, 17.06 №17
+    # НМТ 2026, 16.06 №7: у джерелі переставлено варіанти В і Г; в оригіналі В=(9;+∞), Г=(-9;+∞), офіційний ключ Г (с. 95, 99)
+    (r"{$(-9; +\infty)$}{$(9; +\infty)$}{$(-\infty; -9)$}", r"{$(9; +\infty)$}{$(-9; +\infty)$}{$(-\infty; -9)$}", "8^{2x+9} > 8^x"),
+    # НМТ 2025, 4.06 №18: на прямій K=-1, L=-0,5, M=0, N=0,5, P=1 (с. 42), а не K і P поза поділками
+    ("\\draw[thick, ->] (-1.5,0) -- (1.5,0);\n\\foreach \\x/\\label in {-1/L, 0/M, 1/N} {\n"
+     "    \\draw[thick] (\\x,0.1) -- (\\x,-0.1) node[below] {\\small $\\label$};\n    \\node[above] at (\\x,0.1) {\\small $\\x$};\n}\n"
+     "\\node[below] at (-1.3,0) {\\small $K$};\n\\node[below] at (1.3,0) {\\small $P$};",
+     "\\draw[thick, ->] (-2.8,0) -- (2.8,0);\n\\foreach \\x/\\label in {-2/K, -1/L, 0/M, 1/N, 2/P} {\n"
+     "    \\draw[thick] (\\x,0.1) -- (\\x,-0.1) node[below] {\\small $\\label$};\n}\n"
+     "\\node[above] at (-2,0.1) {\\small $-1$};\n\\node[above] at (0,0.1) {\\small $0$};\n\\node[above] at (2,0.1) {\\small $1$};"),
+    # НМТ 2025, 24.05 №17: у варіанті В пряма x = 1 (с. 18); рисунки взято з подібного завдання 2024 року, де x = -1
+    ("    \\node[below left] at (-1,0) {\\tiny $-1$};\n    \\draw (-1,0) -- (-0.8,0) -- (-0.8,0.2) -- (-1,0.2); % прямий кут\n"
+     "    \\draw[thick] (-1,-2) -- (-1,3); % x = -1",
+     "    \\node[below right] at (1,0) {\\tiny $1$};\n    \\draw (1,0) -- (1.2,0) -- (1.2,0.2) -- (1,0.2); % прямий кут\n"
+     "    \\draw[thick] (1,-2) -- (1,3); % x = 1", r"\log_2(x-1)"),
+    # НМТ 2025, дотична, паралельна осі x: при ytick={-2,...,6} підписи «0» і «1» стояли на клітинку вище
+    ("yticklabels={,,,0,1,,,,,}", "yticklabels={,,0,1,,,,,,}", "ytick={-2,-1,...,6}"),
+    # НМТ 2024: підпис y=f(x) закривав вершину графіка
+    (r"\node[right] at (2.5, 4) {$y=f(x)$};", r"\node[above] at (4.2, 4.5) {$y=f(x)$};"),
+    # НМТ 2026, контейнери для сміття: напис «ПЛАСТИК» довший за наліпку
+    (r"\node[rotate=90, text=black, font=\bfseries] at (\x+1, 1.5) {\txt};",
+     r"\node[rotate=90, text=black, font=\bfseries\scriptsize] at (\x+1, 1.5) {\txt};", "0/bin1/ПЛАСТИК"),
+    # НМТ 2026, 18.06 №18 (папір у клітинку): точки перенесено неправильно -- усі три площі виходили по 6 см², такого варіанта
+    # немає; в оригіналі (с. 110) K(0;0), L(2;0), M(6;0), A(1;4), B(3;4), C(6;4), зеленим AK, BL, CM, AC, KM -> ключ БАГ
+    ('    \\draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);\n    % точки: верхній ряд A,B,C; нижній ряд K,L,M\n    \\coordinate (A) at (1,3);\n    \\coordinate (B) at (3,3);\n    \\coordinate (C) at (5,3);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (4,0);\n    \\foreach \\p/\\lab/\\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\node[font=\\scriptsize] at (6.5,3.5) {$1$~см$^2$};\n    \\draw[gray!60] (6,3) rectangle (7,4);',
+     '    \\draw[step=1cm, gray!40, thin] (-1.5,-1.5) grid (10.5,5.5);\n    % як в оригіналі (с. 110): висота 4 клітинки, C над M; зеленим -- AK, BL, CM, AC, KM\n    \\coordinate (A) at (1,4);\n    \\coordinate (B) at (3,4);\n    \\coordinate (C) at (6,4);\n    \\coordinate (K) at (0,0);\n    \\coordinate (L) at (2,0);\n    \\coordinate (M) at (6,0);\n    \\draw[thick, green!55!black] (K) -- (A) -- (C) -- (M) -- cycle;\n    \\draw[thick, green!55!black] (L) -- (B);\n    \\foreach \\p/\\lab/\\pos in {A/A/above left, B/B/above, C/C/above, K/K/below left, L/L/below, M/M/below} {\n        \\fill (\\p) circle (2.5pt);\n        \\node[\\pos, font=\\scriptsize] at (\\p) {$\\lab$};\n    }\n    \\draw[thick] (8,3) rectangle (9,4);\n    \\node[right, font=\\scriptsize] at (9,3.5) {$1$~см$^2$};'),
+    # НМТ 2026, 15.06 №16 (тотожно рівні вирази): в оригіналі (с. 91) умова «a ≠ 0, a ≠ 1»; з «a > 0» у пункті 1 правильні і А (a), і Д (|a|)
+    ('якщо $a > 0$, $a \\neq 1$',
+     'якщо $a \\neq 0$, $a \\neq 1$', 'a^3 : a^4'),
+    # НМТ 2024, 18.05 №18 (точки на прямій): в оригіналі підписано лише -1, 0, 1, а K і P стоять біля ±2,4 (значення √2 + 1 = 2,41 -- точка P)
+    ('\\foreach \\x/\\name in {-2/K, -1/L, 0/M, 1/N, 2/P} {\n        \\draw (\\x,0.1) -- (\\x,-0.1);\n        \\node[above] at (\\x,0.15) {$\\name$};\n        \\node[below] at (\\x,-0.15) {$\\x$};\n    }',
+     '\\foreach \\x/\\name in {-2.414/K, -1/L, 0/M, 1/N, 2.414/P} {\n        \\draw (\\x,0.1) -- (\\x,-0.1);\n        \\node[above] at (\\x,0.15) {$\\name$};\n    }\n    \\foreach \\x in {-1, 0, 1} \\node[below] at (\\x,-0.15) {$\\x$};', '\\log_{\\sqrt{2}} \\cos 360'),
+    # НМТ 2026, 18.06 №17 (графік з трьох частин): на (0; +∞) в оригіналі (с. 110) y = sin x з амплітудою 1, а не 2 sin x
+    ('plot (\\x, {sin(deg(\\x))*2});',
+     'plot (\\x, {sin(deg(\\x))});'),
+    # НМТ 2025, 4.06 №17 (графік з трьох частин): біля поділки 1 на осі y стояла ще й зайва мітка «-1»
+    ('\\node[left] at (0,1) {$-1$}; % На картинці тут -1 позначено як засічка, але насправді це 1, просто риска',
+     '% зайву мітку «-1» біля поділки 1 прибрано'),
+    # НМТ 2024, 21.06 №12 (паралелограм, PKD): умову було переказано, а варіанти замінено -- правильного серед них не було;
+    # текст і варіанти як в оригіналі (НМТ23-25.pdf, с. 202), рік 2024
+    (r"""\zadtask{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $P$, а на стороні $BC$ --- точку $K$ так, що трикутник $PKD$ є рівностороннім, $BP \perp AD$, $PK = 6$, $\angle ABP = \alpha$ (див. рисунок). Визначте площу паралелограма $ABCD$. \nmtyear{2025}}""",
+     r"""\zadtask{На сторонах $AD$ й $BC$ паралелограма $ABCD$ вибрано відповідно точки $P$ й $K$ так, що трикутник $PKD$ є правильним, $BP \perp AD$ (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $PK = 6$, $\angle ABP = \alpha$. \nmtyear{2024}}"""),
+    (r"""\textbf{А} & $18\sqrt{3}(1 + \mathrm{tg}\,\alpha)$ \\[0.2cm]
+\textbf{Б} & $18(1 + \mathrm{tg}\,\alpha)$ \\[0.2cm]
+\textbf{В} & $18\sqrt{3}\,\mathrm{tg}\,\alpha$ \\[0.2cm]
+\textbf{Г} & $18(1 + \sqrt{3}\,\mathrm{tg}\,\alpha)$ \\[0.2cm]
+\textbf{Д} & $18\sqrt{3}(1 - \mathrm{tg}\,\alpha)$ \\""",
+     r"""\textbf{А} & $18\sqrt{3} + \dfrac{9}{\mathrm{tg}\,\alpha}$ \\[0.2cm]
+\textbf{Б} & $18 + 9\,\mathrm{tg}\,\alpha$ \\[0.2cm]
+\textbf{В} & $18\sqrt{3} + 9\,\mathrm{tg}\,\alpha$ \\[0.2cm]
+\textbf{Г} & $18 + 27\,\mathrm{tg}\,\alpha$ \\[0.2cm]
+\textbf{Д} & $18\sqrt{3} + 27\,\mathrm{tg}\,\alpha$ \\"""),
+    # НМТ 2026, 23.05 №14 (трафарет ABCDEFG): в базі втрачено вершину F, переписано питання, варіанти переставлено (68 було А, в оригіналі Б)
+    # і Г = 40, не 70 (НМТ 2026 основна сесія (22).pdf, с. 15); відповідь Б і розв'язок -- у originals_2026.json
+    (r"трафарету $ABCDEG$ Андрійко", r"трафарету $ABCDEFG$ Андрійко"),
+    (r"Обчисліть площу трафарету $ABCDEG$.", r"Обчисліть площу зображеного трафарету $ABCDEFG$."),
+    (r"""\answerTable{$68$ см$^2$}{$64$ см$^2$}{$72$ см$^2$}{$70$ см$^2$}{$76$ см$^2$}""", r"""\answerTable{$64$ см$^2$}{$68$ см$^2$}{$72$ см$^2$}{$40$ см$^2$}{$76$ см$^2$}"""),
+    # НМТ 2026, 8.06 №12 (сфера, M і N): варіант Г в оригіналі (1; -2; -8), не (5; -2; 0) (НМТ 2026 основна сесія (22).pdf, с. 58)
+    (r"{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(5; -2; 0)$}{$(-1; 2; 8)$}", r"{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(1; -2; -8)$}{$(-1; 2; 8)$}"),
+    # НМТ 2023, 07.06 №4 (свічки): варіанти намальовано в іншому порядку (А куля, Б конус, В піраміда, Г циліндр, Д призма);
+    # в оригіналі (НМТ23-25.pdf, с. 9) А піраміда, Б призма, В куля, Г циліндр, Д конус -- відповідь В
+    (переставити_варіанти("answerTableTall", [2, 4, 0, 3, 1]), None, "% В - Куля", "% Б - Призма (паралелепіпед)"),
+    # НМТ 2026, 10.06 №2 (опитування в музичній школі): варіанти в оригіналі 10, 20, 25, 35, 40 (НМТ 2026 основна сесія (22).pdf, с. 68); відповідь А -- у originals_2026.json
+    (r"\answerTable{$5$}{$10$}{$15$}{$20$}{$40$}", r"\answerTable{$10$}{$20$}{$25$}{$35$}{$40$}", "улюбленого жанру музики"),
+    # НМТ 2026, 30.05 №2 (апофеми): умову було переказано з підказкою («трикутну», SABC); в оригіналі (НМТ 2026 основна сесія (22).pdf, с. 19) --
+    # «правильну піраміду ... в піраміді, що має 4 грані»
+    (r"На рисунку зображено правильну трикутну піраміду $SABC$ з вершиною $S$. Скільки всього апофем можна провести в цій піраміді, якщо у неї $4$ грані?",
+     r"На рисунку зображено правильну піраміду. Скільки всього апофем можна провести в піраміді, що має $4$ грані?"),
+    # НМТ 2026, 23.05 №21 (циліндр і конус): умову було переказано («мають спільну вісь», якого в оригіналі немає); текст як в оригіналі (НМТ 2026 основна сесія (22).pdf, с. 17)
+    (r"На рисунку зображено циліндр і конус, що мають спільну вісь. Радіус основи конуса вдвічі менший за радіус циліндра. Висота конуса дорівнює $15$~см, а твірна конуса~--- $17$~см. Знайдіть об'єм циліндра (у см$^3$), якщо площа його бічної поверхні дорівнює $640\pi$~см$^2$. У відповіді запишіть значення $\dfrac{V}{\pi}$.",
+     r"Задано циліндр із площею бічної поверхні $640\pi$~см$^2$ та конус (див. рисунок). Радіус основи конуса вдвічі менший за радіус основи циліндра. Висота конуса дорівнює $15$~см, його твірна~--- $17$~см. Знайдіть об'єм $V$ (у см$^3$) циліндра. У відповідь запишіть значення $\dfrac{V}{\pi}$."),
+    # НМТ 2024, 10.06 №19 (площа фігури під x^3/3): в оригіналі (НМТ23-25.pdf, с. 148) рисунка немає, а доданий «для перевірки» малюнок із заливкою підказує відповідь
+    (прибрати_від("% Ілюстрація до завдання 22", "\\end{center}"), None, "Знайдіть площу фігури, обмеженої графіком функції $y = \\dfrac{x^3}{3}$"),
+    # НМТ 2024, 25.05 №13 (паралелограм, бісектриса AK): у базі BK:KC = 5:2, AK = c, кут β і варіанти без правильного; в оригіналі (НМТ23-25.pdf, с. 95) 4:3, AK = b, ∠KAD = α, відповідь В
+    (r"так, що $BK : KC = 5 : 2$ (див. рисунок). $AK = c$, $\angle KAD = \beta$.", r"так, що $BK : KC = 4 : 3$ (див. рисунок). $AK = b$, $\angle KAD = \alpha$."),
+    (замінити_варіанти("answerTableTall", [r"$\dfrac{4b}{11\cos\alpha}$", r"$\dfrac{11b}{4\mathrm{tg}\,\alpha}$", r"$\dfrac{11b}{4\cos\alpha}$", r"$\dfrac{36b}{\cos\alpha}$", r"$\dfrac{11b}{4\sin\alpha}$"]), None, "$AK = b$, $\\angle KAD = \\alpha$."),
+    # старе поле відповіді з \fbox поруч із \nmtAnswerBox -- дубль (24. Арифметична прогресія, завдання про колоди)
+    (r"Відповідь: \fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}, \fbox{\phantom{0}}\fbox{\phantom{0}}\fbox{\phantom{0}}", ""),
+    # НМТ 2026, 15.06 №20 (таблиця сортів груш): «Улюблениця» не вміщувалась у стовпчик 2 см і налазила на сусідній
+    (r"m{2.2cm}|c|c|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|c|", r"m{2.2cm}|c|c|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.8cm}|c|"),
+]
+FIXES_USED = collections.Counter()
+
+def apply_source_fixes(t):
+    # рядки з самих пробілів -- порожні, кілька порожніх поспіль -- один (так їх і записує збирач): інакше не впізнаються виправлення,
+    # що містять порожні рядки (напр. цілі рисунки TikZ, скопійовані з готового файла теми)
+    t = re.sub(r"\n{3,}", "\n\n", re.sub(r"(?m)^[ \t]+$", "", t))
+    for a, b, *only in SOURCE_FIXES:
+        if callable(a):                               # функція-виправлення (напр. переставити_варіанти): b = None, only -- маркери
+            if all(c in t for c in only): t = a(t); FIXES_USED[a] += 1
+        elif a in t and all(c in t for c in only):     # третій елемент -- виправляти лише в завданні з цим текстом
+            t = t.replace(a, b); FIXES_USED[a] += 1
+    return t
+
+# ілюстрації: рисунки-зображення (scripts/рисунки.py) + TikZ-накладки замість старих рисунків завдань
+ILLUSTRATIONS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "вставки_рисунків.json"), encoding="utf-8")) \
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "вставки_рисунків.json")) else []
+
+def apply_illustrations(t):
+    for it in ILLUSTRATIONS:
+        if it["якір"] not in t: continue
+        m = re.search(it["шаблон"], t, re.S)
+        if not m: continue
+        t = t[:m.start()] + it["нове"] + t[m.end():]
+        FIXES_USED["ілюстрація " + it["id"]] += 1
+    return t
+
+def order_cells_by_comment(t):
+    """клітинки \answerTable з рисунками підписані коментарем «% Г: Призма» -- буквою з оригіналу, але в кількох
+    старих файлах стоять не в тому порядку (свічки 14.06.2023); переставляємо клітинки за цими буквами"""
+    for m in reversed(list(re.finditer(r"\\answerTable(?:Tall|Small)?(?=\s*\{)", t))):
+        args, j = read_args(t, m.end(), 5)
+        if not args: continue
+        lab = [re.match(r"\s*%\s*([А-Д]):", a) for a in args]
+        if not all(lab): continue
+        ls = [x.group(1) for x in lab]
+        if sorted(ls) != list("АБВГД") or ls == list("АБВГД"): continue
+        t = t[:m.end()] + "".join("{%s}" % a for _, a in sorted(zip(ls, args))) + t[j:]
+        FIXES_USED["клітинки за коментарями"] += 1
+    return t
+
 def fix_figures_tables(t):
     """підпис y=f(x)/y=g(x) на кривій -> білий фон; дроби -> висока таблиця; голі числа в таблиці -> математика; сирі '|' у словах; поля відповіді з \\framebox"""
     COLORS = r"(?:mainGreen|headerblue|yearOrange|red|blue|green|gray|black|cyan|magenta|orange|violet|brown|purple|teal|olive)(?:![0-9]+(?:![a-zA-Z]+)?)*"
@@ -981,12 +1201,23 @@ def _to_matching_layout(t):
         c = re.sub(r"\n{3,}", "\n\n", c)
         return c.strip("\n \t")
     body = ("\\matchingLayout{\n" + clean(c1) + "\n}{\n" + clean(c2) + "\n}{\n\\matchingGrid\n}\n")
-    return t[:a1] + body + (tail if mg is None else tail[mg.end():]).lstrip("\n")
+    head = t[:a1]
+    # рисунок між колонками (графік поруч із пунктами) не губимо: ставимо праворуч від умови
+    figs = re.findall(r"(?:\\begin\{nmtfit\})?\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}(?:\\end\{nmtfit\})?|\\includegraphics(?:\[[^\]]*\])?\{[^{}]*\}", t[b1:a2], re.S)
+    if figs:
+        fig = "\n".join(figs)
+        ms = re.search(r"(\\zadnum[ \t]*)((?:(?!\\begin\{|\n[ \t]*\n).)*?\\nmtyear\{\d{4}\})", head, re.S)
+        if ms:
+            head = (head[:ms.start(2)] + "\\begin{minipage}[t]{0.55\\textwidth}\n" + ms.group(2) + "\n\\end{minipage}\n\\hfill\n"
+                    "\\begin{minipage}[t]{0.4\\textwidth}\n\\vspace{0pt}\n\\begin{flushright}\n" + fig + "\n\\end{flushright}\n\\end{minipage}" + head[ms.end(2):])
+        else:
+            head = head + "\\begin{center}\n" + fig + "\n\\end{center}\n"
+    return head + body + (tail if mg is None else tail[mg.end():]).lstrip("\n")
 
 def unify_matching(t):
     """єдиний вигляд блоків «на відповідність»: однакові відступи, вирівняні мітки,
     висячий відступ у довгих пунктах"""
-    if not re.search(r"\\matchingGrid|\\matchTable|\\cline\{2-6\}", t): return t
+    if not re.search(r"\\matchingGrid|\\matchTable|\\cline\{2-6\}|\\matchingLayout", t): return t
     orig = t
     t = _grid_to_macro(t)
     t = _two_col_tabular(t)
@@ -1038,9 +1269,12 @@ def prep_2026(t):
     c = t["latex"]
     c = re.sub(r"\s*\\nmtyear\{\d{4}\}", "", c)
     c = clean_chunk(c)
+    c = apply_source_fixes(c)
+    c = apply_illustrations(c)
     c = insert_year(c, "2026")
     c = fix_cyr_math(c)
     c = fix_figures_tables(c)
+    c = дизайн_завдань.уніфікувати(c, ДИЗАЙН)
     if count_starts(c) != 1: raise SystemExit(f"2026 {t['id']}: {count_starts(c)} стартів завдання")
     return c
 
@@ -1097,7 +1331,11 @@ def build_unit(key, by2026, log):
             c = insert_year(c, it["year"])
         c = restore(c, store)
         c = fix_cyr_math(c)
+        c = apply_source_fixes(c)
+        c = apply_illustrations(c)
+        c = order_cells_by_comment(c)
         c = fix_figures_tables(c)
+        c = дизайн_завдань.уніфікувати(c, ДИЗАЙН)
         c = re.sub(r"(?<!\\begin\{nmtfit\})\\begin\{tikzpicture\}", r"\\begin{nmtfit}\\begin{tikzpicture}", c)
         c = re.sub(r"\\end\{tikzpicture\}(?!\\end\{nmtfit\})", r"\\end{tikzpicture}\\end{nmtfit}", c)
         # відомі помилкові рядки старих файлів (некоректний синтаксис TikZ; далі координата задана вручну)
@@ -1188,6 +1426,8 @@ def build_unit(key, by2026, log):
             if c.startswith("\\newcommand{\\matchingLayout"):
                 for a, b in ML_WIDTHS: c = c.replace(a, b)
                 c = re.sub(r"(\\begin\{minipage\}\[t\]\{[^}]*\})", r"\1\\vspace{0pt}\\raggedright", c)
+                # «Величина / Початок» тощо: не дублювати заголовки, які завдання (2026) задає саме
+                c = re.sub(r"(\\textit\{[^{}]*\}\s*\\par\s*\\vspace\{[^}]*\})(\s*)(#[12])", r"\\nmtHeadUnless{\3}{\1}\2\3", c)
             c = re.sub(r"\\vspace\{(?!0pt\})", r"\\nbvspace{", c)   # усередині завдання розривів сторінки немає
             out.append(c + "\n")
         for c in pre_defs: out.append(c + "\n")
@@ -1206,8 +1446,9 @@ def build_unit(key, by2026, log):
         for d in ex_seen.values(): out.append(d + "\n")
         out.append("\n")
     out.append(COMPAT)
-    if "\\includegraphics" in "".join(it["out"] for it in items):
-        out.append("\\graphicspath{{./}{%s/}}\n" % folder)
+    if "\\includegraphics" in "".join(parts):          # і старі завдання, і завдання 2026 (ілюстрації)
+        # NFC, як і в input_line(): на Overleaf (Linux) тека в NFD-записі не знаходиться
+        out.append("\\graphicspath{{./}{%s/}}\n" % unicodedata.normalize("NFC", folder))
     out.append("\\chapterTitle{Тема %s. %s}\n" % (key, title))
     secnum, secname = SECTION_OF[key]
     out.append("\\noindent{\\small\\color{gray!80} Розділ %s. %s \\quad\\textbullet\\quad Усього завдань: %d (НМТ %s); %s.}\\par\\vspace{0.2cm}\n\n" % (secnum, secname, total, stat, tstat))
@@ -1266,7 +1507,135 @@ def build_master(paths_by_unit):
         fname = "Розділ_%s_%s.tex" % (num, re.sub(r"[ ,]+", "_", name))
         build_collection(fname, "База завдань НМТ 2022--2026 \\textendash{} Розділ %s" % num, t, [(num, name, units)], paths_by_unit)
 
+ПЕРЕМАЛЬОВАНІ = collections.Counter()
+ЗМІНА_ПЕРЕД = {}            # id блока ПІСЛЯ заміни растра на TikZ -> id ДО (каталог тримається за старий)
+
+
+def перемалювати_за_оригіналом(шляхи):
+    """рисунки, перемальовані за оригіналами НМТ (scripts/data/рисунки_за_оригіналом.json: id завдання, номер рисунка
+    в завданні, tikz), -- у готові файли тем. Ключ -- id завдання (як у каталозі): текст завдань не змінюється, тож id ті
+    самі; рисунки вже написано за правилами дизайн-системи, нормалізатор їх не чіпає."""
+    f = os.path.join(DATA, "рисунки_за_оригіналом.json")
+    if not os.path.exists(f): return []
+    за_id = collections.defaultdict(dict)
+    for r in json.load(open(f, encoding="utf-8")):
+        за_id[r["id"]][r.get("рисунок", 0) if isinstance(r.get("рисунок", 0), str) else int(r.get("рисунок", 0))] = r["tikz"]
+    замінені = {}                       # id -> цілий блок завдання, перенабраний за оригіналом (scripts/data/завдання_за_оригіналом.json)
+    ff = os.path.join(DATA, "завдання_за_оригіналом.json")
+    if os.path.exists(ff):
+        for r in json.load(open(ff, encoding="utf-8")): замінені[r["id"]] = дизайн_завдань.кути_біля_дуги(r["блок"].strip("\n"))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
+    import спільне as SP
+    IMG = re.compile(r"\\includegraphics(?:\[[^\]]*\])?\{[^}]*\}")
+    TIKZ = re.compile(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", re.S)
+    def розмір_блока(текст):
+        """усі рисунки блока (вони вже нові) -- до єдиного розміру (дизайн_завдань.розмір_перемальованих)"""
+        ms = list(TIKZ.finditer(текст))
+        if not ms: return текст
+        нові = дизайн_завдань.розмір_перемальованих([m.group(0) for m in ms], [текст[:m.start()] for m in ms], len(ms))
+        return "".join(текст[(ms[k - 1].end() if k else 0):m.start()] + нові[k] for k, m in enumerate(ms)) + текст[ms[-1].end():]
+    def блок(m):
+        b = m.group(1); i = SP.підпис(b)
+        if i in замінені:
+            ПЕРЕМАЛЬОВАНІ[(i, "блок")] += 1
+            if not замінені[i].strip(): return ""            # порожній блок = завдання вилучено з бази
+            return "\\begin{samepage}\n" + розмір_блока(замінені[i]) + "\n\\end{samepage}"
+        if i not in за_id: return m.group(0)
+        # растрові рисунки (\\includegraphics поза TikZ), замінені на TikZ: ключ "img<k>" -- k-й за порядком
+        поза = TIKZ.sub(lambda mm: " " * len(mm.group(0)), b)
+        for k, mm in enumerate(IMG.finditer(поза)):
+            нове = за_id[i].get("img%d" % k)
+            if нове is None: continue
+            ПЕРЕМАЛЬОВАНІ[(i, "img%d" % k)] += 1
+            нове = дизайн_завдань.розмір_перемальованих([дизайн_завдань.кути_біля_дуги(нове.strip())], [b[:mm.start()]], 1)[0]
+            b = b[:mm.start()] + нове + b[mm.end():]
+            ЗМІНА_ПЕРЕД[SP.підпис(b)] = i
+            поза = TIKZ.sub(lambda m2: " " * len(m2.group(0)), b)
+            break
+        ms = list(TIKZ.finditer(b)); заміни = {}
+        for k, mm in enumerate(ms):
+            нове = за_id[i].get(k)
+            if нове is None: continue
+            ПЕРЕМАЛЬОВАНІ[(i, k)] += 1
+            заміни[k] = дизайн_завдань.кути_біля_дуги(нове.strip())      # підписи кутів -- біля дуги (\\nmtAngleLabel)
+        if заміни:                                  # розмір -- за єдиними правилами (група: варіанти рисунків мають спільний множник)
+            ключі = sorted(заміни)
+            розм = дизайн_завдань.розмір_перемальованих([заміни[k] for k in ключі], [b[:ms[k].start()] for k in ключі], len(ms))
+            заміни = dict(zip(ключі, розм))
+        вихід, поз = [], 0
+        for k, mm in enumerate(ms):
+            вихід.append(b[поз:mm.start()]); вихід.append(заміни.get(k, mm.group(0))); поз = mm.end()
+        вихід.append(b[поз:])
+        return "\\begin{samepage}" + "".join(вихід) + "\\end{samepage}"
+    for шлях in шляхи:
+        повний = os.path.join(ROOT, шлях)
+        t = open(повний, encoding="utf-8").read()
+        t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
+        if "\\includegraphics" in t2 and "\\graphicspath" not in t2 and "\\chapterTitle{" in t2:     # рисунок-зображення з заміни/перемальовування: шлях до теки теми
+            тека = unicodedata.normalize("NFC", os.path.dirname(шлях))
+            t2 = t2.replace("\\chapterTitle{", "\\graphicspath{{./}{%s/}}\n\\chapterTitle{" % тека, 1)
+        if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
+    return [(i, k) for i, d in за_id.items() for k in d if not ПЕРЕМАЛЬОВАНІ[(i, k)] and i not in замінені] + [(i, "блок") for i in замінені if not ПЕРЕМАЛЬОВАНІ[(i, "блок")]]
+
+
+def єдина_розкладка(шляхи):
+    """усі завдання з одним рисунком -- до єдиної розкладки (scripts/розкладка_завдань.py: бічний вид S чи широкий C; відповідність під рисунком;
+    продовження пунктів відповідності зливаються). Текст завдання змінюється, тож id теж: мапа {id до: id після} -> scripts/data/id_після_розкладки.json;
+    застосувати: python3 scripts/міграція_id.py --мапа scripts/data/id_після_розкладки.json (каталог, пробна база, класифікація)."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "варіант_нмт"))
+    import спільне as SP
+    import розкладка_завдань as Р
+    мапа, види, зіпсовано = {}, collections.Counter(), []
+    def растр(b, тека):
+        """\\includegraphics поза TikZ -> width= за єдиним правилом розміру; повертає (блок, вид S/C або None)"""
+        поза = re.sub(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", lambda mm: " " * len(mm.group(0)), b, flags=re.S)
+        ms = list(re.finditer(r"\\includegraphics(?:\[([^\]]*)\])?\{([^}]*)\}", поза))
+        if len(ms) != 1: return b, None
+        m = ms[0]; r = дизайн_завдань.розмір_растрового(m.group(1), m.group(2), тека)
+        if not r: return b, None
+        нов = "\\includegraphics[%s]{%s}%%@N %s\n" % (r[0], m.group(2), "0x0 " + r[1])
+        return b[:m.start()] + нов + b[m.end():], r[1]
+    # те саме завдання в кількох темах («також у темі») мало різні малюнки (старі файли тем малювали окремо): беремо рисунок першої появи --
+    # тоді розкладка однакова в усіх темах, а id після розкладки збігаються
+    перший = {}
+    for шлях in шляхи:
+        for m in re.finditer(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", open(os.path.join(ROOT, шлях), encoding="utf-8").read(), re.S):
+            блок0 = растр(m.group(1), os.path.dirname(os.path.join(ROOT, шлях)))[0]
+            ф = list(Р.FIG.finditer(блок0))
+            if len(ф) == 1 and not os.environ.get("NMT_NO_ETALON"): перший.setdefault(Р.плоский(Р.злити_продовження(блок0)), ф[0].group(0))
+    тека_файлу = [ROOT]
+    def блок(m):
+        b, _ = растр(m.group(1), тека_файлу[0])
+        ф = list(Р.FIG.finditer(b))
+        if len(ф) == 1:
+            еталон = перший.get(Р.плоский(Р.злити_продовження(b)))
+            if еталон and еталон != ф[0].group(0): b_для = b[:ф[0].start()] + еталон + b[ф[0].end():]
+            else: b_для = b
+        else: b_для = b
+        новий, вид = Р.нормалізувати(b_для)
+        if новий == m.group(1):
+            поточний = SP.підпис(m.group(1))
+            if поточний in ЗМІНА_ПЕРЕД: мапа[ЗМІНА_ПЕРЕД[поточний]] = поточний
+            return m.group(0)
+        if not Р.перевірити_зміст(m.group(1), новий):
+            зіпсовано.append(SP.підпис(m.group(1))); return m.group(0)
+        види[вид or "пункти"] += 1
+        до, після = SP.підпис(m.group(1)), SP.підпис(новий)
+        до = ЗМІНА_ПЕРЕД.get(до, до)
+        if до != після: мапа[до] = після
+        return "\\begin{samepage}" + новий + "\\end{samepage}"
+    for шлях in шляхи:
+        повний = os.path.join(ROOT, шлях)
+        тека_файлу[0] = os.path.dirname(повний)
+        t = open(повний, encoding="utf-8").read()
+        t2 = re.sub(r"\\begin\{samepage\}(.*?)\\end\{samepage\}", блок, t, flags=re.S)
+        if t2 != t: open(повний, "w", encoding="utf-8").write(t2)
+    json.dump(мапа, open(os.path.join(DATA, "id_після_розкладки.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    return види, len(мапа), зіпсовано
+
+
 def main():
+    open(os.path.join(ROOT, "nmtbase.sty"), "w", encoding="utf-8").write(STY)
     by2026 = load_2026()
     log = []; paths_by_unit = {}
     for key in UNIT_ORDER:
@@ -1274,12 +1643,25 @@ def main():
         paths_by_unit[key] = os.path.relpath(p, ROOT)
     build_master(paths_by_unit)
     json.dump(log, open(os.path.join(DATA, "build_log.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    не_застосовано = перемалювати_за_оригіналом(paths_by_unit.values())
+    розкладка = єдина_розкладка(paths_by_unit.values())
     tot = collections.Counter()
     for e in log:
         print(f"[{e['key']:>3}] {e['total']:4d}  {e['counts']}  -> {e['out']}")
         for w in e["warns"]: print("       ! " + w)
         for y, c in e["counts"].items(): tot[y] += c
     print("РАЗОМ (з урахуванням завдань у кількох темах):", dict(tot), "=", sum(tot.values()))
+    print("виправлення джерел:", ", ".join("%d" % FIXES_USED[f[0]] for f in SOURCE_FIXES))
+    print("клітинки з рисунками переставлено за коментарями:", FIXES_USED["клітинки за коментарями"])
+    for it in ILLUSTRATIONS:
+        print("ілюстрація %s: %s" % (it["id"], "вставлено %d раз(и)" % FIXES_USED["ілюстрація " + it["id"]] if FIXES_USED["ілюстрація " + it["id"]] else "! не застосовано"))
+    for a, *_ in SOURCE_FIXES:
+        if not FIXES_USED[a]: print("   ! виправлення не застосовано:", a)
+    print("перемальовано за оригіналами: %d рисунків у %d місцях%s" % (len({k for k in ПЕРЕМАЛЬОВАНІ}), sum(ПЕРЕМАЛЬОВАНІ.values()),
+          "" if not не_застосовано else " | ! не застосовано: %s" % не_застосовано))
+    print("єдина розкладка: %s | id змінено: %d | зміст порушено (лишено як було): %d" % (dict(розкладка[0]), розкладка[1], len(розкладка[2])))
+    print("дизайн-система:", dict(ДИЗАЙН), "| рисунків без виміру розміру:", дизайн_завдань.записати_на_вимір(),
+          "(виміряти: python3 scripts/дизайн_завдань.py --виміряти, потім зібрати ще раз)")
 
 if __name__ == "__main__":
     main()

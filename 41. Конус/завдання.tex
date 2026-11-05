@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 41}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -210,44 +33,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 41. Конус}
 \noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 32 (НМТ \mbox{2023~--- 8}, \mbox{2024~--- 6}, \mbox{2025~--- 7}, \mbox{2026~--- 11}); \mbox{тестових~--- 12}; \mbox{з короткою відповіддю~--- 20}.}\par\vspace{0.2cm}
@@ -261,19 +47,8 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \noindent
-\textbf{А} \quad рівнобедреного трикутника навколо його основи».
+\nmtOptions{рівнобедреного трикутника навколо його основи».}{рівностороннього трикутника навколо його сторони».}{рівностороннього трикутника навколо його висоти».}{прямокутного трикутника навколо його гіпотенузи».}{прямокутного трикутника навколо його діагоналі».}
 
-\nmtnobreak
-\textbf{Б} \quad рівностороннього трикутника навколо його сторони».
-
-\nmtnobreak
-\textbf{В} \quad рівностороннього трикутника навколо його висоти».
-
-\nmtnobreak
-\textbf{Г} \quad прямокутного трикутника навколо його гіпотенузи».
-
-\nmtnobreak
-\textbf{Д} \quad прямокутного трикутника навколо його діагоналі».
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -292,25 +67,15 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 3 (Обертання прямокутного трикутника - 10 см) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-Укажіть геометричне тіло, яке утворене внаслідок обертання прямокутного трикутника з меншим катетом 10~см навколо прямої $a$ (див. рисунок). \nmtyear{2023}
-
-\nopagebreak\nbvspace{0.3cm}
-\textbf{А} \quad циліндр із твірною 10~см
-
-\textbf{Б} \quad циліндр із радіусом основи 10~см
-
-\textbf{В} \quad конус із твірною 10~см
-
-\textbf{Г} \quad конус із радіусом основи 10~см
-
-\textbf{Д} \quad конус із висотою 10~см
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Укажіть геометричне тіло, яке утворене внаслідок обертання прямокутного трикутника з меншим катетом 10~см навколо прямої $a$ (див. рисунок). \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.06]%@N 2.55x3.63 S
+
     % Стиль стрілки обертання
     \tikzset{rotarrow/.style={-{Latex[length=3mm, width=2mm]}, thick, headerblue}}
 
@@ -333,8 +98,11 @@
     %\draw[rotarrow] (2.5, 3.3) ++(130:0.4 and 0.15) arc (130:-150:0.4 and 0.15);
 
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
+\par
+\nmtOptions{циліндр із твірною 10~см}{циліндр із радіусом основи 10~см}{конус із твірною 10~см}{конус із радіусом основи 10~см}{конус із висотою 10~см}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -343,25 +111,15 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 4 (Обертання рівнобедреного трикутника) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-Укажіть тіло, яке утвориться внаслідок обертання рівнобедреного трикутника навколо прямої $a$ (див. рисунок). \nmtyear{2023}
-
-\nopagebreak\nbvspace{0.3cm}
-\textbf{А} \quad конус
-
-\textbf{Б} \quad циліндр
-
-\textbf{В} \quad куля
-
-\textbf{Г} \quad зрізаний конус
-
-\textbf{Д} \quad півкуля
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Укажіть тіло, яке утвориться внаслідок обертання рівнобедреного трикутника навколо прямої $a$ (див. рисунок). \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.11]%@N 2.43x3.46 S
+
     \tikzset{rotarrow/.style={-{Latex[length=3mm, width=2mm]}, thick, headerblue}}
 
     % Вісь a
@@ -381,8 +139,11 @@
     \draw[rotarrow] (1.5, 3.3) ellipse (0.5 and 0.15);
 
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
+\par
+\nmtOptions{конус}{циліндр}{куля}{зрізаний конус}{півкуля}
+
+\nopagebreak\nbvspace{-0.3cm}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -392,26 +153,11 @@
 \begin{samepage}
 % === ЗАВДАННЯ 7 (Конус через радіус R і висоту H - формула твірної) ===
 \noindent\zadnum Висота конуса дорівнює $H$, а радіус основи – $R$. Укажіть формулу для обчислення довжини твірної $L$ цього конуса. \nmtyear{2023}
-
-\nmtnobreak
-\answerListVertical
-{$L=\sqrt{R^2+H^2}$}
-{$L=\sqrt{R^2-H^2}$}
-{$L=\sqrt{H^2-R^2}$}
-{$L=R+H$}
-{$L=R\cdot H$}
+\nmtOptions{$L=\sqrt{R^2+H^2}$}{$L=\sqrt{R^2-H^2}$}{$L=\sqrt{H^2-R^2}$}{$L=R+H$}{$L=R\cdot H$}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
-\begin{samepage}
-% === ЗАВДАННЯ 8 (Площа бічної поверхні - формула) ===
-\noindent\zadnum Укажіть формулу для обчислення площі $S$ бічної поверхні конуса, твірна якого дорівнює $l$, а радіус основи – $r$. \nmtyear{2023}
 
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerTableTall{$S=\pi rl$}{$S=\frac{1}{3}\pi r^2 l$}{$S=\pi r(r+l)$}{$S=\pi r^2$}{$S=2\pi rl$}
-\par\penalty-20
-\end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 10 (Теорія - утворення конуса) ===
@@ -420,19 +166,8 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \noindent
-\textbf{А} \quad рівнобедреного трикутника навколо його основи».
+\nmtOptions{рівнобедреного трикутника навколо його основи».}{рівностороннього трикутника навколо його сторони».}{рівностороннього трикутника навколо його висоти».}{прямокутного трикутника навколо його гіпотенузи».}{прямокутна навколо його діагоналі».}
 
-\nmtnobreak
-\textbf{Б} \quad рівностороннього трикутника навколо його сторони».
-
-\nmtnobreak
-\textbf{В} \quad рівностороннього трикутника навколо його висоти».
-
-\nmtnobreak
-\textbf{Г} \quad прямокутного трикутника навколо його гіпотенузи».
-
-\nmtnobreak
-\textbf{Д} \quad прямокутна навколо його діагоналі».
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -456,19 +191,8 @@
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
 \noindent
-\textbf{А} \quad лежать в одній площині».
+\nmtOptions{лежать в одній площині».}{паралельні».}{не мають спільних точок».}{перпендикулярні».}{мимобіжні».}
 
-\nmtnobreak
-\textbf{Б} \quad паралельні».
-
-\nmtnobreak
-\textbf{В} \quad не мають спільних точок».
-
-\nmtnobreak
-\textbf{Г} \quad перпендикулярні».
-
-\nmtnobreak
-\textbf{Д} \quad мимобіжні».
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.5cm}
@@ -488,14 +212,7 @@
 \begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №6
 \zadnum Конус утворений обертанням \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, align=left, leftmargin=2.2em, labelsep=0.6em, itemsep=2pt, topsep=2pt]
-\item рівнобедреного трикутника навколо його основи
-\item прямокутного трикутника навколо його гіпотенузи
-\item рівностороннього трикутника навколо його сторони
-\item прямокутного трикутника навколо його катета
-\item прямокутника навколо його сторони
-\end{enumerate}
+\nmtOptions{рівнобедреного трикутника навколо його основи}{прямокутного трикутника навколо його гіпотенузи}{рівностороннього трикутника навколо його сторони}{прямокутного трикутника навколо його катета}{прямокутника навколо його сторони}
 \par\nbvspace{0.25cm}
 % Відповідь: Г
 \ifshowsolutions\solution{Конус дістаємо обертанням прямокутного трикутника навколо одного з його катетів: цей катет стає віссю (висотою), другий катет~--- радіусом основи, гіпотенуза~--- твірною. Відповідь: \textbf{Г}.}\fi
@@ -505,14 +222,7 @@
 \begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №5 --- також у темі: Циліндр
 \zadtask{У якій просторовій фігурі можна провести твірну? \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Alph*}, leftmargin=2.8em, itemsep=2pt]
-    \item лише в конусі
-    \item лише в піраміді
-    \item лише в конусі та піраміді
-    \item лише в конусі та циліндрі
-    \item лише в циліндрі
-\end{enumerate}
+\nmtOptions{лише в конусі}{лише в піраміді}{лише в конусі та піраміді}{лише в конусі та циліндрі}{лише в циліндрі}
 \nopagebreak\nbvspace{0.1cm}}
 % Відповідь: Г
 \par\penalty-20
@@ -633,23 +343,31 @@
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №19 --- основна тема: Циліндр
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
-\zadnum На рисунку зображено циліндр і конус, що мають спільну вісь. Радіус основи конуса вдвічі менший за радіус циліндра. Висота конуса дорівнює $15$~см, а твірна конуса~--- $17$~см. Знайдіть об'єм циліндра (у см$^3$), якщо площа його бічної поверхні дорівнює $640\pi$~см$^2$. У відповіді запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Задано циліндр із площею бічної поверхні $640\pi$~см$^2$ та конус (див. рисунок). Радіус основи конуса вдвічі менший за радіус основи циліндра. Висота конуса дорівнює $15$~см, його твірна~--- $17$~см. Знайдіть об'єм $V$ (у см$^3$) циліндра. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    \draw[dashed] (-1.1,0) arc (180:0:1.1 and 0.35);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.34, thick, line join=round]%@N 6.20x3.93 S
+
+    % циліндр
+    \draw[dashed, thin] (-1.1,0) arc (180:0:1.1 and 0.35);
     \draw (-1.1,0) arc (180:360:1.1 and 0.35);
-    \draw (-1.1,0) -- (-1.1,3.2);
-    \draw (1.1,0) -- (1.1,3.2);
-    \draw (0,3.2) ellipse (1.1 and 0.35);
-    \begin{scope}[shift={(3.7,0)}]
-        \draw[dashed] (-0.8,0) arc (180:0:0.8 and 0.25);
-        \draw (-0.8,0) arc (180:360:0.8 and 0.25);
-        \draw (-0.8,0) -- (0,3.5);
-        \draw (0.8,0) -- (0,3.5);
+    \draw (-1.1,0) -- (-1.1,2.3);
+    \draw (1.1,0) -- (1.1,2.3);
+    \draw (0,2.3) ellipse (1.1 and 0.35);
+    \draw[dashed, thin] (0,0) -- (0,2.3);
+    \draw[dashed, thin] (0,0) -- (235:1.1 and 0.35);
+    \node[nmt dot] at (0,0) {};
+    \node[nmt dot] at (0,2.3) {};
+    % конус
+    \begin{scope}[shift={(2.9,0)}]
+        \draw[dashed, thin] (-0.75,0) arc (180:0:0.75 and 0.25);
+        \draw (-0.75,0) arc (180:360:0.75 and 0.25);
+        \draw (-0.75,0) -- (0,1.8) -- (0.75,0);
+        \draw[dashed, thin] (0,0) -- (0,1.8);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -662,14 +380,10 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №21 --- основна тема: Призма. Паралелепіпед. Куб
-\noindent
-\begin{minipage}[c]{0.58\textwidth}
-\zadnum Пряма чотирикутна призма й конус мають рівні висоти. В основі призми лежить рівнобічна трапеція, у яку можна вписати коло. Висота трапеції дорівнює діаметру основи конуса. Бічна сторона трапеції дорівнює $26$ см, а площа основи призми~--- $624$ см$^2$. Твірна конуса дорівнює $20$ см. Визначте площу (у см$^2$) бічної поверхні призми. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.40\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick, line join=round]
+\zadtask{Пряма чотирикутна призма й конус мають рівні висоти. В основі призми лежить рівнобічна трапеція, у яку можна вписати коло. Висота трапеції дорівнює діаметру основи конуса. Бічна сторона трапеції дорівнює $26$ см, а площа основи призми~--- $624$ см$^2$. Твірна конуса дорівнює $20$ см. Визначте площу (у см$^2$) бічної поверхні призми. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.01, thick, line join=round]%@N 5.43x2.28 C
+
     \coordinate (A) at (0,0);
     \coordinate (B) at (5,0);
     \coordinate (C) at (4,1);
@@ -694,8 +408,8 @@
     \draw[thick] (V) -- (10.8, 0);
     \draw[thick, dashed] (V) -- (9, 0);
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $1664$
 \ifshowsolutions\solution{У трапецію з вписаним колом сума основ дорівнює сумі бічних сторін: $a+b=2\cdot26=52$. Площа основи $\dfrac{a+b}{2}\cdot h_{\text{тр}}=624\Rightarrow 26\,h_{\text{тр}}=624\Rightarrow h_{\text{тр}}=24$~--- це діаметр основи конуса, тож $r=12$. Висота конуса (= висота призми) $h=\sqrt{20^2-12^2}=\sqrt{256}=16$. Периметр трапеції $P=(a+b)+2\cdot26=52+52=104$. Бічна поверхня призми $P\cdot h=104\cdot16=1664$. Відповідь: $1664$.}\fi
@@ -705,31 +419,30 @@
 \begin{samepage}
 % НМТ 2026, сесія 1.06, завдання №21 --- також у темі: Піраміда
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum Конус і правильна трикутна піраміда мають \textit{рівні висоти}. Радіус основи конуса дорівнює радіусу кола, \textit{вписаного} в основу піраміди, і дорівнює $4\sqrt{3}$. Площа бічної поверхні піраміди дорівнює $288$. Знайдіть об'єм конуса. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick, line join=round]
-    \draw[thick, dashed] (-1.3,0) arc (180:0:1.3 and 0.38);
-    \draw[thick] (-1.3,0) arc (180:360:1.3 and 0.38);
-    \coordinate (CV) at (0,3);
-    \draw[thick] (CV) -- (-1.3,0);
-    \draw[thick] (CV) -- (1.3,0);
-    \draw[thick, dashed] (CV) -- (0,0);
-    \draw[<-, >=stealth, gray] (0,0) -- (1.3,0);
-    \node[below, font=\scriptsize] at (0.7,-0.05) {$R$};
-    \coordinate (A) at (3.2,-0.35);
-    \coordinate (B) at (5.6,-0.35);
-    \coordinate (C) at (4.4,0.45);
-    \coordinate (S) at (4.4,3);
-    \draw[thick] (A) -- (B) -- (S) -- cycle;
-    \draw[thick] (A) -- (S);
-    \draw[thick, dashed] (A) -- (C) -- (B);
-    \draw[thick, dashed] (C) -- (S);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.559, line join=round]%@N 7.37x4.77 S
+
+    % правильна трикутна піраміда (ліворуч), як в оригіналі: видно дві бічні грані, пунктиром лише задня сторона основи
+    \coordinate (S) at (0,5.1);
+    \coordinate (L) at (-3.2,0);
+    \coordinate (R) at (2.85,0);
+    \coordinate (F) at (0.13,-2.2);
+    \draw[thick] (L) -- (S) -- (R) -- (F) -- cycle;
+    \draw[thick] (S) -- (F);
+    \draw[thin, dashed] (L) -- (R);
+    % конус (праворуч)
+    \coordinate (V) at (5.9,5.0);
+    \draw[thick] (3.7,-1.2) -- (V) -- (8.1,-1.2);
+    \draw[thick] (3.7,-1.2) arc (180:360:2.2 and 0.9);
+    \draw[thin, dashed] (3.7,-1.2) arc (180:0:2.2 and 0.9);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $64$
 \ifshowsolutions\solution{Для основи піраміди $r=\dfrac{a}{2\sqrt3}=4\sqrt3$, звідки сторона $a=24$. Площа бічної поверхні $S=\dfrac12\cdot 3a\cdot l=288$, тож $l=\dfrac{288}{36}=8$ (апофема). З $l^2=h^2+r^2$: $h^2=64-48=16$, $h=4$. Тоді висота й радіус конуса: $h=4$, $R=4\sqrt3$, а $V=\dfrac13\pi R^2 h=\dfrac13\pi\cdot48\cdot4=64\pi$. Отже $\dfrac{V}{\pi}=64$. Відповідь: \textbf{$64$}.}\fi
@@ -739,13 +452,14 @@
 \begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №21 --- також у темі: Куля. Сфера
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum Радіус основи й твірна конуса відносяться як $3 : 5$, а площа його бічної поверхні дорівнює $135\pi$. Площа повної поверхні півсфери дорівнює $243\pi$. У скільки разів об'єм півсфери більший за об'єм конуса? \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.17, thick, line join=round]%@N 4.43x2.17 S
+
     \draw[thick, dashed] (-1.0,0) arc (180:0:1.0 and 0.28);
     \draw[thick] (-1.0,0) arc (180:360:1.0 and 0.28);
     \draw[thick] (-1.0,0) -- (0,2.4) -- (1.0,0);
@@ -757,6 +471,7 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $1{,}5$
 \ifshowsolutions\solution{Конус: $r:l=3:5$, $S_{\text{бік}}=\pi rl=135\pi$. Із $l=\dfrac{5r}{3}$: $\pi r\cdot\dfrac{5r}{3}=135\pi$, тож $r^2=81$, $r=9$, $l=15$, висота $h=\sqrt{l^2-r^2}=\sqrt{225-81}=12$, $V_{\text{кон}}=\dfrac13\pi r^2h=\dfrac13\pi\cdot81\cdot12=324\pi$. Півсфера: $3\pi R^2=243\pi$, $R=9$, $V_{\text{півсф}}=\dfrac23\pi R^3=\dfrac23\pi\cdot729=486\pi$. Відношення $\dfrac{486\pi}{324\pi}=1{,}5$.}\fi
@@ -766,13 +481,14 @@
 \begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №21 --- основна тема: Призма. Паралелепіпед. Куб
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку зображено пряму чотирикутну призму та конус. В основі призми лежить ромб, площа якого дорівнює $216$ см$^2$, а сторона~--- $15$ см. Радіус основи конуса дорівнює половині \textit{висоти} ромба. Висота призми дорівнює твірній конуса. Визначте площу \textit{повної} поверхні призми (у см$^2$), якщо площа бічної поверхні конуса дорівнює $144\pi$ см$^2$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.11, thick, line join=round]%@N 3.32x3.04 S
+
     \coordinate (A) at (0,0);
     \coordinate (B) at (1.8,0);
     \coordinate (C) at (2.6,0.7);
@@ -793,6 +509,7 @@
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
 \nmtAnswerBox
 % Відповідь: $1632$
 \ifshowsolutions\solution{Висота ромба: $S=a\cdot h\Rightarrow h=\dfrac{216}{15}=14{,}4$. Радіус конуса $r=\dfrac{h}{2}=7{,}2$. З $\pi r l=144\pi$ маємо $l=\dfrac{144}{7{,}2}=20$~--- це й висота призми $H$. Повна поверхня призми $=2S+P\cdot H=2\cdot216+(4\cdot15)\cdot20=432+1200=1632$ см$^2$. Відповідь: \textbf{$1632$}.}\fi
@@ -806,9 +523,10 @@
 \zadnum Задано циліндр та конус, що мають рівні основи (див. рисунок). Радіус основи конуса дорівнює $5$~см, а його твірна дорівнює $13$~см. Визначте, у скільки разів об'єм циліндра більший за об'єм конуса, якщо площа бічної поверхні циліндра дорівнює $150\pi$~см$^2$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.871, thick, line join=round]%@N 3.99x3.09 S
+
     % циліндр
     \draw (0,4.4) ellipse (1.2 and 0.35);
     \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
@@ -836,23 +554,23 @@
 \zadnum На рисунку зображено циліндр і конус, які мають рівні основи й об'єми. Визначте площу $S$ (у см$^2$) бічної поверхні циліндра, якщо об'єм конуса дорівнює $810\pi$~см$^3$, а діаметр його основи~--- $18$~см. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % циліндр
-    \draw (0,3) ellipse (1.2 and 0.35);
-    \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
-    \draw (-1.2,0) arc (180:360:1.2 and 0.35);
-    \draw (-1.2,0) -- (-1.2,3);
-    \draw (1.2,0) -- (1.2,3);
-    \fill (0,0) circle (1.2pt);
-    % конус
-    \begin{scope}[shift={(4.2,0)}]
-        \draw[dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
-        \draw (-1.2,0) arc (180:360:1.2 and 0.35);
-        \draw (-1.2,0) -- (0,4.2);
-        \draw (1.2,0) -- (0,4.2);
-        \fill (0,0) circle (1.2pt);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.94, line join=round]%@N 6.03x4.88 S
+
+    % циліндр: радіус 1,2, висота 1,5; конус з тією ж основою, висота 4,5 (втричі більша: рівні об'єми)
+    \draw[thick] (0,1.5) ellipse (1.2 and 0.35);
+    \draw[thin, dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+    \draw[thick] (-1.2,0) arc (180:360:1.2 and 0.35);
+    \draw[thick] (-1.2,0) -- (-1.2,1.5);
+    \draw[thick] (1.2,0) -- (1.2,1.5);
+    \node[nmt dot] at (0,0) {};
+    \begin{scope}[shift={(3.6,0)}]
+        \draw[thin, dashed] (-1.2,0) arc (180:0:1.2 and 0.35);
+        \draw[thick] (-1.2,0) arc (180:360:1.2 and 0.35);
+        \draw[thick] (-1.2,0) -- (0,4.5);
+        \draw[thick] (1.2,0) -- (0,4.5);
+        \node[nmt dot] at (0,0) {};
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -869,27 +587,23 @@
 \zadnum На рисунку зображено правильну трикутну призму й конус. Твірна конуса дорівнює $12$~см, а площа його бічної поверхні дорівнює $48\pi$~см$^2$. Радіус основи конуса дорівнює радіусу кола, описаного навколо основи призми. Знайдіть об'єм (у см$^3$) призми, якщо її бічні грані є квадратами. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % трикутна призма
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.4,0.5);
-    \coordinate (c) at (1.3,1.4);
-    \coordinate (a2) at (0,4);
-    \coordinate (b2) at (2.4,4.5);
-    \coordinate (c2) at (1.3,5.4);
-    \draw (a) -- (b) -- (c) -- cycle;
-    \draw (a2) -- (b2) -- (c2) -- cycle;
-    \draw (a) -- (a2);
-    \draw (b) -- (b2);
-    \draw[dashed] (c) -- (c2);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.599, line join=round]%@N 6.07x4.89 S
+
+    % за оригіналом (НМТ 2026, 17.06, № 21, с. 105): трикутна призма з вершиною основи спереду, бічні грані -- квадрати;
+    % невидиме лише заднє нижнє ребро
+    \coordinate (TL) at (0,5.56);   \coordinate (TR) at (3.84,5.56);  \coordinate (TF) at (1.07,3.78);
+    \coordinate (BL) at (0,1.78);   \coordinate (BR) at (3.84,1.78);  \coordinate (BF) at (1.07,0);
+    \draw[thick] (TL) -- (TR) -- (TF) -- cycle;
+    \draw[thick] (TL) -- (BL) -- (BF) -- (BR) -- (TR);
+    \draw[thick] (TF) -- (BF);
+    \draw[thin, dashed] (BL) -- (BR);
     % конус
-    \begin{scope}[shift={(4.4,0)}]
-        \draw[dashed] (-1.3,0.5) arc (180:0:1.3 and 0.4);
-        \draw (-1.3,0.5) arc (180:360:1.3 and 0.4);
-        \draw (-1.3,0.5) -- (0,4.6);
-        \draw (1.3,0.5) -- (0,4.6);
+    \begin{scope}[shift={(7.46,0.77)}]
+        \draw[thick] (-1.99,0) -- (0,6.7) -- (1.99,0);
+        \draw[thick] (-1.99,0) arc (180:360:1.99 and 0.9);
+        \draw[thin, dashed] (-1.99,0) arc (180:0:1.99 and 0.9);
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -906,24 +620,23 @@
 \zadnum На рисунку зображено правильну трикутну піраміду та конус, у якому радіус основи відноситься до висоти як $5 : 12$. Радіус основи конуса дорівнює радіусу кола, уписаного в основу піраміди, а висота піраміди в $\sqrt{3}$ більша за висоту конуса. Визначте об'єм (у см$^3$) піраміди, якщо об'єм конуса дорівнює $800\pi$~см$^3$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    % правильна трикутна піраміда
-    \coordinate (a) at (0,0);
-    \coordinate (b) at (2.8,0.6);
-    \coordinate (c) at (1.6,1.5);
-    \coordinate (ap) at (1.3,5);
-    \draw (a) -- (b) -- (ap) -- cycle;
-    \draw (a) -- (c) -- (b);
-    \draw[dashed] (a) -- (c);
-    \draw[dashed] (c) -- (ap);
+\begin{nmtfit}\begin{tikzpicture}[scale=1.35, thick, line join=round]%@N 6.20x4.35 S
+
+    % правильна трикутна піраміда: основа LRF, невидиме лише заднє ребро LR
+    \coordinate (L) at (0,0);
+    \coordinate (R) at (2.2,0);
+    \coordinate (F) at (1.15,-1);
+    \coordinate (P) at (1.1,2.2);
+    \draw (P) -- (L) -- (F) -- (R) -- (P);
+    \draw (P) -- (F);
+    \draw[dashed, thin] (L) -- (R);
     % конус
-    \begin{scope}[shift={(4.6,0)}]
-        \draw (0,0.5) ellipse (1.5 and 0.45);
-        \draw[dashed] (-1.5,0.5) -- (0,4.6);
-        \draw (-1.5,0.5) .. controls (-1.5,0.1) and (1.5,0.1) .. (1.5,0.5);
-        \draw (-1.5,0.5) -- (0,4.6) -- (1.5,0.5);
+    \begin{scope}[shift={(3.6,-0.67)}]
+        \draw[dashed, thin] (-0.97,0) arc (180:0:0.97 and 0.3);
+        \draw (-0.97,0) arc (180:360:0.97 and 0.3);
+        \draw (-0.97,0) -- (0,2.0) -- (0.97,0);
     \end{scope}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}

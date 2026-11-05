@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 11}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -210,44 +33,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \graphicspath{{./}{11. Трикутники/}}
 \chapterTitle{Тема 11. Трикутники}
@@ -261,11 +47,11 @@
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & $AC \parallel MN$. \\
-II. & Відрізок $MN$ є середньою лінією трикутника $ABC$. \\
-III. & Площа трикутника $MBN$ та чотирикутника $AMNC$ рівні. \\
-\end{tabular}
+\nmtStmt{I}{$AC \parallel MN$.}
+\nmtStmt{II}{Відрізок $MN$ є середньою лінією трикутника $ABC$.}
+\nmtStmt{III}{Площа трикутника $MBN$ та чотирикутника $AMNC$ рівні.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише II та III}{лише I та II}{лише II}{I, II та III}
@@ -274,50 +60,39 @@ III. & Площа трикутника $MBN$ та чотирикутника $AM
 
 \begin{samepage}
 % Завдання 2
-\zadtask{Рівнобедрений трикутник $ABC$ ($AB = BC$) вписано в коло (див. рисунок). Визначте градусну міру меншої дуги $AB$, якщо $\angle ABC = 20°$. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\answerTableSmall{$140°$}{$160°$}{$170°$}{$70°$}{$80°$}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Рівнобедрений трикутник $ABC$ ($AB = BC$) вписано в коло (див. рисунок). Визначте градусну міру меншої дуги $AB$, якщо $\angle ABC = 20°$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-    % Коло
-    \draw[thick] (0,0) circle (1.5);
-
-    % Точки трикутника
-    \coordinate (B) at (90:1.5);
-    \coordinate (A) at (210:1.5);
-    \coordinate (C) at (330:1.5);
-
-    % Трикутник
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
+    \def\R{1.9}
+    \draw[thick] (0,0) circle (\R);
+    \coordinate (B) at (90:\R);
+    \coordinate (A) at (232:\R);
+    \coordinate (C) at (308:\R);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Позначки рівних сторін
-    \draw ($(A)!0.45!(B)$) -- ++(0.08,0.12) -- ++(-0.16,0);
-    \draw ($(A)!0.55!(B)$) -- ++(0.08,0.12) -- ++(-0.16,0);
-    \draw ($(C)!0.45!(B)$) -- ++(-0.08,0.12) -- ++(0.16,0);
-    \draw ($(C)!0.55!(B)$) -- ++(-0.08,0.12) -- ++(0.16,0);
-
-    % Кут 20° при B
-    \pic[draw, angle radius=0.5cm] {angle = A--B--C};
-    \node at ($(B)+(0,-0.9)$) {\small $20°$};
-
-    % Підписи
+    \nmtEq{A}{B}{1}
+    \nmtEq{B}{C}{1}
+    \pic[draw, angle radius=1cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1}{$20^\circ$}
+    \node[nmt dot] at (A) {};
+    \node[nmt dot] at (B) {};
+    \node[nmt dot] at (C) {};
     \node[above] at (B) {$B$};
     \node[below left] at (A) {$A$};
     \node[below right] at (C) {$C$};
-
-    % Точки
-    \fill (A) circle (1.5pt);
-    \fill (B) circle (1.5pt);
-    \fill (C) circle (1.5pt);
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{$140°$}{$160°$}{$170°$}{$70°$}{$80°$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -327,11 +102,11 @@ III. & Площа трикутника $MBN$ та чотирикутника $AM
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Медіана трикутника з'єднує його вершину із серединою протилежної сторони. \\
-II. & Точка перетину медіан трикутника є центром кола, вписаного в цей трикутник. \\
-III. & У прямокутному трикутнику одна з його медіан дорівнює половині гіпотенузи. \\
-\end{tabular}
+\nmtStmt{I}{Медіана трикутника з'єднує його вершину із серединою протилежної сторони.}
+\nmtStmt{II}{Точка перетину медіан трикутника є центром кола, вписаного в цей трикутник.}
+\nmtStmt{III}{У прямокутному трикутнику одна з його медіан дорівнює половині гіпотенузи.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише I}{лише III}{лише I та II}{I, II та III}
@@ -344,11 +119,11 @@ III. & У прямокутному трикутнику одна з його м�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Одна з висот рівнобедреного трикутника ділить його на два рівних трикутника. \\
-II. & Дві висоти тупокутного трикутника лежать поза його межами. \\
-III. & Висота, проведена з вершини прямого кута прямокутного трикутника більша за менший катет цього трикутника. \\
-\end{tabular}
+\nmtStmt{I}{Одна з висот рівнобедреного трикутника ділить його на два рівних трикутника.}
+\nmtStmt{II}{Дві висоти тупокутного трикутника лежать поза його межами.}
+\nmtStmt{III}{Висота, проведена з вершини прямого кута прямокутного трикутника більша за менший катет цього трикутника.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише I}{I, II та III}{лише II}{лише I та II}
@@ -368,11 +143,11 @@ III. & Висота, проведена з вершини прямого кут�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & У прямокутному трикутнику найбільший кут дорівнює половині розгорнутого кута. \\
-II. & У рівносторонньому трикутнику сума градусних мір двох кутів дорівнює $120°$. \\
-III. & Існує гострокутний трикутник, у якого всі гострі кути більші за $60°$. \\
-\end{tabular}
+\nmtStmt{I}{У прямокутному трикутнику найбільший кут дорівнює половині розгорнутого кута.}
+\nmtStmt{II}{У рівносторонньому трикутнику сума градусних мір двох кутів дорівнює $120°$.}
+\nmtStmt{III}{Існує гострокутний трикутник, у якого всі гострі кути більші за $60°$.}
+
+
 
 \nmtnobreak
 \answerTable{лише II}{I, II та III}{лише I та II}{лише I та III}{лише II та III}
@@ -385,11 +160,11 @@ III. & Існує гострокутний трикутник, у якого в�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Чотирикутник $AMNC$ є трапецією. \\
-II. & Трикутник $MBN$ є рівнобедреним. \\
-III. & Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$. \\
-\end{tabular}
+\nmtStmt{I}{Чотирикутник $AMNC$ є трапецією.}
+\nmtStmt{II}{Трикутник $MBN$ є рівнобедреним.}
+\nmtStmt{III}{Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише II та III}{лише II}{лише I та II}{I, II та III}
@@ -402,11 +177,11 @@ III. & Периметр трикутника $MBN$ дорівнює полови
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & $BM = MC$. \\
-II. & $\angle BAM = \angle MAC$. \\
-III. & Площа трикутника $ABM$ дорівнює площі трикутника $MCA$. \\
-\end{tabular}
+\nmtStmt{I}{$BM = MC$.}
+\nmtStmt{II}{$\angle BAM = \angle MAC$.}
+\nmtStmt{III}{Площа трикутника $ABM$ дорівнює площі трикутника $MCA$.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише I}{лише III}{лише II та III}{I, II та III}
@@ -419,11 +194,11 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує ромб, у якого менша діагональ дорівнює стороні. \\
-II. & Висота будь-якого ромба більша за його сторону. \\
-III. & Діагональ будь-якого ромба ділить ромб на два однакові трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Існує ромб, у якого менша діагональ дорівнює стороні.}
+\nmtStmt{II}{Висота будь-якого ромба більша за його сторону.}
+\nmtStmt{III}{Діагональ будь-якого ромба ділить ромб на два однакові трикутники.}
+
+
 
 \nmtnobreak
 \answerTable{лише II та III}{лише I та III}{лише I}{лише III}{I, II та III}
@@ -436,11 +211,11 @@ III. & Діагональ будь-якого ромба ділить ромб �
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & $AB$ --- найдовша сторона трикутника $ABC$. \\
-II. & Трикутника $ABC$ --- рівнобедрений. \\
-III. & Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$. \\
-\end{tabular}
+\nmtStmt{I}{$AB$ --- найдовша сторона трикутника $ABC$.}
+\nmtStmt{II}{Трикутника $ABC$ --- рівнобедрений.}
+\nmtStmt{III}{Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$.}
+
+
 
 \nmtnobreak
 \answerTable{лише II та III}{лише I}{лише I та III}{I, II та III}{лише III}
@@ -453,11 +228,11 @@ III. & Довжина висоти, проведеної з вершини $A$, 
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Середня лінія трапеції проходить через точку перетину її діагоналей. \\
-II. & Діагональ трапеції ділить її на два рівних трикутники. \\
-III. & Діагоналі рівнобічної трапеції рівні. \\
-\end{tabular}
+\nmtStmt{I}{Середня лінія трапеції проходить через точку перетину її діагоналей.}
+\nmtStmt{II}{Діагональ трапеції ділить її на два рівних трикутники.}
+\nmtStmt{III}{Діагоналі рівнобічної трапеції рівні.}
+
+
 
 \nmtnobreak
 \answerTable{I, II та III}{лише II та III}{лише I та III}{лише III}{лише I та II}
@@ -470,11 +245,11 @@ III. & Діагоналі рівнобічної трапеції рівні. \\
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Діагональ паралелограма ділить його на два рівних трикутники. \\
-II. & Діагоналі паралелограма є бісектрисами його кутів. \\
-III. & Менша діагональ паралелограма ділить його на два гострокутні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Діагональ паралелограма ділить його на два рівних трикутники.}
+\nmtStmt{II}{Діагоналі паралелограма є бісектрисами його кутів.}
+\nmtStmt{III}{Менша діагональ паралелограма ділить його на два гострокутні трикутники.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише II та III}{I, II та III}{лише I}{лише I та II}
@@ -487,11 +262,11 @@ III. & Менша діагональ паралелограма ділить й�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує лише одна точка на площині трикутника, яка рівновіддалена від його вершин. \\
-II. & Медіана трикутника ділить його на два інші трикутники з однаковою площею. \\
-III. & Середня лінія трикутника перетинає точку перетину його медіан. \\
-\end{tabular}
+\nmtStmt{I}{Існує лише одна точка на площині трикутника, яка рівновіддалена від його вершин.}
+\nmtStmt{II}{Медіана трикутника ділить його на два інші трикутники з однаковою площею.}
+\nmtStmt{III}{Середня лінія трикутника перетинає точку перетину його медіан.}
+
+
 
 \nmtnobreak
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I}{лише II та III}
@@ -504,11 +279,11 @@ III. & Середня лінія трикутника перетинає точ�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & $AB + BC = AC$. \\
-II. & $BK \perp AC$. \\
-III. & $AK = KC$. \\
-\end{tabular}
+\nmtStmt{I}{$AB + BC = AC$.}
+\nmtStmt{II}{$BK \perp AC$.}
+\nmtStmt{III}{$AK = KC$.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише II та III}{лише I}{I, II та III}{лише I та II}
@@ -521,11 +296,11 @@ III. & $AK = KC$. \\
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{14cm}}
-I. & Існує трикутник, у якого лише один гострий кут. \\
-II. & У рівнобедреному трикутнику $ABC$ серединний перпендикуляр, проведений до основи $AC$, проходить через вершину $B$. \\
-III. & У будь-якому прямокутному трикутнику сума градусних мір гострих кутів дорівнює $90°$. \\
-\end{tabular}
+\nmtStmt{I}{Існує трикутник, у якого лише один гострий кут.}
+\nmtStmt{II}{У рівнобедреному трикутнику $ABC$ серединний перпендикуляр, проведений до основи $AC$, проходить через вершину $B$.}
+\nmtStmt{III}{У будь-якому прямокутному трикутнику сума градусних мір гострих кутів дорівнює $90°$.}
+
+
 
 \nmtnobreak
 \answerTable{лише II}{лише II та III}{лише I та II}{лише III}{лише I та III}
@@ -534,24 +309,43 @@ III. & У будь-якому прямокутному трикутнику су
 
 \begin{samepage}
 % Завдання 20 (з рисунком)
-\zadtask{У довільний трикутник $ABC$ вписано коло з центром у точці $O$, точки $K$, $L$, $M$ --- точки дотику (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{8cm}}
-I. & Трикутник $AOK$ є прямокутним. \\
-II. & Трикутник $BKL$ є рівнобедреним. \\
-III. & Трикутники $MOC$ і $LOC$ є рівними. \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У довільний трикутник $ABC$ вписано коло з центром у точці $O$, точки $K$, $L$, $M$ --- точки дотику (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.65]{triangle_inscribed_circle.png}
-\end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+  [scale=0.96]%@N 5.76x4.90 S
+\coordinate (A) at (0,0);
+  \coordinate (B) at (-0.986,3.7);
+  \coordinate (C) at (3.586,0);
+  \coordinate (O) at (0.767,0.998);
+  \coordinate (K) at (-0.197,0.741);
+  \coordinate (L) at (1.394,1.773);
+  \coordinate (M) at (0.767,0);
+  \draw[thick] (A) -- (B) -- (C) -- cycle;
+  \draw[thick] (O) circle (0.998);
+  \node[nmt dot] at (O) {};
+  \node[nmt dot] at (K) {};
+  \node[nmt dot] at (L) {};
+  \node[nmt dot] at (M) {};
+  \node[above left] at (B) {$B$};
+  \node[below left] at (A) {$A$};
+  \node[below right] at (C) {$C$};
+  \node[left] at (K) {$K$};
+  \node[above right] at (L) {$L$};
+  \node[below] at (M) {$M$};
+  \node[above left, inner sep=1pt] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\nmtStmt{I}{Трикутник $AOK$ є прямокутним.}
+\nmtStmt{II}{Трикутник $BKL$ є рівнобедреним.}
+\nmtStmt{III}{Трикутники $MOC$ і $LOC$ є рівними.}
+
+ \nbvspace{0pt}
 
 \nmtnobreak
 \answerTable{лише II та III}{лише I та II}{лише II}{лише III}{I, II та III}
@@ -560,167 +354,147 @@ III. & Трикутники $MOC$ і $LOC$ є рівними. \\
 
 \begin{samepage}
 % Завдання 25
-\zadtask{У паралелограмі $ABCD$ проведено висоту $BH$. На $BH$ вибрано точку $K$ так, що трикутник $CKD$ є правильним (див. рисунок). Знайдіть площу цього паралелограма, якщо периметр трикутника $CKD$ дорівнює 18, $\angle A = \alpha$. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{tabular}{ll}
-\textbf{А} & $18\,\mathrm{tg}\,\alpha$ \\[0.3cm]
-\textbf{Б} & $\dfrac{18}{\mathrm{tg}\,\alpha}$ \\[0.3cm]
-\textbf{В} & $18\sin\alpha$ \\[0.3cm]
-\textbf{Г} & $\dfrac{6}{\cos\alpha} + 12$ \\[0.3cm]
-\textbf{Д} & $9\,\mathrm{tg}\,\alpha$ \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У паралелограмі $ABCD$ проведено висоту $BH$. На $BH$ вибрано точку $K$ так, що трикутник $CKD$ є правильним (див. рисунок). Знайдіть площу цього паралелограма, якщо периметр трикутника $CKD$ дорівнює 18, $\angle A = \alpha$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.2]{parallelogram_ABCD_triangle_CKD.png}
-\end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    %@N 6.58x3.90 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0.9,2.7);
+    \coordinate (C) at (5.4,2.7);
+    \coordinate (D) at (4.5,0);
+    \coordinate (H) at (4.95,1.35);
+    \coordinate (K) at (2.612,2.129);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (C) -- (K) -- (D);
+    \draw[thin] (B) -- (H);
+    \pic[draw, angle radius=0.26cm]{right angle=C--H--K};
+    \pic[draw, angle radius=0.45cm] {angle=D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.45}{$\alpha$}
+    \node[nmt dot] at (K) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[right] at (H) {$H$};
+    \node[below left] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par
+\nmtOptions{$18\,\mathrm{tg}\,\alpha$}{$\dfrac{18}{\mathrm{tg}\,\alpha}$}{$18\sin\alpha$}{$\dfrac{6}{\cos\alpha} + 12$}{$9\,\mathrm{tg}\,\alpha$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 26 (з рисунком)
-\zadtask{У трикутнику $ABC$ $\angle A = 40°$, $\angle B = 30°$ (див. рисунок). Визначте градусну міру зовнішнього кута при вершині $C$. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\answerTableSmall{$80°$}{$110°$}{$60°$}{$50°$}{$70°$}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У трикутнику $ABC$ $\angle A = 40°$, $\angle B = 30°$ (див. рисунок). Визначте градусну міру зовнішнього кута при вершині $C$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Координати трикутника
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (3,0);
-    \coordinate (B) at (2.5,2.5);
-
-    % Продовження AC за C
-    \coordinate (D) at (4,0);
-
-    % Трикутник
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.943]%@N 5.78x5.06 S
+\coordinate (A) at (0,0);
+    \coordinate (C) at (3.2,0);
+    \coordinate (B) at (4.607,3.866);
+    \coordinate (D) at (4.9,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Продовження
-    \draw[thick] (C) -- (D);
-
-    % Кут 40° при A
-    \pic[draw, angle radius=0.5cm] {angle = C--A--B};
-    \node at (0.9,0.3) {\small $40°$};
-
-    % Кут 30° при B (подвійна дуга)
-    \pic[draw, angle radius=0.4cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.5cm] {angle = A--B--C};
-    \node at (2.3,1.7) {\small $30°$};
-
-    % Кут ? (зовнішній при C, потрійна дуга)
-    \pic[draw, angle radius=0.35cm] {angle = D--C--B};
+    \draw[thin] (C) -- (D);
+    \pic[draw, angle radius=0.45cm] {angle = C--A--B};
+    \nmtAngleLabel{C}{A}{B}{0.45}{$40^\circ$}
+    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.53}{$30^\circ$}
+    \pic[draw, angle radius=0.53cm] {angle = A--B--C};
     \pic[draw, angle radius=0.45cm] {angle = D--C--B};
-    \pic[draw, angle radius=0.55cm] {angle = D--C--B};
-    \node at (3.7,0.5) {\small $?$};
-
-    % Підписи
+    \nmtAngleLabel{D}{C}{B}{0.61}{$?$}
+    \pic[draw, angle radius=0.53cm] {angle = D--C--B};
+    \pic[draw, angle radius=0.61cm] {angle = D--C--B};
     \node[below left] at (A) {$A$};
     \node[below] at (C) {$C$};
-    \node[above] at (B) {$B$};
+    \node[above right] at (B) {$B$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{$80°$}{$110°$}{$60°$}{$50°$}{$70°$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 27 (з рисунком)
-\zadtask{Зовнішній кут при вершині $A$ трикутника $ABC$ дорівнює $100°$, $\angle C = 20°$ (див. рисунок). Визначте градусну міру кута $B$. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\answerTableSmall{$100°$}{$80°$}{$70°$}{$120°$}{$90°$}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Зовнішній кут при вершині $A$ трикутника $ABC$ дорівнює $100°$, $\angle C = 20°$ (див. рисунок). Визначте градусну міру кута $B$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Координати трикутника
-    \coordinate (A) at (1.5,0);
-    \coordinate (C) at (3.5,0);
-    \coordinate (B) at (2.2,2.5);
-
-    % Продовження CA за A
-    \coordinate (D) at (0,0);
-
-    % Трикутник
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    %@N 6.10x4.20 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0.5,3);
+    \coordinate (C) at (4.4,0);
+    \coordinate (D) at (-1.1,0);
     \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Продовження
-    \draw[thick] (D) -- (A);
-
-    % Кут 100° (зовнішній при A)
-    \pic[draw, angle radius=0.5cm] {angle = B--A--D};
-    \node at (0.75,0.4) {\small $100°$};
-
-    % Кут 20° при C (подвійна дуга)
-    \pic[draw, angle radius=0.4cm] {angle = B--C--A};
-    \pic[draw, angle radius=0.5cm] {angle = B--C--A};
-    \node at (2.8,0.4) {\small $20°$};
-
-    % Кут ? при B (потрійна дуга)
-    \pic[draw, angle radius=0.35cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
-    \pic[draw, angle radius=0.55cm] {angle = A--B--C};
-    \node at (2.2,1.7) {\small $?$};
-
-    % Підписи
+    \draw[thin] (D) -- (A);
+    \pic[draw, angle radius=0.45cm] {angle=B--A--D};
+    \nmtAngleLabel{B}{A}{D}{0.45}{$100^\circ$}
+    \pic[draw, angle radius=0.35cm]{angle=B--C--A};
+    \pic[draw, angle radius=0.43cm] {angle=B--C--A};
+    \nmtAngleLabel{B}{C}{A}{0.43}{$20^\circ$}
+    \pic[draw, angle radius=0.35cm]{angle=A--B--C};
+    \pic[draw, angle radius=0.43cm]{angle=A--B--C};
+    \pic[draw, angle radius=0.51cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.51}{$?$}
+    \node[above] at (B) {$B$};
     \node[below] at (A) {$A$};
     \node[below right] at (C) {$C$};
-    \node[above] at (B) {$B$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{$100°$}{$80°$}{$70°$}{$120°$}{$90°$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 30 (з рисунком)
-\zadtask{Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.5em}}p{7.5cm}}
-I. & $\angle ABD = \angle CBD$. \\
-II. & Точки $B$ і $D$ симетричні відносно прямої $AC$. \\
-III. & Висота ромба, проведена з вершини $B$ до сторони $AD$, є бісектрисою трикутника $ABD$. \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Які з наведених тверджень є правильними для будь-якого ромба $ABCD$ (див. рисунок)? \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Ромб (вертикальна орієнтація)
-    \coordinate (A) at (-1.5,0);
-    \coordinate (B) at (0,2);
-    \coordinate (C) at (1.5,0);
-    \coordinate (D) at (0,-2);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0, line join=round]%@N 6.58x4.11 S
 
-    % Ромб
+    \coordinate (A) at (-2.7,0);
+    \coordinate (B) at (0,1.46);
+    \coordinate (C) at (2.7,0);
+    \coordinate (D) at (0,-1.46);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Підписи
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[right] at (C) {$C$};
     \node[below] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\nmtStmt{I}{$\angle ABD = \angle CBD$.}
+\nmtStmt{II}{Точки $B$ і $D$ симетричні відносно прямої $AC$.}
+\nmtStmt{III}{Висота ромба, проведена з вершини $B$ до сторони $AD$, є бісектрисою трикутника $ABD$.}
+
+ \nbvspace{0pt}
 
 \nmtnobreak
 \answerTable{I, II та III}{лише II}{лише I та II}{лише I та III}{лише II та III}
@@ -729,64 +503,42 @@ III. & Висота ромба, проведена з вершини $B$ до с
 
 \begin{samepage}
 % Завдання 31
-\zadtask{У паралелограмі $ABCD$ з гострим кутом $\angle A = \alpha$ проведено висоту $BK$ і відрізок $KC$, трикутник $KDC$ є рівнобедреним (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $KD = 6$. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{tabular}{ll}
-\textbf{А} & $36\left(1 + \dfrac{1}{\sin\alpha}\right)\dfrac{1}{\cos\alpha}$ \\[0.4cm]
-\textbf{Б} & $12(2 + \cos\alpha)$ \\[0.2cm]
-\textbf{В} & $18(1 + \mathrm{tg}\,\alpha)\sin\alpha$ \\[0.2cm]
-\textbf{Г} & $36(1 + \cos\alpha)\sin\alpha$ \\[0.2cm]
-\textbf{Д} & $36(1 + \sin\alpha)\cos\alpha$ \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У паралелограмі $ABCD$ з гострим кутом $\angle A = \alpha$ проведено висоту $BK$ і відрізок $KC$, трикутник $KDC$ є рівнобедреним (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $KD = 6$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.45\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Паралелограм ABCD
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (1.2,2);
-    \coordinate (C) at (4.5,2);
-    \coordinate (D) at (3.3,0);
-    \coordinate (K) at (1.2,0);
-
-    % Паралелограм
+    \coordinate (K) at (1.59,0);
+    \coordinate (D) at (4.59,0);
+    \coordinate (B) at (1.59,2.54);
+    \coordinate (C) at (6.18,2.54);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Висота BK
     \draw[thick] (B) -- (K);
-
-    % Відрізок KC
     \draw[thick] (K) -- (C);
-
-    % Прямий кут при K (зліва)
-    \draw (0.95,0) -- (0.95,0.25) -- (1.2,0.25);
-
-    % Одинарна риска рівності на KD
-    \draw[thick] (2.25,-0.15) -- (2.25,0.15);
-
-    % Одинарна риска рівності на CD
-    \draw[thick] (3.85,1.1) -- (4,0.9);
-
-    % Кут alpha при A
-    \draw (0.5,0) arc (0:59:0.5);
-    \node at (0.7,0.35) {\small $\alpha$};
-
-    % Позначення 6 на KD
-    \node[below] at (2.25,0) {\small $6$};
-
-    % Підписи
+    \pic[draw, angle radius=0.26cm]{right angle=D--K--B};
+    \pic[draw, angle radius=0.45cm] {angle=D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.45}{$\alpha$}
+    \nmtEq{K}{D}{1}
+    \nmtEq{D}{C}{1}
+    \node[below] at ($(K)!0.5!(D)$) {$6$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[below] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par
+\nmtOptions{$36\left(1 + \dfrac{1}{\sin\alpha}\right)\dfrac{1}{\cos\alpha}$}{$12(2 + \cos\alpha)$}{$18(1 + \mathrm{tg}\,\alpha)\sin\alpha$}{$36(1 + \cos\alpha)\sin\alpha$}{$36(1 + \sin\alpha)\cos\alpha$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -796,14 +548,11 @@ III. & Висота ромба, проведена з вершини $B$ до с
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Серединний перпендикуляр, проведений до сторони рівностороннього трикутника, \\
-   & поділяє його на два рівні трикутники. \\
-II. & У прямокутному трикутнику серединні перпендикуляри, проведенні до його катетів, \\
-    & перетинаються в точці, що є серединою гіпотенузи. \\
-III. & Точка перетину серединних перпендикулярів у тупокутному трикутнику розташована \\
-     & всередині цього трикутника. \\
-\end{tabular}
+\nmtStmt{I}{Серединний перпендикуляр, проведений до сторони рівностороннього трикутника, поділяє його на два рівні трикутники.}
+\nmtStmt{II}{У прямокутному трикутнику серединні перпендикуляри, проведенні до його катетів, перетинаються в точці, що є серединою гіпотенузи.}
+\nmtStmt{III}{Точка перетину серединних перпендикулярів у тупокутному трикутнику розташована всередині цього трикутника.}
+
+
 
 \nmtnobreak
 \answerTable{лише I та III}{лише I}{лише II}{I, II та III}{лише I та II}
@@ -812,51 +561,35 @@ III. & Точка перетину серединних перпендикуля
 
 \begin{samepage}
 % Завдання 36
-\zadtask{Трикутник $ABC$ є рівнобедреним ($AB = BC$), $\angle ABC = 50°$ (див. рисунок). Визначте градусну міру зовнішнього кута трикутника при вершині $A$. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.42\textwidth}
-\answerTableSmall{$115°$}{$120°$}{$105°$}{$65°$}{$130°$}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Трикутник $ABC$ є рівнобедреним ($AB = BC$), $\angle ABC = 50°$ (див. рисунок). Визначте градусну міру зовнішнього кута трикутника при вершині $A$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.52\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-    % Координати трикутника
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.949, tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]%@N 5.70x5.06 S
+
     \coordinate (A) at (0,0);
-    \coordinate (B) at (2,2.5);
-    \coordinate (C) at (4,0);
-    \coordinate (M) at (-1.2,0);  % продовження CA за A
-
-    % Трикутник
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Продовження сторони CA
-    \draw[thick] (A) -- (M);
-
-    % Одинарна риска рівності на AB
-    \draw[thick] (0.9,1.35) -- (1.1,1.15);
-
-    % Одинарна риска рівності на BC
-    \draw[thick] (3.2,1.35) -- (2.9,1.15);
-
-    % Кут 50° при B
-    \draw (B) ++(-51:0.6) arc (-51:-129:0.6);
-    \node at (2,1.6) {\small $50°$};
-
-    % Зовнішній кут при A (подвійна дуга)
-    \draw (A) ++(180:0.5) arc (180:51:0.5);
-    \draw (A) ++(180:0.65) arc (180:51:0.65);
-    \node at (-0.2,0.85) {\small $?$};
-
-    % Підписи
+    \coordinate (C) at (3.6,0);
+    \coordinate (B) at (1.8,3.86);
+    \coordinate (M) at (-1.5,0);
+    \draw[thick] (A) -- (B) node[midway, tick] {} -- (C) node[midway, tick] {} -- cycle;
+    \draw[thin] (M) -- (A);
+    \pic[draw, angle radius=0.45cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.45}{$50^\circ$}
+    \pic[draw, angle radius=0.45cm] {angle = B--A--M};
+    \nmtAngleLabel{B}{A}{M}{0.53}{$?$}
+    \pic[draw, angle radius=0.53cm] {angle = B--A--M};
     \node[below left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[below right] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{$115°$}{$120°$}{$105°$}{$65°$}{$130°$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -866,11 +599,11 @@ III. & Точка перетину серединних перпендикуля
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{r@{\hspace{0.3em}}p{14cm}}
-I. & Діагональ рівнобічної трапеції ділить її на 2 трикутники, серед яких обов'язково є один тупокутний. \\[0.15cm]
-II. & Діагоналі будь-якої трапеції ділять її на 4 трикутники, серед яких обов'язково є два подібних. \\[0.15cm]
-III. & Діагоналі рівнобічної трапеції точкою перетину діляться навпіл. \\
-\end{tabular}
+\nmtStmt{I}{Діагональ рівнобічної трапеції ділить її на 2 трикутники, серед яких обов'язково є один тупокутний.}
+\nmtStmt{II}{Діагоналі будь-якої трапеції ділять її на 4 трикутники, серед яких обов'язково є два подібних.}
+\nmtStmt{III}{Діагоналі рівнобічної трапеції точкою перетину діляться навпіл.}
+
+
 
 \nmtnobreak
 \answerTable{лише III}{лише I та II}{лише I та III}{лише II}{лише I}
@@ -883,11 +616,11 @@ III. & Діагоналі рівнобічної трапеції точкою �
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Бісектриса будь-якого трикутника ділить його протилежну сторону навпіл. \\
-II. & Точка перетину бісектрис трикутника є центром вписаного кола. \\
-III. & У рівнобедреному трикутнику одна з бісектрис утворює два рівні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Бісектриса будь-якого трикутника ділить його протилежну сторону навпіл.}
+\nmtStmt{II}{Точка перетину бісектрис трикутника є центром вписаного кола.}
+\nmtStmt{III}{У рівнобедреному трикутнику одна з бісектрис утворює два рівні трикутники.}
+
+
 
 \nmtnobreak
 \answerTable{лише III}{лише I та III}{лише II та III}{I, II та III}{лише II}
@@ -900,11 +633,11 @@ III. & У рівнобедреному трикутнику одна з бісе
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Півсума довжин бічних сторін будь-якої трапеції дорівнює її середній лінії. \\
-II. & Діагональ будь-якої трапеції ділить її на 2 рівні трикутники. \\
-III. & Середня лінія будь-якої трапеції ділить її висоту навпіл. \\
-\end{tabular}
+\nmtStmt{I}{Півсума довжин бічних сторін будь-якої трапеції дорівнює її середній лінії.}
+\nmtStmt{II}{Діагональ будь-якої трапеції ділить її на 2 рівні трикутники.}
+\nmtStmt{III}{Середня лінія будь-якої трапеції ділить її висоту навпіл.}
+
+
 
 \nmtnobreak
 \answerTable{лише II та III}{лише I та III}{I, II та III}{лише III}{лише I та II}
@@ -913,70 +646,42 @@ III. & Середня лінія будь-якої трапеції ділить
 
 \begin{samepage}
 % Завдання 40
-\zadtask{У паралелограмі $ABCD$ на стороні $AD$ вибрано точку $P$, а на стороні $BC$ --- точку $K$ так, що трикутник $PKD$ є рівностороннім, $BP \perp AD$, $PK = 6$, $\angle ABP = \alpha$ (див. рисунок). Визначте площу паралелограма $ABCD$. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\begin{tabular}{ll}
-\textbf{А} & $18\sqrt{3}(1 + \mathrm{tg}\,\alpha)$ \\[0.2cm]
-\textbf{Б} & $18(1 + \mathrm{tg}\,\alpha)$ \\[0.2cm]
-\textbf{В} & $18\sqrt{3}\,\mathrm{tg}\,\alpha$ \\[0.2cm]
-\textbf{Г} & $18(1 + \sqrt{3}\,\mathrm{tg}\,\alpha)$ \\[0.2cm]
-\textbf{Д} & $18\sqrt{3}(1 - \mathrm{tg}\,\alpha)$ \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На сторонах $AD$ й $BC$ паралелограма $ABCD$ вибрано відповідно точки $P$ й $K$ так, що трикутник $PKD$ є правильним, $BP \perp AD$ (див. рисунок). Визначте площу паралелограма $ABCD$, якщо $PK = 6$, $\angle ABP = \alpha$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Паралелограм ABCD
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (1.2,2.4);
-    \coordinate (C) at (5.2,2.4);
-    \coordinate (D) at (4,0);
-    \coordinate (P) at (1.2,0);
-    \coordinate (K) at (2.4,2.4);
-
-    % Паралелограм
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.931]%@N 6.98x3.80 S
+\coordinate (A) at (0,0);
+    \coordinate (P) at (1.4,0);
+    \coordinate (D) at (4.4,0);
+    \coordinate (B) at (1.4,2.598);
+    \coordinate (K) at (2.9,2.598);
+    \coordinate (C) at (5.8,2.598);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % BP перпендикуляр
-    \draw[thick] (B) -- (P);
-
-    % Трикутник PKD
+    \draw[thin] (B) -- (P);
     \draw[thick] (P) -- (K) -- (D);
-
-    % Прямий кут при P (зліва)
-    \draw (0.95,0) -- (0.95,0.25) -- (1.2,0.25);
-
-    % Одинарна риска рівності на PK
-    \draw[thick] (1.7,1.3) -- (1.9,1.1);
-
-    % Одинарна риска рівності на KD
-    \draw[thick] (3.3,1.3) -- (3.1,1.1);
-
-    % Одинарна риска рівності на PD
-    \draw[thick] (2.6,-0.15) -- (2.6,0.15);
-
-    % Кут alpha (ABP)
-
-    \node at (1,1.6) {\small $\alpha$};
-
-    % Позначення 6 на PK
-    \node[left] at (1.65,1.2) {\small $6$};
-
-    % Підписи
+    \pic[draw, angle radius=0.26cm]{right angle=B--P--A};
+    \pic[draw, angle radius=0.6cm] {angle=A--B--P};
+    \nmtAngleLabel{A}{B}{P}{0.6}{$\alpha$}
+    \node[nmt dot] at (P) {};
+    \node[nmt dot] at (K) {};
+    \path (P) -- (K) node[midway, above left] {$6$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[below] at (P) {$P$};
     \node[above] at (K) {$K$};
-    \pic[draw, angle radius=0.6cm] { angle = A--B--P};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par
+\nmtOptions{$18\sqrt{3} + \dfrac{9}{\mathrm{tg}\,\alpha}$}{$18 + 9\,\mathrm{tg}\,\alpha$}{$18\sqrt{3} + 9\,\mathrm{tg}\,\alpha$}{$18 + 27\,\mathrm{tg}\,\alpha$}{$18\sqrt{3} + 27\,\mathrm{tg}\,\alpha$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -986,11 +691,11 @@ III. & Середня лінія будь-якої трапеції ділить
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Діагоналі будь-якого прямокутника є бісектрисами його кутів. \\
-II. & Діагоналі будь-якого прямокутника ділять його на чотири рівні трикутники. \\
-III. & Діагоналі будь-якого прямокутника рівні. \\
-\end{tabular}
+\nmtStmt{I}{Діагоналі будь-якого прямокутника є бісектрисами його кутів.}
+\nmtStmt{II}{Діагоналі будь-якого прямокутника ділять його на чотири рівні трикутники.}
+\nmtStmt{III}{Діагоналі будь-якого прямокутника рівні.}
+
+
 \answerTable{лише III}{лише I та III}{лише II}{лише II та III}{лише I}
 \par\penalty-20
 \end{samepage}
@@ -1001,12 +706,11 @@ III. & Діагоналі будь-якого прямокутника рівн�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Будь-який ромб є паралелограмом. \\
-II. & Будь-яка висота ромба, проведена з його вершини, проходить через точку \\
-& перетину діагоналей ромба. \\
-III. & Діагональ ромба ділить його на два рівні трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Будь-який ромб є паралелограмом.}
+\nmtStmt{II}{Будь-яка висота ромба, проведена з його вершини, проходить через точку перетину діагоналей ромба.}
+\nmtStmt{III}{Діагональ ромба ділить його на два рівні трикутники.}
+
+
 \answerTable{лише II}{лише I та II}{лише I та III}{лише I}{I, II та III}
 \par\penalty-20
 \end{samepage}
@@ -1017,11 +721,11 @@ III. & Діагональ ромба ділить його на два рівн�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Сума будь-яких двох сторін трикутника менша за третю сторону. \\
-II. & Сума двох будь-яких кутів трикутника більша за $90°$. \\
-III. & Навпроти найбільшої сторони трикутника знаходиться найбільший кут. \\
-\end{tabular}
+\nmtStmt{I}{Сума будь-яких двох сторін трикутника менша за третю сторону.}
+\nmtStmt{II}{Сума двох будь-яких кутів трикутника більша за $90°$.}
+\nmtStmt{III}{Навпроти найбільшої сторони трикутника знаходиться найбільший кут.}
+
+
 \answerTable{лише II}{лише I}{лише II та III}{лише III}{лише I та III}
 \par\penalty-20
 \end{samepage}
@@ -1029,52 +733,39 @@ III. & Навпроти найбільшої сторони трикутника
 \begin{samepage}
 % Завдання 44
 % Завдання 44
-\zadtask{У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.2cm}
-\begin{minipage}[t]{0.58\textwidth}
-\begin{tabular}{rl}
-I. & $BM \perp BC$. \\
-II. & Трикутник $ABD$ є рівностороннім. \\
-III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
-\end{tabular}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У ромбі $ABCD$ з вершини тупого кута проведено висоту $BM$, яка ділить сторону $AD$ навпіл (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.38\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-    % Координати: M під B, ромб з тупим кутом при B
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.15, line join=round]%@N 6.58x4.32 S
+
+    % ромб зі стороною 3: кут A = 60°, M -- середина AD, BM \perp AD
     \coordinate (A) at (0,0);
     \coordinate (M) at (1.5,0);
     \coordinate (D) at (3,0);
-    \coordinate (B) at (1.5,2);
-    \coordinate (C) at (4.5,2);
-
-    % Ромб
+    \coordinate (B) at (1.5,2.598);
+    \coordinate (C) at (4.5,2.598);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Висота BM
     \draw[thick] (B) -- (M);
-
-    % Прямий кут при M
-    \draw (1.5,0.3) -- (1.8,0.3) -- (1.8,0);
-
-    % Позначки рівних відрізків AM = MD
-    \draw (0.65,0.1) -- (0.65,-0.1);
-    \draw (0.85,0.1) -- (0.85,-0.1);
-    \draw (2.15,0.1) -- (2.15,-0.1);
-    \draw (2.35,0.1) -- (2.35,-0.1);
-
-    % Підписи
+    \pic[draw, angle radius=0.26cm] {right angle = B--M--A};
+    \foreach \p/\q in {A/M, M/D}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
     \node[below left] at (A) {$A$};
     \node[below] at (M) {$M$};
     \node[below right] at (D) {$D$};
-    \node[above] at (B) {$B$};
-    \node[above] at (C) {$C$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\nmtStmt{I}{$BM \perp BC$.}
+\nmtStmt{II}{Трикутник $ABD$ є рівностороннім.}
+\nmtStmt{III}{$\angle BAD$ удвічі менший від $\angle ADC$.}
+
+ \nbvspace{0pt}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -1088,59 +779,44 @@ III. & $\angle BAD$ удвічі менший від $\angle ADC$. \\
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Точка $M$ є серединою $BC$. \\
-II. & Промінь $AM$ є бісектрисою $\angle A$. \\
-III. & Площа трикутника $ABM$ дорівнює площі трикутника $AMC$. \\
-\end{tabular}
+\nmtStmt{I}{Точка $M$ є серединою $BC$.}
+\nmtStmt{II}{Промінь $AM$ є бісектрисою $\angle A$.}
+\nmtStmt{III}{Площа трикутника $ABM$ дорівнює площі трикутника $AMC$.}
+
+
 \answerTable{лише I}{лише II та III}{лише I та III}{I, II та III}{лише I та II}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 48
-\zadtask{Діагональ квадрата $ABCD$ дорівнює 12 \textit{см}. На стороні $BC$ квадрата вибрано точку $K$ так, що $\angle KAB = 30°$ (див. рисунок). Визначте площу трикутника $ABK$. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Діагональ квадрата $ABCD$ дорівнює 12 \textit{см}. На стороні $BC$ квадрата вибрано точку $K$ так, що $\angle KAB = 30°$ (див. рисунок). Визначте площу трикутника $ABK$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-    % Квадрат ABCD
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1]%@N 4.81x4.80 S
+
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \coordinate (C) at (3,3);
-    \coordinate (D) at (3,0);
-
-    % Точка K на BC
-    \coordinate (K) at (1.73,3);
-
-    % Квадрат
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (3.6,3.6);
+    \coordinate (D) at (3.6,0);
+    \coordinate (K) at (2.078,3.6);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Відрізок AK
     \draw[thick] (A) -- (K);
-
-    % Кут 30° при A
-    \draw (0,0.6) arc (90:60:0.6);
-    \node at (0.5,1.5) {\small $30°$};
-
-    % Підписи
+    \pic[draw, angle radius=1.1cm] {angle=K--A--B};
+    \nmtAngleLabel{K}{A}{B}{1.1}{$30^\circ$}
+    \node[nmt dot] at (K) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[above] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$36\sqrt{3}$ \textit{см}$^2$}{$12\sqrt{3}$ \textit{см}$^2$}{36 \textit{см}$^2$}{18 \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
@@ -1151,78 +827,81 @@ III. & Площа трикутника $ABM$ дорівнює площі три�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Довжина $AM$ дорівнює половині довжини сторони $BC$. \\
-II. & Довжина $AM$ дорівнює відстані від точки $A$ до сторони $BC$. \\
-III. & Точка $M$ рівновіддалена від точок $B$ і $C$. \\
-\end{tabular}
+\nmtStmt{I}{Довжина $AM$ дорівнює половині довжини сторони $BC$.}
+\nmtStmt{II}{Довжина $AM$ дорівнює відстані від точки $A$ до сторони $BC$.}
+\nmtStmt{III}{Точка $M$ рівновіддалена від точок $B$ і $C$.}
+
+
 \answerTable{лише III}{лише II та III}{лише II}{лише I та III}{лише I}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 50
-\zadtask{У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.95]
-    % Прямокутна трапеція ABCD
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,2);
-    \coordinate (C) at (2,2);
-    \coordinate (D) at (3.5,0);
-
-    % Точка перетину діагоналей O
-    \coordinate (O) at (0.8,0.3);
-
-    % Трапеція
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.902]%@N 7.21x4.40 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0,3.2);
+    \coordinate (C) at (2.4,3.2);
+    \coordinate (D) at (6,0);
+    \coordinate (O) at ($(B)!2/7!(D)$);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Діагоналі
     \draw[thick] (A) -- (C);
     \draw[thick] (B) -- (D);
-
-    % Прямий кут при A
-    \draw (0,0.3) -- (0.3,0.3) -- (0.3,0);
-
-    % Підписи
+    \node at ($(O)+(196:0.42)$) {$O$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
-    \node[above right] at (O) {$O$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{42 \textit{см}}{49 \textit{см}}{21 \textit{см}}{$9{,}8$ \textit{см}}{$24{,}5$ \textit{см}}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 52
-\zadtask{Визначте зовнішній кут при вершині $A$ трикутника $ABC$, якщо $\angle B = 50°$, $\angle C = 25°$ (див. рисунок). \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\answerTableSmall{$130°$}{$95°$}{$75°$}{$15°$}{$105°$}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Визначте зовнішній кут при вершині $A$ трикутника $ABC$, якщо $\angle B = 50°$, $\angle C = 25°$ (див. рисунок). \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.4]{triangle_external_angle.png}
-\end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05]%@N 6.19x3.14 S
+
+  \coordinate (B) at (0,0);
+  \coordinate (C) at (5,0);
+  \coordinate (A) at (50:2.188);
+  \coordinate (D) at ($(B)!1.51!(A)$);
+  \draw[thick] (B) -- (C) -- (A) -- (B);
+  \draw[thin] (A) -- (D);
+  \pic[draw, angle radius=0.45cm] {angle=C--B--A};
+    \nmtAngleLabel{C}{B}{A}{0.53}{$50^\circ$}
+  \pic[draw, angle radius=0.53cm]{angle=C--B--A};
+  \pic[draw, angle radius=1cm] {angle=A--C--B};
+    \nmtAngleLabel{A}{C}{B}{1}{$25^\circ$}
+  \pic[draw, angle radius=0.45cm] {angle=C--A--D};
+    \nmtAngleLabel{C}{A}{D}{0.61}{$?$}
+  \pic[draw, angle radius=0.53cm]{angle=C--A--D};
+  \pic[draw, angle radius=0.61cm]{angle=C--A--D};
+  \node[above left] at (A) {$A$};
+  \node[below left] at (B) {$B$};
+  \node[below right] at (C) {$C$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{$130°$}{$95°$}{$75°$}{$15°$}{$105°$}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -1232,33 +911,46 @@ III. & Точка $M$ рівновіддалена від точок $B$ і $C$.
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Будь-яка точка на бісектрисі кута $A$ рівновіддалена від сторін $AC$ і $AB$. \\
-II. & Бісектриса кута $A$ ділить сторону $BC$ на дві рівні частини. \\
-III. & Центр вписаного в трикутник кола лежить на бісектрисі кута $A$. \\
-\end{tabular}
+\nmtStmt{I}{Будь-яка точка на бісектрисі кута $A$ рівновіддалена від сторін $AC$ і $AB$.}
+\nmtStmt{II}{Бісектриса кута $A$ ділить сторону $BC$ на дві рівні частини.}
+\nmtStmt{III}{Центр вписаного в трикутник кола лежить на бісектрисі кута $A$.}
+
+
 \answerTable{лише I та II}{лише I та III}{лише III}{лише I}{лише II}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 55
-\zadtask{На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30°$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що $\angle KAB = 30°$ і $DK$ є бісектрисою кута $ADC$ (див. рисунок). Визначте площу трикутника $ABK$, якщо $DK = 12\sqrt{2}$ \textit{см}. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=1]{rectangle_bisector.png}
-\end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    %@N 6.26x4.40 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0,3.2);
+    \coordinate (C) at (5.05,3.2);
+    \coordinate (D) at (5.05,0);
+    \coordinate (K) at (1.848,3.2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K) -- (D);
+    \pic[draw, angle radius=1.0cm]{angle=K--A--B};
+    \node[inner sep=0pt] at (75:1.74) {$30^\circ$};
+    \pic[draw, angle radius=0.45cm]{angle=C--D--A};
+    \pic[draw, angle radius=0.53cm]{angle=C--D--A};
+    \node[nmt dot] at (K) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$72\sqrt{3}$ \textit{см}$^2$}{$24\sqrt{3}$ \textit{см}$^2$}{$48\sqrt{3}$ \textit{см}$^2$}{144 \textit{см}$^2$}{72 \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
@@ -1269,75 +961,49 @@ III. & Центр вписаного в трикутник кола лежить
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.2cm}
-\begin{tabular}{rl}
-I. & Точка перетину діагоналей квадрата рівновіддалена від його вершин. \\
-II. & Сума довжин діагоналей квадрата дорівнює сумі довжин його сторін. \\
-III. & Діагональ квадрата ділить його на два рівновеликих трикутники. \\
-\end{tabular}
+\nmtStmt{I}{Точка перетину діагоналей квадрата рівновіддалена від його вершин.}
+\nmtStmt{II}{Сума довжин діагоналей квадрата дорівнює сумі довжин його сторін.}
+\nmtStmt{III}{Діагональ квадрата ділить його на два рівновеликих трикутники.}
+
+
 \answerTable{лише II}{лише I та III}{лише I та II}{лише I}{I, II та III}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % Завдання 57
-\zadtask{На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює 18 \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\answerTableSmall{40 \textit{см}}{26 \textit{см}}{52 \textit{см}}{13 \textit{см}}{36 \textit{см}}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено ромб $ABCD$. Периметр трикутника $ABC$ дорівнює 18 \textit{см}, $AC = 5$ \textit{см}. Знайдіть периметр ромба. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Ромб ABCD (вертикальний)
-    \coordinate (A) at (-1.5,0);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.925]%@N 3.58x5.19 S
+\coordinate (A) at (-1.2,0);
     \coordinate (B) at (0,2);
-    \coordinate (C) at (1.5,0);
+    \coordinate (C) at (1.2,0);
     \coordinate (D) at (0,-2);
-
-    % Ромб
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Діагональ AC
     \draw[thick] (A) -- (C);
-
-    % Підписи
     \node[left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[right] at (C) {$C$};
     \node[below] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\answerTableSmall{40 \textit{см}}{26 \textit{см}}{52 \textit{см}}{13 \textit{см}}{36 \textit{см}}
+
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
-% НМТ 2026, сесія 23.05, завдання №2
-\noindent
-\begin{minipage}[c]{0.60\textwidth}
-\zadnum Дано трикутник $ABC$ з кутами $\angle A=30^\circ$ та $\angle B=35^\circ$. Знайдіть градусну міру кута $C$. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.38\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (4.5,0);
-    \coordinate (B) at (1,2.8);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \pic [draw, angle radius=0.5cm, "$30^\circ$"{right, shift={(0.15,0.15)}}] {angle = C--A--B};
-    \pic [draw, angle radius=0.4cm, "$35^\circ$"{below, shift={(0.2,-0.1)}}] {angle = A--B--C};
-    \pic [draw, angle radius=0.5cm, red, "?"{left, shift={(-0.15,0.15)}}] {angle = B--C--A};
-    \node[below left] at (A) {$A$};
-    \node[above] at (B) {$B$};
-    \node[below right] at (C) {$C$};
-\end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
-\answerTable{$75^\circ$}{$100^\circ$}{$115^\circ$}{$120^\circ$}{$30^\circ$}
+% НМТ 2026, сесія 23.05, завдання №3
+\zadtask{У трикутнику $ABC$ $\angle A = 30^\circ$, $\angle B = 35^\circ$. Визначте градусну міру кута $C$. \nmtyear{2026}}
+\answerTable{$65^\circ$}{$295^\circ$}{$115^\circ$}{$125^\circ$}{$130^\circ$}
 % Відповідь: В
 \ifshowsolutions\solution{Сума кутів трикутника $180^\circ$: $\angle C=180^\circ-30^\circ-35^\circ=115^\circ$. Відповідь: \textbf{В}.}\fi
 \par\penalty-20
@@ -1347,19 +1013,14 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 30.05, завдання №9
 \zadtask{Розгляньте наведені нижче твердження. \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.2cm}
-\noindent
-\makebox[1.8em][l]{\textbf{I}}\, Найбільший кут прямокутного трикутника дорівнює половині розгорнутого кута.\par\nbvspace{0.1cm}
-\makebox[1.8em][l]{\textbf{II}}\, Сума двох кутів рівностороннього трикутника дорівнює $120^\circ$.\par\nbvspace{0.1cm}
-\makebox[1.8em][l]{\textbf{III}}\, Усі гострі кути гострокутного трикутника більші за $60^\circ$.\par\nbvspace{0.25cm}\par
+\nmtStmt{I}{Найбільший кут прямокутного трикутника дорівнює половині розгорнутого кута.}
+\nmtStmt{II}{Сума двох кутів рівностороннього трикутника дорівнює $120^\circ$.}
+\nmtStmt{III}{Усі гострі кути гострокутного трикутника більші за $60^\circ$.}
+\nbvspace{0.25cm}\par
 \noindent Які з тверджень є \textit{правильними}?
-\par\nbvspace{0.2cm}
-\begin{flushleft}
-\textbf{А} \quad лише I \\[0.1cm]
-\textbf{Б} \quad лише II \\[0.1cm]
-\textbf{В} \quad лише I та II \\[0.1cm]
-\textbf{Г} \quad лише II та III \\[0.1cm]
-\textbf{Д} \quad I, II та III
-\end{flushleft}}
+\par
+\nmtOptions{лише I}{лише II}{лише I та II}{лише II та III}{I, II та III}
+}
 % Відповідь: В
 \ifshowsolutions\solution{\textbf{I}: найбільший кут прямокутного трикутника дорівнює $90^\circ$, а половина розгорнутого кута — $180^\circ:2=90^\circ$ (правильно). \textbf{II}: у рівносторонньому трикутнику всі кути по $60^\circ$, сума двох — $120^\circ$ (правильно). \textbf{III}: гострокутний трикутник може мати кут $\le60^\circ$ (напр. $50^\circ,60^\circ,70^\circ$), тож неправильно. Відповідь: \textbf{В} (лише I та II).}\fi
 \par\penalty-20
@@ -1369,10 +1030,10 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 1.06, завдання №9
 \zadtask{У рівнобедреному трикутнику $ABC$ ($AB = BC$) $BK$~--- бісектриса кута $B$, точка $K$ належить стороні $AC$. Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.2cm}
-\noindent
-\makebox[1.8em][l]{\textbf{I}}\, $AB + BC = AC$.\par\nbvspace{0.1cm}
-\makebox[1.8em][l]{\textbf{II}}\, $BK \perp AC$.\par\nbvspace{0.1cm}
-\makebox[1.8em][l]{\textbf{III}}\, $AK = KC$.}
+\nmtStmt{I}{$AB + BC = AC$.}
+\nmtStmt{II}{$BK \perp AC$.}
+\nmtStmt{III}{$AK = KC$.}
+}
 \answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
 % Відповідь: Г
 \ifshowsolutions\solution{У рівнобедреному трикутнику бісектриса, проведена до основи, є також висотою й медіаною, тому $BK\perp AC$ (II) і $AK=KC$ (III). Рівність $AB+BC=AC$ (I) хибна (нерівність трикутника). Правильні II та III. Відповідь: \textbf{Г}.}\fi
@@ -1388,17 +1049,25 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (8,0);
-    \coordinate (B) at (4,4);
-    \draw[fill=mainGreen!15, draw=mainGreen!80!black, thick] (A) -- (B) -- (C) -- cycle;
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, line join=round]
+    % за оригіналом (НМТ 2026, 2.06, № 3, с. 31): клумба у формі трикутника ABC (AB = BC), поливалки в кутах; квіти -- згенерована картинка (nmt_klumba.jpg), обрізана по контуру трикутника
+    \coordinate (A) at (0,0); \coordinate (C) at (6,0); \coordinate (B) at (3,3);
+    \begin{scope}
+        \clip (A) -- (B) -- (C) -- cycle;
+        \node[inner sep=0] at (3,1.5) {\includegraphics[width=7cm]{nmt_klumba.jpg}};
+    \end{scope}
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \def\spr#1#2{\begin{scope}[shift={(#1)}]
+        \draw[draw=gray!70, fill=gray!30] (-0.1,-0.05) rectangle (0.1,0.26);
+        \draw[draw=gray!70, fill=gray!55] (-0.15,0.26) rectangle (0.15,0.34);
+        \foreach \a in {#2} {\fill[nmtBlue!35] (\a:0.55) ellipse (0.07 and 0.04);\fill[nmtBlue!35] (\a:0.8) ellipse (0.06 and 0.035);}
+        \end{scope}}
+    \spr{A}{15,35,60,150,175}
+    \spr{B}{20,45,135,160,200,225,320}
+    \spr{C}{5,30,120,145,165}
     \node[below left] at (A) {$A$};
-    \node[above] at (B) {$B$};
+    \node[above right, xshift=3pt] at (B) {$B$};
     \node[below right] at (C) {$C$};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = C--A--B};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = B--C--A};
-    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = A--B--C};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1412,11 +1081,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 2.06, завдання №9
 \zadtask{Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*}, align=left, leftmargin=2.8em, labelsep=0.6em, itemsep=2pt, topsep=2pt]
-\item У правильному трикутнику всі медіани рівні.
-\item Медіана трикутника ділить його на два трикутники з рівними периметрами.
-\item Медіана трикутника ділить його на два трикутники з рівними площами.
-\end{enumerate}
+\nmtStmt{I}{У правильному трикутнику всі медіани рівні.}
+\nmtStmt{II}{Медіана трикутника ділить його на два трикутники з рівними периметрами.}
+\nmtStmt{III}{Медіана трикутника ділить його на два трикутники з рівними площами.}
 \nopagebreak\nbvspace{0.15cm}}
 \answerTable{лише I}{лише II}{лише I та III}{лише II та III}{I, II та III}
 % Відповідь: В
@@ -1428,9 +1095,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 4.06, завдання №9 --- основна тема: Коло, круг і їх елементи
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\par\noindent\hangindent=2.2em\textbf{I.}\ \ Коло, уписане в рівнобедрений трикутник, дотикається до середини його основи.
-\par\noindent\hangindent=2.2em\textbf{II.}\ \ Центр кола, описаного навколо тупокутного трикутника, лежить усередині трикутника.
-\par\noindent\hangindent=2.2em\textbf{III.}\ \ Коло, побудоване на гіпотенузі прямокутного трикутника як на діаметрі, проходить через вершину прямого кута.
+\par\nmtStmt{I}{Коло, уписане в рівнобедрений трикутник, дотикається до середини його основи.}
+\nmtStmt{II}{Центр кола, описаного навколо тупокутного трикутника, лежить усередині трикутника.}
+\nmtStmt{III}{Коло, побудоване на гіпотенузі прямокутного трикутника як на діаметрі, проходить через вершину прямого кута.}
 \nopagebreak\nbvspace{0.15cm}
 \answerTable{лише I}{лише I та II}{I, II та III}{лише II та III}{лише I та III}}
 % Відповідь: Д
@@ -1442,11 +1109,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 5.06, завдання №9
 \zadnum На сторонах $AB$ та $BC$ довільного трикутника $ABC$ вибрано точки $M$ та $N$ так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є \textit{правильними}? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Чотирикутник $AMNC$ є трапецією.
-\item Трикутник $MBN$ рівнобедрений.
-\item Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.
-\end{enumerate}
+\nmtStmt{I}{Чотирикутник $AMNC$ є трапецією.}
+\nmtStmt{II}{Трикутник $MBN$ рівнобедрений.}
+\nmtStmt{III}{Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.}
 \nopagebreak\nbvspace{0.1cm}
 \answerTable{лише II}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
 % Відповідь: В
@@ -1463,25 +1128,25 @@ III. & Діагональ квадрата ділить його на два р�
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.32, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.889]%@N 4.12x5.40 S
+
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,15);
-    \coordinate (C) at (11,15);
-    \coordinate (D) at (11,0);
-    \coordinate (K) at (11,6);
-    \coordinate (M) at (5.2,15);
+    \coordinate (B) at (0,4.2);
+    \coordinate (C) at (2.91,4.2);
+    \coordinate (D) at (2.91,0);
+    \coordinate (K) at (2.91,1.68);
+    \coordinate (M) at (1.455,4.2);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (A) -- (K) -- (M) -- cycle;
-    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.7cm] {right angle = A--K--M};
-    \draw[thick] (K) -- (A) -- (D) -- cycle;
-    \pic[draw=yearOrange, line width=0.6pt, angle radius=0.3cm] { angle = D--A--K};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above left, font=\scriptsize] at (B) {$B$};
-    \node[above, font=\scriptsize] at (M) {$M$};
-    \node[above right, font=\scriptsize] at (C) {$C$};
-    \node[right, font=\scriptsize] at (K) {$K$};
-    \node[below right, font=\scriptsize] at (D) {$D$};
-    \node[font=\tiny] at (1.9,0.5) {$30^\circ$};
+    \pic[draw, angle radius=0.26cm]{right angle=M--K--A};
+    \pic[draw, angle radius=0.9cm] {angle=D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.9}{$30^\circ$}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above] at (M) {$M$};
+    \node[above right] at (C) {$C$};
+    \node[right] at (K) {$K$};
+    \node[below right] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1494,29 +1159,28 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №3 --- основна тема: Прямокутник
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum Ділянка складається з прямокутного трикутника та прямокутника (див. рисунок). За наведеними на рисунку розмірами сторін визначте периметр цієї ділянки. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.38\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.3, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (D) at (10,0);
-    \coordinate (C) at (10,7);
-    \coordinate (B) at (0,7);
-    \coordinate (Top) at (6.4, 11.8);
-    \draw (A) -- (D) -- (C) -- (Top) -- (B) -- cycle;
-    \draw[dashed] (B) -- (C);
-    \pic[draw, angle radius=0.3cm] {right angle = A--B--C};
-    \pic[draw, angle radius=0.3cm] {right angle = B--A--D};
-    \pic[draw, angle radius=0.3cm] {right angle = A--D--C};
-    \pic[draw, angle radius=0.3cm] {right angle = D--C--B};
-    \pic[draw, angle radius=0.3cm] {right angle = B--Top--C};
-    \node[left] at (0,3.5) {$7$ м};
-    \node[right] at (10,3.5) {$7$ м};
-    \node[above left] at (3.2, 9.4) {$8$ м};
-    \node[above right] at (8.2, 9.4) {$6$ м};
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.965]%@N 5.88x4.75 S
+\coordinate (A) at (0,0);
+    \coordinate (D) at (4,0);
+    \coordinate (C) at (4,2.8);
+    \coordinate (B) at (0,2.8);
+    \coordinate (T) at (2.56,4.72);
+    \draw[thick] (A) -- (D) -- (C) -- (T) -- (B) -- cycle;
+    \draw[dashed, thin] (B) -- (C);
+    \pic[draw, angle radius=0.26cm] {right angle = D--A--B};
+    \pic[draw, angle radius=0.26cm] {right angle = C--D--A};
+    \pic[draw, angle radius=0.26cm] {right angle = B--T--C};
+    \node[left] at ($(A)!0.5!(B)$) {$7$~\textit{м}};
+    \node[right] at ($(D)!0.5!(C)$) {$7$~\textit{м}};
+    \node[above left] at ($(B)!0.5!(T)$) {$8$~\textit{м}};
+    \node[above right] at ($(T)!0.5!(C)$) {$6$~\textit{м}};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1528,11 +1192,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 8.06, завдання №9 --- основна тема: Коло, круг і їх елементи
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item У будь-який ромб можна вписати коло.
-\item У будь-яку прямокутну трапецію можна вписати коло.
-\item У будь-якому трикутнику бісектриси кутів проходять через центр вписаного в цей трикутник кола.
-\end{enumerate}
+\nmtStmt{I}{У будь-який ромб можна вписати коло.}
+\nmtStmt{II}{У будь-яку прямокутну трапецію можна вписати коло.}
+\nmtStmt{III}{У будь-якому трикутнику бісектриси кутів проходять через центр вписаного в цей трикутник кола.}
 \nopagebreak\nbvspace{0.15cm}}
 \answerTable{лише III}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
 \par\penalty-20
@@ -1541,28 +1203,25 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №9 --- основна тема: Коло, круг і їх елементи
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
-\zadnum Трикутник $ABC$ вписано в коло з центром у точці $O$, що належить стороні $AC$ (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=2pt]
-\item $\angle ABC$ є прямим.
-\item $\angle BAC$ вдвічі менший від $\angle BOC$.
-\item Довжина $AC$ вдвічі більша за довжину $BO$.
-\end{enumerate}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Трикутник $ABC$ вписано в коло з центром у точці $O$, що належить стороні $AC$ (див. рисунок). Які з наведених тверджень є правильними? \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \nmtStmt{I}{$\angle ABC$ є прямим.}
+\nmtStmt{II}{$\angle BAC$ вдвічі менший від $\angle BOC$.}
+\nmtStmt{III}{Довжина $AC$ вдвічі більша за довжину $BO$.}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.36\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1, thick, line join=round]
-    \coordinate (O) at (0,0);
-    \draw (O) circle (2);
-    \coordinate (A) at (-1.732, -1);
-    \coordinate (C) at (1.732, 1);
-    \coordinate (B) at (-0.5, 1.936);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (A) -- (C);
-    \draw (B) -- (O);
-    \fill (O) circle (2pt) node[below right] {$O$};
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=1.09]%@N 4.24x4.42 S
+\coordinate (O) at (0,0);
+    \coordinate (A) at (-1.532,-1.286);
+    \coordinate (C) at (1.532,1.286);
+    \coordinate (B) at (-0.845,1.813);
+    \draw[thick] (O) circle (2);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (B) -- (O);
+    \node[nmt dot] at (O) {};
+    \node[below right] at (O) {$O$};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1575,33 +1234,33 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №14
-\noindent
-\begin{minipage}[c]{0.60\textwidth}
-\zadnum На рисунку зображено рівнобедрений трикутник $ABC$, у якому $\angle ABC = 120^\circ$. Точки $K$ і $M$ є серединами сторін $AB$ та $AC$ відповідно. Визначте площу чотирикутника $KBCM$, якщо $AC = 24$ см. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.38\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6, thick, line join=round]
-    \coordinate (B) at (0,0);
-    \coordinate (C) at (6,0);
-    \coordinate (A) at (-3, 5.196);
-    \coordinate (K) at (-1.5, 2.598);
-    \coordinate (M) at (1.5, 2.598);
+\zadtask{На рисунку зображено рівнобедрений трикутник $ABC$, у якому $\angle ABC = 120^\circ$. Точки $K$ і $M$ є серединами сторін $AB$ та $AC$ відповідно. Визначте площу чотирикутника $KBCM$, якщо $AC = 24$ см. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.59, line join=round]%@N 6.94x2.85 C
 
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (K) -- (M);
-
-    \node[above left] at (A) {$A$};
-    \node[below left] at (B) {$B$};
-    \node[below right] at (C) {$C$};
-    \node[left] at (K) {$K$};
-    \node[above right] at (M) {$M$};
-
-    \pic[draw, angle radius=0.5cm, pic text={$120^\circ$}, angle eccentricity=1.5, font=\scriptsize] {angle = C--B--A};
+    \coordinate (A) at (-2.88,0);
+    \coordinate (C) at (2.88,0);
+    \coordinate (B) at (0,1.663);
+    \coordinate (M) at (0,0);
+    \coordinate (K) at (-1.44,0.8315);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (K) -- (M);
+    \foreach \p/\q/\o in {A/K/-0.05cm, A/K/0.05cm, K/B/-0.05cm, K/B/0.05cm}
+        \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.09cm!-90:(\q)$);
+    \foreach \p/\q in {A/M, M/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
+    \pic[draw, angle radius=0.4cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.4}{$120^\circ$}
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[above] at (B) {$B$};
+    \node[left] at (A) {$A$};
+    \node[right] at (C) {$C$};
+    \node[above left] at (K) {$K$};
+    \node[below] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$24$~см$^2$}{$24\sqrt{3}$~см$^2$}{$72$~см$^2$}{$72\sqrt{3}$~см$^2$}{$36\sqrt{3}$~см$^2$}
 \par\penalty-20
 \end{samepage}
@@ -1610,11 +1269,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 10.06, завдання №9
 \zadtask{Кути гострокутного трикутника $ABC$ задовольняють умову $\angle A < \angle B < \angle C$. Які з наведених тверджень є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=2pt]
-\item $AB$~--- найдовша сторона трикутника $ABC$.
-\item Трикутник $ABC$~--- рівнобедрений.
-\item Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$.
-\end{enumerate}
+\nmtStmt{I}{$AB$~--- найдовша сторона трикутника $ABC$.}
+\nmtStmt{II}{Трикутник $ABC$~--- рівнобедрений.}
+\nmtStmt{III}{Довжина висоти, проведеної з вершини $A$, менша за довжину сторони $AC$.}
 \nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише I}{лише III}{лише I та III}{лише II та III}{I, II та III}
 \par\penalty-20
@@ -1624,11 +1281,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 11.06, завдання №9
 \zadtask{Які з наведених тверджень правильні щодо трикутника зі сторонами $a$, $b$ і $c$? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, leftmargin=2.8em, itemsep=2pt]
-\item Якщо $a^2 + b^2 = c^2$, то трикутник прямокутний.
-\item Для будь-якого трикутника справджується нерівність $a + b > c$.
-\item Якщо $a + b = a + c$ й $a = c$, то трикутник правильний.
-\end{enumerate}
+\nmtStmt{I}{Якщо $a^2 + b^2 = c^2$, то трикутник прямокутний.}
+\nmtStmt{II}{Для будь-якого трикутника справджується нерівність $a + b > c$.}
+\nmtStmt{III}{Якщо $a + b = a + c$ й $a = c$, то трикутник правильний.}
 \nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише I}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
 \par\penalty-20
@@ -1638,11 +1293,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 12.06, завдання №9
 \zadtask{На сторонах $AB$ та $BC$ трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які твердження є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item $AC \parallel MN$.
-\item Відрізок $MN$ є середньою лінією трикутника $ABC$.
-\item Площі трикутника $MBN$ та чотирикутника $AMNC$ рівні.
-\end{enumerate}
+\nmtStmt{I}{$AC \parallel MN$.}
+\nmtStmt{II}{Відрізок $MN$ є середньою лінією трикутника $ABC$.}
+\nmtStmt{III}{Площі трикутника $MBN$ та чотирикутника $AMNC$ рівні.}
 \nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише II}{лише I та II}{лише I та III}{лише II та III}{I, II та III}
 \par\penalty-20
@@ -1651,30 +1304,39 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №14 --- основна тема: Квадрат
 \noindent
-\begin{minipage}[c]{0.54\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum Відпочинкова зона в Парку здоров'я складається з двох ділянок квадратної форми площею $144$~м$^2$ і $225$~м$^2$ і ділянки у формі прямокутного трикутника, гіпотенуза та катет якого є сторонами квадратів (див. рисунок). На ділянці трикутної форми розміщено фонтан, який на схемі зображений у формі кола, що дотикається до сторін трикутника. Визначте радіус цього кола. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.44\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, line join=round, line cap=round]
-    % Лівий квадрат (225)
-    \draw[thick] (0,0) rectangle (-5,5);
-    \node at (-2.5, 2.5) {$225~\text{м}^2$};
-
-    % Трикутник
-    \draw[thick] (0,0) -- (2.4, 1.8) -- (0,5) -- cycle;
-
-    % Правий квадрат (144)
-    \draw[thick] (0,5) -- (3.2, 7.4) -- (5.6, 4.2) -- (2.4, 1.8) -- cycle;
-    \node at (2.8, 4.6) {$144~\text{м}^2$};
-
-    % Коло (фонтан)
-    \draw[thick] (1, 2) circle (1);
-    \node[scale=0.95] at (1, 2) {фонтан};
+\begin{nmtfit}\begin{tikzpicture}[x=0.2cm, y=0.2cm, line join=round]
+    % за оригіналом (НМТ 2026, 12.06, № 14, с. 84): квадрати 225 і 144 м², між ними прямокутний трикутник (катети 9 і 12, гіпотенуза 15), вписане коло r = 3.
+    % Геометрія точна; парк і фонтан -- згенеровані картинки (nmt_park.jpg, nmt_fontan.jpg), обрізані по контурах фігур.
+    \coordinate (O) at (0,0); \coordinate (T) at (0,15); \coordinate (R) at (7.2,5.4);
+    \fill[nmtFillD] (O) -- (T) -- (R) -- cycle;
+    % великий квадрат (225 м²)
+    \begin{scope}
+        \clip (-15,0) rectangle (0,15);
+        \node[inner sep=0] at (-7.5,7.5) {\includegraphics[width=5.2cm]{nmt_park.jpg}};
+    \end{scope}
+    % малий квадрат (144 м²) -- на катеті TR, повернутий
+    \begin{scope}[shift={(T)}, rotate=-53.13]
+        \clip (0,0) rectangle (12,12);
+        \node[inner sep=0] at (6,6) {\includegraphics[width=4.6cm]{nmt_park.jpg}};
+    \end{scope}
+    % фонтан -- коло, вписане в трикутник
+    \begin{scope}
+        \clip (3,6) circle (3);
+        \node[inner sep=0] at (3,6) {\includegraphics[width=3.4cm]{nmt_fontan.jpg}};
+    \end{scope}
+    \draw[thick] (-15,0) rectangle (0,15);
+    \draw[thick] (T) -- (R) -- ($(R)+(9.6,7.2)$) -- ($(T)+(9.6,7.2)$) -- cycle;
+    \draw[thick] (O) -- (R);
+    \draw[thick] (3,6) circle (3);
+    \node[fill=white, fill opacity=0.85, text opacity=1, inner sep=2pt] at (-7.5,7.5) {$225$~\textit{м}$^2$};
+    \node[fill=white, fill opacity=0.85, text opacity=1, inner sep=2pt] at (8.4,13.8) {$144$~\textit{м}$^2$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
 \par\nbvspace{0.2cm}
 \answerTable{$4{,}5$~м}{$9$~м}{$6$~м}{$3$~м}{$1{,}5$~м}
@@ -1684,24 +1346,25 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №14
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum У рівнобедреному трикутнику $ABC$ з точки $K$, що лежить на бічній стороні $BC$, до бічної сторони $AB$ проведено перпендикуляр $KM$ (див. рисунок). Визначте площу трикутника $ABC$, якщо $KM = 6\sqrt{3}$~см, $AK : MB = 2 : 3$, $\angle B = 30^\circ$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.38\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.72, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (3.2,0);
-    \coordinate (B) at (1.05,4.2);
-    % M на AB, K на BC
-    \coordinate (M) at ($(A)!0.55!(B)$);
-    \coordinate (K) at ($(B)!0.55!(C)$);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (K) -- (M);
-    \draw (A) -- (K);
-    \pic[draw, angle radius=0.18cm] {right angle = K--M--A};
-    \pic[draw, angle radius=0.5cm, pic text={$30^\circ$}, angle eccentricity=1.55, font=\scriptsize] {angle = A--B--C};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.96]%@N 3.21x5.00 S
+
+    \coordinate (B) at (0,3.8);
+    \coordinate (A) at (-1.018,0);
+    \coordinate (C) at (1.018,0);
+    \coordinate (M) at ($(B)!0.75!(A)$);
+    \coordinate (K) at ($(B)!0.866!(C)$);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (K) -- (M);
+    \draw[thick] (A) -- (K);
+    \pic[draw, angle radius=0.26cm]{right angle=K--M--B};
+    \pic[draw, angle radius=1.1cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1.1}{$30^\circ$}
     \node[below left] at (A) {$A$};
     \node[above] at (B) {$B$};
     \node[below right] at (C) {$C$};
@@ -1722,20 +1385,20 @@ III. & Діагональ квадрата ділить його на два р�
 \zadnum На катеті $CB$ прямокутного трикутника $ABC$ вибрано точку $O$ так, що півколо з центром у точці $O$ дотикається катета $AC$ в точці $C$, а гіпотенузи $AB$~--- у точці $K$. $OB = 6$~см, $\angle COK = 120^\circ$. Визначте довжину відрізка $AC$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.62, thick, line join=round]
-    \coordinate (C) at (0,0);
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.881]%@N 7.19x4.66 S
+\coordinate (C) at (0,0);
     \coordinate (B) at (6,0);
-    \coordinate (A) at (0,3.46);
+    \coordinate (A) at (0,3.464);
     \coordinate (O) at (2,0);
-    % K точка дотику на AB
-    \coordinate (K) at ($(A)!(O)!(B)$);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (O) -- (K);
-    \draw (2,0) ++(0:2) arc (0:180:2);
-    \pic[draw, angle radius=0.2cm] {right angle = A--C--B};
-    \pic[draw, angle radius=0.4cm, pic text={\scriptsize $120^\circ$}, angle eccentricity=1.7] {angle = K--O--C};
+    \coordinate (K) at ($(O)+(60:2)$);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (O) -- (K);
+    \draw[thick] (O) ++(0:2) arc (0:180:2);
+    \pic[draw, angle radius=0.35cm] {angle = K--O--C};
+    \nmtAngleLabel{K}{O}{C}{0.35}{$120^\circ$}
     \node[above left] at (A) {$A$};
     \node[below left] at (C) {$C$};
     \node[below right] at (B) {$B$};
@@ -1753,11 +1416,9 @@ III. & Діагональ квадрата ділить його на два р�
 % НМТ 2026, сесія 19.06, завдання №9 --- основна тема: Коло, круг і їх елементи
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2026}\par
 \nopagebreak\nbvspace{0.1cm}
-\begin{enumerate}[label=\textbf{\Roman*.}, align=left, leftmargin=2.6em, labelsep=0.5em, itemsep=2pt, topsep=2pt]
-\item Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.
-\item Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.
-\item У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.
-\end{enumerate}
+\nmtStmt{I}{Діаметр кола, описаного навколо прямокутного трикутника, більший за гіпотенузу.}
+\nmtStmt{II}{Центром кола, описаного навколо будь-якого трикутника, є точка перетину його медіан.}
+\nmtStmt{III}{У рівносторонньому трикутнику центри вписаного й описаного кіл збігаються.}
 \nopagebreak\nbvspace{0.1cm}}
 \answerTable{лише II}{лише III}{лише I та II}{лише I та III}{I, II та III}
 % Відповідь: Б
@@ -1771,18 +1432,20 @@ III. & Діагональ квадрата ділить його на два р�
 \zadnum На стороні $BC$ прямокутника $ABCD$ вибрано точку $K$ так, що трикутник $AKD$ прямокутний (див. рисунок). Визначте довжину сторони $AD$, якщо $AB = 6\sqrt{3}$, а $\angle KAD = 60^\circ$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (10,4);
-    \coordinate (D) at (10,0);
-    \coordinate (K) at (2.4,4);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw (A) -- (K) -- (D);
-    \pic[draw, angle radius=0.3cm] {right angle = A--K--D};
-    \pic[draw, angle radius=0.55cm, pic text={\scriptsize $60^\circ$}, angle eccentricity=1.6] {angle = D--A--K};
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.902]%@N 7.21x3.80 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0,2.598);
+    \coordinate (C) at (6,2.598);
+    \coordinate (D) at (6,0);
+    \coordinate (K) at (1.5,2.598);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (K) -- (D);
+    \pic[draw, angle radius=0.26cm]{right angle=A--K--D};
+    \pic[draw, angle radius=0.45cm] {angle=D--A--K};
+    \nmtAngleLabel{D}{A}{K}{0.45}{$60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -1800,297 +1463,335 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % Завдання 10 (на відповідність)
-\zadtask{У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$~--- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.6\textwidth}
 \noindent
-\begin{minipage}[t]{0.46\linewidth}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$~--- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[line join=round, scale=0.9]%@N 6.24x4.35 S
+
+    % за оригіналом (НМТ 2023, рівнобічна трапеція ABCD, діагоналі AC ⟂ BD, KM — середня лінія трикутника AOD):
+    % AD = 5,6; BC = 1,4; висота = (AD+BC)/2 = 3,5 (діагоналі під 45° до основи); O = (2,8; 2,8); scale=0.9 (AD = 5,04 см)
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (2.1,3.5);
+    \coordinate (C) at (3.5,3.5);
+    \coordinate (D) at (5.6,0);
+    \coordinate (O) at (2.8,2.8);
+    \coordinate (K) at ($(A)!0.5!(O)$);
+    \coordinate (M) at ($(O)!0.5!(D)$);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
+    \draw[thick] (K) -- (M);
+    \foreach \p/\q in {A/B, D/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
+    \pic[draw, angle radius=0.26cm] {right angle=A--O--D};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[anchor=west, xshift=2pt] at (O) {$O$};
+    \node[below right] at (K) {$K$};
+    \node[below left] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BC$}
 \matchItem{2}{$AD$}
 \matchItem{3}{висота трапеції}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Довжина відрізка}
 \matchItem{А}{12 \textit{см}}
 \matchItem{Б}{15 \textit{см}}
 \matchItem{В}{18 \textit{см}}
 \matchItem{Г}{21 \textit{см}}
 \matchItem{Д}{24 \textit{см}}
-\end{minipage}
-
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.35\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.15]{trapezoid_ABCD.png}
-
-\nopagebreak\nbvspace{0.3cm}
+}{
 \matchingGrid
-\end{flushright}
-\end{minipage}
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 13 (на відповідність, з рисунком)
-\zadtask{У прямокутному трикутнику $ACB$ $\angle C = 90°$, $\angle B = 24°$. На продовженні катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
 \noindent
-\begin{minipage}[t]{0.46\linewidth}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутному трикутнику $ACB$ $\angle C = 90°$, $\angle B = 24°$. На продовженні катета $AC$ вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.882, line join=round]%@N 5.15x5.44 S
+
+    % за оригіналом (НМТ 2023, с. 59): прямокутний трикутник ACB (C = 90°), K на продовженні AC за C, AK = KB
+    \coordinate (C) at (0,0);
+    \coordinate (A) at (0,2.7);
+    \coordinate (B) at (3.96,0);
+    \coordinate (K) at (0,-1.554);
+    \draw[thick] (A) -- (K);
+    \draw[thick] (C) -- (B);
+    \draw[thick] (A) -- (B) -- (K);
+    \pic[draw, angle radius=0.26cm] {right angle=B--C--A};
+    \pic[draw, angle radius=0.75cm] {angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.75}{$24^\circ$}
+    \node[above left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[left] at (C) {$C$};
+    \node[below left] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Кут}
 \matchItem{1}{$\angle BAC$}
 \matchItem{2}{$\angle KBC$}
 \matchItem{3}{$\angle OKB$}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Градусна міра кута}
 \matchItem{А}{$24°$}
 \matchItem{Б}{$34°$}
 \matchItem{В}{$42°$}
 \matchItem{Г}{$66°$}
 \matchItem{Д}{$72°$}
-\end{minipage}
-
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.15]{triangle_ACB_24.png}
-
-\nopagebreak\nbvspace{0.3cm}
+}{
 \matchingGrid
-\end{flushright}
-\end{minipage}
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 15 (на відповідність, з рисунком)
-\zadtask{На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90°$, $\angle B = 32°$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
 \noindent
-\begin{minipage}[t]{0.46\linewidth}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На катеті $BC$ прямокутного трикутника $ACB$, у якому $\angle C = 90°$, $\angle B = 32°$, вибрано точку $K$ так, що $AK = KB$ (див. рисунок). Точка $O$ --- центр кола, описаного навколо трикутника $ACB$. До кожного кута \mbox{(1--3)} доберіть його градусну міру \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.929, tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]%@N 6.59x4.57 S
+
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (5.4,0);
+    \coordinate (A) at (0,3.374);
+    \coordinate (K) at (1.645,0);
+    \draw[thick] (A) -- (C) -- (K) -- (B) node[midway, tick] {} -- cycle;
+    \draw[thick] (A) -- (K) node[midway, tick] {};
+    \pic[draw, angle radius=0.26cm] {right angle = B--C--A};
+    \pic[draw, angle radius=1.0cm] {angle = A--B--C};
+    \nmtAngleLabel{A}{B}{C}{1}{$32^\circ$}
+    \node[above left] at (A) {$A$};
+    \node[below left] at (C) {$C$};
+    \node[below] at (K) {$K$};
+    \node[below right] at (B) {$B$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Кут}
 \matchItem{1}{$\angle KAB$}
 \matchItem{2}{$\angle KAC$}
 \matchItem{3}{$\angle OKB$}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Градусна міра кута}
 \matchItem{А}{$24°$}
 \matchItem{Б}{$26°$}
 \matchItem{В}{$32°$}
 \matchItem{Г}{$58°$}
 \matchItem{Д}{$64°$}
-\end{minipage}
-
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\includegraphics[scale=0.65]{triangle_ACB_32.png}
-
-\nopagebreak\nbvspace{0.3cm}
+}{
 \matchingGrid
-\end{flushright}
-\end{minipage}
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 19 (на відповідність, з простим рисунком TikZ)
-\zadtask{Периметр рівнобедреного трикутника (див. рисунок) дорівнює 32 \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
 \noindent
-\begin{minipage}[t]{0.46\linewidth}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Периметр рівнобедреного трикутника (див. рисунок) дорівнює 32 \textit{см}. $AB = BC = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.54, line join=round]%@N 5.98x4.72 S
+
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (3,0);
+    \coordinate (B) at (1.5,2.2);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \foreach \p/\q in {A/B, B/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.09cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.09cm!-90:(\q)$);
+    \node[below left] at (A) {$A$};
+    \node[below right] at (C) {$C$};
+    \node[above] at (B) {$B$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AC$}
 \matchItem{2}{висота з вершини $B$}
 \matchItem{3}{радіус описаного кола}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Довжина відрізка}
 \matchItem{А}{$6{,}25$ \textit{см}}
 \matchItem{Б}{$7{,}5$ \textit{см}}
 \matchItem{В}{$8$ \textit{см}}
 \matchItem{Г}{$12$ \textit{см}}
 \matchItem{Д}{$12{,}5$ \textit{см}}
-\end{minipage}
-
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.6]
-    % Вершини трикутника
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (3,0);
-    \coordinate (B) at (1.5,2.2);
-
-    % Трикутник
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Позначки рівних сторін
-    \draw (0.6,1.2) -- (0.75,1.05);
-    \draw (0.65,1.15) -- (0.8,1);
-    \draw (2.4,1.2) -- (2.25,1.05);
-    \draw (2.35,1.15) -- (2.2,1);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[below right] at (C) {$C$};
-    \node[above] at (B) {$B$};
-\end{tikzpicture}\end{nmtfit}
-
-\nopagebreak\nbvspace{0.3cm}
+}{
 \matchingGrid
-\end{flushright}
-\end{minipage}
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 21 (на відповідність, з рисунком)
 \zadtask{Круг, площа якого $36\pi$, дотикається до паралельних прямих $m$ і $n$ (див. рисунок). Точки $L$, $N$, $P$ належать прямій $m$, а точки $K$, $M$, $Q$ --- прямій $n$. Трикутник $KLM$ рівносторонній. $MNPQ$ --- ромб, площа якого 156. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2024}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.48]%@N 10.02x3.58 C
 
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\noindent
-\begin{minipage}[t]{0.46\linewidth}
+  % відстань між прямими = діаметр круга = 12 -> 1,6; сторона KLM = 8\sqrt3 -> 1,8475; сторона MNPQ = 13 -> трохи менша за неї
+  \coordinate (K) at (-1.8475,0);
+  \coordinate (M) at (0,0);
+  \coordinate (L) at (-0.9238,1.6);        % KLM рівносторонній: висота 1,6, сторона 1,8475
+  \coordinate (N) at (0.8246,1.6);         % MNPQ -- ромб зі стороною 1,8 (менша за сторону KLM): зсув 0,8246 при висоті 1,6
+  \coordinate (P) at (2.6246,1.6);
+  \coordinate (Q) at (1.8,0);
+  % прямі m (угорі) і n (унизу)
+  \draw[thick] (-3.85,1.6) -- (3.55,1.6);
+  \draw[thick] (-3.85,0) -- (3.55,0);
+  % круг, що дотикається до обох прямих
+  \draw[thick] (-2.93,0.8) circle (0.8);
+  % трикутник KLM і ромб MNPQ
+  \draw[thick] (K) -- (L) -- (M) -- (N);
+  \draw[thick] (P) -- (Q);
+  \foreach \p in {K,L,M,N,P,Q} \node[nmt dot] at (\p) {};
+  \node[anchor=south west, inner sep=1.5pt] at (-3.85,1.6) {$m$};
+  \node[anchor=south west, inner sep=1.5pt] at (-3.85,0) {$n$};
+  \node[above=2pt] at (L) {$L$};
+  \node[above=2pt] at (N) {$N$};
+  \node[above=2pt] at (P) {$P$};
+  \node[below=2pt] at (K) {$K$};
+  \node[below=2pt] at (M) {$M$};
+  \node[below=2pt] at (Q) {$Q$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{діаметр круга}
 \matchItem{2}{довжина сторони трикутника $KLM$}
 \matchItem{3}{довжина сторони ромба $MNPQ$}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Довжина відрізка}
 \matchItem{А}{$8\sqrt{3}$}
 \matchItem{Б}{6}
 \matchItem{В}{12}
 \matchItem{Г}{13}
 \matchItem{Д}{15}
-\end{minipage}
-
-\begin{center}
-\begin{flushright}
-
-\includegraphics[scale=0.4]{circle_parallel_lines_KLM.png}
-\end{flushright}
-\end{center}
-
-\nopagebreak\nbvspace{0.3cm}
-\hfill\matchingGrid
-\end{minipage}
-\hfill
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 23 (на відповідність, з рисунком)
 \zadtask{На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}. \nmtyear{2024}}
-
-\nmtnobreak
 \begin{center}
-\begin{flushright}
-\includegraphics[scale=0.4]{parallel_lines_rect_trap_triangle.png}
-\end{flushright}
-\end{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.984]%@N 8.94x3.45 C
 
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\noindent
-\begin{minipage}[t]{0.46\linewidth}
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (2.22,0);
+    \coordinate (M) at (5.05,0);
+    \coordinate (Q) at (7.75,0);
+    \coordinate (B) at (0,2.7);
+    \coordinate (C) at (2.22,2.7);
+    \coordinate (K) at (4.17,2.7);
+    \coordinate (L) at (5.05,2.7);
+    \coordinate (P) at (7.75,2.7);
+    \fill[nmtFillA] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[nmtFillE] (D) -- (K) -- (L) -- (M) -- cycle;
+    \fill[nmtFillC] (M) -- (Q) -- (P) -- cycle;
+    \draw[thick] (-1.63,0) -- (9.35,0);
+    \draw[thick] (-1.63,2.7) -- (9.35,2.7);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (K) -- (L) -- (M) -- cycle;
+    \draw[thick] (M) -- (Q) -- (P) -- cycle;
+    \pic[draw, angle radius=0.26cm] {right angle=P--Q--M};
+    \pic[draw, angle radius=0.45cm] {angle=Q--M--P};
+    \nmtAngleLabel{Q}{M}{P}{0.45}{$45^\circ$}
+    \foreach \p in {A,B,C,D,K,L,M,P,Q} {\node[nmt dot] at (\p) {};}
+    \node[above] at (-1.4,2.7) {$m$};
+    \node[above] at (-1.4,0) {$n$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[above left] at (K) {$K$};
+    \node[above right] at (L) {$L$};
+    \node[above] at (P) {$P$};
+    \node[above] at ($(K)!0.5!(L)$) {$2$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[below] at (M) {$M$};
+    \node[below] at (Q) {$Q$};
+    \node[below] at ($(A)!0.5!(D)$) {$4$};
+    \node[below] at ($(D)!0.5!(M)$) {$5$};
+    \node[below] at ($(M)!0.5!(Q)$) {$6$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Фігура}
 \matchItem{1}{Прямокутник $ABCD$}
 \matchItem{2}{Трапеція $DKLM$}
 \matchItem{3}{Трикутник $MQP$}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.5\linewidth}
+}{
 \matchHead{Площа фігури}
 \matchItem{А}{12}
 \matchItem{Б}{18}
 \matchItem{В}{21}
 \matchItem{Г}{24}
 \matchItem{Д}{36}
-\end{minipage}
-
-\nopagebreak\nbvspace{0.3cm}
-\hfill\matchingGrid
-\end{minipage}
-\hfill
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 29 (на відповідність, з рисунком)
-\zadtask{На рисунку зображено квадрат $ABCD$, площа якого 144 \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.55\textwidth}
-\begin{tabular}{@{}l@{\hspace{1cm}}l@{}}
-\textit{Відрізок} & \textit{Довжина відрізка} \\[0.2cm]
-\textbf{1} \quad сторона квадрата & \textbf{А} \quad 6 \textit{см} \\[0.15cm]
-\textbf{2} \quad $KM$ & \textbf{Б} \quad $6\sqrt{2}$ \textit{см} \\[0.15cm]
-\textbf{3} \quad відстань від точки $A$ до & \textbf{В} \quad 12 \textit{см} \\[0.15cm]
-\quad\quad центра кола, описаного & \textbf{Г} \quad $8\sqrt{2}$ \textit{см} \\[0.15cm]
-\quad\quad навколо трикутника $KMC$ & \textbf{Д} \quad $9\sqrt{2}$ \textit{см} \\
-\end{tabular}
-
-\nopagebreak\nbvspace{0.3cm}
-\hfill\matchingGrid
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено квадрат $ABCD$, площа якого 144 \textit{см}$^2$. Точки $K$ і $M$ --- середини сторін $BC$ і $CD$ відповідно. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75]
-    % Квадрат
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-
-    % Середини
-    \coordinate (K) at (2,4);
-    \coordinate (M) at (4,2);
-
-    % Квадрат
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (3.6,3.6);
+    \coordinate (D) at (3.6,0);
+    \coordinate (K) at (1.8,3.6);
+    \coordinate (M) at (3.6,1.8);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Відрізок KM
     \draw[thick] (K) -- (M);
-
-    % Риски рівності на BK і KC (одинарні, горизонтальна сторона)
-    \draw[thick] (1,3.85) -- (1,4.15);
-    \draw[thick] (3,3.85) -- (3,4.15);
-
-    % Риски рівності на CM і MD (подвійні, вертикальна сторона)
-    \draw[thick] (3.85,3) -- (4.15,3);
-    \draw[thick] (3.85,3.15) -- (4.15,3.15);
-    \draw[thick] (3.85,1) -- (4.15,1);
-    \draw[thick] (3.85,1.15) -- (4.15,1.15);
-
-    % Підписи
+    \nmtEq{B}{K}{1}
+    \nmtEq{K}{C}{1}
+    \nmtEq{C}{M}{1}
+    \nmtEq{M}{D}{1}
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2098,29 +1799,64 @@ III. & Діагональ квадрата ділить його на два р�
     \node[above] at (K) {$K$};
     \node[right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
+\matchHead{Відрізок}
+\matchItem{1}{сторона квадрата}
+\matchItem{2}{$KM$}
+\matchItem{3}{відстань від точки $A$ до центра кола, описаного навколо трикутника $KMC$}
+}{
+\matchHead{Довжина відрізка}
+\matchItem{А}{6 \textit{см}}
+\matchItem{Б}{$6\sqrt{2}$ \textit{см}}
+\matchItem{В}{12 \textit{см}}
+\matchItem{Г}{$8\sqrt{2}$ \textit{см}}
+\matchItem{Д}{$9\sqrt{2}$ \textit{см}}
+}{
+\matchingGrid
+}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 32
-\zadtask{У рівносторонньому трикутнику $ABC$ $AB = 24$ \textit{см}. З точки $K$, що є серединою сторони $AB$, на сторону $AC$ опущено перпендикуляр $KM$ (див. рисунок). До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У рівносторонньому трикутнику $ABC$ $AB = 24$ \textit{см}. З точки $K$, що є серединою сторони $AB$, на сторону $AC$ опущено перпендикуляр $KM$ (див. рисунок). До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.868]%@N 6.18x5.53 S
+\coordinate (A) at (0,0);
+    \coordinate (C) at (5,0);
+    \coordinate (B) at (2.5,4.33);
+    \coordinate (K) at ($(A)!0.5!(B)$);
+    \coordinate (M) at (1.25,0);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (K) -- (M);
+    \pic[draw, angle radius=0.26cm] {right angle = K--M--A};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (C) {$C$};
+    \node[above] at (B) {$B$};
+    \node[above left] at (K) {$K$};
+    \node[below] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
-\matchItem{1}{Відстань від точки $K$ до}
-\quad\quad середини сторони $BC$
+\matchItem{1}{Відстань від точки $K$ до середини сторони $BC$}
 
 \nmtnobreak
-\matchItem{2}{Відстань від точки $M$ до}
-\quad\quad прямої $BC$
+\matchItem{2}{Відстань від точки $M$ до прямої $BC$}
 
 \nmtnobreak
-\matchItem{3}{Сума радіусів описаного та}
-\quad\quad вписаного в цей трикутник кіл
+\matchItem{3}{Сума радіусів описаного та вписаного в цей трикутник кіл}
 }{
 \matchHead{Закінчення речення}
 \matchItem{А}{дорівнює $12$ \textit{см}.}
@@ -2131,51 +1867,43 @@ III. & Діагональ квадрата ділить його на два р�
 }{
 \matchingGrid
 }
-\hfill
-\begin{minipage}[t]{0.22\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.95]
-    % Рівносторонній трикутник
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (4,0);
-    \coordinate (C) at (2,3.46);
 
-    % Середина AB
-    \coordinate (K) at (0.75,0);
-
-    % Точка M на AC (проекція K)
-    \coordinate (M) at (0.75,1.3);
-
-    % Трикутник
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Перпендикуляр KM
-    \draw[thick] (K) -- (M);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[below right] at (B) {$B$};
-    \node[above] at (C) {$B$};
-    \node[below] at (K) {$K$};
-    \node[left] at (M) {$M$};
-    \pic[draw, angle radius=0.2cm] {right angle = A--K--M};
-\end{tikzpicture}\end{nmtfit}
-\end{flushright}
-\end{minipage}
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 33
-\zadtask{На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90°$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює 10 \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено прямокутний трикутник $ABC$ ($\angle C = 90°$). Точка $M$ --- середина $CB = 16$ \textit{см}. Радіус кола, описаного навколо трикутника $ABC$, дорівнює 10 \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    \def\nmttick#1#2{\path[draw, thick] let \p1=($(#1)!0.5!(#2)$), \p2=($(#2)-(#1)$), \n1={atan2(\y2,\x2)+90} in (\x1,\y1) ++(\n1:0.09) -- ++(\n1+180:0.18);}
+    \coordinate (C) at (0,0);
+    \coordinate (B) at (4.8,0);
+    \coordinate (A) at (0,3.6);
+    \coordinate (M) at (2.4,0);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thin] (A) -- (M);
+    \pic[draw, angle radius=0.26cm]{right angle=B--C--A};
+    \nmttick{C}{M}
+    \nmttick{M}{B}
+    \node[nmt dot] at (M) {};
+    \node[above left] at (A) {$A$};
+    \node[below right] at (B) {$B$};
+    \node[below left] at (C) {$C$};
+    \node[below] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AC$}
-\matchItem{2}{найбільша середня}
-\quad\quad лінія трикутника $ABC$
+\matchItem{2}{найбільша середня лінія трикутника $ABC$}
 
 \nmtnobreak
 \matchItem{3}{$AM$}
@@ -2189,57 +1917,44 @@ III. & Діагональ квадрата ділить його на два р�
 }{
 \matchingGrid
 }
-\hfill
-\begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-    % Прямокутний трикутник
-    \coordinate (A) at (0,4);
-    \coordinate (B) at (4,0);
-    \coordinate (C) at (0,0);
 
-    % Середина CB
-    \coordinate (M) at (2,0);
-
-    % Трикутник
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-
-    % Прямий кут при C
-    \draw (0,0.4) -- (0.4,0.4) -- (0.4,0);
-
-    % Риски рівності на CM і MB
-    \draw[thick] (0.9,-0.15) -- (0.9,0.15);
-    \draw[thick] (A) -- (M);
-    \draw[thick] (1.05,-0.15) -- (1.05,0.15);
-    \draw[thick] (2.95,-0.15) -- (2.95,0.15);
-    \draw[thick] (3.1,-0.15) -- (3.1,0.15);
-
-    % Підписи
-    \node[above left] at (A) {$A$};
-    \node[right] at (B) {$B$};
-    \node[below left] at (C) {$C$};
-    \node[below] at (M) {$M$};
-\end{tikzpicture}\end{nmtfit}
-\end{flushright}
-\end{minipage}
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 35
-\zadtask{На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90°$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює 24 \textit{см}, середня лінія трапеції $AKCD$ дорівнює 10 \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90°$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює 24 \textit{см}, середня лінія трапеції $AKCD$ дорівнює 10 \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.851, line join=round]%@N 3.22x5.64 S
 
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,2);
+    \coordinate (C) at (2,2);
+    \coordinate (D) at (2,0);
+    \coordinate (K) at (0,4.45);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (K) -- (B);
+    \draw[thick] (K) -- (C);
+    \pic[draw, angle radius=0.26cm] {right angle = K--B--C};
+    \node[below left] at (A) {$A$};
+    \node[left] at (B) {$B$};
+    \node[right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above left] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BK$}
 \matchItem{2}{$KC$}
-\matchItem{3}{відстань між центрами кіл,}
-\quad\quad описаних навколо квадрата
-
-\nmtnobreak
-\quad\quad $ABCD$ та трикутника $KBC$
+\matchItem{3}{відстань між центрами кіл, описаних навколо квадрата $ABCD$ та трикутника $KBC$}
 }{
 \matchHead{Довжина відрізка}
 \matchItem{А}{$6$ \textit{см}}
@@ -2250,38 +1965,8 @@ III. & Діагональ квадрата ділить його на два р�
 }{
 \matchingGrid
 }
-\hfill
-\begin{minipage}[t]{0.3\textwidth}\nbvspace{0pt}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-    % Квадрат ABCD (A внизу ліворуч, за годинниковою)
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
 
-    % Точка K над B
-    \coordinate (K) at (0,8);
-
-    % Квадрат
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Трикутник KBC
-    \draw[thick] (K) -- (B);
-    \draw[thick] (K) -- (C);
-
-    % Прямий кут при B
-    \draw (0,4.4) -- (0.4,4.4) -- (0.4,4);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[left] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \node[above left] at (K) {$K$};
-\end{tikzpicture}\end{nmtfit}
-\end{flushright}
-\end{minipage}
+ \nbvspace{0pt}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
@@ -2294,8 +1979,7 @@ III. & Діагональ квадрата ділить його на два р�
 \matchingLayout{
 \matchHead{Геометрична фігура}
 \matchItem{1}{ромб з висотою 4 \textit{см}}
-\matchItem{2}{трикутник з площею 24 \textit{см}$^2$}
-\quad\quad та периметром 12 \textit{см}
+\matchItem{2}{трикутник з площею 24 \textit{см}$^2$ та периметром 12 \textit{см}}
 
 \nmtnobreak
 \matchItem{3}{квадрат з периметром 64 \textit{см}}
@@ -2315,9 +1999,30 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % Завдання 45
 \zadtask{На рисунку зображено два рівні рівнобедрені трикутники $ABC$ ($AB = BC$) і $CMN$ ($CM = MN$), що лежать в одній площині. $AN = 8$ \textit{см}, $AB = 2\sqrt{17}$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
+    \coordinate (A) at (0,0);
+    \coordinate (C) at (2.7,0);
+    \coordinate (N) at (5.4,0);
+    \coordinate (B) at (1.35,3.4);
+    \coordinate (M) at (4.05,3.4);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thick] (C) -- (M) -- (N) -- cycle;
+    \nmtEq{A}{B}{1}
+    \nmtEq{B}{C}{1}
+    \nmtEq{C}{M}{1}
+    \nmtEq{M}{N}{1}
+    \node[below left] at (A) {$A$};
+    \node[below] at (C) {$C$};
+    \node[below right] at (N) {$N$};
+    \node[above] at (B) {$B$};
+    \node[above] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{Відстань від $B$ до сторони $AC$}
@@ -2334,44 +2039,41 @@ III. & Діагональ квадрата ділить його на два р�
 \matchingGrid
 }
 \nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Точки
-    \coordinate (A) at (0,0);
-    \coordinate (C) at (4,0);
-    \coordinate (N) at (8,0);
-    \coordinate (B) at (2,2.5);
-    \coordinate (M) at (6,2.5);
-
-    % Трикутники
-    \draw[thick] (A) -- (B) -- (C) -- cycle;
-    \draw[thick] (C) -- (M) -- (N) -- cycle;
-
-    % Позначки рівних сторін (трикутник ABC)
-    \draw (0.85,1.35) -- (1.05,1.15);
-    \draw (3.15,1.35) -- (2.95,1.15);
-
-    % Позначки рівних сторін (трикутник CMN)
-    \draw (4.85,1.35) -- (5.05,1.15);
-    \draw (7.15,1.35) -- (6.95,1.15);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[below] at (C) {$C$};
-    \node[below right] at (N) {$N$};
-    \node[above] at (B) {$B$};
-    \node[above] at (M) {$M$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 47
-\zadtask{Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Коло із центром у точці $O$ дотикається трьох сторін прямокутника $ABCD$ (див. рисунок). Вершина $K$ прямокутного рівнобедреного трикутника $AKB$ належить колу. $AB = 12$ \textit{см}. Доберіть до кожного початку речення \mbox{(1--3)} його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.833, tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]%@N 7.21x5.20 S
 
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,4);
+    \coordinate (C) at (6,4);
+    \coordinate (D) at (6,0);
+    \coordinate (O) at (4,2);
+    \coordinate (K) at (2,2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (O) circle (2);
+    \draw[thick] (A) -- (K) node[midway, tick] {} -- (B) node[midway, tick] {};
+    \pic[draw, angle radius=0.26cm] {right angle = B--K--A};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (O) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[right] at (K) {$K$};
+    \node[above right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина радіуса $OK$ кола дорівнює}
@@ -2388,55 +2090,39 @@ III. & Діагональ квадрата ділить його на два р�
 \matchingGrid
 }
 \nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Прямокутник ABCD
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (6,4);
-    \coordinate (D) at (6,0);
-
-    % Центр кола O (на AD, праворуч)
-    \coordinate (O) at (4,2);
-
-    % Точка K (на колі, де дотикається трикутник)
-    \coordinate (K) at (2,2);
-
-    % Прямокутник
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Коло
-    \draw[thick] (O) circle (2);
-
-    % Трикутник AKB
-    \draw[thick] (A) -- (K) -- (B);
-
-    % Діагоналі трикутника (позначки рівних сторін)
-    \draw (0.85,0.85) -- (1.15,1.15);
-    \draw (0.85,3.15) -- (1.15,2.85);
-
-    % Прямий кут при K
-    \pic[draw, angle radius=0.3cm] { right angle = A--K--B};
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \node[right] at (K) {$K$};
-    \node[above] at (4.3,2) {$O$};
-    \fill (O) circle (2pt);
-\end{tikzpicture}\end{nmtfit}
-\end{center}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 51
-\zadtask{На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури \mbox{(1--3)} її площу \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено прямокутник $ABCD$, $O$ --- точка перетину його діагоналей. $AB = 6$ \textit{см}, $AD = 8$ \textit{см}, $OM$ --- перпендикуляр, проведений з точки $O$ до сторони $AD$. Доберіть до геометричної фігури \mbox{(1--3)} її площу \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=0.905]%@N 6.61x4.80 S
+\coordinate (A) at (0,0);
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (5.4,3.6);
+    \coordinate (D) at (5.4,0);
+    \coordinate (O) at (2.7,1.8);
+    \coordinate (M) at (2.7,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (B) -- (D);
+    \draw[thin] (O) -- (M);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[above] at (O) {$O$};
+    \node[below] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Фігура}
 \matchItem{1}{трикутник $ABD$}
@@ -2453,54 +2139,55 @@ III. & Діагональ квадрата ділить його на два р�
 \matchingGrid
 }
 \nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1]
-    % Прямокутник ABCD
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \coordinate (C) at (4,3);
-    \coordinate (D) at (4,0);
-
-    % Центр O
-    \coordinate (O) at (2,1.5);
-
-    % Точка M (проекція O на AD)
-    \coordinate (M) at (2,0);
-
-    % Прямокутник
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-    % Діагоналі
-    \draw[thick] (A) -- (C);
-    \draw[thick] (B) -- (D);
-
-    % Перпендикуляр OM
-    \draw[thick] (O) -- (M);
-
-    % Підписи
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \node[above] at (O) {$O$};
-    \node[below] at (M) {$M$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % Завдання 53
 \zadtask{На паралельних прямих $n$ і $m$ розміщено сторони прямокутника $ABCD$ й паралелограма $DKLM$, вершини $L$ і $Q$ трикутника $LQP$ (див. рисунок). $BC = KL = 6$ \textit{см}, $AB : BC = 4 : 3$, $LP = PQ$, $\angle LPQ = 60°$, діагональ $KM$ паралелограма й сторона $LQ$ трикутника $LPQ$ перпендикулярні до прямої $n$. Установіть відповідність між фігурою \mbox{(1--3)} та її периметром \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\includegraphics[scale=0.5]{parallel_lines_figures.png}
+\begin{nmtfit}\begin{tikzpicture}[scale=1, line join=round]
+    % за оригіналом НМТ 2025: смуга між паралельними прямими m і n; прямокутник ABCD, паралелограм DKLM, правильний трикутник LQP (риски на LP і PQ)
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,3.6);
+    \coordinate (C) at (2.7,3.6);
+    \coordinate (D) at (2.7,0);
+    \coordinate (M) at (5.4,0);
+    \coordinate (K) at (5.4,3.6);
+    \coordinate (L) at (8.1,3.6);
+    \coordinate (Q) at (8.1,0);
+    \coordinate (P) at (11.218,1.8);
+    \fill[nmtFillA] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[nmtFillE] (D) -- (K) -- (L) -- (M) -- cycle;
+    \fill[nmtFillC] (L) -- (Q) -- (P) -- cycle;
+    \draw[thick] (-1.7,3.6) -- (12.3,3.6);
+    \draw[thick] (-1.7,0) -- (12.3,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D);
+    \draw[thick] (D) -- (K) -- (L) -- (M);
+    \draw[thin] (K) -- (M);
+    \draw[thick] (L) -- (Q) -- (P) -- cycle;
+    \nmtEq{L}{P}{1}
+    \nmtEq{P}{Q}{1}
+    \pic[draw, angle radius=0.26cm]{right angle=K--M--D};
+    \pic[draw, angle radius=0.26cm]{right angle=L--Q--M};
+    \pic[draw, angle radius=0.45cm] {angle=L--P--Q};
+    \nmtAngleLabel{L}{P}{Q}{0.45}{$60^\circ$}
+    \node[above right] at (-1.7,3.6) {$m$};
+    \node[above right] at (-1.7,0) {$n$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[above] at (K) {$K$};
+    \node[above] at (L) {$L$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[below] at (M) {$M$};
+    \node[below] at (Q) {$Q$};
+    \node[right] at (P) {$P$};
+\end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Фігура}
 \matchItem{1}{прямокутник $ABCD$}
@@ -2522,57 +2209,36 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{samepage}
 % Завдання 58
 \zadtask{На паралельних прямих $n$ і $m$ розміщено круговий сектор $ABC$, рівнобедрений трикутник $DKL$ ($DK = KL$) й паралелограм $LMNP$ (див. рисунок). Площа сектора $ABC$ дорівнює $64\pi$ \textit{см}$^2$, площа паралелограма $LMNP$ дорівнює 288 \textit{см}$^2$, $DK = 20$ \textit{см}. Увідповідніть відрізок \mbox{(1--3)} та його довжину \mbox{(А--Д)}. \nmtyear{2025}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-    % Паралельні прямі
-    \draw[thick] (-0.5,3) -- (14,3);
-    \draw[thick] (-0.5,0) -- (14,0);
-    \node[left] at (-0.5,3) {$m$};
-    \node[left] at (-0.5,0) {$n$};
+\begin{nmtfit}\begin{tikzpicture}[scale=1.19, line join=round]%@N 9.28x3.29 C
 
-    % Круговий сектор ABC (жовтий)
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,3);
-    \fill[yellow!30] (A) -- (B) arc (90:0:3) -- cycle;
-    \draw[thick] (A) -- (B) arc (90:0:3) -- cycle;
-    \coordinate (C) at (3,0);
-
-    % Рівнобедрений трикутник DKL (блакитний)
-    \coordinate (D) at (4,0);
-    \coordinate (K) at (5.5,3);
-    \coordinate (L) at (7,0);
-    \fill[cyan!30] (D) -- (K) -- (L) -- cycle;
-    \draw[thick] (D) -- (K) -- (L) -- cycle;
-
-    % Позначки рівних сторін DK = KL
-    \draw (4.6,1.6) -- (4.8,1.4);
-    \draw (6.4,1.6) -- (6.2,1.4);
-
-    % Паралелограм LMNP (рожевий)
-    \coordinate (M) at (9,3);
-    \coordinate (N) at (13,3);
-    \coordinate (P) at (11,0);
-    \fill[pink!50] (L) -- (M) -- (N) -- (P) -- cycle;
+    % за оригіналом: B -- центр сектора на прямій m, C на m, A на n; між C і D, K і M проміжки
+    \coordinate (B) at (0,2.087); \coordinate (A) at (0,0); \coordinate (C) at (2.087,2.087);
+    \coordinate (D) at (1.851,0); \coordinate (K) at (3.04,2.087); \coordinate (L) at (4.226,0);
+    \coordinate (M) at (5.136,2.087); \coordinate (N) at (7.35,2.087); \coordinate (P) at (6.45,0);
+    \fill[nmtFillC] (B) -- (A) arc (-90:0:2.087) -- cycle;
+    \fill[nmtFillA] (D) -- (K) -- (L) -- cycle;
+    \fill[nmtFillE] (L) -- (M) -- (N) -- (P) -- cycle;
+    \draw[thick] (-1.0,2.087) -- (8.2,2.087);
+    \draw[thick] (-1.0,0) -- (8.25,0);
+    \draw[thick] (A) -- (B);
+    \draw[thick] (A) arc (-90:0:2.087);
+    \draw[thick] (D) -- (K) -- (L);
     \draw[thick] (L) -- (M) -- (N) -- (P) -- cycle;
-
-    % Підписи
-    \node[below] at (A) {$A$};
+    \node[above right] at (-1.0,2.087) {$m$};
+    \node[above right] at (-1.0,0) {$n$};
     \node[above] at (B) {$B$};
-    \node[below] at (C) {$C$};
-    \node[below] at (D) {$D$};
+    \node[above] at (C) {$C$};
     \node[above] at (K) {$K$};
-    \node[below] at (L) {$L$};
     \node[above] at (M) {$M$};
     \node[above] at (N) {$N$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[below] at (L) {$L$};
     \node[below] at (P) {$P$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AB$}
@@ -2593,29 +2259,32 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №16 --- основна тема: Квадрат
-\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами \mbox{(1--3)} та їхніми значеннями \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{На рисунку зображено квадрат $ABCD$ та рівнобедрений прямокутний трикутник $KBC$ (прямий кут при вершині $K$), які мають спільну сторону $BC$. Точка $M$~--- середина сторони $CD$. Довжина ламаної $BADM$ дорівнює $20$. Установіть відповідність між величинами \mbox{(1--3)} та їхніми значеннями \mbox{(А--Д)}. \nmtyear{2026}\par}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=1]
+    % риски рівних відрізків: \nmtEq{P}{Q}{кількість} -- 1-3 риски по 0,18 см поперек відрізка PQ посередині
+    \def\nmtTk#1#2#3#4{\coordinate (tk0) at ($(#1)!#3!(#2)$);\coordinate (tk1) at ($(tk0)!#4!(#2)$);\draw[thin] ($(tk1)!0.09cm!90:(#2)$) -- ($(tk1)!0.09cm!-90:(#2)$);}
+    \def\nmtEq#1#2#3{\ifcase#3\or\nmtTk{#1}{#2}{0.5}{0cm}\or\nmtTk{#1}{#2}{0.5}{-0.05cm}\nmtTk{#1}{#2}{0.5}{0.05cm}\or\nmtTk{#1}{#2}{0.5}{-0.1cm}\nmtTk{#1}{#2}{0.5}{0cm}\nmtTk{#1}{#2}{0.5}{0.1cm}\fi}
     \coordinate (A) at (0,0);
-    \coordinate (B) at (0,4);
-    \coordinate (C) at (4,4);
-    \coordinate (D) at (4,0);
-    \coordinate (K) at (2,6);
-    \coordinate (Mid) at (4,2);
+    \coordinate (B) at (0,2.6);
+    \coordinate (C) at (2.6,2.6);
+    \coordinate (D) at (2.6,0);
+    \coordinate (K) at (1.3,3.9);
+    \coordinate (M) at (2.6,1.3);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
     \draw[thick] (B) -- (K) -- (C);
-    \fill (Mid) circle (2pt);
+    \nmtEq{B}{K}{1}
+    \nmtEq{K}{C}{1}
+    \node[nmt dot] at (M) {};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[above] at (K) {$K$};
-    \node[right] at (Mid) {$M$};
+    \node[right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
-\noindent
 \matchingLayout{
 \matchHead{Величина}
 \matchItem{1}{довжина сторони квадрата}
@@ -2631,7 +2300,7 @@ III. & Діагональ квадрата ділить його на два р�
 }{
 \matchingGrid
 }
-}
+
 % Відповідь: 1~--~Д, 2~--~А, 3~--~Г
 \ifshowsolutions\solution{Нехай сторона квадрата $a$. Ламана $BADM=BA+AD+DM=a+a+\dfrac a2=\dfrac{5a}{2}=20$, звідки $a=8$ (\textbf{1}~--~Д). Висота трикутника до $BC$ дорівнює $\dfrac a2=4$, тож відстань від $K$ до $AD$: $a+\dfrac a2=12$ (\textbf{2}~--~А). У координатах $K(4;12)$, $M(8;4)$: $KM=\sqrt{4^2+8^2}=\sqrt{80}=4\sqrt5$ (\textbf{3}~--~Г). Відповідь: \textbf{1~--~Д, 2~--~А, 3~--~Г}.}\fi
 \par\penalty-20
@@ -2639,30 +2308,37 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 3.06, завдання №18 --- основна тема: Прямокутник
-\zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.17, thick]
-    \coordinate (A) at (0,0);
-    \coordinate (B) at (0,16);
-    \coordinate (Cc) at (12,16);
-    \coordinate (D) at (12,0);
-    \coordinate (M) at (36,0);
-    \coordinate (K) at (24,32);
-    \draw[thick] (A) -- (B) -- (Cc) -- (D) -- cycle;
-    \draw[thick] (A) -- (M);
-    \draw[thick] (D) -- (K) -- (M);
-    \draw[thick] (A) -- (K);
-    \fill (K) circle (3pt); \node[above, font=\scriptsize] at (K) {$K$};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above left, font=\scriptsize] at (B) {$B$};
-    \node[above, font=\scriptsize] at (Cc) {$C$};
-    \node[below, font=\scriptsize] at (D) {$D$};
-    \node[below right, font=\scriptsize] at (M) {$M$};
-\end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\nbvspace{0.2cm}
 \noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено прямокутник $ABCD$ та рівнобедрений трикутник $DKM$ ($DK = KM$). Пряма, що містить діагональ $AC$ прямокутника, проходить через точку $K$. $AB = 16$ см, $AD = 12$ см, $DM = 2AD$. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.954, tick/.style={sloped, draw, thick, inner sep=0pt, minimum width=0pt, minimum height=0.18cm}]%@N 5.60x5.03 S
+
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (0,1.92);
+    \coordinate (C) at (1.44,1.92);
+    \coordinate (D) at (1.44,0);
+    \coordinate (M) at (4.32,0);
+    \coordinate (K) at (2.88,3.84);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (D) -- (M);
+    \draw[thick] (A) -- (K);
+    \draw[thin] (A) -- ++(-0.252,-0.336);
+    \draw[thin] (K) -- ++(0.288,0.384);
+    \draw[thick] (D) -- (K) node[midway, tick] {} ;
+    \draw[thick] (K) -- (M) node[midway, tick] {};
+    \node[above left] at (K) {$K$};
+    \node[below right] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above left] at (C) {$C$};
+    \node[below] at (D) {$D$};
+    \node[below right] at (M) {$M$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина відрізка $AM$ дорівнює}
@@ -2685,56 +2361,53 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №18
-\zadtask{Прямокутні рівнобедрені трикутники $ABC$ і $KMN$ є рівними (див. рисунок). Точки $K$, $C$, $N$ і $A$ лежать на прямій $AK$, причому $AN = NC = CK$. $AC = 12$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.2cm}
 \noindent
-\begin{minipage}[c]{0.62\textwidth}
-\begin{minipage}[t]{0.55\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Прямокутні рівнобедрені трикутники $ABC$ і $KMN$ є рівними (див. рисунок). Точки $K$, $C$, $N$ і $A$ лежать на прямій $AK$, причому $AN = NC = CK$. $AC = 12$~см. Установіть відповідність між відрізком \mbox{(1--3)} та його довжиною \mbox{(А--Д)}. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    \def\nmttick#1#2{\path[draw, thick] let \p1=($(#1)!0.5!(#2)$), \p2=($(#2)-(#1)$), \n1={atan2(\y2,\x2)+90} in (\x1,\y1) ++(\n1:0.09) -- ++(\n1+180:0.18);}
+    \coordinate (K) at (0,0);
+    \coordinate (M) at (2.9,0);
+    \coordinate (N) at (2.9,-2.9);
+    \coordinate (C) at (1.45,-1.45);
+    \coordinate (B) at (1.45,-4.35);
+    \coordinate (A) at (4.35,-4.35);
+    \draw[thick] (K) -- (M) -- (N);
+    \draw[thick] (C) -- (B) -- (A);
+    \draw[thick] (K) -- (A);
+    \pic[draw, angle radius=0.26cm]{right angle=K--M--N};
+    \pic[draw, angle radius=0.26cm]{right angle=A--B--C};
+    \nmttick{C}{N}
+    \nmttick{N}{A}
+    \node[nmt dot] at (C) {};
+    \node[nmt dot] at (N) {};
+    \node[above left] at (K) {$K$};
+    \node[above right] at (M) {$M$};
+    \node[below left] at (C) {$C$};
+    \node[above right] at (N) {$N$};
+    \node[below left] at (B) {$B$};
+    \node[below right] at (A) {$A$};
+\end{tikzpicture}\end{nmtfit}
+\end{minipage}
+\par\nbvspace{0.2cm}
+\matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AK$}
 \matchItem{2}{$AB$}
 \matchItem{3}{$BM$}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.42\textwidth}
+}{
 \matchHead{Довжина відрізка}
 \matchItem{А}{$6\sqrt{2}$~см}
 \matchItem{Б}{$6\sqrt{5}$~см}
 \matchItem{В}{$12\sqrt{2}$~см}
 \matchItem{Г}{$18$~см}
 \matchItem{Д}{$24$~см}
-\end{minipage}
-\par\nbvspace{0.3cm}
+}{
 \matchingGrid
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.36\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick]
-    \coordinate (K) at (-3,3);
-    \coordinate (M) at (1,3);
-    \coordinate (N) at (1,-1);
-    \coordinate (C) at (-1,1);
-    \coordinate (B) at (-1,-3);
-    \coordinate (A) at (3,-3);
-    \draw (K) -- (M) -- (N);
-    \draw (C) -- (B) -- (A);
-    \draw (K) -- (A);
-    \draw (M) ++(-0.4,0) -- ++(0,-0.4) -- ++(0.4,0);
-    \draw (B) ++(0,0.4) -- ++(0.4,0) -- ++(0,-0.4);
-    \draw (-2-0.15, 2-0.15) -- (-2+0.15, 2+0.15);
-    \draw (0-0.15, 0-0.15) -- (0+0.15, 0+0.15);
-    \draw (2-0.15, -2-0.15) -- (2+0.15, -2+0.15);
-    \fill (C) circle (2pt);
-    \fill (N) circle (2pt);
-    \node[above left] at (K) {$K$};
-    \node[above right] at (M) {$M$};
-    \node[left] at (-1.1, 0.9) {$C$};
-    \node[right] at (1.1, -0.9) {$N$};
-    \node[below left] at (B) {$B$};
-    \node[below right] at (A) {$A$};
-\end{tikzpicture}\end{nmtfit}
-\end{minipage}
 }
 % Відповідь: 1~--~Г, 2~--~А, 3~--~Б
 \ifshowsolutions\solution{$AC$~--- гіпотенуза рівнобедреного прямокутного $\triangle ABC$, тож катети $AB=BC=\dfrac{AC}{\sqrt2}=\dfrac{12}{\sqrt2}=6\sqrt2$~см (А). Оскільки $AN=NC=CK=\dfrac{AC}{2}=6$, маємо $AK=AN+NC+CK=18$~см (Г). Точка $B$ лежить на відстані катета від $C$; $BN$ обчислюється з прямокутного трикутника $BCN$ ($BC=6\sqrt2$, $CN=6$): тоді й $BM=\sqrt{BC^2+CM^2}$ дає $6\sqrt5$~см (Б). Відповідь: \textbf{1~--~Г, 2~--~А, 3~--~Б}.}\fi
@@ -2743,10 +2416,15 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №18
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку зображено правильний трикутник $ABC$ та прямокутні рівнобедрені трикутники $AKB$ і $BMC$. Установіть відповідність між кутом \mbox{(1--3)} та його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1.9, thick]
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.82, line join=round]%@N 6.75x4.66 S
+
     \coordinate (A) at (0,0);
     \coordinate (C) at (2,0);
     \coordinate (B) at (1,1.732);
@@ -2756,18 +2434,16 @@ III. & Діагональ квадрата ділить його на два р�
     \draw[thick] (A) -- (K) -- (B);
     \draw[thick] (B) -- (M) -- (C);
     \draw[thick] (A) -- (M);
-    \draw[thick] (K) -- (B);
-    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = A--K--B};
-    \pic[draw=yearOrange, line width=0.5pt, angle radius=0.3cm] {right angle = B--M--C};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above, font=\scriptsize] at (B) {$B$};
-    \node[below right, font=\scriptsize] at (C) {$C$};
-    \node[left, font=\scriptsize] at (K) {$K$};
-    \node[right, font=\scriptsize] at (M) {$M$};
+    \pic[draw, angle radius=0.26cm] {right angle = B--K--A};
+    \pic[draw, angle radius=0.26cm] {right angle = C--M--B};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[above left] at (K) {$K$};
+    \node[above right] at (M) {$M$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\nbvspace{0.2cm}
-\noindent
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Кут}
 \matchItem{1}{$\angle ACM$}
@@ -2799,53 +2475,57 @@ III. & Діагональ квадрата ділить його на два р�
 \begin{minipage}[t]{0.51\textwidth}
 \matchHead{Трикутник $ABC$}
 % 1
-\noindent\textbf{1}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[baseline=0cm, scale=0.55, thick, line join=round]
+\noindent\textbf{1}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.741, baseline=0.3cm]%@N 6.18x2.90 S
+
     \coordinate (A) at (0,0);
-    \coordinate (C) at (4.6,0);
-    \coordinate (B) at (2.9,0.9);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \pic[draw, angle radius=0.12cm, pic text={\tiny $150^\circ$}, angle eccentricity=1.9] {angle = A--B--C};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above, font=\scriptsize] at (B) {$B$};
-    \node[below right, font=\scriptsize] at (C) {$C$};
-    \node[right, font=\scriptsize] at (5.0,0.5) {$AB\cdot BC = 48,\ \angle B = 150^\circ$};
+    \coordinate (B) at (2.2,1.2);
+    \coordinate (C) at (5,0);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \pic[draw, angle radius=0.22cm]{angle=A--B--C};
+    \nmtAngleLabel{A}{B}{C}{0.22}{$150^\circ$}
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[anchor=south west, inner sep=0pt] at (-0.2,1.9) {$AB\cdot BC=48,\ \angle B=150^\circ$};
 \end{tikzpicture}\end{nmtfit}
 \par\nbvspace{0.5cm}
 % 2
-\noindent\textbf{2}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[baseline=0cm, scale=0.5, thick, line join=round]
+\noindent\textbf{2}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.741, baseline=1.0cm]%@N 6.18x4.05 S
+
     \coordinate (A) at (0,0);
+    \coordinate (H) at (1.9,0);
     \coordinate (C) at (5,0);
-    \coordinate (H) at (2,0);
-    \coordinate (B) at (2,2.4);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (B) -- (H);
-    \pic[draw, angle radius=0.2cm] {right angle = B--H--C};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above, font=\scriptsize] at (B) {$B$};
-    \node[below right, font=\scriptsize] at (C) {$C$};
-    \node[below, font=\scriptsize] at (H) {$H$};
-    \node[right, font=\scriptsize] at (5.3,1.2) {$BH = 4,\ AC = 9$};
+    \coordinate (B) at (1.9,2.3);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thin] (B) -- (H);
+    \pic[draw, angle radius=0.26cm]{right angle=C--H--B};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[below] at (H) {$H$};
+    \node[anchor=south west, inner sep=0pt] at (-0.2,3.05) {$BH=4,\ AC=9$};
 \end{tikzpicture}\end{nmtfit}
 \par\nbvspace{0.5cm}
 % 3
-\noindent\textbf{3}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[baseline=0cm, scale=0.55, thick, line join=round]
+\noindent\textbf{3}\hspace{0.3cm}\begin{nmtfit}\begin{tikzpicture}[scale=0.741, baseline=1.2cm]%@N 5.21x4.65 S
+
     \coordinate (A) at (0,0);
-    \coordinate (C) at (3.2,0);
-    \coordinate (B) at (0,3.2);
-    \coordinate (O) at (0,1.6);
-    \coordinate (K) at (1.6,1.6);
-    \draw (A) -- (B) -- (C) -- cycle;
-    \draw (O) -- (K);
-    \pic[draw, angle radius=0.2cm] {right angle = O--A--C};
-    \pic[draw, angle radius=0.2cm] {right angle = B--O--K};
-    \path (B) -- (K) node[midway, sloped, font=\tiny] {$|$};
-    \path (K) -- (C) node[midway, sloped, font=\tiny] {$|$};
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[above, font=\scriptsize] at (B) {$B$};
-    \node[below right, font=\scriptsize] at (C) {$C$};
-    \node[left, font=\scriptsize] at (O) {$O$};
-    \node[above right, font=\scriptsize] at (K) {$K$};
-    \node[right, font=\scriptsize] at (3.4,2.2) {$AO = 3,\ OK = 4$};
+    \coordinate (B) at (0,3.0);
+    \coordinate (C) at (4.0,0);
+    \coordinate (O) at (0,1.5);
+    \coordinate (K) at (2.0,1.5);
+    \draw[thick] (A) -- (B) -- (C) -- cycle;
+    \draw[thin] (O) -- (K);
+    \pic[draw, angle radius=0.26cm]{right angle=C--A--B};
+    \pic[draw, angle radius=0.26cm]{right angle=A--O--K};
+    \draw[thin] (0.914,2.147) -- (1.086,2.253);
+    \draw[thin] (2.914,0.647) -- (3.086,0.753);
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[below right] at (C) {$C$};
+    \node[left] at (O) {$O$};
+    \node[above right] at (K) {$K$};
+    \node[anchor=south west, inner sep=0pt] at (0.5,3.65) {$AO=3,\ OK=4$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}%
 \hfill
@@ -2869,28 +2549,28 @@ III. & Діагональ квадрата ділить його на два р�
 
 \begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №18 --- також у темі: Основи планіметрії
-\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{На папері у клітинку зображено точки $A$, $B$, $C$, $K$, $L$ та $M$ (див. рисунок). Кожна клітинка~--- квадрат площею $1$~см$^2$. Установіть відповідність між фігурою \mbox{(1--3)} та її площею \mbox{(А--Д)}. \nmtyear{2026}\par}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.55, thick, line join=round]
-    \draw[step=1cm, gray!40, thin] (-0.5,-0.5) grid (7.5,4.5);
-    % точки: верхній ряд A,B,C; нижній ряд K,L,M
-    \coordinate (A) at (1,3);
-    \coordinate (B) at (3,3);
-    \coordinate (C) at (5,3);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 7.01x4.01 C
+
+    \draw[nmt grid, step=1] (-2,-2) grid (12,6);
+    \coordinate (A) at (1,4);
+    \coordinate (B) at (3,4);
+    \coordinate (C) at (6,4);
     \coordinate (K) at (0,0);
     \coordinate (L) at (2,0);
-    \coordinate (M) at (4,0);
-    \foreach \p/\lab/\pos in {A/A/above, B/B/above, C/C/above, K/K/below, L/L/below, M/M/below} {
-        \fill (\p) circle (2.5pt);
-        \node[\pos, font=\scriptsize] at (\p) {$\lab$};
+    \coordinate (M) at (6,0);
+    \draw[ultra thick, nmtGreen] (K) -- (A) -- (C) -- (M) -- cycle;
+    \draw[ultra thick, nmtGreen] (L) -- (B);
+    \foreach \p/\pos in {A/above left, B/above, C/above, K/below left, L/below, M/below} {
+        \node[nmt dot] at (\p) {};
+        \node[\pos, fill=white, inner sep=1pt, outer sep=1pt] at (\p) {$\p$};
     }
-    \node[font=\scriptsize] at (6.5,3.5) {$1$~см$^2$};
-    \draw[gray!60] (6,3) rectangle (7,4);
+    \draw[very thick, fill=white] (8,3) rectangle (9,4);
+    \node[right, fill=white, inner sep=1.5pt] at (9,3.5) {$1$~\textit{см}$^2$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
 \nopagebreak\nbvspace{0.2cm}
-\noindent
 \matchingLayout{
 \matchHead{Фігура}
 \matchItem{1}{$ACM$}
@@ -2906,7 +2586,7 @@ III. & Діагональ квадрата ділить його на два р�
 }{
 \matchingGrid
 }
-}
+
 % Відповідь: 1--Б,\ \ 2--А,\ \ 3--Г
 \par\penalty-20
 \end{samepage}

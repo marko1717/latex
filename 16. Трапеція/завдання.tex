@@ -1,212 +1,14 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 16}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
-
 \begin{document}
 \begingroup\setcounter{zad}{0}
-% --- макроси, перенесені зі старого файлу теми ---
-\newcommand{\matchingLayout}[3]{
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-       
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
-        \vspace{0pt} % Хаки для вирівнювання minipage по верху
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}
-}
-
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -228,99 +30,48 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
+\graphicspath{{./}{16. Трапеція/}}
 \chapterTitle{Тема 16. Трапеція}
 \noindent{\small\color{gray!80} Розділ 4. Планіметрія \quad\textbullet\quad Усього завдань: 50 (НМТ \mbox{2023~--- 15}, \mbox{2024~--- 16}, \mbox{2025~--- 13}, \mbox{2026~--- 6}); \mbox{тестових~--- 31}; \mbox{на відповідність~--- 19}.}\par\vspace{0.2cm}
 
 \typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.4]
-        % Сітка
-        \draw[step=1cm,gray!50,very thin] (-4,-3) grid (7,5);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.01x4.79 S
 
-        % Осі
-        \draw[->, >=stealth] (-4,0) -- (7,0) node[below]{$x$};
-        \draw[->, >=stealth] (0,-3) -- (0,5) node[left]{$y$};
-
-        % Точки за візуальними координатами:
-        % B(-1, 0), C(-1, 3) - вертикальна сторона
-        % A(6, -2), D(6, 4) - вертикальна сторона
-        % Трапеція "лежача"
-        \coordinate (B) at (-1,0);
-        \coordinate (C) at (-1,3);
-        \coordinate (D) at (6,4);
-        \coordinate (A) at (6,-2);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-        % Підписи точок
-        \node[below] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[above] at (D) {$D$};
-        \node[below] at (A) {$A$};
-
-        \node[above right] at (0,1) {$1$}; % Позначка 1 на y
-        \draw (0.1,1) -- (-0.1,1);
-        \node[above] at (1,0) {$1$};   % Позначка 1 на x
-        \node[below right] at (0,0) {$0$};   % Позначка 1 на x
-        \draw (1,0.1) -- (1,-0.1);
-
-        \fill (A) circle (3pt);
-        \fill (B) circle (3pt);
-        \fill (C) circle (3pt);
-        \fill (D) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \draw[nmt grid, step=1] (-4,-3) grid (6,6);
+    \draw[->] (-4,0) -- (6,0) node[below left] {$x$};
+    \draw[->] (0,-3) -- (0,6) node[left] {$y$};
+    \draw[thin] (1,0.12) -- (1,-0.12);
+    \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \coordinate (B) at (-2,0);
+    \coordinate (C) at (-2,3);
+    \coordinate (D) at (5,4);
+    \coordinate (A) at (5,-2);
+    \draw[very thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \node[nmt dot] at (A) {};
+    \node[nmt dot] at (B) {};
+    \node[nmt dot] at (C) {};
+    \node[nmt dot] at (D) {};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+    \node[above left, fill=white, inner sep=1pt, outer sep=1pt] at (C) {$C$};
+    \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (D) {$D$};
+    \node[below right, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$27$}{$63$}{$31{,}5$}{$29{,}5$}{$32{,}5$}
 \par\penalty-20
 \end{samepage}
@@ -335,54 +86,39 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        % Сітка
-        \draw[step=1cm,gray!50,very thin] (-3,-3) grid (5,6);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.75x4.79 S
 
-        % Осі
-        \draw[->, >=stealth] (-3,0) -- (5,0) node[below]{$x$};
-        \draw[->, >=stealth] (0,-3) -- (0,6) node[left]{$y$};
-
-        % Точки
-        % A(-2, -2)
-        % D(4, -2)
-        % B(-1, 4)
-        % C(2, 4)
+        \draw[nmt grid, step=1] (-3,-3) grid (6,6);
+        \draw[->] (-3,0) -- (6,0) node[below]{$x$};
+        \draw[->] (0,-3) -- (0,6) node[left]{$y$};
         \coordinate (A) at (-2,-2);
         \coordinate (D) at (4,-2);
-        \coordinate (B) at (-1,4);
-        \coordinate (C) at (2,4);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-        \node[left] at (A) {$A$};
-        \node[right] at (D) {$D$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-
-        \node[below left] at (0,0) {$0$};
-        \node[left] at (0,1) {$1$};
+        \coordinate (B) at (0,4);
+        \coordinate (C) at (3,4);
+        \draw[very thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
+        \node[right, fill=white, inner sep=1pt, outer sep=1pt] at (D) {$D$};
+        \node[above left, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+        \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (C) {$C$};
+        \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
         \draw (-0.1,1) -- (0.1,1);
-        \node[below] at (1,0) {$1$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
         \draw (1,-0.1) -- (1,0.1);
-
-        \fill (A) circle (3pt);
-        \fill (B) circle (3pt);
-        \fill (C) circle (3pt);
-        \fill (D) circle (3pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+        \path (A) node[nmt dot] {};
+        \path (B) node[nmt dot] {};
+        \path (C) node[nmt dot] {};
+        \path (D) node[nmt dot] {};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$54$}{$24$}{$27$}{$25$}{$45$}
 \par\penalty-20
 \end{samepage}
@@ -398,11 +134,9 @@
 
 \begin{samepage}
 \zadtask{На сторонах $AB$ та $BC$ довільного трикутника $ABC$ вибрано точки $M$ та $N$ відповідно так, що $AM = MB$, $CN = NB$. Які з наведених тверджень є правильними? \nmtyear{2023}
-\begin{enumerate}[label=\Roman*., nosep, leftmargin=*]
-    \item Чотирикутник $AMNC$ є трапецією.
-    \item Трикутник $MBN$ є рівнобедреним.
-    \item Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.
-\end{enumerate}}
+\nmtStmt{I}{Чотирикутник $AMNC$ є трапецією.}
+\nmtStmt{II}{Трикутник $MBN$ є рівнобедреним.}
+\nmtStmt{III}{Периметр трикутника $MBN$ дорівнює половині периметра трикутника $ABC$.}}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -412,11 +146,9 @@
 
 \begin{samepage}
 \zadtask{Які з наведених тверджень є правильними? \nmtyear{2023}
-\begin{enumerate}[label=\Roman*., nosep, leftmargin=*]
-    \item Середня лінія трапеції проходить через точку перетину її діагоналей.
-    \item Діагональ трапеції ділить її на два рівних трикутники.
-    \item Діагоналі рівнобічної трапеції рівні.
-\end{enumerate}}
+\nmtStmt{I}{Середня лінія трапеції проходить через точку перетину її діагоналей.}
+\nmtStmt{II}{Діагональ трапеції ділить її на два рівних трикутники.}
+\nmtStmt{III}{Діагоналі рівнобічної трапеції рівні.}}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -434,14 +166,15 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ проведено висоту $CK$ так, що $AK = 16$ \textit{см}, $KD = 9$ \textit{см} (див. рисунок). Діагональ $AC$ перпендикулярна до бічної сторони $CD$. Визначте площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У рівнобічній трапеції $ABCD$ проведено висоту $CK$ так, що $AK = 16$ \textit{см}, $KD = 9$ \textit{см} (див. рисунок). Діагональ $AC$ перпендикулярна до бічної сторони $CD$. Визначте площу цієї трапеції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.222]%@N 5.09x3.36 S
+
         % AK=16, KD=9 => AD=25.
         % Висота CK^2 = AK * KD (метричні співвідношення у прямокутному трикутнику ACD)
         % CK^2 = 16 * 9 = 144 => CK = 12.
@@ -479,24 +212,17 @@
         \node[below] at (K) {$K$};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$384$ \textit{см}$^2$}{$240$ \textit{см}$^2$}{$288$ \textit{см}$^2$}{$144$ \textit{см}$^2$}{$192$ \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній трапеції $ABCD$ бічні сторони $AB$ і $CD$ дорівнюють $12$ \textit{см} і $20$ \textit{см} відповідно, а $BC : AD = 3 : 5$ (див. рисунок). Знайдіть площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+\zadtask{У прямокутній трапеції $ABCD$ бічні сторони $AB$ і $CD$ дорівнюють $12$ \textit{см} і $20$ \textit{см} відповідно, а $BC : AD = 3 : 5$ (див. рисунок). Знайдіть площу цієї трапеції. \nmtyear{2023}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.229]%@N 7.21x3.00 C
+
         % AB=12 (висота). CD=20.
         % Проведемо висоту з C на AD (CH). CH=12.
         % Трикутник CHD: CD=20, CH=12 => HD = sqrt(400-144) = 16.
@@ -520,11 +246,8 @@
         \node[below right] at (D) {$D$};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$192$ \textit{см}$^2$}{$96$ \textit{см}$^2$}{$364$ \textit{см}$^2$}{$768$ \textit{см}$^2$}{$384$ \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
@@ -534,9 +257,10 @@
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Існує трапеція, у якої одна з бічних сторін перпендикулярна до її основ. \\
-II. \hspace{0.1em} Існує трапеція, у якої суми протилежних сторін рівні. \\
-III. Існує трапеція, у якої суми протилежних кутів рівні.}
+\nmtStmt{I}{\hspace{0.2em} Існує трапеція, у якої одна з бічних сторін перпендикулярна до її основ.}
+\nmtStmt{II}{\hspace{0.1em} Існує трапеція, у якої суми протилежних сторін рівні.}
+\nmtStmt{III}{Існує трапеція, у якої суми протилежних кутів рівні.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -545,51 +269,44 @@ III. Існує трапеція, у якої суми протилежних к
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено рівнобічну трапецію $ABCD$ ($BC \parallel AD$), $\angle DAB = 28^\circ$ (див. рисунок). Знайдіть градусну міру кута $BCD$. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено рівнобічну трапецію $ABCD$ ($BC \parallel AD$), $\angle DAB = 28^\circ$ (див. рисунок). Знайдіть градусну міру кута $BCD$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        \coordinate (A) at (-8,0);
-        \coordinate (B) at (-4,5);
-        \coordinate (C) at (4,5);
-        \coordinate (D) at (8,0);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-
-        % Кут 28
-        \pic [draw, pic text={\small $28^\circ$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--B};
-
-        % Позначки рівнобічності
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.5) -- ++(-30:1);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.5) -- ++(-120:1);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\tick#1#2{\draw[thin] ($($(#1)!0.5!(#2)$)!0.12cm!90:(#2)$) -- ($($(#1)!0.5!(#2)$)!0.12cm!-90:(#2)$);}
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (6.2,0);
+    \coordinate (B) at (2.1,1.2);
+    \coordinate (C) at (4.1,1.2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \tick{A}{B} \tick{C}{D}
+    \pic[draw, angle radius=0.9cm] {angle = D--A--B};
+    \node at (14:1.55) {$28^\circ$};
+    \node[below left] at (A) {$A$};
+    \node[above] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$152^\circ$}{$162^\circ$}{$142^\circ$}{$62^\circ$}{$118^\circ$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $O$ так, що $BO \parallel CD$, $AO = OD$ (див. рисунок). $AD = 12$, $\angle BAD = \alpha$. Знайдіть площу цієї трапеції. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $O$ так, що $BO \parallel CD$, $AO = OD$ (див. рисунок). $AD = 12$, $\angle BAD = \alpha$. Знайдіть площу цієї трапеції. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.421]%@N 5.40x3.03 S
+
         \coordinate (A) at (-6,0);
         \coordinate (D) at (6,0);
         \coordinate (O) at (0,0);
@@ -620,7 +337,8 @@ III. Існує трапеція, у якої суми протилежних к
         \draw[thick] ($(O)!0.5!(D)$) ++(0.2, -0.3) -- ++(0.2, 0.6); % double
 
         % Angle alpha
-        \pic [draw, pic text={\small $\alpha$}, angle radius=.5cm, angle eccentricity=1.7] {angle = D--A--B};
+        \pic[draw, angle radius=.5cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{\normalsize $\alpha$}
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -628,65 +346,45 @@ III. Існує трапеція, у якої суми протилежних к
         \node[below right] at (D) {$D$};
         \node[below] at (O) {$O$};
 
-        \fill (O) circle (4pt);
+        \path (O) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTableTall{$27\,\mathrm{tg}\,\alpha$}{$27\sin\alpha$}{$54\,\mathrm{tg}\,\alpha$}{$\dfrac{27}{\sin\alpha}$}{$\dfrac{27}{\mathrm{tg}\,\alpha}$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $K$ так, що $BK \parallel CD$, $CK \parallel AB$ (див. рисунок). $KD=8$, $\angle BAD = \beta$. Знайдіть площу цієї трапеції. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $K$ так, що $BK \parallel CD$, $CK \parallel AB$ (див. рисунок). $KD=8$, $\angle BAD = \beta$. Знайдіть площу цієї трапеції. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
-        % AB || CK, BK || CD.
-        % Triangles ABK, KBC, KCD looks congruent equilateral-ish.
-        % Isosceles trapezoid. AB=CD.
-        % AB || CK => ABCK parallelogram => BC = AK, AB = CK.
-        % BK || CD => KBCD parallelogram => BC = KD, BK = CD.
-        % So AK = BC = KD = 8. AD = 16.
-        % Triangles are congruent.
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.855, line join=round]%@N 7.60x4.40 S
 
-        \coordinate (A) at (-8,0);
-        \coordinate (K) at (0,0);
-        \coordinate (D) at (8,0);
-
-        \coordinate (B) at (-4, 6.9); % Height for equilateral roughly
-        \coordinate (C) at (4, 6.9);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (K);
-        \draw[thick] (C) -- (K);
-
-        % Angle beta
-        \pic [draw, pic text={\small $\beta$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--B};
-
-        % Marks on sides
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.4) -- ++(-30:0.8);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.4) -- ++(-120:0.8);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (K) {$K$};
-
-        \fill (K) circle (5pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    % за оригіналом (НМТ 2024, 5.06, № 13, с. 128): AK = KD = BC, K -- середина AD, по одній рисці на бічних сторонах, кут β біля вершини A
+    \coordinate (A) at (0,0);
+    \coordinate (K) at (3.2,0);
+    \coordinate (D) at (6.4,0);
+    \coordinate (B) at (1.6,3.2);
+    \coordinate (C) at (4.8,3.2);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (K) -- (C);
+    \foreach \p/\q in {A/B, D/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
+    \pic[draw, angle radius=0.5cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.5}{$\beta$}
+    \node[nmt dot] at (K) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTableTall{$12\sin\beta$}{$12\,\mathrm{tg}\,\beta$}{$\dfrac{48}{\mathrm{tg}\,\beta}$}{$48\,\mathrm{tg}\,\beta$}{$\dfrac{12}{\mathrm{tg}\,\beta}$}
 \par\penalty-20
 \end{samepage}
@@ -696,9 +394,10 @@ III. Існує трапеція, у якої суми протилежних к
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Середня лінія трапеції дорівнює півсумі її бічних сторін. \\
-II. \hspace{0.1em} Середня лінія трапеції ділить трапецію на рівні за площею фігури. \\
-III. Середня лінія трапеції паралельна її основам.}
+\nmtStmt{I}{\hspace{0.2em} Середня лінія трапеції дорівнює півсумі її бічних сторін.}
+\nmtStmt{II}{\hspace{0.1em} Середня лінія трапеції ділить трапецію на рівні за площею фігури.}
+\nmtStmt{III}{Середня лінія трапеції паралельна її основам.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -711,9 +410,10 @@ III. Середня лінія трапеції паралельна її осн
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Півсума довжин бічних сторін будь-якої трапеції дорівнює її середній лінії. \\
-II. \hspace{0.1em} Діагональ будь-якої трапеції ділить її на 2 рівні трикутники. \\
-III. Середня лінія будь-якої трапеції ділить її висоту навпіл.}
+\nmtStmt{I}{\hspace{0.2em} Півсума довжин бічних сторін будь-якої трапеції дорівнює її середній лінії.}
+\nmtStmt{II}{\hspace{0.1em} Діагональ будь-якої трапеції ділить її на 2 рівні трикутники.}
+\nmtStmt{III}{Середня лінія будь-якої трапеції ділить її висоту навпіл.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -726,9 +426,10 @@ III. Середня лінія будь-якої трапеції ділить �
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} У будь-яку рівнобічну трапецію можна вписати коло. \\
-II. \hspace{0.1em} Довжина радіуса вписаного в ромб кола дорівнює половині його висоти. \\
-III. Навколо будь-якої рівнобічної трапеції можна описати коло.}
+\nmtStmt{I}{\hspace{0.2em} У будь-яку рівнобічну трапецію можна вписати коло.}
+\nmtStmt{II}{\hspace{0.1em} Довжина радіуса вписаного в ромб кола дорівнює половині його висоти.}
+\nmtStmt{III}{Навколо будь-якої рівнобічної трапеції можна описати коло.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -741,9 +442,10 @@ III. Навколо будь-якої рівнобічної трапеції м
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Діагональ рівнобічної трапеції ділить її на 2 трикутники, серед яких обов'язково є один тупокутний. \\
-II. \hspace{0.1em} Діагоналі будь-якої трапеції ділить її на 4 трикутники, серед яких обов'язково є два подібних. \\
-III. Діагоналі рівнобічної трапеції точкою перетину діляться навпіл.}
+\nmtStmt{I}{\hspace{0.2em} Діагональ рівнобічної трапеції ділить її на 2 трикутники, серед яких обов'язково є один тупокутний.}
+\nmtStmt{II}{\hspace{0.1em} Діагоналі будь-якої трапеції ділить її на 4 трикутники, серед яких обов'язково є два подібних.}
+\nmtStmt{III}{Діагоналі рівнобічної трапеції точкою перетину діляться навпіл.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -756,9 +458,10 @@ III. Діагоналі рівнобічної трапеції точкою п�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Діагоналі будь-якого прямокутника ділять його кути навпіл. \\
-II. \hspace{0.1em} Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл. \\
-III. Діагоналі будь-якого прямокутника рівні.}
+\nmtStmt{I}{\hspace{0.2em} Діагоналі будь-якого прямокутника ділять його кути навпіл.}
+\nmtStmt{II}{\hspace{0.1em} Діагоналі будь-якої рівнобічної трапеції ділять її кути навпіл.}
+\nmtStmt{III}{Діагоналі будь-якого прямокутника рівні.}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -771,9 +474,10 @@ III. Діагоналі будь-якого прямокутника рівні.
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Існує прямокутна трапеція, навколо якої можна описати коло. \\
-II. \hspace{0.1em} Існує прямокутна трапеція, у яку можна вписати коло. \\
-III. Існує прямокутна трапеція, висота якої вдвічі менша за більшу бічну сторону. \nmtyear{2025}}
+\nmtStmt{I}{\hspace{0.2em} Існує прямокутна трапеція, навколо якої можна описати коло.}
+\nmtStmt{II}{\hspace{0.1em} Існує прямокутна трапеція, у яку можна вписати коло.}
+\nmtStmt{III}{Існує прямокутна трапеція, висота якої вдвічі менша за більшу бічну сторону. \nmtyear{2025}}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -782,132 +486,87 @@ III. Існує прямокутна трапеція, висота якої в�
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ ($AB=CD$) на більшій основі $AD$ вибрано точку $O$ так, що $AO=OD$, $\angle AOB = 45^\circ$. $AD : BC = 5 : 2$, $AD=b$. Знайдіть площу цієї трапеції. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
-        \coordinate (A) at (-4,0);
-        \coordinate (D) at (4,0);
-        \coordinate (O) at (0,0);
+\zadtask{У рівнобічній трапеції $ABCD$ ($AB=CD$) на більшій основі $AD$ вибрано точку $O$ так, що $AO=OD$, $\angle AOB = 45^\circ$. $AD : BC = 5 : 2$, $AD=b$. Знайдіть площу цієї трапеції. \nmtyear{2025}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.48, line join=round]%@N 7.45x2.46 C
 
-        % AD:BC = 5:2. If AD=8, BC=3.2.
-        % B is at x = -1.6, C is at x = 1.6.
-        % Angle AOB = 45. Vector OA = (-4, 0). Vector OB = (-1.6, h).
-        % Angle between them is 45. O is origin.
-        % Slope of OB needs to be tan(135) = -1? No, A is (-4,0). B is (-1.6, h).
-        % Angle AOB is acute (45). So B is in second quadrant relative to O.
-        % Line OB has angle 135 or 45?
-        % The drawing shows angle between base AD and segment OB is 45.
-        % Since A is to the left, and B is up-left, angle AOB is typically 180 - angle(positive x).
-        % Drawing shows acute angle marked near O.
-        % Let's assume angle(DO, OB) = 135, angle(AO, OB) = 45.
-        % Then height h = 1.6 (approx).
-
-        \coordinate (B) at (-1.6, 3.6);
-        \coordinate (C) at (1.6, 3.6);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (D); % base
-        \draw[thick] (B) -- (O);
-
-        % Marks for AO = OD
-        \draw[thick] (-2, -0.15) -- (-2, 0.15);
-        \draw[thick] (-2.2, -0.15) -- (-2.2, 0.15);
-
-        \draw[thick] (2, -0.15) -- (2, 0.15);
-        \draw[thick] (2.2, -0.15) -- (2.2, 0.15);
-
-        % Marks for legs
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.15) -- ++(-30:0.3);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.15) -- ++(-120:0.3);
-
-        % Angle 45
-        \pic [draw, pic text={\scriptsize $45^\circ$}, angle radius=0.6cm, angle eccentricity=1.5] {angle = B--O--A};
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (O) {$O$};
-
-        \fill (O) circle (2pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+    % за оригіналом (НМТ 2025, 2.06, № 12, с. 234): AD = b = 5 од., BC = 2 од., AO = OD, h = 1 од. (кут AOB = 45°); одиниця = 1,25 см
+    \coordinate (A) at (0,0);
+    \coordinate (D) at (6.25,0);
+    \coordinate (O) at (3.125,0);
+    \coordinate (B) at (1.875,1.25);
+    \coordinate (C) at (4.375,1.25);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (O);
+    \foreach \p/\q in {A/B, D/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
+    \foreach \p/\q/\o in {A/O/-0.06cm, A/O/0.06cm, O/D/-0.06cm, O/D/0.06cm}
+        \draw[thin] ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!\o!(\q)!0.1cm!-90:(\q)$);
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
+    \node[nmt dot] at (O) {};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTableTall{$\dfrac{21b^2}{100}$}{$\dfrac{7b^2}{50}$}{$\dfrac{7b^2\sqrt{2}}{50}$}{$\dfrac{7b^2}{45}$}{$\dfrac{7b^2}{25}$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено рівнобічну трапецію $ABCD$ ($AB=CD$), точки $K$ і $M$ --- середини бічних сторін трапеції, діагональ $AC$ трапеції перетинає відрізок $KM$ у точці $O$ так, що $KO = 5$ \textit{см}, $OM = 7$ \textit{см}, $\angle CAD = 30^\circ$. Знайдіть площу цієї трапеції. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено рівнобічну трапецію $ABCD$ ($AB=CD$), точки $K$ і $M$ --- середини бічних сторін трапеції, діагональ $AC$ трапеції перетинає відрізок $KM$ у точці $O$ так, що $KO = 5$ \textit{см}, $OM = 7$ \textit{см}, $\angle CAD = 30^\circ$. Знайдіть площу цієї трапеції. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
-        % KM - midline. KO = BC/2 = 5 -> BC=10.
-        % OM = AD/2 = 7 -> AD=14.
-        % Isosceles. Angle CAD = 30.
-        % Height h.
-        % Draw diagonals intersecting midline.
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.867, line join=round]%@N 7.50x4.32 S
 
-        \coordinate (A) at (-7,0);
-        \coordinate (D) at (7,0);
-        \coordinate (B) at (-3, 7); % Visual
-        \coordinate (C) at (3, 7);
-
-        \coordinate (K) at ($(A)!0.5!(B)$);
-        \coordinate (M) at ($(C)!0.5!(D)$);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-        \draw[thick] (K) -- (M);
-
-        \coordinate (O) at (intersection of A--C and K--M);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[left] at (K) {$K$};
-        \node[right] at (M) {$M$};
-        \node[below] at (O) {$O$};
-
-        \fill (K) circle (8pt);
-        \fill (M) circle (8pt);
-        \fill (O) circle (8pt);
-
-        % Angle 30
-        \pic [draw, pic text={\scriptsize $30^\circ$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = D--A--C};
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \def\s{0.45}
+    \coordinate (A) at (0,0);
+    \coordinate (D) at ({14*\s},0);
+    \coordinate (B) at ({2*\s},{6.93*\s});
+    \coordinate (C) at ({12*\s},{6.93*\s});
+    \coordinate (K) at ({1*\s},{3.46*\s});
+    \coordinate (M) at ({13*\s},{3.46*\s});
+    \coordinate (O) at ({6*\s},{3.46*\s});
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \draw[thick] (K) -- (M);
+    \pic[draw, angle radius=1.3cm] {angle = D--A--C};
+    \node at (15:2.2) {$30^\circ$};
+    \node[nmt dot] at (K) {};
+    \node[nmt dot] at (M) {};
+    \node[nmt dot] at (O) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[left] at (K) {$K$};
+    \node[right] at (M) {$M$};
+    \node[below right] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$72$ \textit{см}$^2$}{$144\sqrt{3}$ \textit{см}$^2$}{$288$ \textit{см}$^2$}{$48\sqrt{3}$ \textit{см}$^2$}{$144$ \textit{см}$^2$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній трапеції $ABCD$ діагоналі перетинаються в точці $O$ (див. рисунок). Висоти трикутників $BOC$ і $AOD$, проведені з вершини $O$, відносяться як $2 : 5$. $BC = 14$ \textit{см}. Визначте довжину середньої лінії трапеції $ABCD$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.254]%@N 4.36x3.00 S
+
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,10);
         \coordinate (C) at (7,10); % Scaled BC
@@ -926,11 +585,8 @@ III. Існує прямокутна трапеція, висота якої в�
         \node[left] at (O) {$O$}; % Visual position
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$49$ \textit{см}}{$24{,}5$ \textit{см}}{$42$ \textit{см}}{$21$ \textit{см}}{$9{,}8$ \textit{см}}
 \par\penalty-20
 \end{samepage}
@@ -940,9 +596,10 @@ III. Існує прямокутна трапеція, висота якої в�
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Існує трапеція, у якій сума довжин основ дорівнює довжині її висоти. \\
-II. \hspace{0.1em} Існує прямокутна трапеція, у якій суми градусних мір протилежних кутів рівні. \\
-III. Існує прямокутна трапеція, у якій сума довжин бічних сторін дорівнює сумі довжин її основ. \nmtyear{2025}}
+\nmtStmt{I}{\hspace{0.2em} Існує трапеція, у якій сума довжин основ дорівнює довжині її висоти.}
+\nmtStmt{II}{\hspace{0.1em} Існує прямокутна трапеція, у якій суми градусних мір протилежних кутів рівні.}
+\nmtStmt{III}{Існує прямокутна трапеція, у якій сума довжин бічних сторін дорівнює сумі довжин її основ. \nmtyear{2025}}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -955,9 +612,10 @@ III. Існує прямокутна трапеція, у якій сума до
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Центр кола, уписаного в трапецію, лежить на середній лінії трапеції. \\
-II. \hspace{0.1em} Центр кола, уписаного в трапецію, збігається з точкою перетину діагоналей трапеції. \\
-III. Центр кола, описаного навколо трапеції, обов'язково знаходиться на її більшій основі. \nmtyear{2025}}
+\nmtStmt{I}{\hspace{0.2em} Центр кола, уписаного в трапецію, лежить на середній лінії трапеції.}
+\nmtStmt{II}{\hspace{0.1em} Центр кола, уписаного в трапецію, збігається з точкою перетину діагоналей трапеції.}
+\nmtStmt{III}{Центр кола, описаного навколо трапеції, обов'язково знаходиться на її більшій основі. \nmtyear{2025}}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -970,9 +628,10 @@ III. Центр кола, описаного навколо трапеції, о
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Існує трапеція, у якій сума довжин основ дорівнює довжині її висоти. \\
-II. \hspace{0.1em} Існує прямокутна трапеція, у якій суми градусних мір протилежних кутів рівні. \\
-III. Існує прямокутна трапеція, у якій сума довжин бічних сторін дорівнює сумі довжин її основ. \nmtyear{2025}}
+\nmtStmt{I}{\hspace{0.2em} Існує трапеція, у якій сума довжин основ дорівнює довжині її висоти.}
+\nmtStmt{II}{\hspace{0.1em} Існує прямокутна трапеція, у якій суми градусних мір протилежних кутів рівні.}
+\nmtStmt{III}{Існує прямокутна трапеція, у якій сума довжин бічних сторін дорівнює сумі довжин її основ. \nmtyear{2025}}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -985,9 +644,10 @@ III. Існує прямокутна трапеція, у якій сума до
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.1cm}
-I. \hspace{0.2em} Центр кола, уписаного в трапецію, лежить на середній лінії трапеції. \\
-II. \hspace{0.1em} Центр кола, уписаного в трапецію, збігається з точкою перетину діагоналей трапеції. \\
-III. Центр кола, описаного навколо трапеції, обов'язково знаходиться на її більшій основі. \nmtyear{2025}}
+\nmtStmt{I}{\hspace{0.2em} Центр кола, уписаного в трапецію, лежить на середній лінії трапеції.}
+\nmtStmt{II}{\hspace{0.1em} Центр кола, уписаного в трапецію, збігається з точкою перетину діагоналей трапеції.}
+\nmtStmt{III}{Центр кола, описаного навколо трапеції, обов'язково знаходиться на її більшій основі. \nmtyear{2025}}
+}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -996,67 +656,35 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ ($AB=CD$) на більшій основі $AD$ вибрано точку $O$ так, що $AO=OD$, $\angle AOB = 45^\circ$, $BO=a$, $BC$ утричі менше від $AD$. Знайдіть площу цієї трапеції. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-        % Координати для візуалізації
-        % AD = 3 * BC.
-        % Нехай BC має ширину 2, тоді AD має ширину 6.
-        % O - середина AD (0,0).
-        % A = (-3, 0), D = (3, 0).
-        % B = (-1, h), C = (1, h).
-        % Кут AOB = 45 градусів.
-        % Це означає, що вектор OB утворює 45 градусів з віссю OA (від'ємна вісь X).
-        % Тобто кут нахилу прямої OB = 135 градусів (або 45 відносно осі).
-        % Але на малюнку кут гострий позначений.
-        % Зробимо візуально схоже на скріншот.
-
-        \coordinate (O) at (0,0);
-        \coordinate (A) at (-3.5,0);
-        \coordinate (D) at (3.5,0);
-
-        % Точки B і C вужчі
-        \coordinate (B) at (-1.2, 4.5); 
-        \coordinate (C) at (1.2, 4.5);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (B) -- (O);
-
-        % Позначки рівності сторін AB = CD
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.15) -- ++(-30:0.3);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.15) -- ++(-120:0.3);
-
-        % Позначки рівності AO = OD
-        \draw[thick] (-1.75, -0.15) -- (-1.75, 0.15);
-        \draw[thick] (-1.85, -0.15) -- (-1.85, 0.15); % подвійна
-
-        \draw[thick] (1.75, -0.15) -- (1.75, 0.15);
-        \draw[thick] (1.85, -0.15) -- (1.85, 0.15); % подвійна
-
-        % Кут 45
-        \pic [draw, pic text={\scriptsize $45^\circ$}, angle radius=0.5cm, angle eccentricity=1.7] {angle = B--O--A};
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (O) {$O$};
-
-        % Підпис "a" на BO
-        \node[above right] at ($(B)!0.4!(O)$) {$a$};
-
-        \fill (O) circle (2pt);
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{У рівнобічній трапеції $ABCD$ ($AB=CD$) на більшій основі $AD$ вибрано точку $O$ так, що $AO=OD$, $\angle AOB = 45^\circ$, $BO=a$, $BC$ утричі менше від $AD$. Знайдіть площу цієї трапеції. \nmtyear{2025}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=1.47]%@N 7.50x2.26 C
+% AD = 6, BC = 2, AO = OD = 3, ∠AOB = 45°, висота 1
+    \coordinate (A) at (-3.15,0); \coordinate (D) at (3.15,0); \coordinate (O) at (0,0);
+    \coordinate (B) at (-1.05,1.05); \coordinate (C) at (1.05,1.05);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (B) -- (O);
+    % AB = CD
+    \draw[thick] ($(A)!0.5!(B)$) ++(116.6:0.1) -- ++(-63.4:0.2);
+    \draw[thick] ($(C)!0.5!(D)$) ++(63.4:0.1) -- ++(-116.6:0.2);
+    % AO = OD
+    \draw[thick] ($(A)!0.5!(O)$) ++(0,-0.12) -- ++(0,0.24);
+    \draw[thick] ($(A)!0.5!(O)$) ++(0.1,-0.12) -- ++(0,0.24);
+    \draw[thick] ($(O)!0.5!(D)$) ++(0,-0.12) -- ++(0,0.24);
+    \draw[thick] ($(O)!0.5!(D)$) ++(0.1,-0.12) -- ++(0,0.24);
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
+    \node[nmt dot] at (O) {};
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+    \node[above right] at ($(B)!0.45!(O)$) {$a$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$4a^2$}{$a^2\sqrt{3}$}{$a^2\sqrt{2}$}{$2a^2$}{$3a^2$}
 \par\penalty-20
 \end{samepage}
@@ -1072,33 +700,30 @@ III. Центр кола, описаного навколо трапеції, о
 
 \begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №3
-\noindent
-\begin{minipage}[c]{0.54\textwidth}
-\zadnum У рівнобічній трапеції $ABCD$ бічна сторона дорівнює $6$, а гострий кут при більшій основі дорівнює $60^\circ$. З вершин меншої основи $B$ і $C$ проведено відрізки до спільної точки $P$ на більшій основі так, що $BP \perp AB$ і $CP \perp CD$ (див. рисунок). Знайдіть площу трапеції. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.44\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.27, thick]
+\zadtask{У рівнобічній трапеції $ABCD$ бічна сторона дорівнює $6$, а гострий кут при більшій основі дорівнює $60^\circ$. З вершин меншої основи $B$ і $C$ проведено відрізки до спільної точки $P$ на більшій основі так, що $BP \perp AB$ і $CP \perp CD$ (див. рисунок). Знайдіть площу трапеції. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.386, thick]%@N 7.69x2.61 C
+
     \coordinate (A) at (0,0);
     \coordinate (D) at (24,0);
     \coordinate (B) at (3,5.196);
     \coordinate (C) at (21,5.196);
     \coordinate (P) at (12,0);
     \draw[thick] (A) -- (D) -- (C) -- (B) -- cycle;
-    \draw[thick, mainGreen] (B) -- (P) -- (C);
+    \draw[thick, nmtGreen] (B) -- (P) -- (C);
     \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {right angle = A--B--P};
     \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {right angle = P--C--D};
-    \pic[draw=yearOrange, line width=0.7pt, pic text={\scriptsize $60^\circ$}, angle radius=0.3cm, angle eccentricity=1.9] {angle = D--A--B};
+    \pic[draw=yearOrange, line width=0.7pt, angle radius=0.3cm] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.3}{\normalsize $60^\circ$}
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
     \node[below right] at (D) {$D$};
     \node[below] at (P) {$P$};
-    \node[above left, font=\scriptsize] at ($(B)!0.5!(A)$) {$6$};
+    \node[above left, font=\normalsize] at ($(B)!0.5!(A)$) {$6$};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$63$}{$252$}{$126$}{$126\sqrt{3}$}{$63\sqrt{3}$}
 % Відповідь: Д
 \ifshowsolutions\solution{Висота трапеції $h=AB\sin60^\circ=6\cdot\dfrac{\sqrt3}{2}=3\sqrt3$. У прямокутному $\triangle ABP$ ($BP\perp AB$, $\angle A=60^\circ$) маємо $AP=\dfrac{AB}{\cos60^\circ}=\dfrac{6}{0{,}5}=12$, тож більша основа $AD=2\cdot AP=24$. Проєкція бічної сторони $AB\cos60^\circ=3$, тому менша основа $BC=AD-2\cdot3=18$. Площа $S=\dfrac{AD+BC}{2}\cdot h=\dfrac{24+18}{2}\cdot3\sqrt3=63\sqrt3$. Відповідь: \textbf{Б}.}\fi
@@ -1112,22 +737,30 @@ III. Центр кола, описаного навколо трапеції, о
 \zadnum На рисунку 1 схематично зображено бічну проєкцію будівельної драбини-трансформера (рис. 2), розкладеної у вигляді помосту на горизонтальній підлозі (пряма $AD$). Чотирикутник $ABCD$~--- рівнобічна трапеція. Визначте градусну міру кута $BAD$, якщо $\angle BCD = 110^\circ$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    \coordinate (A) at (0,0);
-    \coordinate (D) at (5,0);
-    \coordinate (B) at (1.5,2.5);
-    \coordinate (C) at (3.5,2.5);
-    \draw (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[gray!80, thin] (-0.5,0) -- (5.5,0);
-    \node[below left] at (A) {$A$};
-    \node[above left] at (B) {$B$};
-    \node[above right] at (C) {$C$};
-    \node[below right] at (D) {$D$};
-    \pic[draw, angle radius=0.4cm, pic text={$110^\circ$}, angle eccentricity=1.7, font=\scriptsize] {angle = B--C--D};
-    \pic[draw, angle radius=0.4cm, pic text={$?$}, angle eccentricity=1.5, font=\scriptsize] {angle = D--A--B};
-    \node[below] at (2.5, -0.5) {Рис. 1};
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    % за оригіналом (НМТ 2026, 9.06, № 4, с. 63): Рис. 1 -- схема трапеції, Рис. 2 -- фото драбини-трансформера (згенероване, не з оригіналу)
+    \begin{scope}[scale=0.62, thick]
+        \coordinate (A) at (0,0);
+        \coordinate (D) at (5,0);
+        \coordinate (B) at (0.91,2.5);
+        \coordinate (C) at (4.09,2.5);
+        \draw (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[thin] (-0.5,0) -- (5.5,0);
+        \node[below left] at (A) {$A$};
+        \node[above left] at (B) {$B$};
+        \node[above right] at (C) {$C$};
+        \node[below right] at (D) {$D$};
+        \pic[draw, angle radius=0.4cm] {angle = B--C--D};
+        \pic[draw, angle radius=0.4cm] {angle = D--A--B};
+        \pic[draw, angle radius=0.5cm] {angle = D--A--B};
+    \end{scope}
+    \node at (0.95,0.42) {$?$};
+    \node at (2.08,0.95) {$110^\circ$};
+    \node[below] at (1.55,-0.55) {Рис. 1};
+    \node[anchor=south west, inner sep=0] at (3.85,-0.25) {\includegraphics[width=3.2cm]{nmt_ladder.png}};
+    \node[below] at (5.45,-0.55) {Рис. 2};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1142,21 +775,24 @@ III. Центр кола, описаного навколо трапеції, о
 \zadnum На рисунку зображено рівнобічну трапецію $ABCD$, на основах $BC$ й $AD$ якої вибрано відповідно точки $M$ і $K$ так, що $BK \parallel CD$ і $KM \parallel AB$. $\angle A = 60^\circ$. $KD = 8$~см, $CM = 2$~см. Визначте площу цієї трапеції. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.396, thick, line join=round]%@N 8.21x3.81 S
+
+    % AB = AK = 6, KD = BC = 8, AD = 14, висота 3\sqrt3
     \coordinate (A) at (0,0);
-    \coordinate (D) at (8,0);
-    \coordinate (B) at (2,3.46);
-    \coordinate (C) at (6,3.46);
-    \coordinate (K) at (3.46,0);
-    \coordinate (M) at (5.3,3.46);
+    \coordinate (D) at (14,0);
+    \coordinate (B) at (3,5.196);
+    \coordinate (C) at (11,5.196);
+    \coordinate (K) at (6,0);
+    \coordinate (M) at (9,5.196);
 
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (B) -- (K);
     \draw (K) -- (M);
 
-    \pic[draw, angle radius=0.6cm, pic text={$60^\circ$}, angle eccentricity=1.6, font=\small] {angle = D--A--B};
+    \pic[draw, angle radius=0.6cm, font=\normalsize] {angle = D--A--B};
+    \nmtAngleLabel{D}{A}{B}{0.6}{$60^\circ$}
 
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
@@ -1165,8 +801,8 @@ III. Центр кола, описаного навколо трапеції, о
     \node[below] at (K) {$K$};
     \node[above] at (M) {$M$};
 
-    \fill (M) circle (1.5pt);
-    \fill (K) circle (1.5pt);
+    \node[nmt dot] at (M) {};
+    \node[nmt dot] at (K) {};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1178,14 +814,15 @@ III. Центр кола, описаного навколо трапеції, о
 \typeTitle{Завдання на встановлення відповідності}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Прямокутник $ABCD$, паралелограм $BKMC$ та трапеція $DCMN$ лежать в одній площині, точки $K$, $C$ та $D$ належать одній прямій (див. рисунок). $AB = 5$ \textit{см}, $AD = 12$ \textit{см}, $BK = 13$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Прямокутник $ABCD$, паралелограм $BKMC$ та трапеція $DCMN$ лежать в одній площині, точки $K$, $C$ та $D$ належать одній прямій (див. рисунок). $AB = 5$ \textit{см}, $AD = 12$ \textit{см}, $BK = 13$ \textit{см}. До кожної величини \mbox{(1--3)} доберіть її значення \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.55]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.506]%@N 7.07x3.72 S
+
         \coordinate (A) at (0,0);
         \coordinate (B) at (0,2);
         \coordinate (C) at (4.8,2);
@@ -1198,13 +835,11 @@ III. Центр кола, описаного навколо трапеції, о
         \draw[thick] (B) -- (K) -- (M) -- (C);
         \draw[thick] (D) -- (N) -- (M);
 
-        % Прямий кут через pic (хоча для 90 можна і вручну, але pic універсальніше)
-        % Тут простіше лініями, бо pic angle 90 не малює квадратик автоматично без додаткових стилів
         \draw (0,0.4) -- (0.4,0.4) -- (0.4,0);
 
-        \node[left] at (0,1) {\small 5 \textit{см}};
-        \node[below] at (2.4,0) {\small 12 \textit{см}};
-        \node[above left] at (1.6,3.3) {\small 13 \textit{см}};
+        \node[left] at (0,1) {\normalsize 5 \textit{см}};
+        \node[below] at (2.4,0) {\normalsize 12 \textit{см}};
+        \node[above left] at (1.6,3.3) {\normalsize 13 \textit{см}};
 
         \node[below left] at (A) {$A$};
         \node[above left] at (B) {$B$};
@@ -1214,18 +849,15 @@ III. Центр кола, описаного навколо трапеції, о
         \node[above] at (M) {$M$};
         \node[below right] at (N) {$N$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
+\matchHead{Величина}
 \matchItem{1}{діагональ $ABCD$}
 \matchItem{2}{відстань від $K$ до $AN$}
 \matchItem{3}{висота трапеції $DCMN$}
 }{
+\matchHead{Значення}
     \matchItem{А}{10 \textit{см}}
 \matchItem{Б}{12 \textit{см}}
 \matchItem{В}{13 \textit{см}}
@@ -1238,14 +870,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутну трапецію $ABCD$, у якої $AB=BC$, $AC=40$ \textit{см}, $CD=24$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}, якщо $O$ --- середина діагоналі $AC$ трапеції $ABCD$. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено прямокутну трапецію $ABCD$, у якої $AB=BC$, $AC=40$ \textit{см}, $CD=24$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}, якщо $O$ --- середина діагоналі $AC$ трапеції $ABCD$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.135]%@N 5.04x4.08 S
+
         % CD = 24. Right angle at D.
         % AC = 40. => AD = sqrt(40^2 - 24^2) = 32.
         % A=(0,0), D=(32,0), C=(32,24).
@@ -1286,15 +919,10 @@ III. Центр кола, описаного навколо трапеції, о
         \node[below right] at (D) {$D$};
         \node[below right] at (O) {$O$};
 
-        \fill (O) circle (15pt);
+        \path (O) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$AO$}
@@ -1314,14 +942,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $O$ так, що $BO \parallel CD$ (див. рисунок). $CO$ --- висота трапеції, $BC = 6$ \textit{см}, $CD = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На більшій основі $AD$ рівнобічної трапеції $ABCD$ вибрано точку $O$ так, що $BO \parallel CD$ (див. рисунок). $CO$ --- висота трапеції, $BC = 6$ \textit{см}, $CD = 10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.312]%@N 5.20x3.21 S
+
         % BC = 6. CD = 10. BO || CD => BCDO parallelogram => OD=6, BO=10.
         % Isosceles ABCD => AB=CD=10.
         % CO perp AD. Triangle OCD: CD=10. Need CO.
@@ -1365,13 +994,8 @@ III. Центр кола, описаного навколо трапеції, о
         \draw[thick] ($(C)!0.5!(D)$) ++(60:0.5) -- ++(-120:1);
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$OD$}
@@ -1391,14 +1015,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ $AB=BC=CD=6$ \textit{см}, діагональ $AC$ утворює з основою $AD$ кут $30^\circ$ (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У рівнобічній трапеції $ABCD$ $AB=BC=CD=6$ \textit{см}, діагональ $AC$ утворює з основою $AD$ кут $30^\circ$ (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.406]%@N 4.80x2.76 S
+
         % Рівнобічна трапеція. AB=BC=CD=6.
         % Кут CAD = 30. Оскільки BC || AD, кут BCA = 30.
         % Трикутник ABC рівнобедрений (AB=BC), отже кут BAC = 30.
@@ -1416,7 +1041,8 @@ III. Центр кола, описаного навколо трапеції, о
         \draw[thick] (A) -- (C);
 
         % Кут 30 градусів
-        \pic [draw, pic text={\scriptsize $30^\circ$}, angle radius=0.5cm, angle eccentricity=1.8] {angle = D--A--C};
+        \pic[draw, angle radius=0.5cm] {angle = D--A--C};
+    \nmtAngleLabel{D}{A}{C}{0.5}{\normalsize $30^\circ$}
 
         % Позначки рівності AB=BC=CD
         \draw[thick] ($(A)!0.5!(B)$) ++(150:0.4) -- ++(-30:0.8);
@@ -1428,13 +1054,8 @@ III. Центр кола, описаного навколо трапеції, о
         \node[above right] at (C) {$C$};
         \node[below right] at (D) {$D$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{основа $AD$}
@@ -1454,14 +1075,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$ --- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У рівнобічній трапеції $ABCD$ діагоналі $AC$ і $BD$ взаємно перпендикулярні і перетинаються в точці $O$, $KM$ --- середня лінія трикутника $AOD$, $BO = 6\sqrt{2}$ \textit{см}, $KM = 12$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.18]%@N 5.52x4.44 S
+
         % Трапеція з перп діагоналями.
         % AOD рівнобедрений прямокутний.
         % KM середня лінія AOD = 12 => AD = 24.
@@ -1501,17 +1123,12 @@ III. Центр кола, описаного навколо трапеції, о
         \node[below] at (K) {$K$};
         \node[below] at (M) {$M$};
 
-        \fill (K) circle (10pt);
-        \fill (M) circle (10pt);
+        \path (K) node[nmt dot] {};
+        \path (M) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BC$}
@@ -1531,14 +1148,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено прямокутну трапецію $ABCD$, у якої $AC = DC = 15$ \textit{см}, $BC = 12$ \textit{см}. $O$ --- середина діагоналі $AC$ трапеції $ABCD$. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено прямокутну трапецію $ABCD$, у якої $AC = DC = 15$ \textit{см}, $BC = 12$ \textit{см}. $O$ --- середина діагоналі $AC$ трапеції $ABCD$. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.224]%@N 5.22x2.82 S
+
         % Прямокутна трапеція. A=90, B=90.
         % BC=12. AC=15. => AB = sqrt(225-144) = 9.
         % DC=15. Проведемо висоту CH. CH=9. HD = sqrt(225-81)=12.
@@ -1587,15 +1205,10 @@ III. Центр кола, описаного навколо трапеції, о
         \node[below] at (D) {$D$};
         \node[below right] at (O) {$O$};
 
-        \fill (O) circle (12pt);
+        \path (O) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$OB$}
@@ -1615,83 +1228,32 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У рівнобічній трапеції $ABCD$ ($BC \parallel AD$) проведено висоту $CO$ (див. рисунок). Середня лінія трапеції дорівнює $23$ \textit{см}, $AD = 38$ \textit{см}, $\angle AOB = 45^\circ$. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
-        \coordinate (A) at (-20,0);
-        \coordinate (D) at (18,0); % AD = 38 total width
-        \coordinate (O) at (0,0);  % O is projection of C? No, CO is height.
-        % Text says CO is height. So C is directly above O.
-        % Let's set O as (0,0). C = (0, h).
-        % ABCD isosceles.
-        % Middle line = 23. (BC+AD)/2 = 23 => BC + 38 = 46 => BC = 8.
-        % If BC=8, and O is projection of C, then OD = (AD-BC)/2 is wrong.
-        % In isosceles trapezoid, OD = (AD+BC)/2 = (38+8)/2 = 23? No.
-        % Usually projection of C is H. HD = (AD-BC)/2 = (38-8)/2 = 15.
-        % AH = (AD+BC)/2 = 23.
-        % So if O is the foot of height C, then AO = 23, OD = 15 (if D is right).
-        % Wait, drawing shows O is between A and D.
-        % Angle AOB = 45. B is top left vertex.
-        % Let's construct: O=(0,0). C=(0,h). D=(15,0). A=(-23,0).
-        % B must be at (-15, h).
-        % Connect B to O. Angle AOB is angle between AO (x-axis left) and BO.
-        % If B=(-15, h), and angle(BO, AO) = 45, then B must be on y=x line (relative to O, but A is left).
-        % So angle between (-1,0) and (-15, h) is 45.
-        % This implies height h = 15.
+\zadtask{У рівнобічній трапеції $ABCD$ ($BC \parallel AD$) проведено висоту $CO$ (див. рисунок). Середня лінія трапеції дорівнює $23$ \textit{см}, $AD = 38$ \textit{см}, $\angle AOB = 45^\circ$. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.45, line join=round]%@N 7.59x2.56 C
 
-        \coordinate (O) at (0,0);
-        \coordinate (C) at (0,15);
-        \coordinate (D) at (15,0);
-        \coordinate (A) at (-23,0);
-        \coordinate (B) at (-15,15); % BC = 15 - (-15)? No, B is symmetric to C relative to axis? No.
-        % Isosceles trapezoid properties:
-        % Projection of B (let's say B') and C (O) on AD.
-        % B'O = BC. B'A = OD.
-        % O is projection of C. OD = (AD-BC)/2 = 15. Correct.
-        % AO = AD - OD = 38 - 15 = 23. Correct.
-        % B is at x = -8 (relative to O). No, B' is at -8. B is at (-8, 15).
-        % BC = 8.
-        % Check angle AOB = 45?
-        % Vector OA = (-23, 0). Vector OB = (-8, 15).
-        % This does not look like 45 degrees.
-        % Let's look at the drawing "21.52.02".
-        % Visual: O is distinct point on base. C is above O. CO perp AD.
-        % B connects to O. Angle AOB is marked.
-        % Angle is clearly acute. 45 degrees.
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (C) -- (O);
-        \draw[thick] (B) -- (O);
-
-        % Right angle at O
-        \draw (O) rectangle ++(1.5,1.5);
-
-        % Angle 45 at O (AOB)
-        \pic [draw, pic text={\small $45^\circ$}, angle radius=.6cm, angle eccentricity=1.5] {angle = B--O--A};
-
-        % Marks
-        \draw[thick] ($(A)!0.5!(B)$) ++(150:0.8) -- ++(-30:1.6);
-        \draw[thick] ($(C)!0.5!(D)$) ++(60:0.8) -- ++(-120:1.6);
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-        \node[below] at (O) {$O$};
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+    % за оригіналом (НМТ 2024, 1.06, № 18, с. 111): AD = 38, BC = 8, OD = 15, AO = 23, висота CO = 8, кут AOB = 45°; одиниця = 0,168 см
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (2.52,1.344);
+    \coordinate (C) at (3.864,1.344);
+    \coordinate (O) at (3.864,0);
+    \coordinate (D) at (6.384,0);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (C) -- (O);
+    \draw[thick] (B) -- (O);
+    \foreach \p/\q in {A/B, D/C}
+        \draw[thin] ($(\p)!0.5!(\q)!0.1cm!90:(\q)$) -- ($(\p)!0.5!(\q)!0.1cm!-90:(\q)$);
+    \pic[draw, thin, angle radius=0.22cm] {right angle=C--O--D};
+    \pic[draw, angle radius=0.5cm] {angle = B--O--A};
+    \nmtAngleLabel{B}{O}{A}{0.5}{$45^\circ$}
+    \node[above left] at (B) {$B$};
+    \node[above right] at (C) {$C$};
+    \node[below left] at (A) {$A$};
+    \node[below right] at (D) {$D$};
+    \node[below] at (O) {$O$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BC$}
@@ -1711,14 +1273,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Навколо кола описано рівнобічну трапецію (див. рисунок), периметр якої дорівнює $100$ \textit{см}. Різниця основ трапеції дорівнює $14$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Навколо кола описано рівнобічну трапецію (див. рисунок), периметр якої дорівнює $100$ \textit{см}. Різниця основ трапеції дорівнює $14$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.183]%@N 4.83x3.63 S
+
         % Circumscribed isosceles trapezoid.
         % Sum of bases = Sum of legs = Perimeter / 2 = 50.
         % a + b = 50. a - b = 14.
@@ -1737,13 +1300,8 @@ III. Центр кола, описаного навколо трапеції, о
         \draw[thick] (O) circle (12cm);
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина середньої лінії \par \quad трапеції}
@@ -1763,114 +1321,74 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+% Завдання 23 (на відповідність, з рисунком)
+\zadtask{На паралельних прямих $m$ та $n$ побудовано прямокутник $ABCD$, прямокутну трапецію $DKLM$ і прямокутний трикутник $MQP$ (див. рисунок). Користуючись даними на рисунку, узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}. \nmtyear{2024}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-    % Coordinates logic based on numbers:
-    % ABCD: width 4. height h.
-    % DKLM: base KL=2, DM=5.
-    % MQP: leg MQ=6. Angle 45 -> PQ=6. So h=6.
-
-    \def\h{6}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.984]%@N 8.94x3.45 C
 
     \coordinate (A) at (0,0);
-    \coordinate (D) at (4,0);
-    \coordinate (B) at (0,\h);
-    \coordinate (C) at (4,\h);
-
-    \coordinate (M) at (9,0); % D(4) + 5 = 9
-    \coordinate (K) at (7,\h); % M(9) is vertical side? No, Trap DKLM usually means D->K->L->M.
-    % Image: D to K is slant. L to M is vertical? 
-    % Let's look at numbers. "2" is between K and L. "5" is between D and M.
-    % Angle at M is not marked 90. But triangle MQP has right angle at Q.
-    % The text says "Rectangular Trapezoid DKLM". In drawing, side LM is vertical.
-    % So L is above M. M is at 9. L is at (9, h).
-    % K is left of L. KL=2. K is at (7, h).
-    % D is at (4,0).
-    \coordinate (L) at (9,\h);
-
-    \coordinate (Q) at (15,0); % M(9) + 6 = 15.
-    \coordinate (P) at (15,\h); % P is above Q. Triangle MQP, right angle at Q.
-
-    % Colors
-    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
-    \fill[violet!20] (D) -- (K) -- (L) -- (M) -- cycle;
-    \fill[yellow!20] (M) -- (Q) -- (P) -- cycle;
-
-    % Lines
-    \draw[thick] (-1,0) -- (16,0) node[above] {$n$};
-    \draw[thick] (-1,\h) -- (16,\h) node[above] {$m$};
-
-    % Shapes
+    \coordinate (D) at (2.22,0);
+    \coordinate (M) at (5.05,0);
+    \coordinate (Q) at (7.75,0);
+    \coordinate (B) at (0,2.7);
+    \coordinate (C) at (2.22,2.7);
+    \coordinate (K) at (4.17,2.7);
+    \coordinate (L) at (5.05,2.7);
+    \coordinate (P) at (7.75,2.7);
+    \fill[nmtFillA] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[nmtFillE] (D) -- (K) -- (L) -- (M) -- cycle;
+    \fill[nmtFillC] (M) -- (Q) -- (P) -- cycle;
+    \draw[thick] (-1.63,0) -- (9.35,0);
+    \draw[thick] (-1.63,2.7) -- (9.35,2.7);
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick] (D) -- (K) -- (L) -- (M); % Base is on line n
-    \draw[thick] (M) -- (P) -- (Q); % Triangle MQP (Q is right angle)
-
-    % Labels and Values
-    \node[below] at (A) {$A$};
-    \node[below] at (2,0) {4};
-    \node[below] at (D) {$D$};
+    \draw[thick] (D) -- (K) -- (L) -- (M) -- cycle;
+    \draw[thick] (M) -- (Q) -- (P) -- cycle;
+    \pic[draw, angle radius=0.26cm] {right angle=P--Q--M};
+    \pic[draw, angle radius=0.45cm] {angle=Q--M--P};
+    \nmtAngleLabel{Q}{M}{P}{0.45}{$45^\circ$}
+    \foreach \p in {A,B,C,D,K,L,M,P,Q} {\node[nmt dot] at (\p) {};}
+    \node[above] at (-1.4,2.7) {$m$};
+    \node[above] at (-1.4,0) {$n$};
     \node[above] at (B) {$B$};
     \node[above] at (C) {$C$};
-
-    \node[below] at (6.5,0) {5};
-    \node[below] at (M) {$M$};
-    \node[above] at (K) {$K$};
-    \node[above] at (8, \h) {2};
-    \node[above] at (L) {$L$};
-
-    \node[below] at (12,0) {6};
-    \node[below] at (Q) {$Q$};
+    \node[above left] at (K) {$K$};
+    \node[above right] at (L) {$L$};
     \node[above] at (P) {$P$};
-
-    % Angles
-    \draw (Q) ++(-0.4,0) -- ++(0,0.4) -- ++(0.4,0); % Right angle at Q
-    \draw (M) ++(0,0.4) -- ++(-0.4,0) -- ++(0,-0.4); % Right angle at M (trap)? No, M is just point. 
-    % Wait, text says DKLM is rectangular trap. Usually one leg is perp. Side LM corresponds to vertical line.
-
-    % 45 degrees at M in triangle MQP?
-    % Image shows angle 45 at M inside triangle MQP.
-    \pic [draw, pic text={\small $45^\circ$}, angle radius=0.9cm, angle eccentricity=1.6] {angle = Q--M--P};
-
+    \node[above] at ($(K)!0.5!(L)$) {$2$};
+    \node[below] at (A) {$A$};
+    \node[below] at (D) {$D$};
+    \node[below] at (M) {$M$};
+    \node[below] at (Q) {$Q$};
+    \node[below] at ($(A)!0.5!(D)$) {$4$};
+    \node[below] at ($(D)!0.5!(M)$) {$5$};
+    \node[below] at ($(M)!0.5!(Q)$) {$6$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
-\matchHead{Величина}
+\matchHead{Фігура}
 \matchItem{1}{Прямокутник $ABCD$}
 \matchItem{2}{Трапеція $DKLM$}
 \matchItem{3}{Трикутник $MQP$}
 }{
-
-\nmtnobreak
-\matchHead{Значення величини}
-    \matchItem{А}{12}
+\matchHead{Площа фігури}
+\matchItem{А}{12}
 \matchItem{Б}{18}
 \matchItem{В}{21}
 \matchItem{Г}{24}
 \matchItem{Д}{36}
 }{
-    \matchingGrid
+\matchingGrid
 }
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 14 (Відповідність з кольоровим рисунком) ===
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $24$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}.\nmtyear{2024}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{На паралельних прямих $m$ та $n$ розміщено основи трапеції $ABCD$, сторони квадрата $DKLM$ та сторони паралелограма $MNPQ$ (див. рисунок). Периметр квадрата дорівнює $24$, $BC=KL$, $BC:AD = 2:3$, $AD=MQ$. Узгодьте фігуру \mbox{(1--3)} з її площею \mbox{(А--Д)}.\nmtyear{2024}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.664]%@N 9.94x3.09 C
+
     % Лінії m та n
 
     % Координати
@@ -1923,9 +1441,9 @@ III. Центр кола, описаного навколо трапеції, о
     \coordinate (N_par) at (9.5,3); % P - N = 4.5. 14-9.5=4.5. OK.
 
     % Заливаємо
-    \fill[cyan!20] (A) -- (B) -- (C) -- (D) -- cycle;
-    \fill[violet!20] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
-    \fill[yellow!20] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
+    \fill[nmtFillA] (A) -- (B) -- (C) -- (D) -- cycle;
+    \fill[nmtFillE] (D) -- (K_sq) -- (L_sq) -- (M_sq) -- cycle;
+    \fill[nmtFillC] (M_sq) -- (N_par) -- (P) -- (Q) -- cycle;
 
     % Контури
     \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle; % Трапеція
@@ -1953,13 +1471,14 @@ III. Центр кола, описаного навколо трапеції, о
 
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
+\matchHead{Фігура}
 \matchItem{1}{квадрат $DKLM$}
 \matchItem{2}{паралелограм $MNPQ$}
 \matchItem{3}{трапеція $ABCD$}
 }{
+\matchHead{Площа фігури}
     \matchItem{А}{48}
 \matchItem{Б}{90}
 \matchItem{В}{54}
@@ -1972,27 +1491,30 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено квадрат $ABCD$ і прямокутний трикутник $KBC$ ($\angle B = 90^\circ$), що лежать в одній площині. Периметр квадрата $ABCD$ дорівнює $24$ \textit{см}, середня лінія трапеції $AKCD$ дорівнює $10$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.3]
-        % P=24 => сторона 6.
-        % Трапеція AKCD. Основи AK і CD. CD=6. Середня лінія 10 -> AK+6 = 20 -> AK=14.
-        % BK = 14-6 = 8.
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.283]%@N 3.02x5.09 S
+
+        % Square side 6.
         \coordinate (A) at (0,0);
         \coordinate (D) at (6,0);
         \coordinate (C) at (6,6);
         \coordinate (B) at (0,6);
+
+        % Triangle KBC. B=90. K on line AB.
+        % Midline = 10. Trapezoid AKCD.
+        % Bases AK, CD. CD=6. (AK+6)/2=10 -> AK=14.
+        % BK = AK - AB = 14 - 6 = 8.
         \coordinate (K) at (0,14);
 
-        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Контур трапеції
-        \draw[thick] (B) -- (C); % Верхня сторона квадрата
-
-        % Прямий кут
+        \draw[thick] (A) -- (D) -- (C) -- (K) -- cycle; % Trapezoid contour
+        \draw[thick] (B) -- (C); % Square top
+        % Right angle B
         \draw (0,6.5) -- (0.5,6.5) -- (0.5,6);
 
         \node[left] at (A) {$A$};
@@ -2001,13 +1523,8 @@ III. Центр кола, описаного навколо трапеції, о
         \node[left] at (B) {$B$};
         \node[left] at (K) {$K$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{$BK$}
@@ -2027,14 +1544,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Навколо кола радіуса $4$ \textit{см} описано рівнобічну трапецію, середня лінія якої дорівнює $10$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}.\nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Навколо кола радіуса $4$ \textit{см} описано рівнобічну трапецію, середня лінія якої дорівнює $10$ \textit{см} (див. рисунок). До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}.\nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.18]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.402]%@N 2.91x1.47 S
+
         % R=4, h=8. Midline=10 => a+b=20.
         % Inscribed => a+b = 2c => 2c=20 => c=10.
         % Leg c=10. Height h=8. Projection x=6.
@@ -2055,13 +1573,8 @@ III. Центр кола, описаного навколо трапеції, о
         % Висота 8.
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{Висота трапеції}
@@ -2081,14 +1594,10 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У паралелограмі $ABCD$ з точки $B$ на сторону $AD$ опущено висоту $BK = 6$ \textit{см}, $AK = 8$ \textit{см}, $KD = 4$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.35]
+\zadtask{У паралелограмі $ABCD$ з точки $B$ на сторону $AD$ опущено висоту $BK = 6$ \textit{см}, $AK = 8$ \textit{см}, $KD = 4$ \textit{см}. До кожного відрізка \mbox{(1--3)} доберіть його довжину \mbox{(А--Д)}. \nmtyear{2024}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.471]%@N 8.18x3.30 C
+
         \coordinate (A) at (0,0);
         \coordinate (K) at (8,0); % AK = 8
         \coordinate (D) at (12,0); % KD = 4, AD = 12
@@ -2106,13 +1615,8 @@ III. Центр кола, описаного навколо трапеції, о
         \node[below right] at (D) {$D$};
         \node[below] at (K) {$K$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{Середня лінія трапеції $KBCD$}
@@ -2132,39 +1636,24 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-Діагональ $AC$ рівнобічної трапеції $ABCD$ утворює зі стороною $CD$ кут $120^\circ$ (див. рисунок). Довжини основ трапеції дорівнюють $12$ \textit{см} і $30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.15]
-        \coordinate (A) at (-15,0);
-        \coordinate (D) at (15,0);
-        % Bases 30 and 12. Top base centered.
-        % Coordinates for C approx to look like the image.
-        \coordinate (B) at (-6, 12);
-        \coordinate (C) at (6, 12);
-
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
-        \draw[thick] (A) -- (C);
-
-        % Obtuse angle 120 at C (ACD)
-        \pic [draw, pic text={\scriptsize $120^\circ$}, angle radius=0.3cm, angle eccentricity=1.5] {angle = A--C--D};
-
-        \node[below left] at (A) {$A$};
-        \node[above left] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[below right] at (D) {$D$};
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
-\end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\zadtask{Діагональ $AC$ рівнобічної трапеції $ABCD$ утворює зі стороною $CD$ кут $120^\circ$ (див. рисунок). Довжини основ трапеції дорівнюють $12$ \textit{см} і $30$ \textit{см}. До кожного початку речення \mbox{(1--3)} доберіть його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=1.41]%@N 7.80x2.87 C
+% AD = 30, BC = 12 (одиниця 0,22 см), h = 7.588, ∠ACD = 120°
+    \coordinate (A) at (-3.3,0); \coordinate (D) at (3.3,0);
+    \coordinate (B) at (-1.32,1.669); \coordinate (C) at (1.32,1.669);
+    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[thick] (A) -- (C);
+    \pic[draw, angle radius=0.5cm] {angle = A--C--D};
+    \nmtAngleLabel{A}{C}{D}{0.5}{$120^\circ$}
+    \node[below left] at (A) {$A$};
+    \node[above left] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below right] at (D) {$D$};
+\end{tikzpicture}\end{nmtfit}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина середньої лінії трапеції \par \quad дорівнює}
@@ -2184,14 +1673,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній трапеції $ABCD$ проведено висоту $CK$. $ABCK$ --- квадрат з діагоналлю $12\sqrt{2}$ \textit{см}. $CD = 13$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній трапеції $ABCD$ проведено висоту $CK$. $ABCK$ --- квадрат з діагоналлю $12\sqrt{2}$ \textit{см}. $CD = 13$ \textit{см}. Узгодьте відрізок \mbox{(1--3)} із його довжиною \mbox{(А--Д)}. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.25]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.266]%@N 5.46x4.20 S
+
         % Квадрат діагональ 12sqrt(2) -> сторона 12.
         % Висота CK=12. CD=13. KD=5. AD=17.
 
@@ -2213,13 +1703,8 @@ III. Центр кола, описаного навколо трапеції, о
         \node[below] at (K) {$K$};
         \node[below right] at (D) {$D$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Відрізок}
 \matchItem{1}{висота трапеції $ABCD$}
@@ -2239,14 +1724,15 @@ III. Центр кола, описаного навколо трапеції, о
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-На рисунку зображено паралелограм $ABCD$. Точка $K$ є серединою сторони $BC$, $KP$ --- висота паралелограма, $AP = 20$ \textit{см}, $PD = 10$ \textit{см}, $PK = 12$ \textit{см}. Узгодьте початок речення \mbox{(1--3)} та його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено паралелограм $ABCD$. Точка $K$ є серединою сторони $BC$, $KP$ --- висота паралелограма, $AP = 20$ \textit{см}, $PD = 10$ \textit{см}, $PK = 12$ \textit{см}. Узгодьте початок речення \mbox{(1--3)} та його закінчення \mbox{(А--Д)} так, щоб утворилося правильне твердження. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.12]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.145]%@N 5.38x2.64 S
+
         % P=(0,0). K=(0,12).
         % AP=20 => A=(-20,0).
         % PD=10 => D=(10,0).
@@ -2278,14 +1764,8 @@ III. Центр кола, описаного навколо трапеції, о
         \node[above] at (K) {$K$};
         \node[below] at (P) {$P$};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-
-\nmtnobreak
-\noindent
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Початок речення}
 \matchItem{1}{Довжина відрізка $KC$ дорівнює}
@@ -2300,8 +1780,7 @@ III. Центр кола, описаного навколо трапеції, о
 \matchItem{Д}{15 \textit{см}.}
 
 \nmtnobreak
-    \begin{flushright}
-    \end{flushright}
+
 }{
 \matchingGrid
 }
@@ -2310,23 +1789,26 @@ III. Центр кола, описаного навколо трапеції, о
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №16
-\zadtask{На рисунку зображено трапецію $ABCD$, у якій $\angle CDA = 30^\circ$. Висота $CK$, довжина якої дорівнює $2$, є бісектрисою кута $ACD$. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
+\zadtask{На рисунку зображено трапецію $ABCD$, у якій $\angle CDA = 30^\circ$. Висота $CK$, довжина якої дорівнює $2$, є бісектрисою кута $ACD$. \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak Установіть відповідність між величиною \mbox{(1--3)} та її значенням \mbox{(А--Д)}.\par}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.37, thick]%@N 9.05x3.61 C
+
     \coordinate (A) at (0,0);
-    \coordinate (K) at (4,0);
-    \coordinate (D) at (7.46,0);
-    \coordinate (C) at (4,2);
+    \coordinate (K) at (3.464,0);
+    \coordinate (D) at (6.928,0);
+    \coordinate (C) at (3.464,2);
     \coordinate (B) at (0,2);
     \draw (A) -- (B) -- (C) -- (D) -- cycle;
     \draw (C) -- (K);
-    \draw[dashed] (A) -- (C);
-    \draw (0,0) -- (0,0.3) -- (0.3,0.3) -- (0.3,0);
-    \draw (4,0) -- (4,0.3) -- (4.3,0.3) -- (4.3,0);
-    \pic [draw, angle radius=0.6cm, "$30^\circ$"{above left, shift={(-0.28,-0.15)}}] {angle = C--D--K};
-    \pic [draw, angle radius=0.45cm] {angle = K--C--D};
-    \pic [draw, angle radius=0.55cm] {angle = A--C--K};
+    \draw (A) -- (C);
+    \pic[draw, angle radius=0.3cm] {right angle = D--A--B};
+    \pic[draw, angle radius=0.3cm] {right angle = D--K--C};
+    \pic[draw, angle radius=0.9cm] {angle = C--D--K};
+    \nmtAngleLabel{C}{D}{K}{0.9}{$30^\circ$}
+    \pic[draw, angle radius=0.5cm] {angle = K--C--D};
+    \pic[draw, angle radius=0.6cm] {angle = K--C--D};
+    \pic[draw, angle radius=0.5cm] {angle = A--C--K};
+    \pic[draw, angle radius=0.6cm] {angle = A--C--K};
     \node[below left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above=2pt] at (C) {$C$};
@@ -2334,10 +1816,7 @@ III. Центр кола, описаного навколо трапеції, о
     \node[below=2pt] at (K) {$K$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\nopagebreak\nbvspace{0.3cm}
-\noindent Установіть відповідність між величиною \mbox{(1--3)} та її значенням \mbox{(А--Д)}.\par
-\nopagebreak\nbvspace{0.3cm}
-\noindent
+\nopagebreak\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Величина}
 \matchItem{1}{довжина відрізка $CD$}
@@ -2353,7 +1832,7 @@ III. Центр кола, описаного навколо трапеції, о
 }{
 \matchingGrid
 }
-}
+
 % Відповідь: 1~--~Б, 2~--~А, 3~--~Г
 \ifshowsolutions\solution{У прямокутному $\triangle CKD$: $\angle CDK=30^\circ$, катет $CK=2$ лежить навпроти $30^\circ$, тож $CD=\dfrac{CK}{\sin 30^\circ}=4$~(Б). $\angle KCD=60^\circ$; оскільки $CK$~--- бісектриса, $\angle ACK=60^\circ$, тоді у прямокутному $\triangle ACK$: $AK=CK\tan 60^\circ=2\sqrt{3}$, а $BC=AK=2\sqrt{3}$~(А). Відстань від $B$ до $AC$ дорівнює $\dfrac{2S_{ABC}}{AC}$; $AC=\dfrac{CK}{\cos 60^\circ}=4$, $S_{ABC}=\dfrac{1}{2}\cdot BC\cdot AB=\dfrac{1}{2}\cdot 2\sqrt{3}\cdot 2=2\sqrt{3}$, тож відстань $=\dfrac{2\cdot 2\sqrt{3}}{4}=\sqrt{3}$~(Г). Відповідь: \textbf{1--Б, 2--А, 3--Г}.}\fi
 \par\penalty-20
@@ -2361,12 +1840,15 @@ III. Центр кола, описаного навколо трапеції, о
 
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №18 --- також у темі: Коло, круг і їх елементи
-\zadtask{Усередині рівнобічної трапеції $ABCD$ вибрано точку $M$, яка рівновіддалена від усіх вершин трапеції. $\angle BMC = 60^\circ$, $\angle MAD = 30^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.65\textwidth}
-\nopagebreak\nbvspace{0.6cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=1, line join=round, line cap=round]
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Усередині рівнобічної трапеції $ABCD$ вибрано точку $M$, яка рівновіддалена від усіх вершин трапеції. $\angle BMC = 60^\circ$, $\angle MAD = 30^\circ$. Узгодьте кут \mbox{(1--3)} з його градусною мірою \mbox{(А--Д)}. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.04, line join=round, line cap=round]%@N 5.39x4.47 S
+
     % Центр кола (точка M)
     \coordinate (M) at (0,0);
 
@@ -2386,7 +1868,7 @@ III. Центр кола, описаного навколо трапеції, о
     \draw[thick] (M) -- (D);
 
     % Точка M
-    \fill (M) circle (1.5pt);
+    \path (M) node[nmt dot] {};
 
     % Підписи вершин
     \node[below left=-2pt] at (A) {$A$};
@@ -2414,12 +1896,8 @@ III. Центр кола, описаного навколо трапеції, о
     \path (M) -- (C) node[midway, sloped] {$||$};
     \path (M) -- (D) node[midway, sloped] {$||$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.2cm}
-\noindent
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Кут}
 \matchItem{1}{$\angle AMD$}
@@ -2435,40 +1913,41 @@ III. Центр кола, описаного навколо трапеції, о
 }{
 \matchingGrid
 }
-}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №18 --- основна тема: Паралелограм
-\zadtask{На рисунку зображено паралелограм $ABCD$, рівносторонній трикутник $CDK$ і прямокутну трапецію $AKNM$, що лежать в одній площині. Менша основа трапеції дорівнює стороні трикутника, її менша бічна сторона~--- стороні $BC$ паралелограма. Узгодьте геометричну фігуру \mbox{(1--3)} та її площу \mbox{(А--Д)}, якщо $MN : AK = 5 : 9$ і $MN = 10$~см. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick, line join=round]
-    % середня горизонтальна лінія: A ... D ... K
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено паралелограм $ABCD$, рівносторонній трикутник $CDK$ і прямокутну трапецію $AKNM$, що лежать в одній площині. Менша основа трапеції дорівнює стороні трикутника, її менша бічна сторона~--- стороні $BC$ паралелограма. Узгодьте геометричну фігуру \mbox{(1--3)} та її площу \mbox{(А--Д)}, якщо $MN : AK = 5 : 9$ і $MN = 10$~см. \nmtyear{2026}\par
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.232, thick, line join=round]%@N 6.60x6.21 S
+
+    % AD : DK : AK = 8 : 10 : 18, MN = DK = 10, BC = KN = 8
     \coordinate (A) at (0,0);
-    \coordinate (D) at (5,0);
-    \coordinate (K) at (10,0);
-    % паралелограм ABCD: B,C зверху
-    \coordinate (B) at (2.5,4.33);
-    \coordinate (C) at (7.5,4.33);
-    % трапеція AKNM знизу (прямий кут при K)
-    \coordinate (N) at (10,-6);
-    \coordinate (M) at (3.5,-6);
-    % --- заливки ---
-    \filldraw[fill=orange!25, draw=black] (A) -- (B) -- (C) -- (D) -- cycle;
-    \filldraw[fill=cyan!25, draw=black] (D) -- (C) -- (K) -- cycle;
-    \filldraw[fill=green!20, draw=black] (A) -- (K) -- (N) -- (M) -- cycle;
+    \coordinate (D) at (8,0);
+    \coordinate (K) at (18,0);
+    \coordinate (B) at (5,8.66);
+    \coordinate (C) at (13,8.66);
+    \coordinate (N) at (18,-8);
+    \coordinate (M) at (8,-8);
+    \filldraw[fill=nmtFillC, draw=black] (A) -- (B) -- (C) -- (D) -- cycle;
+    \filldraw[fill=nmtFillA, draw=black] (D) -- (C) -- (K) -- cycle;
+    \filldraw[fill=nmtFillB, draw=black] (A) -- (K) -- (N) -- (M) -- cycle;
     % прямий кут при K
-    \draw (9.3,0) -- (9.3,-0.7) -- (10,-0.7);
-    % --- мітки рівних сторін ---
-    \path (B) -- (C) node[midway, sloped, font=\small] {$||$};
-    \path (D) -- (C) node[midway, sloped, font=\small] {$|$};
-    \path (C) -- (K) node[midway, sloped, font=\small] {$|$};
-    \path (D) -- (K) node[midway, font=\small, yshift=3pt] {$|$};
-    \path (K) -- (N) node[midway, sloped, font=\small] {$||$};
-    \path (M) -- (N) node[midway, font=\small, yshift=3pt] {$|$};
-    % --- підписи ---
+    \draw (17,0) -- (17,-1) -- (18,-1);
+    % мітки рівних сторін
+    \path (B) -- (C) node[midway, sloped, font=\normalsize] {$||$};
+    \path (D) -- (C) node[midway, sloped, font=\normalsize] {$|$};
+    \path (C) -- (K) node[midway, sloped, font=\normalsize] {$|$};
+    \path (D) -- (K) node[midway, font=\normalsize, yshift=3pt] {$|$};
+    \path (K) -- (N) node[midway, sloped, font=\normalsize] {$||$};
+    \path (M) -- (N) node[midway, font=\normalsize, yshift=3pt] {$|$};
+    % підписи
     \node[left] at (A) {$A$};
     \node[above left] at (B) {$B$};
     \node[above right] at (C) {$C$};
@@ -2477,9 +1956,8 @@ III. Центр кола, описаного навколо трапеції, о
     \node[below] at (M) {$M$};
     \node[below] at (N) {$N$};
 \end{tikzpicture}\end{nmtfit}
-\end{center}
-\nopagebreak\nbvspace{0.2cm}
-\noindent
+\end{minipage}
+\par\nbvspace{0.2cm}
 \matchingLayout{
 \matchHead{Геометрична фігура}
 \matchItem{1}{трикутник $CDK$}
@@ -2495,7 +1973,7 @@ III. Центр кола, описаного навколо трапеції, о
 }{
 \matchingGrid
 }
-}
+
 % Відповідь: 1--В,\ \ 2--Г,\ \ 3--А
 \par\penalty-20
 \end{samepage}

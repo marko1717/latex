@@ -32,7 +32,8 @@ def evaluate(t, base, inv, year):
     cand = collections.Counter()
     for w in ws | ns:
         for i in inv.get(w, ()): cand[i] += 1
-    top = [i for i, _ in cand.most_common(80)]
+    # рівні рахунки -- за номером завдання: most_common бере їх у порядку обходу множини, тобто щоразу інакше
+    top = [i for i, _ in sorted(cand.items(), key=lambda x: (-x[1], x[0]))[:80]]
     same = [i for i in top if base[i]["year"] == year]
     top = same + [i for i in top if i not in set(same)]
     best = None

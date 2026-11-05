@@ -1,212 +1,14 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 18}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
 
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
-
 \begin{document}
 \begingroup\setcounter{zad}{0}
-% --- макроси, перенесені зі старого файлу теми ---
-\newcommand{\matchingLayout}[3]{
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-       
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}\vspace{0pt}\raggedright
-        \vspace{0pt} % Хаки для вирівнювання minipage по верху
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}
-}
-
 % --- макроси з файлів сесій НМТ-2026 (для рисунків) ---
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -228,44 +30,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 18. Координати і вектори на площині і в просторі. Рівняння кола}
 \noindent{\small\color{gray!80} Розділ 5. Стереометрія \quad\textbullet\quad Усього завдань: 67 (НМТ \mbox{2023~--- 14}, \mbox{2024~--- 18}, \mbox{2025~--- 16}, \mbox{2026~--- 19}); \mbox{тестових~--- 50}; \mbox{з короткою відповіддю~--- 17}.}\par\vspace{0.2cm}
@@ -273,82 +38,78 @@
 \typeTitle{Завдання з вибором однієї відповіді (А--Д)}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі точка $N$ лежить на координатній осі $y$ (див. рисунок). Укажіть можливі координати вектора $\vec{ON}$. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі точка $N$ лежить на координатній осі $y$ (див. рисунок). Укажіть можливі координати вектора $\vec{ON}$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
-        % Axes
-        \draw[->, >=stealth] (0,0) -- (0,2) node[left] {$z$};
-        \draw[->, >=stealth] (0,0) -- (2.5,0) node[below] {$y$};
-        \draw[->, >=stealth] (0,0) -- (-1.5,-1.5) node[below] {$x$};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}
+    [scale=1.25]%@N 3.94x3.84 S
+% осі -- повні прямі через O, стрілки на додатних напрямках
+    \draw[->] (0,-1.6) -- (0,1.8) node[left] {$z$};
+    \draw[->] (-1.45,0) -- (1.95,0) node[below] {$y$};
+    \draw[->] (1.1,0.94) -- (-1.5,-1.3) node[below] {$x$};
 
-        \coordinate (O) at (0,0);
-        \coordinate (N) at (1.5,0);
+    \coordinate (O) at (0,0);
+    \coordinate (N) at (0.82,0);
 
-        \node[below right] at (O) {$O$};
-        \node[above] at (N) {$N$};
-        \fill (O) circle (1.5pt);
-        \fill (N) circle (1.5pt);
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \node[below right] at (O) {$O$};
+    \node[above] at (N) {$N$};
+    \node[nmt dot] at (O) {};
+    \node[nmt dot] at (N) {};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$(-4; 0; 0)$}{$(0; 0; 4)$}{$(4; 0; 0)$}{$(4; -4; 0)$}{$(0; 4; 0)$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі точка $N$ лежить на координатній осі $z$ (див. рисунок). Укажіть можливі координати середини відрізка $ON$. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі точка $N$ лежить на координатній осі $z$ (див. рисунок). Укажіть можливі координати середини відрізка $ON$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.949]%@N 3.29x3.54 S
+
         % Axes
-        \draw[->, >=stealth] (0,0) -- (0,2.5) node[left] {$z$};
-        \draw[->, >=stealth] (0,0) -- (2.5,0) node[below] {$y$};
-        \draw[->, >=stealth] (0,0) -- (-1.5,-1.5) node[below] {$x$};
+        \draw[->] (0,0) -- (0,2.5) node[left] {$z$};
+        \draw[->] (0,0) -- (2.5,0) node[below] {$y$};
+        \draw[->] (0,0) -- (-1.5,-1.5) node[below] {$x$};
 
         \coordinate (O) at (0,0);
         \coordinate (N) at (0,1.5);
 
         \node[below right] at (O) {$O$};
         \node[right] at (N) {$N$};
-        \fill (O) circle (1.5pt);
-        \fill (N) circle (1.5pt);
+        \path (O) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$(5; 0; 5)$}{$(0; 0; 5)$}{$(0; 5; 0)$}{$(0; 0; -5)$}{$(5; 0; 0)$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі задано точки $K$ та $N$, що лежать на координатній осі $y$ (див. рисунок). Укажіть можливі координати вектора $\vec{KN}$. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі задано точки $K$ та $N$, що лежать на координатній осі $y$ (див. рисунок). Укажіть можливі координати вектора $\vec{KN}$. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.7]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05]%@N 3.40x3.19 S
+
         % Axes
-        \draw[->, >=stealth] (0,-1.5) -- (0,2) node[left] {$z$}; % z axis vertical through origin
-        \draw[->, >=stealth] (-2,0) -- (2.5,0) node[below] {$y$}; % y axis horizontal
-        \draw[->, >=stealth] (0,0) -- (-1.5,-1.5) node[below] {$x$}; % x axis diagonal
+        \draw[->] (0,-1.5) -- (0,2) node[left] {$z$}; % z axis vertical through origin
+        \draw[->] (-2,0) -- (2.5,0) node[below] {$y$}; % y axis horizontal
+        \draw[->] (0,0) -- (-1.5,-1.5) node[below] {$x$}; % x axis diagonal
 
         \coordinate (O) at (0,0);
         \coordinate (K) at (-1,0);
@@ -357,16 +118,13 @@
         \node[below right] at (O) {$O$};
         \node[above] at (K) {$K$};
         \node[above] at (N) {$N$};
-        \fill (O) circle (1.5pt);
-        \fill (K) circle (1.5pt);
-        \fill (N) circle (1.5pt);
+        \path (O) node[nmt dot] {};
+        \path (K) node[nmt dot] {};
+        \path (N) node[nmt dot] {};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$(0; 0; 4)$}{$(4; -4; 0)$}{$(0; 4; 0)$}{$(0; -4; 0)$}{$(4; 0; 0)$}
 \par\penalty-20
 \end{samepage}
@@ -390,20 +148,21 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.4]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.65x3.49 S
+
         % Сітка
-        \draw[step=1cm,gray!50,very thin] (-4,-3) grid (7,5);
+        \draw[nmt grid, step=1cm] (-4,-3) grid (7,5);
 
         % Осі
-        \draw[->, >=stealth] (-4,0) -- (7,0) node[below]{$x$};
-        \draw[->, >=stealth] (0,-3) -- (0,5) node[left]{$y$};
+        \draw[->] (-4,0) -- (7,0) node[below]{$x$};
+        \draw[->] (0,-3) -- (0,5) node[left]{$y$};
 
         % Точки за візуальними координатами:
         % B(-1, 0), C(-1, 3) - вертикальна сторона
@@ -414,49 +173,47 @@
         \coordinate (D) at (6,4);
         \coordinate (A) at (6,-2);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[very thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
         % Підписи точок
-        \node[below] at (B) {$B$};
-        \node[above] at (C) {$C$};
-        \node[above] at (D) {$D$};
-        \node[below] at (A) {$A$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+        \node[above, fill=white, inner sep=1pt, outer sep=1pt] at (C) {$C$};
+        \node[above, fill=white, inner sep=1pt, outer sep=1pt] at (D) {$D$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
 
-        \node[above right] at (0,1) {$1$}; % Позначка 1 на y
+        \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$}; % Позначка 1 на y
         \draw (0.1,1) -- (-0.1,1);
-        \node[above] at (1,0) {$1$};   % Позначка 1 на x
-        \node[below right] at (0,0) {$0$};   % Позначка 1 на x
+        \node[above, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};   % Позначка 1 на x
+        \node[below right, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};   % Позначка 1 на x
         \draw (1,0.1) -- (1,-0.1);
 
-        \fill (A) circle (3pt);
-        \fill (B) circle (3pt);
-        \fill (C) circle (3pt);
-        \fill (D) circle (3pt);
+        \path (A) node[nmt dot] {};
+        \path (B) node[nmt dot] {};
+        \path (C) node[nmt dot] {};
+        \path (D) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$63$}{$31{,}5$}{$27$}{$32{,}5$}{$29{,}5$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано трапецію $ABCD$ (див. рисунок). Обчисліть площу цієї трапеції. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.5]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.25x4.79 S
+
         % Сітка
-        \draw[step=1cm,gray!50,very thin] (-3,-3) grid (5,6);
+        \draw[nmt grid, step=1cm] (-3,-3) grid (5,6);
 
         % Осі
-        \draw[->, >=stealth] (-3,0) -- (5,0) node[below]{$x$};
-        \draw[->, >=stealth] (0,-3) -- (0,6) node[left]{$y$};
+        \draw[->] (-3,0) -- (5,0) node[below]{$x$};
+        \draw[->] (0,-3) -- (0,6) node[left]{$y$};
 
         % Точки
         % A(-2, -2)
@@ -468,52 +225,46 @@
         \coordinate (B) at (-1,4);
         \coordinate (C) at (2,4);
 
-        \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+        \draw[very thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-        \node[left] at (A) {$A$};
-        \node[right] at (D) {$D$};
-        \node[above left] at (B) {$B$};
-        \node[above right] at (C) {$C$};
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
+        \node[right, fill=white, inner sep=1pt, outer sep=1pt] at (D) {$D$};
+        \node[above left, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+        \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (C) {$C$};
 
-        \node[below left] at (0,0) {$0$};
-        \node[left] at (0,1) {$1$};
+        \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
         \draw (-0.1,1) -- (0.1,1);
-        \node[below] at (1,0) {$1$};
+        \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
         \draw (1,-0.1) -- (1,0.1);
 
-        \fill (A) circle (3pt);
-        \fill (B) circle (3pt);
-        \fill (C) circle (3pt);
-        \fill (D) circle (3pt);
+        \path (A) node[nmt dot] {};
+        \path (B) node[nmt dot] {};
+        \path (C) node[nmt dot] {};
+        \path (D) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$54$}{$25$}{$27$}{$24$}{$45$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\zadtask{У прямокутній системі координат на площині задано паралелограм $ABCD$ (див. рисунок). Обчисліть площу цього паралелограма. \nmtyear{2023}}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\begin{minipage}[t]{0.42\textwidth}
-
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано паралелограм $ABCD$ (див. рисунок). Обчисліть площу цього паралелограма. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.52\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{flushright}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.45]
-    \draw[gray!40, very thin] (-5,-5) grid (5,5);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 5.01x5.48 S
+
+    \draw[nmt grid] (-5,-5) grid (5,5);
     \draw[->] (-5,0) -- (5,0) node[right] {$x$};
     \draw[->] (0,-5) -- (0,5) node[above] {$y$};
-    \node[below left] at (0,0) {$0$};
-    \node[below] at (1,0) {$1$};
-    \node[left] at (0,1) {$1$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
 
     \coordinate (A) at (-3,1);
     \coordinate (B) at (-3,4);
@@ -521,18 +272,15 @@
     \coordinate (D) at (4,-5);
 
     \fill[gray!40, opacity=0.5] (A) -- (B) -- (C) -- (D) -- cycle;
-    \draw[thick] (A) -- (B) -- (C) -- (D) -- cycle;
+    \draw[very thick] (A) -- (B) -- (C) -- (D) -- cycle;
 
-    \node[left] at (A) {$A$};
-    \node[above] at (B) {$B$};
-    \node[right] at (C) {$C$};
-    \node[below] at (D) {$D$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
+    \node[above, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+    \node[right, fill=white, inner sep=1pt, outer sep=1pt] at (C) {$C$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (D) {$D$};
 \end{tikzpicture}\end{nmtfit}
-\end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$10{,}5$}{$21$}{$18$}{$3\sqrt{85}$}{$1{,}5\sqrt{85}$}
 \par\penalty-20
 \end{samepage}
@@ -565,39 +313,31 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат на площині задано точки $A$ та $B$ (див. рисунок). Визначте відстань між цими точками. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат на площині задано точки $A$ та $B$ (див. рисунок). Визначте відстань між цими точками. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-        % Grid
-        \draw[step=1cm,gray!50,very thin] (-1.5,-2.5) grid (5.5,3.5);
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.01x4.01 S
 
-        % Axes
-        \draw[->, >=stealth, thick] (-1.5,0) -- (5.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-2.5) -- (0,3.5) node[left] {$y$};
+    \draw[nmt grid, step=1] (-3,-3) grid (5,5);
+    \draw[->] (-3,0) -- (5,0) node[below left] {$x$};
+    \draw[->] (0,-3) -- (0,5) node[below left] {$y$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
 
-        % Ticks
-        \node[below left] at (0,0) {$0$};
-        \draw (1,0.1) -- (1,-0.1) node[below] {$1$};
-        \draw (0.1,1) -- (-0.1,1) node[left] {$1$};
-
-        % Points A(0, -1) and B(4, 2) based on visual count
-        \coordinate (A) at (-1,-1);
-        \coordinate (B) at (4,2);
-
-        \fill (A) circle (2.5pt) node[below left] {$A$};
-        \fill (B) circle (2.5pt) node[above right] {$B$};
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \coordinate (A) at (-1,-1);
+    \coordinate (B) at (3,2);
+    \node[nmt dot] at (A) {};
+    \node[nmt dot] at (B) {};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (A) {$A$};
+    \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (B) {$B$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$\sqrt{13}$}{$25$}{$\sqrt{5}$}{$\sqrt{17}$}{$5$}
 \par\penalty-20
 \end{samepage}
@@ -621,48 +361,42 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат $xy$ зображено точку $M$. Укажіть функцію, графік якої проходить через початок координат і точку $M$. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат $xy$ зображено точку $M$. Укажіть функцію, графік якої проходить через початок координат і точку $M$. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
-        \draw[step=1cm,gray!50,very thin] (-2.5,-0.5) grid (3.5,4.5);
-        \draw[->, >=stealth, thick] (-2.5,0) -- (3.5,0) node[below] {$x$};
-        \draw[->, >=stealth, thick] (0,-0.5) -- (0,4.5) node[left] {$y$};
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 4.53x4.29 S
 
-        \node[below left] at (0,0) {$0$};
-        \draw (1,0.1) -- (1,-0.1) node[below] {$1$};
-        \draw (0.1,1) -- (-0.1,1) node[left] {$1$};
-
-        % Point M at (-1, 2)
-        \coordinate (M) at (-1,2);
-        \fill (M) circle (2.5pt) node[above left] {$M$};
-        \draw[dashed] (-1,0) -- (M) -- (0,2);
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \draw[nmt grid, step=1] (-4,-2) grid (5,6);
+    \draw[->, thick] (-4,0) -- (5,0) node[below left] {$x$};
+    \draw[->, thick] (0,-2) -- (0,6) node[left] {$y$};
+    \draw[thin] (1,0.12) -- (1,-0.12); \draw[thin] (0.12,1) -- (-0.12,1);
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \draw[dashed, thick] (-2,4) -- (0,4);
+    \node[nmt dot] at (-2,4) {};
+    \node[above left, fill=white, inner sep=1pt, outer sep=1pt] at (-2,4) {$M$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTableTall{$y=-2x$}{$y=8+2x$}{$y=4-2x$}{$y=2x$}{$y=-\dfrac{x}{2}$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 33 (Виправлено 3D) ===
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат --- точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(12; 15; 16)$ є вершиною паралелепіпеда. Визначте довжину (модуль) вектора $\vec{OK}$. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат --- точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(12; 15; 16)$ є вершиною паралелепіпеда. Визначте довжину (модуль) вектора $\vec{OK}$. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    % Налаштування 3D перспективи: x - вліво-вниз, y - вправо, z - вгору
-    \begin{nmtfit}\begin{tikzpicture}[x={(-0.5cm,-0.4cm)}, y={(0.8cm,0cm)}, z={(0cm,0.8cm)}, scale=0.15]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.12, x={(-0.5cm,-0.4cm)}, y={(0.8cm,0cm)}, z={(0cm,0.8cm)}, scale=0.15]%@N 4.67x4.28 S
 
         % Координати
         \coordinate (O) at (0,0,0);
@@ -682,9 +416,9 @@
         \coordinate (YZ) at (0,\yk,\zk);
 
         % Осі (малюємо трохи далі за коробку)
-        \draw[->, >=stealth] (0,0,0) -- (\xk+5,0,0) node[below left] {$x$};
-        \draw[->, >=stealth] (0,0,0) -- (0,\yk+5,0) node[right] {$y$};
-        \draw[->, >=stealth] (0,0,0) -- (0,0,\zk+5) node[left] {$z$};
+        \draw[->] (0,0,0) -- (\xk+5,0,0) node[below left] {$x$};
+        \draw[->] (0,0,0) -- (0,\yk+5,0) node[right] {$y$};
+        \draw[->] (0,0,0) -- (0,0,\zk+5) node[left] {$z$};
 
         % Невидимі лінії (задні стінки)
         \draw[dashed] (A) -- (XY) -- (B);
@@ -724,8 +458,9 @@
         \fill (K) circle (8pt);
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
+\par\nbvspace{0.2cm}
+% Налаштування 3D перспективи: x - вліво-вниз, y - вправо, z - вгору
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -788,59 +523,38 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат --- точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(5; 1; 7)$ є вершиною паралелепіпеда. Визначте довжину діагоналі цього паралелепіпеда. \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі зображено прямокутний паралелепіпед, одна з вершин якого збігається з початком координат --- точкою $O$, а три ребра лежать на координатних осях (див. рисунок). Точка $K(5; 1; 7)$ є вершиною паралелепіпеда. Визначте довжину діагоналі цього паралелепіпеда. \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    % Налаштування 3D: z - вгору, y - вправо, x - вліво-вниз
-    \begin{nmtfit}\begin{tikzpicture}[x={(-0.6cm,-0.5cm)}, y={(0.9cm,0cm)}, z={(0cm,0.9cm)}, scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.8, thick, line join=round]%@N 5.76x6.00 S
 
-        % Параметри
-        \def\xk{1.5} % візуальний розмір по x
-        \def\yk{2.5} % візуальний розмір по y
-        \def\zk{3.5} % візуальний розмір по z
-
-        \coordinate (O) at (0,0,0);
-        \coordinate (K) at (\xk,\yk,\zk);
-
-        % Вершини на осях
-        \coordinate (X) at (\xk,0,0);
-        \coordinate (Y) at (0,\yk,0);
-        \coordinate (Z) at (0,0,\zk);
-
-        % Проміжні вершини
-        \coordinate (XY) at (\xk,\yk,0);
-        \coordinate (XZ) at (\xk,0,\zk);
-        \coordinate (YZ) at (0,\yk,\zk);
-
-        % Осі
-        \draw[->, >=stealth] (0,0,0) -- (\xk+1,0,0) node[below left] {$x$};
-        \draw[->, >=stealth] (0,0,0) -- (0,\yk+1,0) node[right] {$y$};
-        \draw[->, >=stealth] (0,0,0) -- (0,0,\zk+1) node[left] {$z$};
-
-        % Каркас паралелепіпеда
-        % Невидимі лінії (задні)
-        \draw[thick] (X) -- (XY) -- (Y);
-        \draw[thick] (XY) -- (K);
-
-        % Видимі лінії
-        \draw[thick] (O) -- (X) -- (XZ) -- (Z) -- cycle; % Ліва грань
-        \draw[thick] (O) -- (Y) -- (YZ) -- (Z) -- cycle; % Задня (але візуально ліва) грань
-
-        % Домальовуємо передні ребра
-        \draw[thick] (XZ) -- (K);
-        \draw[thick] (YZ) -- (K);
-
-        % Точки
-        \node[below right] at (O) {$O$};
-        \node[right] at (K) {$K$};
-
-    \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
+    \coordinate (O) at (0,0);
+    \coordinate (X) at (-0.925,-0.95);
+    \coordinate (Y) at (1.75,0);
+    \coordinate (Z) at (0,2.675);
+    \coordinate (XY) at (0.825,-0.95);
+    \coordinate (XZ) at (-0.925,1.725);
+    \coordinate (YZ) at (1.75,2.675);
+    \coordinate (K) at (0.825,1.725);
+    \draw (O) -- (Y) -- (XY) -- (X) -- cycle;
+    \draw (Z) -- (YZ) -- (K) -- (XZ) -- cycle;
+    \draw (O) -- (Z);
+    \draw (Y) -- (YZ);
+    \draw (XY) -- (K);
+    \draw (X) -- (XZ);
+    \draw[->] (Z) -- (0,3.6) node[above] {$z$};
+    \draw[->] (Y) -- (3.1,0) node[right] {$y$};
+    \draw[->] (X) -- (-1.65,-1.4) node[below left] {$x$};
+    \node[above left] at (O) {$O$};
+    \node[right] at (K) {$K$};
+\end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par\nbvspace{0.2cm}
+% Налаштування 3D: z - вгору, y - вправо, x - вліво-вниз
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -849,21 +563,22 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус більшої кулі? \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус більшої кулі? \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.2cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.05]%@N 3.70x2.19 S
+
         % Ліва куля (O1)
         \coordinate (O1) at (0,0);
         \draw[thick] (O1) circle (1.2cm);
         % Екватор лівої кулі
         \draw[dashed] (-1.2,0) arc (180:0:1.2cm and 0.4cm);
         \draw (-1.2,0) arc (180:360:1.2cm and 0.4cm);
-        \fill (O1) circle (2pt);
+        \path (O1) node[nmt dot] {};
         \node[left] at (O1) {$O_1$};
 
         % Права куля (O2), трохи більша
@@ -873,37 +588,35 @@
         % Екватор правої кулі
         \draw[dashed] (1.2,0) arc (180:0:1.8cm and 0.6cm);
         \draw (1.2,0) arc (180:360:1.8cm and 0.6cm);
-        \fill (O2) circle (2pt);
+        \path (O2) node[nmt dot] {};
         \node[right] at (O2) {$O_2$};
 
         % Точка дотику
-        \fill (Touch) circle (2pt);
+        \path (Touch) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$13$}{$26$}{$12$}{$17$}{$10$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус меншої кулі? \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі задано кулі з центрами в точках $O_1(1; -4; 10)$ і $O_2(7; 4; -14)$, що мають зовнішній дотик (див. рисунок). Якому значенню серед наведених \textit{може} дорівнювати радіус меншої кулі? \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.2cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=1.11]%@N 3.52x2.07 S
+
         % Ліва куля (O1) - менша
         \coordinate (O1) at (0,0);
         \draw[thick] (O1) circle (1.1cm);
         % Екватор лівої кулі
         \draw[dashed] (-1.1,0) arc (180:0:1.1cm and 0.35cm);
         \draw (-1.1,0) arc (180:360:1.1cm and 0.35cm);
-        \fill (O1) circle (2pt);
+        \path (O1) node[nmt dot] {};
         \node[left] at (O1) {$O_1$};
 
         % Права куля (O2) - більша
@@ -913,17 +626,14 @@
         % Екватор правої кулі
         \draw[dashed] (1.1,0) arc (180:0:1.7cm and 0.55cm);
         \draw (1.1,0) arc (180:360:1.7cm and 0.55cm);
-        \fill (O2) circle (2pt);
+        \path (O2) node[nmt dot] {};
         \node[right] at (O2) {$O_2$};
 
         % Точка дотику
-        \fill (Touch) circle (2pt);
+        \path (Touch) node[nmt dot] {};
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$26$}{$17$}{$13$}{$16$}{$12$}
 \par\penalty-20
 \end{samepage}
@@ -965,14 +675,15 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.55\textwidth}
-У прямокутній системі координат у просторі задано сфери, що мають внутрішній дотик (див. рисунок). $A(9; -2; 4)$ --- точка дотику сфер, $B(1; 7; -8)$ --- центр меншої сфери. Яким \textit{найменшим} з-поміж наведених може бути радіус сфери з центром у точці $O$? \nmtyear{2025}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum У прямокутній системі координат у просторі задано сфери, що мають внутрішній дотик (див. рисунок). $A(9; -2; 4)$ --- точка дотику сфер, $B(1; 7; -8)$ --- центр меншої сфери. Яким \textit{найменшим} з-поміж наведених може бути радіус сфери з центром у точці $O$? \nmtyear{2025}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.4\textwidth}
-    \nopagebreak\nbvspace{-0.3cm}
-    \begin{flushright}
-    \begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.784]%@N 4.20x3.63 S
+
         % Велика сфера (центр O)
         % Щоб виглядало як на картинці: A зліва, B всередині, O правіше
         \coordinate (A) at (-2,0); % Точка дотику
@@ -990,16 +701,13 @@
         \draw (-0.5-1.5,0) arc (180:360:1.5cm and 0.4cm);
 
         % Точки
-        \fill (A) circle (2pt) node[left] {$A$};
-        \fill (B) circle (2pt) node[right] {$B$};
-        \fill (O) circle (2pt) node[right] {$O$};
+        \path (A) node[nmt dot] {} node[left] {$A$};
+        \path (B) node[nmt dot] {} node[right] {$B$};
+        \path (O) node[nmt dot] {} node[right] {$O$};
 
     \end{tikzpicture}\end{nmtfit}
-    \end{flushright}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$17$}{$36$}{$42$}{$21$}{$56$}
 \par\penalty-20
 \end{samepage}
@@ -1024,21 +732,14 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №10 --- основна тема: Куля. Сфера
-\zadtask{У прямокутній системі координат у просторі задано сферу та дві точки $M(-4;\, 5;\, 0)$ і $N(4;\, -3;\, 4)$, які належать цій сфері, причому відстань між ними є \textit{найбільшою} серед усіх можливих відстаней між точками цієї сфери. Знайдіть радіус сфери. \nmtyear{2026}}
+\zadtask{У прямокутній системі координат у просторі задано точки $M(-4;\, 5;\, 4)$ і $N(4;\, -3;\, 0)$, які лежать на сфері та є найбільш віддаленими точками цієї сфери. Визначте довжину радіуса цієї сфери. \nmtyear{2026}}
 \answerTable{$4$}{$6$}{$8$}{$12$}{$24$}
 % Відповідь: Б
-\ifshowsolutions\solution{Найбільша відстань між точками сфери~--- це діаметр, тож $MN$ є діаметром. $MN=\sqrt{(4-(-4))^2+(-3-5)^2+(4-0)^2}=\sqrt{64+64+16}=\sqrt{144}=12$. Радіус $R=\dfrac{12}{2}=6$. Відповідь: \textbf{Б} ($6$).}\fi
+\ifshowsolutions\solution{Найбільша відстань між точками сфери~--- це діаметр, тож $MN$ є діаметром. $MN=\sqrt{(4-(-4))^2+(-3-5)^2+(0-4)^2}=\sqrt{64+64+16}=\sqrt{144}=12$. Радіус $R=\dfrac{12}{2}=6$. Відповідь: \textbf{Б} ($6$).}\fi
 \par\penalty-20
 \end{samepage}
 
-\begin{samepage}
-% НМТ 2026, сесія 1.06, завдання №15
-\zadtask{У прямокутній системі координат у просторі задано точку $O(0;\,0;\,0)$. Укажіть з-поміж наведених точку, відстань від якої до точки $O$ \textit{не дорівнює} $10$. \nmtyear{2026}}
-\answerTable{$(0;\,6;\,8)$}{$(10;\,0;\,0)$}{$(9;\,1;\,0)$}{$(-6;\,0;\,8)$}{$(0;\,-8;\,-6)$}
-% Відповідь: В
-\ifshowsolutions\solution{Відстань від $O$ до $(x;y;z)$ дорівнює $\sqrt{x^2+y^2+z^2}$. Для чотирьох точок маємо $\sqrt{100}=10$, а для $(9;1;0)$: $\sqrt{81+1}=\sqrt{82}\approx 9{,}06\neq 10$. Відповідь: \textbf{В}.}\fi
-\par\penalty-20
-\end{samepage}
+
 
 \begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №12
@@ -1067,14 +768,7 @@
 \par\penalty-20
 \end{samepage}
 
-\begin{samepage}
-% НМТ 2026, сесія 5.06, завдання №7
-\zadtask{У прямокутній системі координат у просторі задано точки $A(1;\,2;\,3)$ і $B(3;\,1;\,1)$. Визначте довжину вектора $\overrightarrow{AB}$. \nmtyear{2026}}
-\answerTable{$3$}{$\sqrt{6}$}{$9$}{$\sqrt{14}$}{$2\sqrt{3}$}
-% Відповідь: А
-\ifshowsolutions\solution{$\overrightarrow{AB}=(3-1;\,1-2;\,1-3)=(2;\,-1;\,-2)$. $|\overrightarrow{AB}|=\sqrt{2^2+(-1)^2+(-2)^2}=\sqrt{9}=3$. Відповідь: \textbf{А}.}\fi
-\par\penalty-20
-\end{samepage}
+
 
 \begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №12
@@ -1088,33 +782,35 @@
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №12 --- основна тема: Куля. Сфера
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum У прямокутній системі координат у просторі зображено сферу радіуса $4$ (див. рисунок). Точки $M(1; -2; 0)$ і $N$ належать діаметру сфери. Визначте координати точки $N$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.38\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.7, thick, line join=round]
-    % Площина
-    \draw[fill=yellow!30!orange!20, draw=black] (-2,-1) -- (4,-1) -- (5.5,1.5) -- (-0.5,1.5) -- cycle;
-    % Осі
-    \draw[->, >=stealth] (2.5,0.5) -- (1,-1.5) node[left] {$x$};
-    \draw[->, >=stealth] (2.5,0.5) -- (5,0.5) node[below] {$y$};
-    \draw[->, >=stealth] (2.5,0.5) -- (2.5,4.5) node[right] {$z$};
-    % Сфера
-    \coordinate (C) at (1, 2.5); % центр сфери
-    \draw[fill=cyan!15, draw=blue!60!black] (C) circle (1.5);
-    \draw[dashed, blue!60!black] (1, 2.5) ellipse (1.5 and 0.4); % екватор
-    % Точки M і N та діаметр
-    \coordinate (M) at (1, 1);
-    \coordinate (N) at (1, 4);
-    \draw[dashed, red!80!black] (M) -- (N);
-    \fill (M) circle (2pt) node[left] {$M$};
-    \fill (N) circle (2pt) node[left] {$N$};
+\begin{nmtfit}\begin{tikzpicture}[thick, line join=round]%@N 5.09x4.70 S
+
+    % площина xOy
+    \filldraw[fill=nmtFillC, draw=nmtInk] (-1.9,0.6) -- (2.3,0.6) -- (1.2,-1.16) -- (-2.76,-1.16) -- cycle;
+    % вісь z: видима частина над сферою
+    \draw[->] (0,2.1) -- (0,2.9) node[right] {$z$};
+    % сфера радіуса 4 (дотикається до площини xOy у точці M)
+    \filldraw[fill=nmtFillA, fill opacity=0.65, draw=nmtBlue] (-0.84,1.16) circle (1.26);
+    \draw[thin, nmtBlue] (-2.1,1.16) arc (180:360:1.26 and 0.34);
+    \draw[dashed, thin, nmtBlue] (-2.1,1.16) arc (180:0:1.26 and 0.34);
+    % прихована частина осі z
+    \draw[dashed, thin] (0,0) -- (0,2.1);
+    % осі x і y
+    \draw[->] (0,0) -- (-1.0,-1.06) node[below left] {$x$};
+    \draw[->] (0,0) -- (1.9,0.1) node[above] {$y$};
+    % діаметр MN
+    \draw[dashed, thin, nmtRed] (-0.84,-0.1) -- (-0.84,2.42);
+    \path (-0.84,-0.1) node[nmt dot] {} node[left] {$M$};
+    \path (-0.84,2.42) node[nmt dot] {} node[left] {$N$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
-\answerTable{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(5; -2; 0)$}{$(-1; 2; 8)$}
+\answerTable{$(1; -2; 4)$}{$(1; -2; 8)$}{$(4; -2; 4)$}{$(1; -2; -8)$}{$(-1; 2; 8)$}
 \par\penalty-20
 \end{samepage}
 
@@ -1125,9 +821,10 @@
 \zadnum У прямокутній системі координат у просторі зображено прямокутний паралелепіпед $ABCDA_1B_1C_1D_1$, вершина $A$ якого збігається з початком координат, а ребра $AB$, $AD$ й $AA_1$ лежать на координатних осях (див. рисунок). Визначте координати вектора $\overrightarrow{DB_1}$. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.75, thick, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.636, thick, line join=round]%@N 5.40x5.66 S
+
     \coordinate (A) at (0,0);
     \coordinate (B) at (225:1.4);
     \coordinate (D) at (3.5,0);
@@ -1138,9 +835,9 @@
     \coordinate (D1) at ($(D)+(A1)$);
 
     % Axes
-    \draw[->, >=stealth] (A) -- ($(B)+(225:1)$) node[left] {$x$};
-    \draw[->, >=stealth] (A) -- ($(D)+(1,0)$) node[below] {$y$};
-    \draw[->, >=stealth] (A) -- ($(A1)+(0,1.2)$) node[left] {$z$};
+    \draw[->] (A) -- ($(B)+(225:1)$) node[left] {$x$};
+    \draw[->] (A) -- ($(D)+(1,0)$) node[below] {$y$};
+    \draw[->] (A) -- ($(A1)+(0,1.2)$) node[left] {$z$};
 
     % Edges
     \draw (B) -- (C) -- (D) -- (D1) -- (C1) -- (B1) -- cycle;
@@ -1152,7 +849,7 @@
     \draw[dashed] (A) -- (A1);
 
     % Vector red dashed
-    \draw[dashed, red, ->, >=stealth, line width=1.1pt] (D) -- (B1);
+    \draw[dashed, nmtRed, ->, line width=1.1pt] (D) -- (B1);
 
     % Text and ticks
     \node[left, xshift=-0.1cm] at (A) {$A$};
@@ -1189,27 +886,27 @@
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №8 --- також у темі: Квадрат
 \noindent
-\begin{minipage}[c]{0.58\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum У прямокутній системі координат $xy$ зображено квадрат $KLMN$, $K(-1; 0)$, $L(-1; 2)$, $M(1; 2)$, $N(1; 0)$ (див. рисунок). Скільки спільних точок з квадратом $KLMN$ має графік рівняння $x^2 + y^2 = 4$? \nmtyear{2026}
 \end{minipage}%
 \hfill
 \begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]
-    \draw[step=1cm, gray!40, thin] (-2,-1) grid (2,3);
-    \draw[->] (-2.3,0) -- (2.3,0) node[right] {$x$};
-    \draw[->] (0,-1.3) -- (0,3.3) node[above] {$y$};
-    \node[below right, font=\scriptsize] at (0,0) {$0$};
-    \node[below, font=\scriptsize] at (-1,0) {$-1$};
-    \node[below right, font=\scriptsize] at (1,0) {$1$};
-    \node[above left, font=\scriptsize] at (0,1) {$1$};
-    \node[above left, font=\scriptsize] at (0,2) {$2$};
-    \draw[mainGreen, very thick] (-1,0) rectangle (1,2);
-    \node[below left, font=\scriptsize] at (-1,0) {$K$};
-    \node[above left, font=\scriptsize] at (-1,2) {$L$};
-    \node[above right, font=\scriptsize] at (1,2) {$M$};
-    \node[below right, font=\scriptsize] at (1,0) {$N$};
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 3.71x3.78 S
 
+    \draw[nmt grid, step=1] (-3,-2) grid (3,4);
+    \draw[->] (-3,0) -- (3.4,0) node[right] {$x$};
+    \draw[->] (0,-2) -- (0,4.4) node[above] {$y$};
+    \draw[nmtGreen, very thick] (-1,0) rectangle (1,2);
+    \node[below left, xshift=-1pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, xshift=-6pt, fill=white, inner sep=1pt, outer sep=1pt] at (-1,0) {$-1$};
+    \node[below, xshift=2pt, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$1$};
+    \node[below right, xshift=1pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,1) {$1$};
+    \node[below right, xshift=1pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,2) {$2$};
+    \node[above left, fill=white, inner sep=1pt, outer sep=1pt] at (-1,0) {$K$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (-1,2) {$L$};
+    \node[right, fill=white, inner sep=1pt, outer sep=1pt] at (1,2) {$M$};
+    \node[above right, fill=white, inner sep=1pt, outer sep=1pt] at (1,0) {$N$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1244,18 +941,13 @@
 % НМТ 2026, сесія 17.06, завдання №12 --- також у темі: Призма. Паралелепіпед. Куб
 \noindent
 \begin{minipage}[c]{0.56\textwidth}
-\zadnum У прямокутній системі координат у просторі зображено куб $ABCDA_1B_1C_1D_1$, вершина $B$ якого збігається з початком координат, а ребра $AB$, $BC$ й $BB_1$ лежать на координатних осях (див. рисунок). Ребро куба дорівнює $1$. Визначте координати вектора $\overrightarrow{AD_1}$. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.2cm}
-\par\noindent\textbf{А}\ \ $(1; 1; 1)$
-\par\noindent\textbf{Б}\ \ $(1; 1; 0)$
-\par\noindent\textbf{В}\ \ $(1; 0; 1)$
-\par\noindent\textbf{Г}\ \ $(1; 0; 0)$
-\par\noindent\textbf{Д}\ \ $(0; 1; 1)$
+\zadnum У прямокутній системі координат у просторі зображено куб $ABCDA_1B_1C_1D_1$, вершина $B$ якого збігається з початком координат, а ребра $AB$, $BC$ й $BB_1$ лежать на координатних осях (див. рисунок). Ребро куба дорівнює $1$. Визначте координати вектора $\overrightarrow{AD_1}$. \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \par
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1.5, line join=round]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.31, line join=round]%@N 5.25x5.49 S
+
     \coordinate (B) at (0,0);
     \coordinate (C) at (1.3,0);
     \coordinate (A) at (-0.55,-0.55);
@@ -1265,9 +957,9 @@
     \coordinate (A1) at (-0.55,0.75);
     \coordinate (D1) at (0.75,0.75);
     % осі
-    \draw[->] (0,0) -- (-1.0,-1.0) node[below, font=\scriptsize] {$x$};
-    \draw[->] (0,0) -- (2.0,0) node[right, font=\scriptsize] {$y$};
-    \draw[->] (0,0) -- (0,2.0) node[above, font=\scriptsize] {$z$};
+    \draw[->] (0,0) -- (-1.0,-1.0) node[below, font=\normalsize] {$x$};
+    \draw[->] (0,0) -- (2.0,0) node[right, font=\normalsize] {$y$};
+    \draw[->] (0,0) -- (0,2.0) node[above, font=\normalsize] {$z$};
     % ребра куба
     \draw[dashed] (A) -- (B) -- (C);
     \draw[dashed] (B) -- (B1);
@@ -1276,16 +968,19 @@
     \draw (D) -- (D1);
     \draw (C) -- (C1);
     \draw (A1) -- (B1) -- (C1) -- (D1) -- cycle;
-    \node[below left, font=\scriptsize] at (A) {$A$};
-    \node[below left, font=\scriptsize] at (B) {$B$};
-    \node[right, font=\scriptsize] at (C) {$C$};
-    \node[below right, font=\scriptsize] at (D) {$D$};
-    \node[left, font=\scriptsize] at (A1) {$A_1$};
-    \node[above left, font=\scriptsize] at (B1) {$B_1$};
-    \node[above right, font=\scriptsize] at (C1) {$C_1$};
-    \node[right, font=\scriptsize] at (D1) {$D_1$};
+    \node[below left, font=\normalsize] at (A) {$A$};
+    \node[below left, font=\normalsize] at (B) {$B$};
+    \node[right, font=\normalsize] at (C) {$C$};
+    \node[below right, font=\normalsize] at (D) {$D$};
+    \node[left, font=\normalsize] at (A1) {$A_1$};
+    \node[above left, font=\normalsize] at (B1) {$B_1$};
+    \node[above right, font=\normalsize] at (C1) {$C_1$};
+    \node[right, font=\normalsize] at (D1) {$D_1$};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
+\par
+\nmtOptions{$(1; 1; 1)$}{$(1; 1; 0)$}{$(1; 0; 1)$}{$(1; 0; 0)$}{$(0; 1; 1)$}
+
 \par\nbvspace{0.3cm}
 % Відповідь: Д
 \par\penalty-20
@@ -1310,9 +1005,7 @@
 \typeTitle{Завдання з короткою відповіддю}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано правильну чотирикутну призму $ABCDA_1B_1C_1D_1$. Діагоналі основи $ABCD$ перетинаються в точці $M$. Висота призми втричі більша за сторону $AB$. Обчисліть об'єм цієї призми, якщо $A(4; \sqrt{10}; 3)$, $M(-2; 0; 1)$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну призму $ABCDA_1B_1C_1D_1$. Діагоналі основи $ABCD$ перетинаються в точці $M$. Висота призми втричі більша за сторону $AB$. Обчисліть об'єм цієї призми, якщо $A(4; \sqrt{10}; 3)$, $M(-2; 0; 1)$. \nmtyear{2024}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -1322,129 +1015,97 @@
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано пряму трикутну призму $ABCA_1B_1C_1$, в основі якої лежить прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$). $A(5; 2; 0)$, $B(-7; 7; 0)$, основа $ABC$ призми лежить у площині $xy$. Точка $K(0; 0; 10)$ належить площині $A_1B_1C_1$. Знайдіть об'єм цієї призми. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано пряму трикутну призму $ABCA_1B_1C_1$, в основі якої лежить прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$). $A(5; 2; 0)$, $B(-7; 7; 0)$, основа $ABC$ призми лежить у площині $xy$. Точка $K(0; 0; 10)$ належить площині $A_1B_1C_1$. Знайдіть об'єм цієї призми. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано пряму чотирикутну призму $ABCDA_1B_1C_1D_1$, в основі якої лежить паралелограм $ABCD$, $A(5; 2; 0)$, $D(-3; 8; 0)$. Площина $ABC$ лежить у площині $xy$. В основі призми з точки $B$ на сторону $AD$ проведено висоту, довжина якої дорівнює $5$. Точка $K(0; 0; 8)$ належить площині $A_1B_1C_1D_1$. Знайдіть об'єм цієї призми. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано пряму чотирикутну призму $ABCDA_1B_1C_1D_1$, в основі якої лежить паралелограм $ABCD$, $A(5; 2; 0)$, $D(-3; 8; 0)$. Площина $ABC$ лежить у площині $xy$. В основі призми з точки $B$ на сторону $AD$ проведено висоту, довжина якої дорівнює $5$. Точка $K(0; 0; 8)$ належить площині $A_1B_1C_1D_1$. Знайдіть об'єм цієї призми. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(-6; 2; 5)$. Точка $M(-1; 3; 4)$ --- середина ребра $DD_1$. Знайдіть об'єм призми $ABCA_1B_1C_1$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(-6; 2; 5)$. Точка $M(-1; 3; 4)$ --- середина ребра $DD_1$. Знайдіть об'єм призми $ABCA_1B_1C_1$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є квадрат $ABCD$. Точки $K(3; -5; 7)$ і $M(11; 1; -3)$ є серединами сторін $AD$ і $CD$ відповідно. Обчисліть площу $S$ бічної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є квадрат $ABCD$. Точки $K(3; -5; 7)$ і $M(11; 1; -3)$ є серединами сторін $AD$ і $CD$ відповідно. Обчисліть площу $S$ бічної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є прямокутник $ABCD$, $C(7; 1; 3)$. Висота $AB$ циліндра вдвічі менша за $AD$. Точка $O(2; -3; 6)$ ділить відрізок $AD$ навпіл. Обчисліть площу $S$ повної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є прямокутник $ABCD$, $C(7; 1; 3)$. Висота $AB$ циліндра вдвічі менша за $AD$. Точка $O(2; -3; 6)$ ділить відрізок $AD$ навпіл. Обчисліть площу $S$ повної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, усі ребра якої рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(2; -8; 7)$, точка $M(6; 2; 4)$ --- середина ребра $AC$. Обчисліть площу бічної поверхні призми $ABCA_1B_1C_1$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, усі ребра якої рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(2; -8; 7)$, точка $M(6; 2; 4)$ --- середина ребра $AC$. Обчисліть площу бічної поверхні призми $ABCA_1B_1C_1$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, у якій $A(2; -8; 10)$. Усі ребра призми рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(12; -2; 7)$. Обчисліть площу бічної поверхні цієї призми. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну трикутну призму $ABCA_1B_1C_1$, у якій $A(2; -8; 10)$. Усі ребра призми рівні. Діагоналі грані $BCC_1B_1$ перетинаються в точці $K(12; -2; 7)$. Обчисліть площу бічної поверхні цієї призми. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано конус з вершиною $M(-6; -9; 7)$, осьовим перерізом якого є прямокутний трикутник $AMB$, $A(6; -12; 4)$. Обчисліть об'єм $V$ цього конуса. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано конус з вершиною $M(-6; -9; 7)$, осьовим перерізом якого є прямокутний трикутник $AMB$, $A(6; -12; 4)$. Обчисліть об'єм $V$ цього конуса. У відповідь запишіть значення $\dfrac{V}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано конус з вершиною $M(4; -9; 7)$, осьовим перерізом якого є рівносторонній трикутник $AMB$, $A(8; -12; 12)$. Обчисліть площу $S$ бічної поверхні цього конуса. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано конус з вершиною $M(4; -9; 7)$, осьовим перерізом якого є рівносторонній трикутник $AMB$, $A(8; -12; 12)$. Обчисліть площу $S$ бічної поверхні цього конуса. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(6; -6; 4)$, точка $M(-4; 4; 9)$ --- середина ребра $CC_1$. Обчисліть площу \textit{повної} поверхні цього куба. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано куб $ABCDA_1B_1C_1D_1$. Діагоналі грані $ABCD$ перетинаються в точці $K(6; -6; 4)$, точка $M(-4; 4; 9)$ --- середина ребра $CC_1$. Обчисліть площу \textit{повної} поверхні цього куба. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано правильну чотирикутну піраміду $SABCD$, $A(15; 1; 10)$, $B(-1; 5; 6)$. Усі ребра піраміди рівні. Знайдіть об'єм цієї піраміди. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну піраміду $SABCD$, $A(15; 1; 10)$, $B(-1; 5; 6)$. Усі ребра піраміди рівні. Знайдіть об'єм цієї піраміди. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано трикутну піраміду $SABC$ з вершиною $S(0; 0; 9)$. Основою піраміди є прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$), що лежить у площині $xy$, $A(-8; 10; 0)$, $B(8; -2; 0)$. Знайдіть об'єм цієї піраміди. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано трикутну піраміду $SABC$ з вершиною $S(0; 0; 9)$. Основою піраміди є прямокутний рівнобедрений трикутник $ABC$ ($\angle C = 90^\circ$), що лежить у площині $xy$, $A(-8; 10; 0)$, $B(8; -2; 0)$. Знайдіть об'єм цієї піраміди. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано правильну чотирикутну призму $ABCDA_1B_1C_1D_1$. Діагоналі основи $ABCD$ перетинаються в точці $M(-3; 2; 0)$. Висота призми вдвічі більша за сторону $AD$. Обчисліть об'єм цієї призми, якщо $A(1; 5; 4)$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано правильну чотирикутну призму $ABCDA_1B_1C_1D_1$. Діагоналі основи $ABCD$ перетинаються в точці $M(-3; 2; 0)$. Висота призми вдвічі більша за сторону $AD$. Обчисліть об'єм цієї призми, якщо $A(1; 5; 4)$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є прямокутник $ABCD$. Точка $O(0; 0; 0)$ є центром нижньої основи циліндра, а точка $O_1(0; 0; 10)$ --- центром верхньої. Точка $A$ належить колу нижньої основи і має координати $(3; 4; 0)$. Обчисліть площу повної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано циліндр, осьовим перерізом якого є прямокутник $ABCD$. Точка $O(0; 0; 0)$ є центром нижньої основи циліндра, а точка $O_1(0; 0; 10)$ --- центром верхньої. Точка $A$ належить колу нижньої основи і має координати $(3; 4; 0)$. Обчисліть площу повної поверхні цього циліндра. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано конус, вершина якого $S$ має координати $(0; 0; 12)$, а центр основи $O$ збігається з початком координат. Точка $A(5; 0; 0)$ належить колу основи конуса. Обчисліть площу бічної поверхні цього конуса. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано конус, вершина якого $S$ має координати $(0; 0; 12)$, а центр основи $O$ збігається з початком координат. Точка $A(5; 0; 0)$ належить колу основи конуса. Обчисліть площу бічної поверхні цього конуса. У відповідь запишіть значення $\dfrac{S}{\pi}$. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-\noindent\zadnum \begin{minipage}[t]{0.95\textwidth}
-У прямокутній системі координат у просторі задано трикутну піраміду $DABC$, $D(0; 0; 6)$. Основа $ABC$ лежить у площині $xy$, $A(-3; 0; 0)$, $B(0; 4; 0)$, $C(0; 0; 0)$. Обчисліть об'єм цієї піраміди. \nmtyear{2024}
-\end{minipage}
+\noindent\zadnum У прямокутній системі координат у просторі задано трикутну піраміду $DABC$, $D(0; 0; 6)$. Основа $ABC$ лежить у площині $xy$, $A(-3; 0; 0)$, $B(0; 4; 0)$, $C(0; 0; 0)$. Обчисліть об'єм цієї піраміди. \nmtyear{2024}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}

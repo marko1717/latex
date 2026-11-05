@@ -1,188 +1,11 @@
 \documentclass[12pt]{article}
-\usepackage[ukrainian,shorthands=off]{babel}   % shorthands=off: символ " не активний (потрібно для міток "..." у TikZ всередині \zadtask)
-\usepackage{fontspec}
-% --- НАЛАШТУВАННЯ ШРИФТІВ ---
-% Шрифти Schoolbook-*.otf лежать у корені проєкту. Шлях підбирається автоматично:
-% ../ (компіляція з папки теми), ./ (корінь проєкту), ../../ (підпапки теми 28); інакше -- TeX Gyre Schola.
-\newcommand{\nmtSchoolbook}[1]{\setmainfont{Schoolbook-Regular.otf}[
-    Path = #1,
-    BoldFont = Schoolbook-Bold.otf,
-    ItalicFont = Schoolbook-Italic.otf,
-    BoldItalicFont = Schoolbook-BoldItalic.otf
-]}
-\IfFileExists{../Schoolbook-Regular.otf}{\nmtSchoolbook{../}}{%
- \IfFileExists{./Schoolbook-Regular.otf}{\nmtSchoolbook{./}}{%
-  \IfFileExists{../../Schoolbook-Regular.otf}{\nmtSchoolbook{../../}}{%
-   \setmainfont{texgyreschola}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic]}}}
-\usepackage[italic]{mathastext}
-\usepackage[a4paper,margin=1.8cm,bottom=2cm,top=2cm]{geometry}
-\usepackage{amsmath,amssymb}
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.18}
-\usepgfplotslibrary{fillbetween}
-\usetikzlibrary{calc,patterns,angles,quotes,intersections,babel,3d,shapes.symbols,shapes.geometric,decorations.pathreplacing,shadings,arrows.meta,hobby}
-\usepackage{xcolor,array,fancyhdr,enumitem,multicol}
-\usepackage{colortbl,multirow,diagbox,needspace}
-\usepackage{tcolorbox}
-\tcbuselibrary{skins,breakable}
-\usepackage[hidelinks]{hyperref}
-\usepackage[firstpage=false, text=@pvtr2525, scale=0.6, color=gray!12]{draftwatermark}
-
-% --- АВТОСТИСКАННЯ: рисунок/сітка, ширша за колонку, масштабується до ширини колонки ---
-\newsavebox{\nmtfitbox}
-\newenvironment{nmtfit}{\begin{lrbox}{\nmtfitbox}}{\end{lrbox}%
-  \ifdim\wd\nmtfitbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtfitbox}}\else\usebox{\nmtfitbox}\fi}
-\let\nmtIncludegraphicsOrig\includegraphics
-\renewcommand{\includegraphics}[2][]{\begin{nmtfit}\nmtIncludegraphicsOrig[#1]{#2}\end{nmtfit}}
-
-
-\definecolor{mainGreen}{RGB}{34, 120, 64}
-\definecolor{yearOrange}{RGB}{220, 100, 30}
-\definecolor{yearcolor}{RGB}{220, 100, 30}
-\definecolor{titleBg}{RGB}{225, 240, 220}
-\definecolor{instrBg}{RGB}{255, 240, 220}
-\definecolor{instrBorder}{RGB}{220, 150, 80}
-\definecolor{headerblue}{RGB}{0, 102, 204}   % використовується в рисунках старої бази
-
-\setlength{\parindent}{0pt}
-\emergencystretch=1.5em
-
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+% єдина преамбула -- nmtbase.sty у корені проєкту (знаходиться і з кореня, і з теки теми, і з підтеки)
+\IfFileExists{nmtbase.sty}{\usepackage{nmtbase}}{\IfFileExists{../nmtbase.sty}{\usepackage{../nmtbase}}{\usepackage{../../nmtbase}}}
 \fancyhead[C]{\small\color{gray!80} База завдань НМТ 2022--2026 \textendash{} Тема 37}
 \fancyhead[R]{\small\color{mainGreen}\textbf{\href{https://t.me/pvtr2525}{@pvtr2525}}}
 \fancyfoot[L]{\small\color{gray!80}\href{https://t.me/pvtr2525}{ТГ: @pvtr2525}}
 \fancyfoot[C]{\small\color{gray!80}\thepage}
 \fancyfoot[R]{\small\color{gray!80}НМТ 2022--2026}
-
-% --- ТАБЛИЦІ ВІДПОВІДЕЙ ---
-% ширина клітинки = (ширина рядка - відступи) / 5: на всю сторінку це ~3 см, у minipage поруч із рисунком таблиця стискається
-\newlength{\nmtcellw}
-\newcommand{\nmtSetCell}{\setlength{\nmtcellw}{\dimexpr(\linewidth-12\tabcolsep-6\arrayrulewidth)/5\relax}}
-\newcommand{\answerTable}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.15cm]{0pt}{0.6cm}\textbf{А} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Б} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{В} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Г} & \rule[-0.15cm]{0pt}{0.6cm}\textbf{Д} \\
-\hline
-\rule[-0.2cm]{0pt}{0.75cm}#1 & \rule[-0.2cm]{0pt}{0.75cm}#2 & \rule[-0.2cm]{0pt}{0.75cm}#3 & \rule[-0.2cm]{0pt}{0.75cm}#4 & \rule[-0.2cm]{0pt}{0.75cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\answerTableTall}[5]{%
-\par\nopagebreak\vspace{0.15cm}
-\noindent\nmtSetCell
-\begin{tabular}{|*{5}{>{\centering\arraybackslash}m{\nmtcellw}|}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm}\textbf{А} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Б} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{В} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Г} & \rule[-0.2cm]{0pt}{0.7cm}\textbf{Д} \\
-\hline
-\rule[-0.45cm]{0pt}{1.2cm}#1 & \rule[-0.45cm]{0pt}{1.2cm}#2 & \rule[-0.45cm]{0pt}{1.2cm}#3 & \rule[-0.45cm]{0pt}{1.2cm}#4 & \rule[-0.45cm]{0pt}{1.2cm}#5 \\
-\hline
-\end{tabular}
-\par\vspace{0.25cm}
-}
-\newcommand{\instructionBox}[1]{%
-\par\vspace{0.3cm}
-\begin{tcolorbox}[colback=instrBg, colframe=instrBorder, boxrule=0.6pt, arc=2pt,
-    left=8pt, right=8pt, top=4pt, bottom=4pt]
-\centering\small\bfseries #1
-\end{tcolorbox}
-\par\vspace{0.15cm}
-}
-\newcommand{\sectionTitle}[1]{%
-\par\vspace{0.4cm}
-\begin{tcolorbox}[colback=titleBg, colframe=titleBg, boxrule=0pt, arc=8pt,
-    halign=center, fontupper=\Large\bfseries\color{mainGreen}]
-\hyphenpenalty=10000 \exhyphenpenalty=10000 #1
-\end{tcolorbox}
-\par\vspace{0.3cm}
-}
-\newcommand{\task}[2]{\noindent\textbf{#1.}\ \ #2\par\vspace{0.2cm}}
-% --- НМТ-СТИЛЬ ПОЛЕ ВІДПОВІДІ ---
-\newcommand{\nmtAnswerBox}{%
-\par\nopagebreak\vspace{0.2cm}\noindent
-Відповідь:\ \
-\begin{tabular}{@{}*{4}{|>{\centering\arraybackslash}p{0.8cm}}|@{\hspace{0.1cm}\textbf{,}\hspace{0.1cm}}*{3}{|>{\centering\arraybackslash}p{0.8cm}}|@{}}
-\hline
-\rule[-0.2cm]{0pt}{0.7cm} & & & & & & \\
-\hline
-\end{tabular}
-\par\vspace{0.3cm}
-}
-% --- СІТКА ДЛЯ МАТЧИНГУ ---
-\newsavebox{\nmtgridbox}
-\newcommand{\matchingGrid}{%
-    \sbox{\nmtgridbox}{\matchingGridRaw}%
-    \ifdim\wd\nmtgridbox>\linewidth \resizebox{\linewidth}{!}{\usebox{\nmtgridbox}}\else\usebox{\nmtgridbox}\fi}
-\newcommand{\matchingGridRaw}{%
-    \begingroup
-    \renewcommand{\arraystretch}{1.15}
-    \setlength{\tabcolsep}{4pt}
-    \footnotesize
-    \begin{tabular}{r|c|c|c|c|c|}
-         \multicolumn{1}{c}{} & \multicolumn{1}{c}{\textbf{А}} & \multicolumn{1}{c}{\textbf{Б}} & \multicolumn{1}{c}{\textbf{В}} & \multicolumn{1}{c}{\textbf{Г}} & \multicolumn{1}{c}{\textbf{Д}} \\ \cline{2-6}
-         \textbf{1} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} & \phantom{X} \\ \cline{2-6}
-         \textbf{2} & & & & & \\ \cline{2-6}
-         \textbf{3} & & & & & \\ \cline{2-6}
-    \end{tabular}
-    \endgroup
-}
-% --- ДОДАТКОВІ МАКРОСИ ЗБІРНИКА ---
-\newcommand{\taskBlock}[1]{%
-\par\vspace{0.45cm}
-\noindent{\color{mainGreen}\rule{\linewidth}{0.8pt}}\par\vspace{0.12cm}
-\noindent{\small\bfseries\color{mainGreen}#1}\par\vspace{0.25cm}
-}
-\newcounter{zad}
-\newcommand{\zadtask}[1]{\stepcounter{zad}\noindent\textbf{\thezad.}\ \ #1\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\zadnum}{\stepcounter{zad}\textbf{\thezad.}\ \ }
-\newcounter{ans}
-\newcommand{\ansitem}[1]{\stepcounter{ans}\noindent\textbf{\theans.}\ #1\par\vspace{0.07cm}}
-% мітка року: нерозривна, притиснута праворуч; якщо не вміщається -- праворуч на новому рядку
-\newcommand{\nmtyear}[1]{\unskip\nobreak\finalhyphendemerits=0 \hfill\penalty100\hskip1em\hbox{}\nobreak\hfill{\small\color{yearOrange}\mbox{\rule{0pt}{2.3ex}(НМТ~#1)}}}
-% --- МАКРОС КОРОТКОГО РОЗВ'ЯЗКУ ---
-\newcommand{\solution}[1]{%
-\par\vspace{0.12cm}
-\begin{tcolorbox}[colback=titleBg!45, colframe=mainGreen!55, boxrule=0.4pt, arc=2pt,
-    left=6pt, right=6pt, top=3pt, bottom=3pt, breakable]
-\footnotesize\textbf{Короткий розв'язок.}\ #1
-\end{tcolorbox}
-\par\vspace{0.12cm}
-}
-% Розв'язки й відповіді (є до завдань НМТ-2026): \showsolutionstrue -- показати, \showsolutionsfalse -- сховати
-\newif\ifshowsolutions
-\showsolutionsfalse
-% --- ЗАГОЛОВКИ З ПУНКТАМИ КЛІКАБЕЛЬНОГО ЗМІСТУ ---
-\setcounter{tocdepth}{2}
-\newcommand{\chapterTitle}[1]{%
-\clearpage\phantomsection\addcontentsline{toc}{section}{#1}%
-\sectionTitle{#1}}
-\newcommand{\typeTitle}[1]{%
-\needspace{6\baselineskip}%
-\phantomsection\addcontentsline{toc}{subsection}{\quad #1}%
-\par\vspace{0.3cm}
-\noindent{\large\bfseries\color{yearOrange}#1}\par\vspace{0.08cm}
-\noindent{\color{yearOrange}\rule{\linewidth}{0.4pt}}\par\nopagebreak\vspace{0.2cm}}
-\raggedbottom
-% усередині одного завдання сторінка не розривається: нерозривний вертикальний проміжок
-% і нерозривна межа абзаців (умова ніколи не відділяється від варіантів, рисунка чи сітки)
-\newcommand{\nbvspace}[1]{\nopagebreak\vspace{#1}}
-\newcommand{\nmtnobreak}{\ifvmode\penalty10000 \fi}
-% --- ЄДИНИЙ МАКЕТ ЗАВДАНЬ НА ВІДПОВІДНІСТЬ ---
-% мітка в колонці сталої ширини, текст -- у parbox: продовження довгого рядка
-% вирівнюється під текстом, а не під міткою; відступ між пунктами однаковий скрізь
-\newlength{\nmtMatchLab}\setlength{\nmtMatchLab}{1.6em}
-\newlength{\nmtMatchSep}\setlength{\nmtMatchSep}{0.28cm}
-\newcommand{\matchHead}[1]{\par\noindent\textit{#1}\par\nopagebreak\vspace{0.2cm}}
-\newcommand{\matchItem}[2]{\par\noindent\makebox[\nmtMatchLab][l]{\textbf{#1}}%
-\parbox[t]{\dimexpr\linewidth-\nmtMatchLab\relax}{\raggedright #2}\par\nopagebreak\vspace{\nmtMatchSep}}
-\newcommand{\ansTheme}[1]{\par\vspace{0.25cm}\noindent{\bfseries\color{mainGreen}#1}\par\vspace{0.12cm}}
-\newcommand{\ansType}[1]{\par\vspace{0.1cm}\noindent{\itshape\color{yearOrange}#1}\par\vspace{0.08cm}}
 
 \begin{document}
 \begingroup\setcounter{zad}{0}
@@ -216,44 +39,7 @@
 \rule[-0.4cm]{0pt}{0.9cm}#1 & \rule[-0.4cm]{0pt}{0.9cm}#2 & \rule[-0.4cm]{0pt}{0.9cm}#3 & \rule[-0.4cm]{0pt}{0.9cm}#4 & \rule[-0.4cm]{0pt}{0.9cm}#5 \\
 \hline
 \end{tabular}\endgroup}
-\providecommand{\matchingLayout}[3]{%
-    \noindent
-    \begin{minipage}[t]{0.36\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.43\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.19\textwidth}
-        \vspace{0pt}
-        \begin{flushright}
-        #3
-        \end{flushright}
-    \end{minipage}}
-\providecommand{\matchingLayoutBottom}[2]{%
-    \noindent
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #1
-    \end{minipage}%
-    \hfill
-    \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}\raggedright
-        #2
-    \end{minipage}
-    \vspace{0.5cm}
-    \noindent
-    \matchingGrid}
-\providecommand{\answerListVertical}[5]{%
-    \par\nopagebreak\vspace{0.2cm}
-    \begin{itemize}[itemsep=0.4cm, leftmargin=1.5cm, labelsep=0.5cm]
-        \item[\textbf{А}] #1
-        \item[\textbf{Б}] #2
-        \item[\textbf{В}] #3
-        \item[\textbf{Г}] #4
-        \item[\textbf{Д}] #5
-    \end{itemize}
-    \vspace{0.2cm}}
+\providecommand{\answerListVertical}[5]{\nmtOptions{#1}{#2}{#3}{#4}{#5}}
 
 \chapterTitle{Тема 37. Статистика}
 \noindent{\small\color{gray!80} Розділ 6. Комбінаторика, теорія ймовірності, статистика \quad\textbullet\quad Усього завдань: 75 (НМТ \mbox{2023~--- 14}, \mbox{2024~--- 22}, \mbox{2025~--- 18}, \mbox{2026~--- 21}); \mbox{тестових~--- 48}; \mbox{з короткою відповіддю~--- 27}.}\par\vspace{0.2cm}
@@ -262,14 +48,15 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 1 (Кругова діаграма - Zoom) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Zoom... \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Zoom... \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.54]%@N 4.80x5.33 S
+
     % Сектори
     % Zoom (Половина, світлий) - права частина
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
@@ -285,29 +72,23 @@
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\answerListVertical
-{менше від 400».}
-{становить половину від загальної кількості».}
-{становить третину від загальної кількості».}
-{менше ніж кількість занять у Google Meet».}
-{належить проміжку [550; 700]».}
+\par
+\nmtOptions{менше від 400».}{становить половину від загальної кількості».}{становить третину від загальної кількості».}{менше ніж кількість занять у Google Meet».}{належить проміжку [550; 700]».}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 2 (Кругова діаграма - Google Meet) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Google meet... \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. Скориставшись діаграмою, продовжте речення так, щоб утворилось правильне твердження: «Кількість відвіданих занять у Google meet... \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.54]%@N 4.80x5.33 S
+
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -318,29 +99,23 @@
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\answerListVertical
-{належить проміжку [500; 700]».}
-{менше від 400».}
-{менше ніж кількість занять у Teams».}
-{становить половину від загальної кількості».}
-{удвічі менше від кількості занять у Zoom».}
+\par
+\nmtOptions{належить проміжку [500; 700]».}{менше від 400».}{менше ніж кількість занять у Teams».}{становить половину від загальної кількості».}{удвічі менше від кількості занять у Zoom».}
 \par\penalty-20\vspace{0.25cm}
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 3 (Кругова діаграма - Teams число) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Teams. \nmtyear{2023}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Teams. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.54]%@N 4.80x5.33 S
+
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -351,24 +126,19 @@
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\par\nbvspace{0.2cm}
 \answerTable{$450$}{$600$}{$300$}{$500$}{$150$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 4 (Графік - Опади) ===
-\noindent\zadnum На графіку відображено зміну кількості опадів (у \textit{мм}) протягом року в регіоні України. За графіком визначте місяці, у яких кількість опадів \textit{перевищувала} 60 \textit{мм}. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На графіку відображено зміну кількості опадів (у \textit{мм}) протягом року в регіоні України. За графіком визначте місяці, у яких кількість опадів \textit{перевищувала} 60 \textit{мм}. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=14cm, height=6cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Місяці},
         ylabel={Кількість опадів, \textit{мм}},
         xmin=0.5, xmax=12.5,
@@ -380,94 +150,74 @@
         axis lines=left,
     ]
         % Точки за скріншотом
-        \addplot[color=cyan!80!blue, thick, mark=*, mark size=1.5pt] coordinates {
+        \addplot[nmt curve, mark=*, mark size=1.5pt] coordinates {
             (1,35) (2,38) (3,40) (4,45) (5,102) (6,70) (7,65) (8,40) (9,20) (10,5) (11,10) (12,58)
         };
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{4; 5; 6; 7}{5; 8}{5; 6; 7; 8}{5; 6; 7}{6; 7}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 5 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало більше 35, але менше 43 глядачів. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало більше 35, але менше 43 глядачів. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        % --- ЧИСЛОВІ КООРДИНАТИ ---
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={біла, блакитна, жовта, зелена, фіолетова},
-        ymin=0, ymax=60,
-        ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
-        ylabel={Кількість глядачів},
-        xlabel={Зали},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={біла, блакитна, жовта, зелена, фіолетова},
+    ymax=60,
+    ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
+    ylabel={Кількість глядачів},
+    xlabel={Зали}]
         % Використовуємо числа: 1=біла, 2=блакитна і т.д.
-        \addplot[fill=white, draw=black] coordinates {(1,55)};
-        \addplot[fill=cyan!50] coordinates {(2,40)};
-        \addplot[fill=yellow!50] coordinates {(3,35)};
-        \addplot[fill=green!50] coordinates {(4,20)};
-        \addplot[fill=violet!60] coordinates {(5,45)};
+        \addplot[nmt bar, fill=white, draw=black]  coordinates {(1,55)};
+        \addplot[nmt bar, fill=cyan!50]  coordinates {(2,40)};
+        \addplot[nmt bar, fill=yellow!50]  coordinates {(3,35)};
+        \addplot[nmt bar, fill=green!50]  coordinates {(4,20)};
+        \addplot[nmt bar, fill=violet!60]  coordinates {(5,45)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{зелена}{блакитна}{фіолетова}{жовта}{біла}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 6 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте всі зали кінотеатру, у яких глядачів було більше, ніж у жовтій. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте всі зали кінотеатру, у яких глядачів було більше, ніж у жовтій. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={біла, блакитна, жовта, зелена, фіолетова},
-        ymin=0, ymax=60,
-        ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
-        ylabel={Кількість глядачів},
-        xlabel={Зали},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-    ]
-        \addplot[fill=white, draw=black] coordinates {(1,55)};
-        \addplot[fill=cyan!50] coordinates {(2,40)};
-        \addplot[fill=yellow!50] coordinates {(3,35)};
-        \addplot[fill=green!50] coordinates {(4,20)};
-        \addplot[fill=violet!60] coordinates {(5,45)};
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={біла, блакитна, жовта, зелена, фіолетова},
+    ymax=60,
+    ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
+    ylabel={Кількість глядачів},
+    xlabel={Зали}]
+        \addplot[nmt bar, fill=white, draw=black]  coordinates {(1,55)};
+        \addplot[nmt bar, fill=cyan!50]  coordinates {(2,40)};
+        \addplot[nmt bar, fill=yellow!50]  coordinates {(3,35)};
+        \addplot[nmt bar, fill=green!50]  coordinates {(4,20)};
+        \addplot[nmt bar, fill=violet!60]  coordinates {(5,45)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
+\nopagebreak\nbvspace{0.2cm}
 \answerListVertical
 {біла, блакитна, зелена, фіолетова}
 {фіолетова}
@@ -479,119 +229,93 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 7 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте суму глядачів, які відвідали білу і зелену зали кінотеатру. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте суму глядачів, які відвідали білу і зелену зали кінотеатру. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={біла, блакитна, жовта, зелена, фіолетова},
-        ymin=0, ymax=60,
-        ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
-        ylabel={Кількість глядачів},
-        xlabel={Зали},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-    ]
-        \addplot[fill=white, draw=black] coordinates {(1,55)};
-        \addplot[fill=cyan!50] coordinates {(2,40)};
-        \addplot[fill=yellow!50] coordinates {(3,35)};
-        \addplot[fill=green!50] coordinates {(4,20)};
-        \addplot[fill=violet!60] coordinates {(5,45)};
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={біла, блакитна, жовта, зелена, фіолетова},
+    ymax=60,
+    ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
+    ylabel={Кількість глядачів},
+    xlabel={Зали}]
+        \addplot[nmt bar, fill=white, draw=black]  coordinates {(1,55)};
+        \addplot[nmt bar, fill=cyan!50]  coordinates {(2,40)};
+        \addplot[nmt bar, fill=yellow!50]  coordinates {(3,35)};
+        \addplot[nmt bar, fill=green!50]  coordinates {(4,20)};
+        \addplot[nmt bar, fill=violet!60]  coordinates {(5,45)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$65$}{$75$}{$90$}{$70$}{$80$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 8 (Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало найбільше глядачів. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте залу кінотеатру, яку відвідало найбільше глядачів. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={біла, блакитна, жовта, зелена, фіолетова},
-        ymin=0, ymax=60,
-        ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
-        ylabel={Кількість глядачів},
-        xlabel={Зали},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-    ]
-        \addplot[fill=white, draw=black] coordinates {(1,55)};
-        \addplot[fill=cyan!50] coordinates {(2,40)};
-        \addplot[fill=yellow!50] coordinates {(3,35)};
-        \addplot[fill=green!50] coordinates {(4,20)};
-        \addplot[fill=violet!60] coordinates {(5,45)};
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={біла, блакитна, жовта, зелена, фіолетова},
+    ymax=60,
+    ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
+    ylabel={Кількість глядачів},
+    xlabel={Зали}]
+        \addplot[nmt bar, fill=white, draw=black]  coordinates {(1,55)};
+        \addplot[nmt bar, fill=cyan!50]  coordinates {(2,40)};
+        \addplot[nmt bar, fill=yellow!50]  coordinates {(3,35)};
+        \addplot[nmt bar, fill=green!50]  coordinates {(4,20)};
+        \addplot[nmt bar, fill=violet!60]  coordinates {(5,45)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{жовта}{фіолетова}{зелена}{біла}{блакитна}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 9 (Графік - Смартфон) ===
-\noindent\zadnum Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 20 хв після початку заряджання. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 20 хв після початку заряджання. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=14cm, height=7cm,
+        width=12.5cm, height=6.2cm,
         xlabel={$x$ (час заряджання, хв)},
         ylabel={$y$ (заряд батареї, \%)},
-        xmin=0, xmax=130,
-        ymin=0, ymax=110,
+        xmin=0, xmax=125,
+        ymin=0, ymax=105,
         xtick={0,10,20,30,40,50,60,70,80,90,100,110,120},
         ytick={0,10,20,30,40,50,60,70,80,90,100},
-        grid=both,
-        major grid style={line width=0.2pt,draw=gray!30},
+        grid=major,
         axis lines=left,
-        ticklabel style={font=\small},
-        % Стиль стрілок осей
-        axis line style={-latex},
+        axis line style={->},
     ]
-        % Точки графіка (приблизно за скріншотом)
-        \addplot[color=black, very thick, smooth, tension=0.3] coordinates {
-            (0,20) (20,30) (40,50) (60,60) (80,80) (100,90) (120,100)
-        };
-
-        % Точки для наочності (опціонально)
-        \addplot[mark=*, mark size=1.5pt] coordinates {
-            (0,20) (20,30) (40,50) (60,60) (80,80) (100,90) (120,100)
-        };
+        \draw[nmt curve] (axis cs:0,20) .. controls (axis cs:6.667,21.667) and (axis cs:13.333,25.556) .. (axis cs:20,30) .. controls (axis cs:26.667,34.444) and (axis cs:33.333,45.556) .. (axis cs:40,50) .. controls (axis cs:46.667,54.444) and (axis cs:53.333,55.556) .. (axis cs:60,60) .. controls (axis cs:66.667,64.444) and (axis cs:73.333,75.556) .. (axis cs:80,80) .. controls (axis cs:86.667,84.444) and (axis cs:93.333,86.667) .. (axis cs:100,90) .. controls (axis cs:106.667,93.333) and (axis cs:113.333,96.667) .. (axis cs:120,100);
+        \node[nmt dot] at (axis cs:0,20) {};
+        \node[nmt dot] at (axis cs:20,30) {};
+        \node[nmt dot] at (axis cs:40,50) {};
+        \node[nmt dot] at (axis cs:60,60) {};
+        \node[nmt dot] at (axis cs:80,80) {};
+        \node[nmt dot] at (axis cs:100,90) {};
+        \node[nmt dot] at (axis cs:120,100) {};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{30\%}{100\%}{80\%}{20\%}{40\%}
 \par\penalty-20
 \end{samepage}
@@ -605,7 +329,8 @@
 \nopagebreak\nbvspace{0.2cm}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \fill[gray!20, draw=black] (0,0.4) rectangle (1,0.8);
+    %@N 8.12x1.02 C
+\fill[gray!20, draw=black] (0,0.4) rectangle (1,0.8);
     \node[right] at (1,0.6) {-- кількість виготовлених стільців};
     \fill[gray!90, draw=black] (0,0) rectangle (1,0.4);
     \node[right] at (1,0.2) {-- кількість виготовлених столів};
@@ -654,97 +379,72 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 11 (Гістограма - Зелена зала інтервал) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте, якому відрізку належить кількість глядачів у зеленій залі. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількість глядачів, які протягом доби відвідали 5 зал кінотеатру: білу, блакитну, жовту, зелену та фіолетову. За діаграмою визначте, якому відрізку належить кількість глядачів у зеленій залі. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        % Числові координати для надійності
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={біла, блакитна, жовта, зелена, фіолетова},
-        ymin=0, ymax=60,
-        ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
-        ylabel={Кількість глядачів},
-        xlabel={Зали},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-    ]
-        \addplot[fill=white, draw=black] coordinates {(1,55)};
-        \addplot[fill=cyan!50] coordinates {(2,40)};
-        \addplot[fill=yellow!50] coordinates {(3,35)};
-        \addplot[fill=green!50] coordinates {(4,20)};
-        \addplot[fill=violet!60] coordinates {(5,45)};
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={біла, блакитна, жовта, зелена, фіолетова},
+    ymax=60,
+    ytick={0,5,10,15,20,25,30,35,40,45,50,55,60},
+    ylabel={Кількість глядачів},
+    xlabel={Зали}]
+        \addplot[nmt bar, fill=white, draw=black]  coordinates {(1,55)};
+        \addplot[nmt bar, fill=cyan!50]  coordinates {(2,40)};
+        \addplot[nmt bar, fill=yellow!50]  coordinates {(3,35)};
+        \addplot[nmt bar, fill=green!50]  coordinates {(4,20)};
+        \addplot[nmt bar, fill=violet!60]  coordinates {(5,45)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{[25; 30)}{[35; 40)}{[15; 25)}{[10; 15)}{[30; 35)}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 12 (Музика) ===
-\noindent\zadnum Серед 100 учнів музичного класу провели опитування: яка музика їм подобається найбільше. Результати опитування подано у вигляді діаграми, зображеної на рисунку. За діаграмою визначте різницю між кількістю учнів, що обрали поп-музику, та кількістю учнів, що обрали класичну музику. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{Серед 100 учнів музичного класу провели опитування: яка музика їм подобається найбільше. Результати опитування подано у вигляді діаграми, зображеної на рисунку. За діаграмою визначте різницю між кількістю учнів, що обрали поп-музику, та кількістю учнів, що обрали класичну музику. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=14cm, height=7cm,
-        enlarge x limits=0.15,
-        xtick={1, 2, 3, 4, 5},
-        % Розбиваємо довгі назви на два рядки
-        xticklabels={джаз, поп-музика, рок-музика, класична\\музика, електронна\\музика},
-        xticklabel style={align=center, font=\small}, 
-        ymin=0, ymax=35,
-        ytick={0,5,10,15,20,25,30,35},
-        ylabel={Кількість учнів},
-        xlabel={Види музики},
-        x label style={at={(axis description cs:0.5,-0.2)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=gray!40,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={джаз, поп-музика, рок-музика, класична\\музика, електронна\\музика},
+    ymax=35,
+    ytick={0,5,10,15,20,25,30,35},
+    ylabel={Кількість учнів},
+    xlabel={Види музики}]
         % Значення з діаграми: 25, 30, 10, 15, 20
-        \addplot coordinates {(1,25)};
-        \addplot coordinates {(2,30)};
-        \addplot coordinates {(3,10)};
-        \addplot coordinates {(4,15)};
-        \addplot coordinates {(5,20)};
+        \addplot[nmt bar] coordinates {(1,25)};
+        \addplot[nmt bar] coordinates {(2,30)};
+        \addplot[nmt bar] coordinates {(3,10)};
+        \addplot[nmt bar] coordinates {(4,15)};
+        \addplot[nmt bar] coordinates {(5,20)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$10$}{$15$}{$25$}{$5$}{$20$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 13 (Транспорт - графік) ===
-\noindent\zadnum На рисунку відображено інформацію про результати опитування пасажирів транспортної мережі деякого міста щодо визначення якості пасажирських перевезень (у балах за шкалою 1–10). Визначте кількість опитуваних, які поставили оцінку, вищу за 8 балів. \nmtyear{2023}
-
-\nmtnobreak
+\zadtask{На рисунку відображено інформацію про результати опитування пасажирів транспортної мережі деякого міста щодо визначення якості пасажирських перевезень (у балах за шкалою 1–10). Визначте кількість опитуваних, які поставили оцінку, вищу за 8 балів. \nmtyear{2023}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=12cm, height=7cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Оцінка в балах},
         ylabel={Кількість опитуваних},
         xmin=3.5, xmax=10.5,
@@ -755,29 +455,28 @@
         major grid style={line width=0.2pt,draw=gray!50},
         axis lines=left,
     ]
-        \addplot[color=black, thick, mark=*, mark size=1.5pt] coordinates {
+        \addplot[nmt curve, mark=*, mark size=1.5pt] coordinates {
             (4,75) (5,100) (6,100) (7,200) (8,175) (9,75) (10,25)
         };
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$100$}{$275$}{$475$}{$19$}{$200$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
-% === ЗАВДАННЯ 3 (Кругова діаграма - Teams число) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom i Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Zoom. \nmtyear{2023}
-\end{minipage}
+% === ЗАВДАННЯ 3 (Кругова діаграма - Zoom число) ===
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На діаграмі відображено розподіл 900 занять, відвіданих студентами у Google Meet, Zoom і Teams. За діаграмою визначте, якою \textit{може} бути кількість проведених занять у Zoom. \nmtyear{2023}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.6]
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.54]%@N 4.80x5.33 S
+
     \draw[fill=gray!20] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
     \draw[fill=gray!60] (0,0) -- (-90:2.5) arc (-90:-210:2.5) -- cycle;
     \draw[fill=gray!90] (0,0) -- (150:2.5) arc (150:90:2.5) -- cycle;
@@ -788,60 +487,41 @@
         \node[fill=gray!90, label=right:Teams, draw=black!50] {}; \\
     };
 \end{tikzpicture}\end{nmtfit}
-\end{center}
 \end{minipage}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
-\answerTable{$1000$}{$500$}{$600$}{$450$}{$300$}
+\par\nbvspace{0.2cm}
+\answerTable{$300$}{$1000$}{$450$}{$750$}{$600$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 18 (Пил - Графік) ===
-\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{зменшувалася}. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{зменшувалася}. \nmtyear{2024}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        width=14cm, height=5cm,
-        xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
-        y label style={align=center, font=\footnotesize, at={(axis description cs:-0.08,0.5)}},
-        xmin=0, xmax=25,
-        ymin=0, ymax=40,
-        xtick={0,2,4,6,8,10,12,14,16,18,20,22,24},
-        ytick={0,5,10,15,20,25,30,35},
-        grid=both,
-        major grid style={line width=0.2pt,draw=gray!50},
-        axis lines=left,
-        axis line style={-latex},
-    ]
-        % Крива (сплайн)
-        \addplot[thick, smooth, tension=0.7] coordinates {
-            (0,15) (4,10) (10,20) (15,30) (24,15)
-        };
-    \end{axis}
+\begin{nmtfit}\begin{tikzpicture}[x=0.35cm, y=0.1cm]
+    \draw[nmt grid, xstep=2, ystep=5] (0,0) grid (24,40);
+    \draw[->, thick] (0,0) -- (0,45);
+    \draw[->, thick] (0,0) -- (27,0);
+    \foreach \x in {2,4,...,24}{ \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (\x,0) {$\x$}; }
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \foreach \y in {5,10,...,35}{ \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,\y) {$\y$}; }
+    \draw[nmt curve] (0,15) .. controls (1.333,11.778) and (2.667,10) .. (4,10) .. controls (6,10) and (8,16.354) .. (10,20) .. controls (11.667,23.039) and (13.333,30) .. (15,30) .. controls (16.667,30) and (18.333,22.542) .. (20,20) .. controls (21.333,17.966) and (22.667,16.222) .. (24,15);
+    \node[below, yshift=-0.55cm] at (12,0) {Час, \textit{години}};
+    \node[rotate=90, align=center, anchor=south] at (-2.8,20) {Кількість\\дрібнодисперсного\\пилу, \textit{мкг/м}$^3$};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{[14; 16]}{[2; 6]}{[20; 24]}{[12; 14]}{[8; 12]}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 25 (Готель - Горизонтальна діаграма - ТЕСТ) ===
-\noindent\zadnum На діаграмі відображено кількість користувачів, які ставили свої відгуки у вигляді оцінок від 1 до 10 за послуги в деякому готелі. Визначте кількість користувачів, які поставили оцінку 5 та вище. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено кількість користувачів, які ставили свої відгуки у вигляді оцінок від 1 до 10 за послуги в деякому готелі. Визначте кількість користувачів, які поставили оцінку 5 та вище. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         xbar,
-        width=12cm, height=6cm,
+        width=12.5cm, height=6.2cm,
         symbolic y coords={1-2, 3-4, 5-6, 7-8, 9-10},
         ytick=data,
         ylabel={Оцінка},
@@ -857,65 +537,48 @@
         ytick style={draw=none}
     ]
         % Значення: 20, 30, 60, 90, 40
-        \addplot coordinates {(20,1-2) (30,3-4) (60,5-6) (90,7-8) (40,9-10)};
+        \addplot[nmt curve]coordinates {(20,1-2) (30,3-4) (60,5-6) (90,7-8) (40,9-10)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$190$}{$130$}{$110$}{$60$}{$210$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 27 (Риболовля - Кругова діаграма) ===
-\noindent\zadnum \begin{minipage}[t]{0.60\textwidth}
-Хлопчик рибалив і зловив різні риби. Результати його риболовлі зображені на круговій діаграмі. Користуючись діаграмою, визначте кількість зловлених лящів. \nmtyear{2024}
-\end{minipage}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum Хлопчик рибалив і зловив різні риби. Результати його риболовлі зображені на круговій діаграмі. Користуючись діаграмою, визначте кількість зловлених лящів. \nmtyear{2024}
+\end{minipage}%
 \hfill
-\begin{minipage}[t]{0.35\textwidth}
-\nopagebreak\nbvspace{-0.3cm}
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.8]
-    % Сектор КАРАСІ (Зелений, 90 градусів, 25%)
-    \draw[fill=green!40] (0,0) -- (0:2.5) arc (0:90:2.5) -- cycle;
-    % Позначка прямого кута
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.958]%@N 4.30x4.01 S
+
+    \def\R{2.5}
+    % карасі: 90 градусів (прямий кут), коропи 10 -- 60, лящі ? -- 30, товстолоби 10 -- 60, окуні 20 -- 120
+    \draw[fill=green!40] (0,0) -- (90:\R) arc (90:0:\R) -- cycle;
+    \draw[fill=yellow!50] (0,0) -- (0:\R) arc (0:-60:\R) -- cycle;
+    \draw[fill=cyan!30] (0,0) -- (-60:\R) arc (-60:-90:\R) -- cycle;
+    \draw[fill=red!40] (0,0) -- (-90:\R) arc (-90:-150:\R) -- cycle;
+    \draw[fill=violet!30] (0,0) -- (-150:\R) arc (-150:-270:\R) -- cycle;
     \draw (0.3,0) -- (0.3,0.3) -- (0,0.3);
-
-    % Сектор ОКУНІ (Фіолетовий, значення 20, найбільший з решти)
-    % Припустимо кут ~135 градусів (від 90 до 225)
-    \draw[fill=violet!30] (0,0) -- (90:2.5) arc (90:225:2.5) -- cycle;
-    \node at (157.5:1.5) {\large 20};
-
-    % Сектор ТОВСТОЛОБИ (Червоний, значення 10)
-    % Припустимо кут ~45 градусів (від 225 до 270)
-    \draw[fill=red!40] (0,0) -- (225:2.5) arc (225:270:2.5) -- cycle;
-    \node at (247.5:1.5) {\large 10};
-
-    % Сектор ЛЯЩІ (Блакитний, ?)
-    % Припустимо кут ~45 градусів (від 270 до 315)
-    \draw[fill=cyan!30] (0,0) -- (270:2.5) arc (270:315:2.5) -- cycle;
-    \node at (292.5:1.5) {\large ?};
-
-    % Сектор КОРОПИ (Жовтий, значення 10)
-    % Решта до 360 (від 315 до 360 = 0)
-    \draw[fill=yellow!50] (0,0) -- (315:2.5) arc (315:360:2.5) -- cycle;
-    \node at (337.5:1.5) {\large 10};
-
-    % Контур кола
-    \draw (0,0) circle (2.5);
+    \node at (-30:1.55) {\large $10$};
+    \node at (-75:1.75) {\large $?$};
+    \node at (-120:1.55) {\large $10$};
+    \node at (150:1.5) {\large $20$};
 \end{tikzpicture}\end{nmtfit}
-
+\end{minipage}
+\par\nbvspace{0.2cm}
 % Легенда
-\nopagebreak\nbvspace{0.2cm}
+
 \begin{tabular}{ll}
 \tikz\draw[fill=green!40] (0,0) rectangle (0.3,0.3); карасі & \tikz\draw[fill=yellow!50] (0,0) rectangle (0.3,0.3); коропи \\
 \tikz\draw[fill=cyan!30] (0,0) rectangle (0.3,0.3); лящі & \tikz\draw[fill=red!40] (0,0) rectangle (0.3,0.3); товстолоби \\
 \tikz\draw[fill=violet!30] (0,0) rectangle (0.3,0.3); окуні & \\
 \end{tabular}
-\end{center}
-\end{minipage}
 
 \nmtnobreak
 \nopagebreak\nbvspace{0.3cm}
@@ -925,13 +588,11 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 30 (Цифри пі - Лінійний графік) ===
-\noindent\zadnum Хлопчик вирішив порахувати 200 цифр після коми числа $\pi$ і подав це у вигляді графіка (див. рисунок). Визначте, яка цифра зустрічалася найчастіше за інші. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{Хлопчик вирішив порахувати 200 цифр після коми числа $\pi$ і подав це у вигляді графіка (див. рисунок). Визначте, яка цифра зустрічалася найчастіше за інші. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=14cm, height=7cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Цифра},
         ylabel={Кількість цифр},
         ylabel style={align=center},
@@ -944,29 +605,25 @@
         axis lines=left,
         axis line style={-latex},
     ]
-        \addplot[color=black, thick, mark=*, mark size=2pt] coordinates {
+        \addplot[nmt curve, mark=*, mark size=2pt] coordinates {
             (0,19) (1,20) (2,24) (3,19) (4,22) (5,20) (6,16) (7,12) (8,25) (9,23)
         };
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$4$}{$2$}{$8$}{$9$}{$7$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 33 (Стрічки - Подвійна діаграма) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між кількостями зелених і жовтих стрічок для маскувальних сіток \textit{влітку}. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між кількостями зелених і жовтих стрічок для маскувальних сіток \textit{влітку}. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
-        width=14cm, height=8cm,
+        width=12.5cm, height=6.2cm,
         bar width=0.6cm,
         ymin=0, ymax=60,
         ytick={0,10,20,30,40,50,60},
@@ -982,77 +639,55 @@
         enlarge x limits=0.25,
     ]
         % Влітку (Білі)
-        \addplot[fill=white, draw=black] coordinates {(Коричневий,30) (Жовтий,20) (Зелений,50)};
+        \addplot[nmt curve, fill=white, draw=black] coordinates {(Коричневий,30) (Жовтий,20) (Зелений,50)};
         % Восени (Сірі)
-        \addplot[fill=black!30, draw=black] coordinates {(Коричневий,40) (Жовтий,40) (Зелений,20)};
+        \addplot[nmt curve, fill=black!30, draw=black] coordinates {(Коричневий,40) (Жовтий,40) (Зелений,20)};
 
         \legend{Влітку, Восени}
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$15$}{$20$}{$25$}{$30$}{$35$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 35 (Контрольна робота - ЧИСЛОВІ + СПЕЦ. ПІДПИСИ ОСІ Y) ===
-\noindent\zadnum На діаграмі відображено інформацію щодо результатів контрольної роботи учнів 11-го класу. Користуючись діаграмою, визначте кількість учнів, які отримали оцінки від 7 до 12 включно. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію щодо результатів контрольної роботи учнів 11-го класу. Користуючись діаграмою, визначте кількість учнів, які отримали оцінки від 7 до 12 включно. \nmtyear{2024}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=13cm, height=8cm,
-        enlarge x limits=0.15,
-        % --- ЧИСЛОВІ КООРДИНАТИ ---
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={1--2, 3--4, 5--6, 7--9, 10--12},
-        ymin=0, ymax=12,
-        % Підписані значення (тільки 0, 2, 4, 10)
-        ytick={0, 2, 4, 10},
-        % Додаткові лінії сітки БЕЗ підписів (6, 8, 12)
-        extra y ticks={6, 8, 12},
-        extra y tick labels={}, % Пусті підписи для додаткових ліній
-        extra y tick style={grid=major},
-        ylabel={Кількість учнів},
-        xlabel={Оцінки},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!40,
-        draw=none
-    ]
-        % 1=(1-2), 2=(3-4)...
-        \addplot coordinates {(1, 2)};  % 1-2 бали: 2 учні
-        \addplot coordinates {(2, 6)};  % 3-4 бали: 5 учнів
-        \addplot coordinates {(3, 8)};  % 5-6 балів: 7 учнів
-        \addplot coordinates {(4, 10)}; % 7-9 балів: 10 учнів
-        \addplot coordinates {(5, 4)};  % 10-12 балів: 4 учні
-    \end{axis}
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\u{0.4}    % 1 учень = 0,4 см
+    \def\w{1.9}    % ширина смуги однієї категорії
+    \foreach \y in {2,4,...,12}{ \draw[nmt grid] (0,{\y*\u}) -- ({5*\w},{\y*\u}); }
+    \foreach \k/\v in {0/2,1/6,2/8,3/10,4/4}{
+        \fill[nmtBlue!45] ({\k*\w+0.45},0) rectangle ({\k*\w+\w-0.45},{\v*\u});
+    }
+    \draw[very thick] (0,0) -- ({5*\w},0);
+    \draw[very thick] (0,0) -- (0,{12.4*\u});
+    \foreach \y in {2,4,...,12}{ \draw[thin] (0,{\y*\u}) -- (-0.1,{\y*\u}); }
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,{4*\u}) {$4$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,{10*\u}) {$10$};
+    \foreach \k/\t in {0/{1--2},1/{3--4},2/{5--6},3/{7--9},4/{10--12}}{
+        \node[below] at ({(\k+0.5)*\w},0) {\t};
+    }
+    \node[below, yshift=-0.7cm] at ({2.5*\w},0) {Оцінки};
+    \node[rotate=90, yshift=0.9cm] at (0,{5.5*\u}) {Кількість учнів};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$14$}{$6$}{$22$}{$19$}{$21$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 36 (Пил - Збільшення) ===
-\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{збільшувалася}. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Укажіть із-поміж наведених проміжок часу (у \textit{год}), упродовж якого густина такого пилу в повітрі лише \textit{збільшувалася}. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=14cm, height=5cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Час, \textit{години}},
         ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
         y label style={align=center, font=\footnotesize, at={(axis description cs:-0.08,0.5)}},
@@ -1065,72 +700,57 @@
         axis lines=left,
         axis line style={-latex},
     ]
-        % Той самий графік, що й у завданні 18
-        \addplot[thick, smooth, tension=0.7] coordinates {
-            (0,15) (4,10) (10,20) (15,30) (24,15)
+        % гладка крива через вузли (0;15) (4;10) (10;20) (15;30) (20;20) (24;15)
+        \addplot[nmt curve, mark=none] coordinates {
+            (0,15.00) (0.25,14.41) (0.5,13.86) (0.75,13.34) (1,12.86) (1.25,12.41) (1.5,12.00) (1.75,11.63) (2,11.29) (2.25,10.99) (2.5,10.73) (2.75,10.51) (3,10.33) (3.25,10.19) (3.5,10.08) (3.75,10.02) (4,10.00) (4.25,10.03) (4.5,10.13) (4.75,10.28) (5,10.49) (5.25,10.75) (5.5,11.05) (5.75,11.40) (6,11.78) (6.25,12.20) (6.5,12.65) (6.75,13.13) (7,13.63) (7.25,14.15) (7.5,14.69) (7.75,15.23) (8,15.79) (8.25,16.34) (8.5,16.90) (8.75,17.45) (9,17.99) (9.25,18.52) (9.5,19.04) (9.75,19.53) (10,20.00) (10.25,20.48) (10.5,21.02) (10.75,21.60) (11,22.21) (11.25,22.84) (11.5,23.50) (11.75,24.17) (12,24.83) (12.25,25.49) (12.5,26.14) (12.75,26.76) (13,27.36) (13.25,27.91) (13.5,28.41) (13.75,28.86) (14,29.25) (14.25,29.57) (14.5,29.80) (14.75,29.95) (15,30.00) (15.25,29.95) (15.5,29.79) (15.75,29.54) (16,29.20) (16.25,28.80) (16.5,28.32) (16.75,27.79) (17,27.21) (17.25,26.60) (17.5,25.95) (17.75,25.29) (18,24.62) (18.25,23.95) (18.5,23.28) (18.75,22.64) (19,22.02) (19.25,21.43) (19.5,20.90) (19.75,20.42) (20,20.00) (20.25,19.62) (20.5,19.25) (20.75,18.89) (21,18.53) (21.25,18.19) (21.5,17.85) (21.75,17.52) (22,17.20) (22.25,16.88) (22.5,16.58) (22.75,16.29) (23,16.01) (23.25,15.74) (23.5,15.48) (23.75,15.24) (24,15.00)
         };
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{[20; 24]}{[2; 6]}{[12; 16]}{[8; 10]}{[16; 20]}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 37 (Працівники - Вік) ===
-\noindent\zadnum На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте, у скільки разів кількість працівників віком від 20 до 29 років перевищує кількість працівників, яким 60 і більше років. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте, у скільки разів кількість працівників віком від 20 до 29 років перевищує кількість працівників, яким 60 і більше років. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=12cm, height=7cm,
-        % Числові координати для надійності
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={20--29, 30--39, 40--49, 50--59, 60--70},
-        ymin=0, ymax=45,
-        ytick={0,10,20,30,40},
-        ylabel={Кількість працівників},
-        xlabel={Вік, роки},
-        ymajorgrids=true,
-        grid style={line width=0.2pt, draw=gray!30},
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!60!blue, % Синій колір
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={20--29, 30--39, 40--49, 50--59, 60--70},
+    ymax=45,
+    ytick={0,10,20,30,40},
+    ylabel={Кількість працівників},
+    xlabel={Вік, роки}]
         % Значення: 36, 40, 24, 16, 4
-        \addplot coordinates {(1,36)};
-        \addplot coordinates {(2,40)};
-        \addplot coordinates {(3,24)};
-        \addplot coordinates {(4,16)};
-        \addplot coordinates {(5,4)};
+        \addplot[nmt bar] coordinates {(1,36)};
+        \addplot[nmt bar] coordinates {(2,40)};
+        \addplot[nmt bar] coordinates {(3,24)};
+        \addplot[nmt bar] coordinates {(4,16)};
+        \addplot[nmt bar] coordinates {(5,4)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$9$}{$18$}{$10$}{$6$}{$32$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 38 (Стрічки - У скільки разів) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте, у скільки разів кількість зелених перевищує кількість коричневих маскувальних сіток \textit{влітку}. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте, у скільки разів кількість зелених перевищує кількість коричневих маскувальних сіток \textit{влітку}. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
-        width=14cm, height=8cm,
+        width=12.5cm, height=6.2cm,
         bar width=0.6cm,
         ymin=0, ymax=60,
         ytick={0,10,20,30,40,50,60},
@@ -1146,31 +766,27 @@
         enlarge x limits=0.25,
     ]
         % Влітку (Білі)
-        \addplot[fill=white, draw=black] coordinates {(1,20) (2,30) (3,50)};
+        \addplot[nmt curve, fill=white, draw=black] coordinates {(1,20) (2,30) (3,50)};
         % Восени (Сірі)
-        \addplot[fill=black!30, draw=black] coordinates {(1,40) (2,40) (3,20)};
+        \addplot[nmt curve, fill=black!30, draw=black] coordinates {(1,40) (2,40) (3,20)};
 
         \legend{Влітку, Восени}
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{2{,}5}{20}{10}{1{,}5}{30}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 39 (Стрічки - Різниця) ===
-\noindent\zadnum На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між зеленими стрічками влітку та восени. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про кількісний розподіл за кольорами стрічок, із яких плетуть маскувальні сітки. Білі стовпці діаграми відповідають кількості стрічок зазначеного кольору, використаних для однієї сітки влітку, а сірі – восени. За діаграмою визначте різницю між зеленими стрічками влітку та восени. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
         ybar,
-        width=14cm, height=8cm,
+        width=12.5cm, height=6.2cm,
         bar width=0.6cm,
         ymin=0, ymax=60,
         ytick={0,10,20,30,40,50,60},
@@ -1184,67 +800,54 @@
         axis y line*=left,
         enlarge x limits=0.25,
     ]
-        % Влітку (Білі)
-        \addplot[fill=white, draw=black] coordinates {(1,20) (2,30) (3,50)};
-        % Восени (Сірі)
-        \addplot[fill=black!30, draw=black] coordinates {(1,40) (2,40) (3,20)};
+        % Влітку (білі)
+        \addplot[nmt curve, fill=white, draw=black] coordinates {(1,30) (2,20) (3,50)};
+        % Восени (сірі)
+        \addplot[nmt curve, fill=black!30, draw=black] coordinates {(1,40) (2,40) (3,20)};
 
         \legend{Влітку, Восени}
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$30$}{$15$}{$20$}{$35$}{$25$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 40 (М'яч - Висота) ===
-\noindent\zadnum На рисунку зображено графік залежності висоти $h$ (у метрах) м’яча, кинутого в повітря, від часу $t$ (у секундах), що минув від початку запуску. Визначте проміжок часу, протягом якого м’яч знаходився на висоті \textbf{не менше} 3 м. \nmtyear{2025}
+\noindent
+\begin{minipage}[c]{0.56\textwidth}
+\zadnum На рисунку зображено графік залежності висоти $h$ (у метрах) м’яча, кинутого в повітря, від часу $t$ (у секундах), що минув від початку запуску. Визначте проміжок часу, протягом якого м’яч знаходився на висоті \textbf{не менше} 3 м. \nmtyear{2025}
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\centering
+\begin{nmtfit}\begin{tikzpicture}[scale=0.5]%@N 6.36x5.59 S
 
-\nmtnobreak
-\begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        width=10cm, height=7cm,
-        xlabel={$t$, с},
-        ylabel={$h$, м},
-        axis lines=middle,
-        xmin=0, xmax=9.5,
-        ymin=0, ymax=7,
-        xtick={0,1,2,3,4,5,6,7,8},
-        ytick={0,1,2,3,4,5,6},
-        grid=both,
-        major grid style={line width=0.5pt,draw=black!50},
-        % Налаштування вигляду як на скріншоті (клітинки)
-        minor tick num=1, % Додаткова клітинка
-        minor grid style={line width=0.2pt,draw=gray!30},
-    ]
-        % Графік (сплайн через точки: (0,0), (1,3), (2,5), (3,6), (4,5), (5,3), (6,2), (8,0))
-        \addplot[thick, smooth, tension=0.6] coordinates {
-            (0,0) (1,3) (2,5) (3,6) (4,5) (5,3) (6,2) (8,0)
-        };
-    \end{axis}
+    \draw[nmt grid, step=1] (-2,-2) grid (10,8);
+    \draw[->] (-2.3,0) -- (10.4,0);
+    \draw[->] (0,-2.3) -- (0,8.4);
+    \node[left] at (0,8.2) {$h$, \textit{м}};
+    \node[below left] at (10,0) {$t$, \textit{с}};
+    \foreach \i in {1,...,8} {\draw[thin] (\i,0.12) -- (\i,-0.12); \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (\i,-0.1) {$\i$};}
+    \foreach \j in {1,...,6} {\draw[thin] (0.12,\j) -- (-0.12,\j); \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (-0.1,\j) {$\j$};}
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \draw[nmt curve] (0,0) .. controls (0.333,1.167) and (0.667,2.2) .. (1,3) .. controls (1.333,3.8) and (1.667,4.556) .. (2,5) .. controls (2.333,5.444) and (2.667,6) .. (3,6) .. controls (3.333,6) and (3.667,5.444) .. (4,5) .. controls (4.333,4.556) and (4.667,3.444) .. (5,3) .. controls (5.333,2.556) and (5.667,2.167) .. (6,2) .. controls (7,1.5) and (8,0.9) .. (8,0);
 \end{tikzpicture}\end{nmtfit}
-\end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\end{minipage}
+\par\nbvspace{0.2cm}
 \answerTable{6~с}{4~с}{2~с}{5~с}{3~с}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 41 (Температура) ===
-\noindent\zadnum На графіку відображено зміну температури повітря (у $^\circ$C) протягом доби у деякому місті. За графіком визначте сумарну кількість годин, протягом яких температура повітря \textbf{не перевищувала} 10 $^\circ$C. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На графіку відображено зміну температури повітря (у $^\circ$C) протягом доби у деякому місті. За графіком визначте сумарну кількість годин, протягом яких температура повітря \textbf{не перевищувала} 10 $^\circ$C. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=14cm, height=6cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Час, години},
         ylabel={Температура повітря, $^\circ$C},
         xmin=0, xmax=25,
@@ -1259,7 +862,7 @@
         axis line style={-latex},
     ]
         % Точки з графіка
-        \addplot[color=cyan!80!blue, thin, mark=*, mark size=1.2pt] coordinates {
+        \addplot[nmt curve, mark=*, mark size=1.2pt] coordinates {
             (0,2) (1,3) (2,3) (3,4) (4,6) (5,6) (6,8) (7,10) (8,12) (9,13) 
             (10,12) (11,14) (12,15) (13,14) (14,13) (15,14) (16,14) (17,13) 
             (18,12) (19,12) (20,11) (21,11) (22,10) (23,9) (24,7)
@@ -1267,127 +870,103 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$16$}{$14$}{$11$}{$10$}{$9$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 44 (Заряд - 80 хв) ===
-\noindent\zadnum Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 1 \textit{год} 20 \textit{хв} після початку заряджання. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{Залежність заряду акумуляторної батареї смартфона від часу заряджання відображено на графіку (див. рисунок). За графіком визначте заряд акумуляторної батареї через 1 \textit{год} 20 \textit{хв} після початку заряджання. \nmtyear{2025}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        width=14cm, height=7cm,
-        xlabel={Час заряджання, \textit{хв}},
-        ylabel={Заряд батареї, \%},
-        xmin=0, xmax=130,
-        ymin=0, ymax=110,
-        xtick={0,10,20,30,40,50,60,70,80,90,100,110,120},
-        ytick={0,10,20,30,40,50,60,70,80,90,100},
-        grid=both,
-        major grid style={line width=0.2pt,draw=gray!30},
-        axis lines=left,
-        axis line style={-latex},
-    ]
-        \addplot[color=black, thick, mark=*, mark size=1.5pt] coordinates {
-            (0,20) (10,25) (20,35) (30,40) (40,45) (50,55) (60,60) (70,65) (80,70) (90,80) (100,85) (110,95) (120,100)
-        };
-    \end{axis}
+\begin{nmtfit}\begin{tikzpicture}[x=0.7cm, y=0.42cm]
+    \draw[nmt grid, step=1] (0,0) grid (12,10);
+    \draw[->] (0,0) -- (12.6,0);
+    \draw[->] (0,0) -- (0,10.8);
+    \foreach \i in {0,...,12} {\node[below] at (\i,-0.1) {$\the\numexpr\i*10\relax$};}
+    \foreach \j in {1,...,10} {\node[left] at (0,\j) {$\the\numexpr\j*10\relax$};}
+    \node[right] at (0.3,10.6) {Заряд батареї, \%};
+    \node[below left] at (12.6,-1.35) {Час заряджання, \textit{хв}};
+    \draw[nmt curve] (0,2) .. controls (0.333,2.083) and (0.667,2.278) .. (1,2.5) .. controls (1.333,2.722) and (1.667,3.278) .. (2,3.5) .. controls (2.333,3.722) and (2.667,3.833) .. (3,4) .. controls (3.333,4.167) and (3.667,4.278) .. (4,4.5) .. controls (4.333,4.722) and (4.667,5.278) .. (5,5.5) .. controls (5.333,5.722) and (5.667,5.833) .. (6,6) .. controls (6.333,6.167) and (6.667,6.333) .. (7,6.5) .. controls (7.333,6.667) and (7.667,6.778) .. (8,7) .. controls (8.333,7.222) and (8.667,7.778) .. (9,8) .. controls (9.333,8.222) and (9.667,8.278) .. (10,8.5) .. controls (10.333,8.722) and (10.667,9.278) .. (11,9.5) .. controls (11.333,9.722) and (11.667,9.917) .. (12,10);
+    \node[nmt dot] at (0,2.0) {};
+    \node[nmt dot] at (1,2.5) {};
+    \node[nmt dot] at (2,3.5) {};
+    \node[nmt dot] at (3,4.0) {};
+    \node[nmt dot] at (4,4.5) {};
+    \node[nmt dot] at (5,5.5) {};
+    \node[nmt dot] at (6,6.0) {};
+    \node[nmt dot] at (7,6.5) {};
+    \node[nmt dot] at (8,7.0) {};
+    \node[nmt dot] at (9,8.0) {};
+    \node[nmt dot] at (10,8.5) {};
+    \node[nmt dot] at (11,9.5) {};
+    \node[nmt dot] at (12,10.0) {};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{50\%}{60\%}{80\%}{70\%}{90\%}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 48 (Підготовка до контрольної - Гістограма) ===
-\noindent\zadnum На діаграмі відображено результати опитування учнів щодо тривалості підготовки до контрольної роботи. Визначте кількість учнів, які готувалися до контрольної роботи \textbf{не менш} як 2 години. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено результати опитування учнів щодо тривалості підготовки до контрольної роботи. Визначте кількість учнів, які готувалися до контрольної роботи \textbf{не менш} як 2 години. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=12cm, height=7cm,
-        % Числові координати для X
-        xtick={1, 2, 3, 4, 5, 6, 7, 8},
-        xticklabels={0{,}5, 1, 1{,}5, 2, 2{,}5, 3, 3{,}5, 4},
-        ymin=0, ymax=6,
-        ytick={0,1,2,3,4,5,6},
-        ylabel={Кількість учнів},
-        xlabel={Час, витрачений на підготовку\\до контрольної роботи, години},
-        x label style={align=center, at={(axis description cs:0.5,-0.2)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.6cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!60!blue,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.41cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5, 6, 7, 8},
+    xticklabels={0{,}5, 1, 1{,}5, 2, 2{,}5, 3, 3{,}5, 4},
+    ymax=6,
+    ytick={0,1,2,3,4,5,6},
+    ylabel={Кількість учнів},
+    xlabel={Час, витрачений на підготовку\\до контрольної роботи, години}]
         % Дані: 1, 3, 3, 4, 5, 2, 1, 1
-        \addplot coordinates {(1,1)};
-        \addplot coordinates {(2,3)};
-        \addplot coordinates {(3,3)};
-        \addplot coordinates {(4,4)};
-        \addplot coordinates {(5,5)};
-        \addplot coordinates {(6,2)};
-        \addplot coordinates {(7,1)};
-        \addplot coordinates {(8,1)};
+        \addplot[nmt bar] coordinates {(1,1)};
+        \addplot[nmt bar] coordinates {(2,3)};
+        \addplot[nmt bar] coordinates {(3,3)};
+        \addplot[nmt bar] coordinates {(4,4)};
+        \addplot[nmt bar] coordinates {(5,5)};
+        \addplot[nmt bar] coordinates {(6,2)};
+        \addplot[nmt bar] coordinates {(7,1)};
+        \addplot[nmt bar] coordinates {(8,1)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$20$}{$16$}{$13$}{$11$}{$9$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 49 (Зарплата - Гістограма - ЧИСЛОВІ КООРДИНАТИ) ===
-\noindent\zadnum На діаграмі відображено нараховану фірмою загальну суму заробітної плати усім своїм працівникам за перший квартал року. Яку частину від загальної суми заробітної плати за весь квартал становить заробітна плата цієї фірми за січень? \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено нараховану фірмою загальну суму заробітної плати усім своїм працівникам за перший квартал року. Яку частину від загальної суми заробітної плати за весь квартал становить заробітна плата цієї фірми за січень? \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=10cm, height=7cm,
-        % --- ЧИСЛОВІ КООРДИНАТИ ---
-        xtick={1, 2, 3},
-        xticklabels={Січень, Лютий, Березень},
-        ymin=0, ymax=550,
-        ytick={0,100,200,300,400,500},
-        ylabel={Загальна сума заробітної\\плати, тис. грн},
-        y label style={align=center},
-        xlabel={Місяць},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!60!blue,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=1.2cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3},
+    xticklabels={Січень, Лютий, Березень},
+    ymax=550,
+    ytick={0,100,200,300,400,500},
+    ylabel={Загальна сума заробітної\\плати, тис. грн},
+    xlabel={Місяць}]
         % Використовуємо числа: 1=Січень, 2=Лютий, 3=Березень
-        \addplot coordinates {(1,300)};
-        \addplot coordinates {(2,400)};
-        \addplot coordinates {(3,500)};
+        \addplot[nmt bar] coordinates {(1,300)};
+        \addplot[nmt bar] coordinates {(2,400)};
+        \addplot[nmt bar] coordinates {(3,500)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 % Таблиця з виправленими дробами (додано $)
 \answerTableTall{$\dfrac{3}{13}$}{$\dfrac{1}{3}$}{$\dfrac{1}{300}$}{$\dfrac{1}{4}$}{$\dfrac{1}{12}$}
 \par\penalty-20
@@ -1395,77 +974,49 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 52 (Пил > 25 - Графік) ===
-\noindent\zadnum На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Упродовж скількох годин густина такого пилу в повітрі \textit{перевищувала} допустимий середньодобовий рівень, що становить 25 $\text{мкг}/\text{м}^3$? \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На рисунку відображено зміну густини ($\text{мкг}/\text{м}^3$) дрібнодисперсного пилу в повітрі протягом доби в деякому районі міста. Упродовж скількох годин густина такого пилу в повітрі \textit{перевищувала} допустимий середньодобовий рівень, що становить 25 $\text{мкг}/\text{м}^3$? \nmtyear{2025}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        width=14cm, height=6cm,
-        xlabel={Час, \textit{години}},
-        ylabel={Кількість\\дрібнодисперсного\\пилу, $\text{мкг}/\text{м}^3$},
-        y label style={align=center, font=\small},
-        xmin=0, xmax=25,
-        ymin=0, ymax=40,
-        xtick={0,2,4,6,8,10,12,14,16,18,20,22,24},
-        ytick={0,5,10,15,20,25,30,35},
-        grid=both,
-        major grid style={line width=0.4pt,draw=gray!50},
-        axis lines=left,
-        axis line style={-latex},
-    ]
-        % Крива
-        \addplot[thick, smooth, tension=0.7] coordinates {
-            (0,15) (4,10) (10,20) (15,30) (24,15)
-        };
-        % Лінія рівня 25 (для наочності, необов'язково)
-        % \draw[red, dashed] (axis cs:0,25) -- (axis cs:24,25);
-    \end{axis}
+\begin{nmtfit}\begin{tikzpicture}[x=0.4cm, y=0.1cm]
+    \draw[nmt grid, xstep=2, ystep=5] (0,0) grid (24,40);
+    \draw[->] (0,0) -- (25.5,0);
+    \draw[->] (0,0) -- (0,44);
+    \foreach \x in {2,4,...,24} \node[below=2pt, fill=white, inner sep=1pt, outer sep=1pt] at (\x,0) {$\x$};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \foreach \y in {5,10,...,35} \node[left=2pt, fill=white, inner sep=1pt, outer sep=1pt] at (0,\y) {$\y$};
+    \node[below=0.9cm] at (12,0) {Час, \textit{години}};
+    \node[rotate=90, align=center] at (-4.6,20) {Кількість\\дрібнодисперсного\\пилу, \textit{мкг/м}$^3$};
+    \draw[nmt curve] (0,15) .. controls (1.333,11.667) and (2.667,10) .. (4,10) .. controls (5.333,10) and (6.667,12.692) .. (8,15) .. controls (8.667,16.154) and (9.333,18.333) .. (10,20) .. controls (10.667,21.667) and (11.333,23.649) .. (12,25) .. controls (13,27.027) and (14,30) .. (15,30) .. controls (16,30) and (17,27.027) .. (18,25) .. controls (18.667,23.649) and (19.333,21.154) .. (20,20) .. controls (21.333,17.692) and (22.667,15) .. (24,15);
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$3$}{$12$}{$5$}{$6$}{$18$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 23.05, завдання №14
-\noindent
-\begin{minipage}[c]{0.42\textwidth}
-\zadnum На рисунку зображено графіки залежності рівня шуму (дБ) від частоти (Гц) для двох джерел. За якої частоти різниця між рівнями шуму джерел є найбільшою? \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.55\textwidth}
-\centering
+\zadtask{На рисунку зображено графіки залежності рівня шуму (дБ) від частоти (Гц) для двох джерел. За якої частоти різниця між рівнями шуму джерел є найбільшою? \nmtyear{2026}}
+\begin{center}
 \begin{nmtfit}\begin{tikzpicture}
 \begin{axis}[
-    width=9cm, height=6cm,
-    xmode=log, log basis x=10,
-    xmin=15, xmax=7000,
-    ymin=0, ymax=85,
+    width=12.5cm, height=6.2cm,
+    xmin=0.5, xmax=9.5, ymin=0, ymax=80,
+    xtick={1,2,3,4,5,6,7,8,9},
+    xticklabels={20,100,200,300,500,1000,2000,3000,5000},
     ytick={0,20,40,60,80},
-    xtick={20,100,200,300,500,1000,2000,5000},
-    xticklabels={20,100,200,300,500,1000,2000,5000},
-    xlabel={\small частота (Гц)},
-    ylabel={\small рівень шуму (дБ)},
-    xmajorgrids=true, ymajorgrids=true,
-    major grid style={dashed, gray!30},
-    axis x line*=bottom, axis y line*=left,
-    tick label style={font=\scriptsize},
-    log ticks with fixed point,
+    xlabel={Частота, Гц}, ylabel={Рівень шуму, дБ},
+    grid=both, minor tick num=0,
+    tick label style={font=\small}, xticklabel style={rotate=45, anchor=north east, inner sep=1pt},
+    legend style={at={(0.5,-0.42)}, anchor=north, legend columns=1, draw=none, font=\small},
 ]
-    \addplot[mark=*, thick, mainGreen, mark options={fill=white}] coordinates {
-        (20,60) (100,53) (200,62) (300,60) (500,57) (1000,62) (2000,65) (5000,67)
-    };
-    \addplot[mark=*, thick, yearOrange, mark options={fill=white}] coordinates {
-        (20,40) (100,30) (200,20) (300,12) (500,16) (1000,20) (2000,25) (5000,40)
-    };
+    \addplot[nmt curve, nmtOrange, mark=*, mark size=1.5pt] coordinates {(1,63) (2,71) (3,79) (4,62) (5,61) (6,60) (7,67) (8,66) (9,60)};
+    \addlegendentry{Джерело 1}
+    \addplot[nmt curve, nmtGreen, mark=*, mark size=1.5pt] coordinates {(1,60) (2,42) (3,58) (4,37) (5,40) (6,30) (7,22) (8,38) (9,40)};
+    \addlegendentry{Джерело 2}
 \end{axis}
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$1000$}{$5000$}{$200$}{$300$}{$2000$}
 % Відповідь: Г
 \ifshowsolutions\solution{Обчислимо різницю рівнів за кожної частоти: при $300$~Гц вона дорівнює $60-12=48$~дБ, що більше за різниці при інших частотах (напр., $200$: $42$; $1000$: $42$). Найбільша різниця~--- за $300$~Гц. Відповідь: \textbf{Г}.}\fi
@@ -1475,31 +1026,29 @@
 \begin{samepage}
 % НМТ 2026, сесія 30.05, завдання №4
 \noindent
-\begin{minipage}[c]{0.60\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На круговій діаграмі зображено розподіл туристів за країнами походження, що відвідали певний музей за рік. Визначте відсоток туристів, які прибули з \textit{Канади}. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.38\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1.2, thick]
-    \def\R{1.7}
-    \filldraw[fill=mainGreen!40, draw=white] (0,0) -- (90:\R) arc (90:-90:\R) -- cycle;
-    \node at (0:0.9) {\scriptsize $50\,\%$};
-    \node[right] at (0:\R+0.1) {\scriptsize Європа};
-
-    \filldraw[fill=yearOrange!40, draw=white] (0,0) -- (-90:\R) arc (-90:-130.32:\R) -- cycle;
-    \node at (-110:1.0) { \scriptsize $11{,}2\,\%$};
-    \node[below] at (-110:\R+0.15) {\scriptsize США};
-
-    \filldraw[fill=mainGreen!20, draw=white] (0,0) -- (-130.32:\R) arc (-130.32:-147.6:\R) -- cycle;
-    \node[left] at (-139:\R+0.05) {\scriptsize $4{,}8\,\%$ Японія};
-
-    \filldraw[fill=yearOrange!20, draw=white] (0,0) -- (-147.6:\R) arc (-147.6:-160.2:\R) -- cycle;
-    \node[left] at (-154:\R+0.05) {\scriptsize $3{,}5\,\%$ Австралія};
-
-    \filldraw[fill=gray!20, draw=white] (0,0) -- (-160.2:\R) arc (-160.2:-270:\R) -- cycle;
-    \node at (145:1.0) {\scriptsize $?\,\%$};
-    \node[left] at (145:\R+0.05) {\scriptsize Канада};
+\begin{nmtfit}\begin{tikzpicture}
+% Європа 50 % (-90..90), США 11,2 %, Японія 4,8 %, Австралія 3,5 %, Канада ? (-160,2..-270)
+\filldraw[thick, fill=nmtFillA, draw=nmtInk] (0,0) -- (90:2.5) arc (90:-90:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillC, draw=nmtInk] (0,0) -- (-90:2.5) arc (-90:-130.32:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillB, draw=nmtInk] (0,0) -- (-130.32:2.5) arc (-130.32:-147.6:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillE, draw=nmtInk] (0,0) -- (-147.6:2.5) arc (-147.6:-160.2:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillD, draw=nmtInk] (0,0) -- (-160.2:2.5) arc (-160.2:-270:2.5) -- cycle;
+% підписи великих секторів -- всередині
+\node[align=center, inner sep=1pt] at (0:1.3) {Європа\\50\,\%};
+\node[align=center, inner sep=1pt] at (145:1.4) {Канада\\?\,\%};
+% підписи малих секторів -- ззовні, з виноскою
+\draw[thin, nmtInk] (-153.9:2.5) -- (-2.75,-0.8);
+\node[anchor=east, inner sep=1pt] at (-2.8,-0.8) {Австралія 3{,}5\,\%};
+\draw[thin, nmtInk] (-138.96:2.5) -- (-2.65,-1.65);
+\node[anchor=east, inner sep=1pt] at (-2.7,-1.65) {Японія 4{,}8\,\%};
+\draw[thin, nmtInk] (-110.16:2.5) -- (-1.25,-2.5);
+\node[anchor=east, inner sep=1pt] at (-1.3,-2.5) {США 11{,}2\,\%};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1511,10 +1060,10 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 2.06, завдання №6
-\zadtask{На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте різницю між кількістю працівників віком від $20$ до $29$ років та кількістю працівників, яким від $40$ до $49$ років. \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.2cm}
+\zadtask{На діаграмі відображено розподіл кількості працівників фірми за віком. За даними діаграми визначте різницю між кількістю працівників віком від $20$ до $29$ років та кількістю працівників, яким від $40$ до $49$ років. \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \par}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick]
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick]%@N 8.19x5.36 C
+
     \draw[->, gray!60] (0,0) -- (0,4.8) node[above, font=\scriptsize, text=black] {Кількість};
     \draw[->, gray!60] (0,0) -- (7.4,0) node[right, font=\scriptsize, text=black] {Вік};
     \foreach \v in {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44} {
@@ -1536,7 +1085,7 @@
     }
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-\par\nbvspace{0.2cm}}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$6$}{$10$}{$12$}{$16$}{$20$}
 % Відповідь: В
 \ifshowsolutions\solution{За діаграмою у віці $20$--$29$ років -- $36$ працівників, у віці $40$--$49$ -- $24$. Різниця $36-24=12$. Відповідь: \textbf{В}.}\fi
@@ -1550,9 +1099,10 @@
 \zadnum На діаграмі відображено інформацію щодо зміни маси (у кг) слона протягом шести місяців із січня до червня цього року в порівнянні з груднем минулого року. Якою стала маса слона в червні, якщо в грудні вона становила $4{,}235$ т? \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.7cm, y=0.035cm, thick]%@N 6.03x8.88 S
+
     \foreach \y in {-60,-40,-20,0,20,40,60,80,100} {
         \draw[gray!60, thin] (0,\y) -- (7,\y);
         \node[left, font=\small] at (0,\y) {\y};
@@ -1568,7 +1118,7 @@
     }
     \node[below, font=\small, yshift=-2.2cm] at (3.5,-65) {Місяць};
     \foreach \x/\y in {0/0, 1/-60, 2/-40, 3/0, 4/20, 5/80, 6/60} {
-        \filldraw[black] (\x,\y) circle (2pt);
+        \path (\x,\y) node[nmt dot] {};
     }
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
@@ -1581,22 +1131,10 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 4.06, завдання №2
-\noindent
-\begin{minipage}[t]{0.52\textwidth}
-\nopagebreak\nbvspace{0pt}
-\zadnum На діаграмі відображено інформацію про ціну пакета цукерок «Чудасія», «Каштанчики», «Шокос», «Смакс» і «Няммі» в деякому магазині. Якщо в Катрусі є лише $200$~грн, то із зазначених цукерок вона може придбати \nmtyear{2026}\par
-\nopagebreak\nbvspace{0.3cm}
-\par\noindent\textbf{А}\ \ лише «Каштанчики» або «Шокос»
-\par\noindent\textbf{Б}\ \ лише «Чудасія»
-\par\noindent\textbf{В}\ \ лише «Чудасія», «Смакс» або «Няммі»
-\par\noindent\textbf{Г}\ \ будь-який один пакет цукерок
-\par\noindent\textbf{Д}\ \ лише «Каштанчики», «Смакс» або «Няммі»
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.48\textwidth}
-\nopagebreak\nbvspace{0pt}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]
+\zadtask{На діаграмі відображено інформацію про ціну пакета цукерок «Чудасія», «Каштанчики», «Шокос», «Смакс» і «Няммі» в деякому магазині. Якщо в Катрусі є лише $200$~грн, то із зазначених цукерок вона може придбати \nmtyear{2026}\par\nmtnobreak \par\nmtnobreak \par}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.85, thick]%@N 6.88x5.58 C
+
     \draw[gray!60] (0,0) -- (6.5,0);
     \draw[gray!60] (0,0) -- (0,4.0);
     \node[rotate=90, font=\small] at (-1.2, 2.0) {Ціна (грн за пакет)};
@@ -1615,7 +1153,11 @@
     \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (4.6, -0.1) {«Смакс»};
     \node[below, rotate=50, anchor=north east, font=\scriptsize, inner sep=2pt] at (5.8, -0.1) {«Няммі»};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
+\end{center}
+\nmtOptions{лише «Каштанчики» або «Шокос»}{лише «Чудасія»}{лише «Чудасія», «Смакс» або «Няммі»}{будь-який один пакет цукерок}{лише «Каштанчики», «Смакс» або «Няммі»}
+
+\nopagebreak\nbvspace{0pt}
+
 % Відповідь: В
 \ifshowsolutions\solution{За діаграмою ціни: «Чудасія» $175$, «Каштанчики» $250$, «Шокос» $325$, «Смакс» $190$, «Няммі» $200$~грн. На $200$~грн вистачає лише на ті, що коштують не більше $200$: «Чудасія», «Смакс» або «Няммі». Відповідь: \textbf{В}.}\fi
 \par\penalty-20
@@ -1624,25 +1166,31 @@
 \begin{samepage}
 % НМТ 2026, сесія 5.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.54\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку відображено результати опитування пасажирів щодо якості перевезень (у балах за шкалою $1$--$10$). Визначте кількість опитаних, які поставили оцінку, \textit{вищу за} $8$ балів. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.44\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.42, thick]
-    \draw[->, gray!60] (0,0) -- (0,9) node[above, font=\scriptsize] {};
-    \draw[->, gray!60] (0,0) -- (7.5,0) node[right, font=\scriptsize, text=black] {бали};
-    \foreach \v/\yy in {25/1,50/2,75/3,100/4,125/5,150/6,175/7,200/8,225/9} {
-        \draw[gray!20] (0,\yy) -- (7,\yy);
+\begin{nmtfit}\begin{tikzpicture}[x=0.95cm, y=0.45cm]
+    % рамка-сітка: клітинки по 25 осіб, межі між оцінками
+    \foreach \v in {1,2,...,9} {\draw[gray!40, thin] (3.5,\v*25/25) -- (10.5,\v*25/25);}
+    \foreach \xx in {3.5,4.5,...,10.5} {\draw[gray!40, thin] (\xx,0) -- (\xx,9);}
+    \draw[thin] (3.5,0) -- (3.5,9);
+    \draw[thin] (3.5,0) -- (10.5,0);
+    % поділки й підписи осі y: 0, 25, ..., 225
+    \foreach \k in {0,1,...,9} {
+        \draw[thin] (3.5,\k) -- (3.3,\k);
+        \node[left, inner sep=2pt] at (3.3,\k) {\small \pgfmathparse{int(\k*25)}\pgfmathresult};
     }
-    \foreach \v/\yy in {50/2,100/4,150/6,200/8} {\node[left,font=\tiny, text=gray!80!black] at (0,\yy){\v};}
-
-    \draw[mainGreen, thick] (1,3)--(2,4)--(3,4)--(4,8)--(5,7)--(6,3)--(7,1);
-    \foreach \xx/\yy in {1/3,2/4,3/4,4/8,5/7,6/3,7/1} {
-        \filldraw[fill=white, draw=mainGreen, thick] (\xx,\yy) circle (3.5pt);
-    }
-    \foreach \xx/\lab in {1/4,2/5,3/6,4/7,5/8,6/9,7/10} {\node[below,font=\tiny] at (\xx,0){\lab};}
+    % підписи осі x: оцінки 4--10 під серединами проміжків
+    \foreach \xx in {4,5,...,10} {\node[below] at (\xx,-0.1) {\small \xx};}
+    \foreach \xx in {3.5,4.5,...,10.5} {\draw[thin] (\xx,0) -- (\xx,-0.25);}
+    \node[below] at (7,-1.4) {\small Оцінка в балах};
+    \node[rotate=90, above] at (2.0,4.5) {\small Кількість опитуваних};
+    % дані: 4--75, 5--100, 6--100, 7--200, 8--175, 9--75, 10--25
+    \draw[thick] (4,3) -- (5,4) -- (6,4) -- (7,8) -- (8,7) -- (9,3) -- (10,1);
+    \foreach \xx/\yy in {4/3,5/4,6/4,7/8,8/7,9/3,10/1} {\node[nmt dot] at (\xx,\yy) {};}
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1654,16 +1202,11 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 8.06, завдання №2
-\noindent
-\begin{minipage}[c]{0.48\textwidth}
-\zadnum На рисунку зображено графік залежності кількості переглядів відеоролика (у тисячах) від часу (у годинах) з моменту його публікації. Укажіть проміжок часу, протягом якого кількість переглядів зростала найшвидше. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.50\textwidth}
-\centering
+\zadtask{На рисунку зображено графік залежності кількості переглядів відеоролика (у тисячах) від часу (у годинах) з моменту його публікації. Укажіть проміжок часу, протягом якого кількість переглядів зростала найшвидше. \nmtyear{2026}}
+\begin{center}
 \begin{nmtfit}\begin{tikzpicture}
 \begin{axis}[
-    width=8.5cm, height=5.5cm,
+    width=12.5cm, height=6.2cm,
     xmin=0, xmax=21,
     ymin=0, ymax=24,
     xtick={0,2,4,6,8,10,12,14,16,18,20},
@@ -1676,27 +1219,23 @@
     tick label style={font=\scriptsize},
     label style={font=\scriptsize}
 ]
-\addplot[mark=*, thick, red!80!black] coordinates {
+\addplot[nmt curve, mark=*] coordinates {
     (0,0) (2,1) (4,2) (6,3) (8,6) (10,12) (12,15) (14,16) (16,17) (18,17.5) (20,18)
 };
 \end{axis}
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$[0; 4]$}{$[4; 8]$}{$[8; 10]$}{$[12; 16]$}{$[18; 20]$}
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 9.06, завдання №2
-\noindent
-\begin{minipage}[c]{0.42\textwidth}
-\zadnum На діаграмі відображено дані про швидкість автомобілів, яку зафіксували камери спостереження у вечірній час. За даними діаграми визначте загальну кількість автомобілів, рух яких було зафіксовано. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.56\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
+\zadtask{На діаграмі відображено дані про швидкість автомобілів, яку зафіксували камери спостереження у вечірній час. За даними діаграми визначте загальну кількість автомобілів, рух яких було зафіксовано. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]%@N 7.77x5.74 C
+
     \draw[->, gray!80] (0,0) -- (0,5.2) node[above, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.5cm, text=gray!80!black, font=\scriptsize] {Кількість автомобілів};
     \draw[->, gray!80] (0,0) -- (7.5,0) node[below, text=gray!80!black, font=\scriptsize, xshift=-3.5cm, yshift=-0.5cm] {Швидкість автомобіля, км/год};
 
@@ -1718,8 +1257,8 @@
     \node[below, font=\scriptsize] at (5.05,0) {101--120};
     \node[below, font=\scriptsize] at (6.45,0) {понад 120};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$48$}{$49$}{$50$}{$45$}{$52$}
 \par\penalty-20
 \end{samepage}
@@ -1727,67 +1266,67 @@
 \begin{samepage}
 % НМТ 2026, сесія 10.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.42\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum У музичній школі опитали $100$ учнів щодо улюбленого жанру музики. Результати опитування наведено на діаграмі (див. рисунок). За діаграмою визначте різницю між кількістю шанувальників попмузики і класичної. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.56\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
-    \draw[->, gray!80] (0,0) -- (0,5.2) node[above, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.5cm, text=gray!80!black, font=\scriptsize] {Кількість учнів};
-    \draw[->, gray!80] (0,0) -- (7.5,0) node[below, text=gray!80!black, font=\scriptsize, xshift=-3.5cm, yshift=-0.6cm] {Жанри музики};
-
-    \foreach \y/\val in {0.7/5, 1.4/10, 2.1/15, 2.8/20, 3.5/25, 4.2/30, 4.9/35} {
-        \draw[gray!30, thin] (0,\y) -- (7,\y);
-        \node[left, font=\scriptsize, text=gray!80!black] at (0,\y) {\val};
+\begin{nmtfit}\begin{tikzpicture}[line join=round]
+    \def\u{0.14}   % 1 учень = 0,14 см
+    \def\w{1.65}   % ширина смуги однієї категорії
+    \fill[nmtFillA] (0,0) rectangle ({5*\w},{35*\u});
+    \foreach \y in {5,10,...,35}{ \draw[nmt grid] (0,{\y*\u}) -- ({5*\w},{\y*\u}); }
+    \foreach \k in {1,...,4}{ \draw[nmt grid] ({\k*\w},0) -- ({\k*\w},{35*\u}); }
+    \draw[very thick] (0,0) rectangle ({5*\w},{35*\u});
+    \foreach \y in {0,5,...,35}{ \node[left, font=\scriptsize, fill=white, inner sep=1pt, outer sep=1pt] at (0,{\y*\u}) {$\y$}; }
+    \foreach \k/\v in {0/15,1/20,2/33,3/25,4/7}{
+        \fill[nmtBlue] ({\k*\w+0.4},0) rectangle ({\k*\w+\w-0.4},{\v*\u});
     }
-    \node[left, font=\scriptsize, text=gray!80!black] at (0,0) {0};
-
-    \filldraw[fill=cyan!60!blue, draw=none] (0.5,0) rectangle (1.2, 2.1);
-    \filldraw[fill=cyan!60!blue, draw=none] (1.9,0) rectangle (2.6, 2.8);
-    \filldraw[fill=cyan!60!blue, draw=none] (3.3,0) rectangle (4.0, 4.62);
-    \filldraw[fill=cyan!60!blue, draw=none] (4.7,0) rectangle (5.4, 3.5);
-    \filldraw[fill=cyan!60!blue, draw=none] (6.1,0) rectangle (6.8, 0.98);
-
-    \node[below, font=\scriptsize] at (0.85,0) {Класична};
-    \node[below, font=\scriptsize] at (2.25,0) {Джаз і блюз};
-    \node[below, font=\scriptsize] at (3.65,0) {Рок};
-    \node[below, font=\scriptsize] at (5.05,0) {Попмузика};
-    \node[below, font=\scriptsize] at (6.45,0) {Інші};
+    \node[below, font=\scriptsize] at ({0.5*\w},0) {Класична};
+    \node[below, font=\scriptsize] at ({1.5*\w},0) {Джаз і блюз};
+    \node[below, font=\scriptsize] at ({2.5*\w},0) {Рок};
+    \node[below, font=\scriptsize] at ({3.5*\w},0) {Попмузика};
+    \node[below, font=\scriptsize] at ({4.5*\w},0) {Інші};
+    \node[below, font=\scriptsize, yshift=-0.55cm] at ({2.5*\w},0) {\textit{Жанри музики}};
+    \node[rotate=90, font=\scriptsize, yshift=0.95cm] at (0,{17.5*\u}) {\textit{Кількість учнів}};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
-\answerTable{$5$}{$10$}{$15$}{$20$}{$40$}
+\answerTable{$10$}{$20$}{$25$}{$35$}{$40$}
+% Відповідь: А
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % НМТ 2026, сесія 11.06, завдання №2
-\noindent
-\begin{minipage}[c]{0.46\textwidth}
-\zadnum На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Визначте різницю (у $^\circ$C) найбільшого і найменшого зафіксованих значень температури повітря. \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.52\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
-    \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
-    \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
-    \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
-    \node[below left, font=\scriptsize] at (0,0) {$0$};
-    \node[below, font=\scriptsize] at (2,0) {$2$};
-    \node[below, font=\scriptsize] at (6,0) {$6$};
-    \node[below, font=\scriptsize] at (10,0) {$10$};
-    \node[below, font=\scriptsize] at (16,0) {$16$};
-    \node[below, font=\scriptsize] at (24,0) {$24$};
-    \node[left, font=\scriptsize] at (0,2) {$2$};
-    \draw[magenta!80!black, thick, smooth] plot coordinates {(0,2) (2,1) (4,-1) (6,-2) (8,-1) (10,1) (13,4) (16,6) (20,4) (24,3)};
-    \fill (0,2) circle (2.5pt);
-    \fill (16,6) circle (2.5pt);
-    \fill (24,3) circle (2.5pt);
+\zadtask{На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Визначте різницю (у $^\circ$C) найбільшого і найменшого зафіксованих значень температури повітря. \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.04, x=0.3cm, y=0.3cm, thick]%@N 8.79x3.95 C
+
+    \draw[nmt grid, step=2] (-2,-4) grid (32,10);
+    \draw[->] (-2,0) -- (32,0) node[below left] {$t$, год};
+    \draw[->] (0,-4) -- (0,10) node[right] {$T$, $^\circ$C};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (2,0) {$2$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (6,0) {$6$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (10,0) {$10$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (16,0) {$16$};
+    \node[below, fill=white, inner sep=1pt, outer sep=1pt] at (24,0) {$24$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,2) {$2$};
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,6) {$6$};
+    \draw[nmt curve] (0,2) .. controls (1.7,2) and (3.2,0.64) .. (4,0)
+        .. controls (4.8,-0.64) and (5.33,-2) .. (6,-2)
+        .. controls (7.333,-2) and (8.667,-0.87) .. (10,0)
+        .. controls (12,1.304) and (14,6) .. (16,6)
+        .. controls (19,6) and (21,3.8) .. (24,2);
+    \node[nmt dot] at (0,2) {};
+    \node[nmt dot] at (6,-2) {};
+    \node[nmt dot] at (16,6) {};
+    \node[nmt dot] at (24,2) {};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$4$}{$6$}{$8$}{$10$}{$24$}
 \par\penalty-20
 \end{samepage}
@@ -1795,20 +1334,21 @@
 \begin{samepage}
 % НМТ 2026, сесія 12.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.46\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На рисунку зображено графік залежності об'єму води в басейні (у м$^3$) від часу його спорожнення (у год). За графіком визначте, скільки кубічних метрів води залишиться в басейні через $5$ годин після початку його спорожнення. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.52\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.55cm, y=0.11cm, thick]
-    \draw[step=1, gray!30, very thin] (0,0) grid (8,40);
-    \draw[->] (0,0) -- (8.8,0) node[right, font=\scriptsize] {$t$, год};
-    \draw[->] (0,0) -- (0,46) node[above, font=\scriptsize] {$V$, м$^3$};
-    \foreach \y in {10,20,30,40} {\node[left, font=\scriptsize] at (0,\y) {\y};}
-    \foreach \xx in {1,2,3,4,5,6,7,8} {\node[below, font=\scriptsize] at (\xx,0) {\xx};}
-    \node[below left, font=\scriptsize] at (0,0) {0};
-    \draw[mainGreen, very thick] (0,40) -- (8,0);
+\begin{nmtfit}\begin{tikzpicture}[scale=0.75, x=0.55cm, y=0.11cm, thick]%@N 6.93x6.40 S
+
+    \draw[nmt grid, step=1] (0,0) grid (8,40);
+    \draw[->] (0,0) -- (8.8,0) node[right, font=\normalsize] {$t$, год};
+    \draw[->] (0,0) -- (0,46) node[above, font=\normalsize] {$V$, м$^3$};
+    \foreach \y in {10,20,30,40} {\node[left, font=\normalsize] at (0,\y) {\y};}
+    \foreach \xx in {1,2,3,4,5,6,7,8} {\node[below, font=\normalsize] at (\xx,0) {\xx};}
+    \node[below left, font=\normalsize] at (0,0) {0};
+    \draw[nmtGreen, very thick] (0,40) -- (8,0);
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1819,37 +1359,35 @@
 \begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.44\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На діаграмі відображено інформацію про кількість золотих, срібних і бронзових медалей, які вибороли українські спортсмени на олімпійських іграх із 2008 до 2024 року. Якого року українські спортсмени вибороли найбільше медалей? \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.54\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.92cm, y=0.28cm, thick]
-    % осі та горизонтальна сітка з позначками 0,2,...,14
-    \draw[->] (0,0) -- (0,15.2) node[above, font=\scriptsize] {Кількість медалей};
-    \draw[->] (0,0) -- (5.6,0) node[below right, font=\scriptsize] {Рік};
+\begin{nmtfit}\begin{tikzpicture}[x=1cm, y=0.26cm, thick]
+    % горизонтальна сітка 0,2,...,14
     \foreach \y in {0,2,4,6,8,10,12,14} {
-        \draw[gray!30, thin] (0,\y) -- (5.3,\y);
-        \node[left, font=\scriptsize] at (0,\y) {\y};
+        \draw[nmt grid] (0,\y) -- (7.2,\y);
+        \node[left] at (0,\y) {\small \y};
     }
-    % групи стовпців: золото/срібло/бронза для кожного року
-    % 2008: 7,5,15 -> сума 27? масштаб під 14 -> беремо реальні висоти в межах 14
-    % значення (золото, срібло, бронза) за реальною діаграмою; найбільша сума - 2008 (22)
+    \node[rotate=90, above=0.5cm] at (0,7) {\small Кількість медалей};
+    % стовпці: золото / срібло / бронза
     \foreach \i/\year/\g/\s/\b in {0/2008/7/4/11, 1/2012/5/4/10, 2/2016/2/5/4, 3/2020/1/6/12, 4/2024/3/5/4} {
-        \pgfmathsetmacro{\bx}{0.55 + \i*1.0}
-        \filldraw[fill=gold, draw=black!60, line width=0.3pt] (\bx,0) rectangle ++(0.22,\g);
-        \filldraw[fill=silver, draw=black!60, line width=0.3pt] (\bx+0.22,0) rectangle ++(0.22,\s);
-        \filldraw[fill=bronze, draw=black!60, line width=0.3pt] (\bx+0.44,0) rectangle ++(0.22,\b);
-        \node[below, font=\tiny] at (\bx+0.33,0) {\year};
+        \pgfmathsetmacro{\cx}{0.9 + \i*1.4}
+        \filldraw[fill=gold, draw=none] (\cx-0.45,0) rectangle (\cx-0.15,\g);
+        \filldraw[fill=silver, draw=none] (\cx-0.15,0) rectangle (\cx+0.15,\s);
+        \filldraw[fill=bronze, draw=none] (\cx+0.15,0) rectangle (\cx+0.45,\b);
+        \node[below] at (\cx,-0.4) {\small \year};
     }
-    % легенда
-    \filldraw[fill=gold, draw=black!60] (3.7,13.4) rectangle ++(0.3,0.7);
-    \node[right, font=\tiny] at (4.0,13.75) {золото};
-    \filldraw[fill=silver, draw=black!60] (3.7,12.2) rectangle ++(0.3,0.7);
-    \node[right, font=\tiny] at (4.0,12.55) {срібло};
-    \filldraw[fill=bronze, draw=black!60] (3.7,11.0) rectangle ++(0.3,0.7);
-    \node[right, font=\tiny] at (4.0,11.35) {бронза};
+    \node[below] at (3.6,-3.2) {\small Рік};
+    % легенда під діаграмою
+    \filldraw[fill=gold, draw=none] (1.2,-7.2) rectangle ++(0.22,-0.85);
+    \node[right] at (1.5,-7.65) {\small золото};
+    \filldraw[fill=silver, draw=none] (3.0,-7.2) rectangle ++(0.22,-0.85);
+    \node[right] at (3.3,-7.65) {\small срібло};
+    \filldraw[fill=bronze, draw=none] (4.8,-7.2) rectangle ++(0.22,-0.85);
+    \node[right] at (5.1,-7.65) {\small бронза};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
 \par\nbvspace{0.2cm}
@@ -1861,13 +1399,14 @@
 \begin{samepage}
 % НМТ 2026, сесія 15.06, завдання №11 --- основна тема: Теорія ймовірності
 \noindent
-\begin{minipage}[c]{0.54\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На круговій діаграмі відображено розподіл музичних треків за жанрами на платівці. Програвач відтворює один випадковий трек із цієї платівки. Знайдіть ймовірність того, що першим прозвучить трек у жанрі рок. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.44\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[scale=1.0]
+\begin{nmtfit}\begin{tikzpicture}[scale=1.0]%@N 5.92x4.02 S
+
     \def\R{1.9}
     % значення: рок 20, поп 25, джаз 11, диско 14; сума 70
     % кути: рок 20/70*360=102.857; поп 25/70*360=128.571; джаз 11/70=56.571; диско 14/70=72
@@ -1905,16 +1444,12 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 16.06, завдання №2
-\noindent
-\begin{minipage}[c]{0.42\textwidth}
-\zadnum На діаграмі відображено кількість відвідувачів музею протягом шести робочих днів тижня (з вівторка по неділю). У який із днів тижня кількість відвідувачів була вдвічі більшою, ніж попереднього робочого дня? \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.56\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]
+\zadtask{На діаграмі відображено кількість відвідувачів музею протягом шести робочих днів тижня (з вівторка по неділю). У який із днів тижня кількість відвідувачів була вдвічі більшою, ніж попереднього робочого дня? \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=0.9, thick, line join=round]%@N 8.32x6.42 C
+
     % Сітка та осі
-    \draw[gray!30, thin] (0,0) grid[xstep=1.2, ystep=0.6] (7.2, 6.0);
+    \draw[nmt grid] (0,0) grid[xstep=1.2, ystep=0.6] (7.2, 6.0);
     \draw[->, thick] (0,0) -- (0, 6.5);
     \draw[->, thick] (0,0) -- (7.5, 0);
 
@@ -1940,8 +1475,8 @@
     \node[below, font=\scriptsize] at (5.4,0) {субота};
     \node[below, font=\scriptsize] at (6.6,0) {неділя};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{середа}{четвер}{п'ятниця}{субота}{неділя}
 % Відповідь: В
 \par\penalty-20
@@ -1950,13 +1485,14 @@
 \begin{samepage}
 % НМТ 2026, сесія 17.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.46\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum На діаграмі відображено частку відвідувачів (у~\%), які позитивно оцінили якість обслуговування в супермаркеті протягом п'яти місяців року. Визначте місяць, у якому ця частка становила $\dfrac{4}{5}$ від загальної кількості опитаних відвідувачів у цьому місяці. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.52\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.9cm, y=0.32cm, thick]
+\begin{nmtfit}\begin{tikzpicture}[x=0.9cm, y=0.32cm, thick]%@N 6.01x4.02 S
+
     \draw[->] (0,0) -- (0,11) node[above, font=\scriptsize, rotate=90, anchor=south, xshift=-2.2cm, yshift=0.4cm] {Частка відвідувачів, \%};
     \draw[->] (0,0) -- (5.6,0);
     \foreach \y in {1,2,3,4,5,6,7,8,9,10} {
@@ -1981,7 +1517,7 @@
     \node[below, font=\tiny] at (4.8,0) {Травень};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\nbvspace{0.5cm}
+\par\nbvspace{0.2cm}
 \answerTable{січень}{лютий}{березень}{квітень}{травень}
 % Відповідь: Б
 \par\penalty-20
@@ -1990,41 +1526,42 @@
 \begin{samepage}
 % НМТ 2026, сесія 18.06, завдання №2
 \noindent
-\begin{minipage}[c]{0.44\textwidth}
+\begin{minipage}[c]{0.56\textwidth}
 \zadnum Власник кав'ярні протягом дня відстежував кількість відвідувачів у різні періоди часу. Результати спостереження відображено на діаграмі (див. рисунок). Визначте, у який із наведених періодів дня кав'ярню відвідала \textit{найменша} кількість відвідувачів. \nmtyear{2026}
 \end{minipage}%
 \hfill
-\begin{minipage}[c]{0.54\textwidth}
+\begin{minipage}[c]{0.40\textwidth}
 \centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.72cm, y=0.55cm, thick]
-    \draw[->] (0,0) -- (0,5.4) node[above, font=\scriptsize, rotate=90, anchor=south, xshift=-2.0cm, yshift=0.4cm] {Кількість відвідувачів};
-    \draw[->] (0,0) -- (6.6,0);
-    \foreach \y in {1,2,3,4,5} {
-        \draw[gray!25, thin] (0,\y) -- (6.4,\y);
-        \node[left, font=\scriptsize] at (0,\y) {\pgfmathparse{int(\y*5)}\pgfmathresult};
-    }
-    \node[left, font=\scriptsize] at (0,0) {0};
+\begin{nmtfit}\begin{tikzpicture}[x=1.4cm, y=0.18cm]
     \definecolor{c1}{RGB}{95,190,225}
     \definecolor{c2}{RGB}{250,220,40}
     \definecolor{c3}{RGB}{235,140,60}
     \definecolor{c4}{RGB}{130,185,55}
     \definecolor{c5}{RGB}{150,50,120}
     \definecolor{c6}{RGB}{225,45,50}
-    \filldraw[fill=c1, draw=none] (0.35,0) rectangle ++(0.6,3);
-    \filldraw[fill=c2, draw=none] (1.35,0) rectangle ++(0.6,1);
-    \filldraw[fill=c3, draw=none] (2.35,0) rectangle ++(0.6,1.6);
-    \filldraw[fill=c4, draw=none] (3.35,0) rectangle ++(0.6,2);
-    \filldraw[fill=c5, draw=none] (4.35,0) rectangle ++(0.6,2.4);
-    \filldraw[fill=c6, draw=none] (5.35,0) rectangle ++(0.6,4.4);
-    \node[below, font=\tiny, rotate=35, anchor=east] at (0.75,-0.05) {8:00--10:00};
-    \node[below, font=\tiny, rotate=35, anchor=east] at (1.75,-0.05) {10:00--12:00};
-    \node[below, font=\tiny, rotate=35, anchor=east] at (2.75,-0.05) {12:00--14:00};
-    \node[below, font=\tiny, rotate=35, anchor=east] at (3.75,-0.05) {14:00--16:00};
-    \node[below, font=\tiny, rotate=35, anchor=east] at (4.75,-0.05) {16:00--18:00};
-    \node[below, font=\tiny, rotate=35, anchor=east] at (5.75,-0.05) {18:00--20:00};
+    \foreach \v in {5,10,15,20,25} {
+        \draw[nmt grid] (0,\v) -- (6,\v);
+        \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,\v) {$\v$};
+    }
+    \node[left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \filldraw[fill=c1, draw=none] (0.2,0) rectangle (0.8,15);
+    \filldraw[fill=c2, draw=none] (1.2,0) rectangle (1.8,5);
+    \filldraw[fill=c3, draw=none] (2.2,0) rectangle (2.8,8);
+    \filldraw[fill=c4, draw=none] (3.2,0) rectangle (3.8,10);
+    \filldraw[fill=c5, draw=none] (4.2,0) rectangle (4.8,12);
+    \filldraw[fill=c6, draw=none] (5.2,0) rectangle (5.8,22);
+    \node[below, align=center] at (0.5,-0.5) {\small 8:00--\\\small 10:00};
+    \node[below, align=center] at (1.5,-0.5) {\small 10:00--\\\small 12:00};
+    \node[below, align=center] at (2.5,-0.5) {\small 12:00--\\\small 14:00};
+    \node[below, align=center] at (3.5,-0.5) {\small 14:00--\\\small 16:00};
+    \node[below, align=center] at (4.5,-0.5) {\small 16:00--\\\small 18:00};
+    \node[below, align=center] at (5.5,-0.5) {\small 18:00--\\\small 20:00};
+    \draw (0,0) -- (6,0);
+    \node[rotate=90, anchor=south] at (-0.65,12.5) {Кількість відвідувачів};
+    \node[below] at (3,-6.5) {Час, години};
 \end{tikzpicture}\end{nmtfit}
 \end{minipage}
-\par\nbvspace{0.7cm}
+\par\nbvspace{0.2cm}
 \answerTable{8:00--12:00}{10:00--14:00}{12:00--16:00}{14:00--18:00}{16:00--20:00}
 % Відповідь: Б
 \par\penalty-20
@@ -2065,32 +1602,21 @@
 
 \begin{samepage}
 % НМТ 2026, сесія 19.06, завдання №2
-\noindent
-\begin{minipage}[c]{0.46\textwidth}
-\zadnum На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Скільки всього годин за добу температура повітря знижувалася? \nmtyear{2026}
-\end{minipage}%
-\hfill
-\begin{minipage}[c]{0.52\textwidth}
-\centering
-\begin{nmtfit}\begin{tikzpicture}[x=0.3cm, y=0.3cm, thick]
-    \draw[step=2, gray!40, thin] (0,-4) grid (26,8);
-    \draw[->] (-1,0) -- (27,0) node[right, font=\scriptsize] {$t$, год};
-    \draw[->] (0,-4.5) -- (0,8.5) node[above, font=\scriptsize] {$T$, $^\circ$C};
-    \node[below left, font=\scriptsize] at (0,0) {$0$};
-    \node[below, font=\scriptsize] at (2,0) {$2$};
-    \node[below, font=\scriptsize] at (6,0) {$6$};
-    \node[below, font=\scriptsize] at (10,0) {$10$};
-    \node[below, font=\scriptsize] at (16,0) {$16$};
-    \node[below, font=\scriptsize] at (24,0) {$24$};
-    \node[left, font=\scriptsize] at (0,2) {$2$};
-    \node[left, font=\scriptsize] at (0,6) {$6$};
-    \draw[magenta!80!black, thick, smooth] plot coordinates {(0,2) (2,2) (4,0) (6,-2) (8,-2) (10,0) (14,4) (16,6) (18,5) (22,2) (24,2)};
-    \fill (0,2) circle (2.5pt);
-    \fill (16,6) circle (2.5pt);
-    \fill (24,2) circle (2.5pt);
+\zadtask{На рисунку зображено графік зміни температури (у $^\circ$C) $T$ повітря протягом доби. Скільки всього годин за добу температура повітря знижувалася? \nmtyear{2026}}
+\begin{center}
+\begin{nmtfit}\begin{tikzpicture}[scale=1.29, x=0.25cm, y=0.25cm]%@N 8.51x3.51 C
+
+    \draw[nmt grid, step=2] (-2,-4) grid (32,10);
+    \draw[->] (-2,0) -- (32,0) node[below left, fill=white, inner sep=1pt] {$t$, год};
+    \draw[->] (0,-4) -- (0,10) node[below right, fill=white, inner sep=1pt] {$T$, $^\circ$C};
+    \node[below left, fill=white, inner sep=1pt, outer sep=1pt] at (0,0) {$0$};
+    \foreach \t in {2,6,10,16,24} \node[below=1pt, fill=white, inner sep=1pt] at (\t,0) {$\t$};
+    \foreach \T in {2,6} \node[left] at (0,\T) {$\T$};
+    \draw[nmt curve] (0,2) .. controls (1.333,2) and (2.667,0.923) .. (4,0) .. controls (4.667,-0.462) and (5.333,-2) .. (6,-2) .. controls (7.333,-2) and (8.667,-0.923) .. (10,0) .. controls (10.667,0.462) and (11.333,1.333) .. (12,2) .. controls (13.333,3.333) and (14.667,6) .. (16,6) .. controls (17.333,6) and (18.667,4.667) .. (20,4) .. controls (21.333,3.333) and (22.667,2.667) .. (24,2);
+    \foreach \p in {(0,2),(6,-2),(16,6),(24,2)} \node[nmt dot] at \p {};
 \end{tikzpicture}\end{nmtfit}
-\end{minipage}
-\par\nbvspace{0.2cm}
+\end{center}
+\nopagebreak\nbvspace{0.2cm}
 \answerTable{$4$}{$6$}{$8$}{$12$}{$14$}
 % Відповідь: Д
 \par\penalty-20
@@ -2125,136 +1651,90 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 16 (Кінотеатр - Відвідуваність - ВИПРАВЛЕНО ПІДПИСИ + СІТКА 10) ===
-\noindent\zadnum На діаграмі наведено відвідуваність сеансу одного фільму в кінотеатрі протягом 6 робочих днів. На скільки \textit{відсотків} кількість глядачів на найбільше відвідуваному сеансі перевищує середню кількість глядачів за ці 6 днів? \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі наведено відвідуваність сеансу одного фільму в кінотеатрі протягом 6 робочих днів. На скільки \textit{відсотків} кількість глядачів на найбільше відвідуваному сеансі перевищує середню кількість глядачів за ці 6 днів? \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=16cm, height=12cm, % Високий графік
-        enlarge x limits=0.1,
-        % --- ЧИСЛОВІ КООРДИНАТИ + ТЕКСТОВІ ПІДПИСИ ---
-        xtick={1, 2, 3, 4, 5, 6},
-        xticklabels={Пн, Вт, Ср, Чт, Пт, Сб},
-        ymin=0, ymax=240,
-        % Основні поділки кожні 20
-        ytick={0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240},
-        % Додаткова лінія посередині (крок 10)
-        minor y tick num=1,
-        ylabel={Кількість відвідувачів},
-        xlabel={День тижня},
-        x label style={at={(axis description cs:0.5,-0.05)},anchor=north},
-        % Налаштування сітки
-        grid=major,
-        ymajorgrids=true,
-        yminorgrids=true, % Вмикаємо проміжні лінії
-        major grid style={line width=0.4pt, draw=gray!50},
-        minor grid style={line width=0.2pt, draw=gray!20},
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=gray!50,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.83cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5, 6},
+    xticklabels={Пн, Вт, Ср, Чт, Пт, Сб},
+    ymax=240,
+    ytick={0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240},
+    ylabel={Кількість відвідувачів},
+    xlabel={День тижня}]
         % Використовуємо числа: 1=Пн, 2=Вт...
-        \addplot coordinates {(1,130)};
-        \addplot coordinates {(2,160)};
-        \addplot coordinates {(3,200)};
-        \addplot coordinates {(4,170)};
-        \addplot coordinates {(5,210)};
-        \addplot coordinates {(6,180)};
+        \addplot[nmt bar] coordinates {(1,130)};
+        \addplot[nmt bar] coordinates {(2,160)};
+        \addplot[nmt bar] coordinates {(3,200)};
+        \addplot[nmt bar] coordinates {(4,170)};
+        \addplot[nmt bar] coordinates {(5,210)};
+        \addplot[nmt bar] coordinates {(6,180)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 17 (Смартфони - ВИПРАВЛЕНО ПІДПИСИ + СІТКА 10) ===
-\noindent\zadnum На діаграмі наведено інформацію про продаж смартфонів протягом п’яти місяців. На скільки \textit{відсотків} середня кількість проданих смартфонів перевищує кількість проданих смартфонів у квітні? \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі наведено інформацію про продаж смартфонів протягом п’яти місяців. На скільки \textit{відсотків} середня кількість проданих смартфонів перевищує кількість проданих смартфонів у квітні? \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=16cm, height=12cm, % Високий графік
-        enlarge x limits=0.12,
-        % --- ЧИСЛОВІ КООРДИНАТИ + ТЕКСТОВІ ПІДПИСИ ---
-        xtick={1, 2, 3, 4, 5},
-        xticklabels={Січень, Лютий, Березень, Квітень, Травень},
-        ymin=0, ymax=400,
-        % Основні поділки кожні 50
-        ytick={0, 50, 100, 150, 200, 250, 300, 350, 400},
-        % 4 проміжні лінії (10, 20, 30, 40) -> крок 10
-        minor y tick num=4,
-        ylabel={Кількість проданих\\смартфонів},
-        xlabel={Місяць},
-        y label style={align=center, at={(axis description cs:-0.05,0.5)}},
-        x label style={at={(axis description cs:0.5,-0.05)},anchor=north},
-        % Налаштування сітки
-        grid=major,
-        ymajorgrids=true,
-        yminorgrids=true, % Вмикаємо густу сітку
-        major grid style={line width=0.4pt, draw=gray!50},
-        minor grid style={line width=0.2pt, draw=gray!20},
-        bar width=0.9cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!40,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5},
+    xticklabels={Січень, Лютий, Березень, Квітень, Травень},
+    ymax=400,
+    ytick={0, 50, 100, 150, 200, 250, 300, 350, 400},
+    ylabel={Кількість проданих\\смартфонів},
+    xlabel={Місяць}]
         % Використовуємо числа: 1=Січень, 2=Лютий...
-        \addplot coordinates {(1,250)};
-        \addplot coordinates {(2,150)};
-        \addplot coordinates {(3,300)};
-        \addplot coordinates {(4,200)};
-        \addplot coordinates {(5,350)};
+        \addplot[nmt bar] coordinates {(1,250)};
+        \addplot[nmt bar] coordinates {(2,150)};
+        \addplot[nmt bar] coordinates {(3,300)};
+        \addplot[nmt bar] coordinates {(4,200)};
+        \addplot[nmt bar] coordinates {(5,350)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 19 (Оцінки клієнтів - Горизонтальна діаграма) ===
-\noindent\zadnum На діаграмі відображено результати опитування 1000 клієнтів, які ставили оцінки від 1 до 5. Середня оцінка склала 4{,}2 бали. За відгуками тих відвідувачів, які оцінили роботу від 1 до 4 включно, середня оцінка 2{,}5 бали. Скільки людей поставили оцінку «5»? \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено результати опитування 1000 клієнтів, які ставили оцінки від 1 до 5. Середня оцінка склала 4{,}2 бали. За відгуками тих відвідувачів, які оцінили роботу від 1 до 4 включно, середня оцінка 2{,}5 бали. Скільки людей поставили оцінку «5»? \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        xbar, % Горизонтальна діаграма
-        width=12cm, height=6cm,
+        xbar,
+        width=12.5cm, height=6.2cm,
         ytick={1,2,3,4,5},
         ylabel={Оцінка},
         xlabel={Кількість опитаних},
-        xmin=0, xmax=600, % Приблизний максимум для візуалізації
-        xtick=\empty, % Приховуємо числа на осі X (бо їх немає на скріншоті)
+        xmin=0, xmax=428,
+        ymin=0.4, ymax=5.6,
+        bar width=11pt,
+        xtick=\empty,
         axis x line*=bottom,
-        axis y line*=left,
-        fill=gray!30,
-        draw=none
+        axis y line*=left
     ]
-        % Дані візуально
-        \addplot coordinates {(30,1) (50,2) (100,3) (180,4) (550,5)};
+        \addplot[fill=nmtFillD, draw=none] coordinates {(15,1) (21,2) (42,3) (91,4) (364,5)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -2301,40 +1781,24 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 24 (Соціальні мережі - Гістограма) ===
-\noindent\zadnum Було проведено опитування серед учнів 5 класу про те, скільки приблизно годин на день кожен з них витрачає на соціальні мережі. Відповіді учнів відображено на діаграмі (див. рисунок). Психолог зазначив, що рекомендована кількість часу на користування соціальними мережами дорівнює 2 \textit{години}. На скільки відсотків середня кількість годин користування учнями соціальними мережами перевищує рекомендовану? \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{Було проведено опитування серед учнів 5 класу про те, скільки приблизно годин на день кожен з них витрачає на соціальні мережі. Відповіді учнів відображено на діаграмі (див. рисунок). Психолог зазначив, що рекомендована кількість часу на користування соціальними мережами дорівнює 2 \textit{години}. На скільки відсотків середня кількість годин користування учнями соціальними мережами перевищує рекомендовану? \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=12cm, height=7cm,
-        xtick={1, 2, 3, 4, 5},
-        ymin=0, ymax=8,
-        ytick={0,1,2,3,4,5,6,7,8},
-        ylabel={Кількість учнів},
-        xlabel={Кількість годин},
-        x label style={at={(axis description cs:0.5,-0.15)},anchor=north},
-        ymajorgrids=true,
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=black!30, % Сірий колір як на скріншоті
-        draw=none
-    ]
-        % Дані: 2, 5, 7, 5, 1
-        \addplot coordinates {(1,2)};
-        \addplot coordinates {(2,5)};
-        \addplot coordinates {(3,7)};
-        \addplot coordinates {(4,5)};
-        \addplot coordinates {(5,1)};
-    \end{axis}
+\begin{axis}[nmt bars,
+    bar width=0.99cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    ymax=8,
+    ylabel={Кількість учнів},
+    xlabel={Кількість годин},
+    xtick={1,2,3,4,5},
+    ytick={0,1,2,3,4,5,6,7,8}]
+\addplot[nmt bar] coordinates {(1,2) (2,5) (3,7) (4,5) (5,1)};
+\end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -2406,51 +1870,32 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 34 (Музей - ЧИСЛОВІ КООРДИНАТИ + КРОК 50) ===
-\noindent\zadnum На діаграмі відображено кількість відвідувачів музею протягом 6 днів (з вівторка по неділю). Знайдіть \textit{різницю} між середнім значенням кількості відвідувачів у вихідні дні та середнім значенням кількості відвідувачів у будні дні. \nmtyear{2024}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено кількість відвідувачів музею протягом 6 днів (з вівторка по неділю). Знайдіть \textit{різницю} між середнім значенням кількості відвідувачів у вихідні дні та середнім значенням кількості відвідувачів у будні дні. \nmtyear{2024}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=15cm, height=9cm,
-        enlarge x limits=0.1,
-        % --- ЧИСЛОВІ КООРДИНАТИ ---
-        xtick={1, 2, 3, 4, 5, 6},
-        xticklabels={Вт, Ср, Чт, Пт, Сб, Нд},
-        ymin=0, ymax=800,
-        % Основні підписи через 100
-        ytick={0, 100, 200, 300, 400, 500, 600, 700, 800},
-        % Проміжна лінія між кожними 100 (тобто крок 50)
-        minor y tick num=1,
-        ylabel={Кількість відвідувачів},
-        xlabel={День тижня},
-        % Вмикаємо сітку для основних і проміжних ліній
-        grid=major,
-        ymajorgrids=true,
-        yminorgrids=true, 
-        major grid style={line width=0.4pt, draw=gray!50},
-        minor grid style={line width=0.2pt, draw=gray!20},
-        bar width=0.8cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!40,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.83cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=0,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5, 6},
+    xticklabels={Вт, Ср, Чт, Пт, Сб, Нд},
+    ymax=800,
+    ytick={0, 100, 200, 300, 400, 500, 600, 700, 800},
+    ylabel={Кількість відвідувачів},
+    xlabel={День тижня}]
         % 1=Вт, 2=Ср...
-        \addplot coordinates {(1,50)};
-        \addplot coordinates {(2,100)};
-        \addplot coordinates {(3,200)};
-        \addplot coordinates {(4,350)};
-        \addplot coordinates {(5,600)};
-        \addplot coordinates {(6,700)};
+        \addplot[nmt bar] coordinates {(1,50)};
+        \addplot[nmt bar] coordinates {(2,100)};
+        \addplot[nmt bar] coordinates {(3,200)};
+        \addplot[nmt bar] coordinates {(4,350)};
+        \addplot[nmt bar] coordinates {(5,600)};
+        \addplot[nmt bar] coordinates {(6,700)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -2477,38 +1922,25 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 45 (Кінофільми - Кругова діаграма) ===
-\noindent\zadnum Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало на 45 осіб більше, ніж жанр «Хоррор». Визначте загальну кількість студентів, які взяли участь в опитуванні. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало на 45 осіб більше, ніж жанр «Хоррор». Визначте загальну кількість студентів, які взяли участь в опитуванні. \nmtyear{2025}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-    % Сектор Комедія (42.5%) - Помаранчевий
-    % 42.5% * 3.6 = 153 градуси. Почнемо з 0.
-    \draw[fill=orange!80] (0,0) -- (0:3) arc (0:153:3) -- cycle;
-    \node at (76.5:1.8) [align=center] {Комедія\\42,5\%};
-
-    % Сектор Мелодрама (40%) - Рожевий
-    % 40% * 3.6 = 144 градуси. 153 + 144 = 297.
-    \draw[fill=magenta!20] (0,0) -- (153:3) arc (153:297:3) -- cycle;
-    \node at (225:1.8) [align=center] {Мелодрама\\40\%};
-
-    % Сектор Фантастика (10%) - Зелений
-    % 10% * 3.6 = 36 градусів. 297 + 36 = 333.
-    \draw[fill=green!50] (0,0) -- (297:3) arc (297:333:3) -- cycle;
-    \node[rotate=0] at (315:2.2) [align=center, font=\footnotesize] {Фантастика\\10\%};
-
-    % Сектор Хоррор (Решта = 7.5%) - Жовтий
-    % 333 до 360.
-    \draw[fill=yellow!60] (0,0) -- (333:3) arc (333:360:3) -- cycle;
-    \node at (346.5:2.2) [align=center, font=\footnotesize] {Хоррор};
-
-    % Контур
-    \draw (0,0) circle (3);
+\begin{nmtfit}\begin{tikzpicture}
+% Комедія 42,5 % (0--153), Хоррор 7,5 % (153--180), Фантастика 10 % (180--216), Мелодрама 40 % (216--360)
+\filldraw[thick, fill=nmtFillC, draw=nmtInk] (0,0) -- (0:2.5) arc (0:153:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillA, draw=nmtInk] (0,0) -- (153:2.5) arc (153:180:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillB, draw=nmtInk] (0,0) -- (180:2.5) arc (180:216:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillE, draw=nmtInk] (0,0) -- (216:2.5) arc (216:360:2.5) -- cycle;
+% підписи великих секторів -- всередині
+\node[align=center, inner sep=1pt] at (76.5:1.4) {Комедія\\42{,}5\,\%};
+\node[align=center, inner sep=1pt] at (288:1.5) {Мелодрама\\40\,\%};
+% підписи малих секторів -- ззовні, з виноскою
+\draw[thin, nmtInk] (166.5:2.5) -- (-2.9,0.95);
+\node[anchor=east, inner sep=1pt] at (-2.95,0.95) {Хоррор};
+\draw[thin, nmtInk] (198:2.5) -- (-2.9,-1.1);
+\node[anchor=east, align=right, inner sep=1pt] at (-2.95,-1.1) {Фантастика\\10\,\%};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -2538,13 +1970,11 @@
 
 \begin{samepage}
 % === ЗАВДАННЯ 47 (Полігон частот) ===
-\noindent\zadnum На рисунку зображено полігон частот певного ряду даних, на якому по горизонталі відмічено елементи цього ряду, а по вертикалі – їхні частоти. Визначте середнє значення цього ряду даних. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На рисунку зображено полігон частот певного ряду даних, на якому по горизонталі відмічено елементи цього ряду, а по вертикалі – їхні частоти. Визначте середнє значення цього ряду даних. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=12cm, height=7cm,
+        width=12.5cm, height=6.2cm,
         xlabel={Елементи ряду даних},
         ylabel={Частоти елементів\\ряду даних},
         ylabel style={align=center, font=\small},
@@ -2557,116 +1987,87 @@
         axis lines=left,
         axis line style={-latex},
     ]
-        \addplot[color=black, thick, mark=diamond*, mark size=2.5pt, mark options={fill=green!60!black, draw=green!60!black}] coordinates {
+        \addplot[nmt curve, mark=diamond*, mark size=2.5pt, mark options={fill=green!60!black, draw=green!60!black}] coordinates {
             (6,3) (12,7) (18,1) (24,3) (30,3) (36,5)
         };
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 50 (Температура Мода - Гістограма) ===
-\noindent\zadnum На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Середнє значення цього ряду збігається з його модою. Знайдіть середньоденну температуру повітря ($^\circ$C) в неділю. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Середнє значення цього ряду збігається з його модою. Знайдіть середньоденну температуру повітря ($^\circ$C) в неділю. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=13cm, height=7cm,
-        % Числові координати
-        xtick={1, 2, 3, 4, 5, 6, 7},
-        xticklabels={Пн, Вт, Ср, Чт, Пт, Сб, Нд},
-        ymin=19, ymax=28,
-        ytick={19,20,21,22,23,24,25,26,27,28},
-        ylabel={Середньоденна\\температура повітря, $^\circ$C},
-        y label style={align=center},
-        xlabel={Дні},
-        ymajorgrids=true,
-        bar width=0.7cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!60!blue,
-        draw=none
-    ]
-        % Дані: 23, 21, 23, 27, 23, 24
-        \addplot coordinates {(1,23)};
-        \addplot coordinates {(2,21)};
-        \addplot coordinates {(3,23)};
-        \addplot coordinates {(4,27)};
-        \addplot coordinates {(5,23)};
-        \addplot coordinates {(6,24)};
-        % Нд - знак питання
-        \node at (axis cs:7, 21) {\Huge ?};
+    \begin{axis}[nmt bars,
+    bar width=0.71cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=19,
+    bar shift=0pt,
+    xmin=0.4,
+    xmax=7.6,
+    ymax=28,
+    xtick={1,2,3,4,5,6,7},
+    xticklabels={Пн, Вт, Ср, Чт, Пт, Сб, Нд},
+    ytick={19,20,21,22,23,24,25,26,27,28},
+    ylabel={Середньоденна\\температура повітря, $^\circ$C},
+    xlabel={Дні}]
+        % Пн, Вт, Ср, Чт, Пт, Сб: 23, 21, 23, 27, 23, 24; неділя --- невідома
+        \addplot[fill=nmtBlue, draw=nmtBlue] coordinates {(1,23) (2,21) (3,23) (4,27) (5,23) (6,24)};
+        \node at (axis cs:7,21.4) {\Huge ?};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 51 (Температура Розмах - Гістограма) ===
-\noindent\zadnum На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Визначте, на скільки \textit{відсотків} середнє значення цього ряду даних перевищує його розмах. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На діаграмі відображено інформацію про середньоденну температуру повітря в місті протягом тижня. Значення середньоденних температур за сім днів утворюють ряд даних. Визначте, на скільки \textit{відсотків} середнє значення цього ряду даних перевищує його розмах. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
-    \begin{axis}[
-        ybar,
-        bar shift=0pt,
-        width=13cm, height=7cm,
-        xtick={1, 2, 3, 4, 5, 6, 7},
-        xticklabels={Пн, Вт, Ср, Чт, Пт, Сб, Нд},
-        ymin=20, ymax=27,
-        ytick={20,21,22,23,24,25,26,27},
-        ylabel={Середньоденна температура\\повітря, $^\circ$C},
-        y label style={align=center},
-        xlabel={Дні},
-        ymajorgrids=true,
-        bar width=0.7cm,
-        axis x line*=bottom,
-        axis y line*=left,
-        fill=cyan!60!blue,
-        draw=none
-    ]
+    \begin{axis}[nmt bars,
+    bar width=0.71cm,
+    width=12.5cm,
+    height=6.2cm,
+    ymin=20,
+    bar shift=0pt,
+    xtick={1, 2, 3, 4, 5, 6, 7},
+    xticklabels={Пн, Вт, Ср, Чт, Пт, Сб, Нд},
+    ymax=27,
+    ytick={20,21,22,23,24,25,26,27},
+    ylabel={Середньоденна температура\\повітря, $^\circ$C},
+    xlabel={Дні}]
         % Дані: 24, 22, 24, 26, 24, 23, 25
-        \addplot coordinates {(1,24)};
-        \addplot coordinates {(2,22)};
-        \addplot coordinates {(3,24)};
-        \addplot coordinates {(4,26)};
-        \addplot coordinates {(5,24)};
-        \addplot coordinates {(6,23)};
-        \addplot coordinates {(7,25)};
+        \addplot[nmt bar] coordinates {(1,24)};
+        \addplot[nmt bar] coordinates {(2,22)};
+        \addplot[nmt bar] coordinates {(3,24)};
+        \addplot[nmt bar] coordinates {(4,26)};
+        \addplot[nmt bar] coordinates {(5,24)};
+        \addplot[nmt bar] coordinates {(6,23)};
+        \addplot[nmt bar] coordinates {(7,25)};
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 53 (Лід - Середнє та різниця - КРОК 0.1 + ЗБІЛЬШЕНО) ===
-\noindent\zadnum На рисунку зірочками позначено річні мінімуми площі (млн $\text{км}^2$, округлені до десятих) поверхні арктичного льоду, що спостерігали в період із 2010 до 2014 р. Визначте середнє значення (млн $\text{км}^2$) річного мінімуму площі поверхні льоду за вказаний період. Обчисліть різницю (млн $\text{км}^2$) середнього значення і найближчого до нього значення річного мінімуму площі поверхні льоду. У відповіді запишіть \textit{модуль} цієї різниці. \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{На рисунку зірочками позначено річні мінімуми площі (млн $\text{км}^2$, округлені до десятих) поверхні арктичного льоду, що спостерігали в період із 2010 до 2014 р. Визначте середнє значення (млн $\text{км}^2$) річного мінімуму площі поверхні льоду за вказаний період. Обчисліть різницю (млн $\text{км}^2$) середнього значення і найближчого до нього значення річного мінімуму площі поверхні льоду. У відповіді запишіть \textit{модуль} цієї різниці. \nmtyear{2025}}
 \begin{center}
 \begin{nmtfit}\begin{tikzpicture}
     \begin{axis}[
-        width=13cm, height=9cm, % Збільшені розміри
+        width=12.5cm, height=6.2cm, % Збільшені розміри
         xlabel={роки},
         ylabel style={align=center, font=\small},
         ylabel={Площа поверхні льоду,\\млн $\text{км}^2$},
@@ -2686,7 +2087,7 @@
         axis line style={-latex},
     ]
         % Дані: 2010-4.6, 2011-4.3, 2012-3.4, 2013-5.0, 2014-5.2
-        \addplot[color=black, thick, mark=10-pointed star, mark size=3.5pt, mark options={fill=cyan, draw=cyan}] coordinates {
+        \addplot[nmt curve, mark=10-pointed star, mark size=3.5pt, mark options={fill=cyan, draw=cyan}] coordinates {
             (2010, 4.6)
             (2011, 4.3)
             (2012, 3.4)
@@ -2696,44 +2097,32 @@
     \end{axis}
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
 
 \begin{samepage}
 % === ЗАВДАННЯ 54 (Кінофільми - Варіант 2 - Система рівнянь) ===
-\noindent\zadnum Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало в 1,5 раза більше осіб, ніж жанр «Хоррор». Скільки всього було опитаних, якщо жанр «Фантастика» вибрало на 30 осіб більше, ніж жанр «Хоррор»? \nmtyear{2025}
-
-\nmtnobreak
+\zadtask{Студентів і студенток опитали щодо улюбленого жанру кінофільмів. Результати опитування відображено на круговій діаграмі. Жанр «Фантастика» вибрало в 1,5 раза більше осіб, ніж жанр «Хоррор». Скільки всього було опитаних, якщо жанр «Фантастика» вибрало на 30 осіб більше, ніж жанр «Хоррор»? \nmtyear{2025}}
 \begin{center}
-\begin{nmtfit}\begin{tikzpicture}[scale=0.9]
-    % Комедія 40% (Помаранчевий) -> 144 град
-    \draw[fill=orange!80] (0,0) -- (0:3) arc (0:144:3) -- cycle;
-    \node at (72:1.8) [align=center] {Комедія\\40\%};
-
-    % Мелодрама 35% (Рожевий) -> 126 град. 144+126=270
-    \draw[fill=magenta!20] (0,0) -- (144:3) arc (144:270:3) -- cycle;
-    \node at (207:1.8) [align=center] {Мелодрама\\35\%};
-
-    % Залишок 25% (90 град). Фантастика > Хоррор.
-    % Нехай Хоррор (Жовтий) ~36 град, Фантастика (Зелений) ~54 град.
-    % Хоррор (270 -> 306)
-    \draw[fill=yellow!60] (0,0) -- (270:3) arc (270:306:3) -- cycle;
-    \node[rotate=45] at (288:2.2) [font=\footnotesize] {Хоррор};
-
-    % Фантастика (306 -> 360)
-    \draw[fill=green!60] (0,0) -- (306:3) arc (306:360:3) -- cycle;
-    \node[rotate=0] at (333:2.0) [font=\footnotesize] {Фантастика};
-
-    \draw (0,0) circle (3);
+\begin{nmtfit}\begin{tikzpicture}
+% Комедія 40 % (0--144), Фантастика (144--198), Хоррор (198--234), Мелодрама 35 % (234--360)
+\filldraw[thick, fill=nmtFillC, draw=nmtInk] (0,0) -- (0:2.5) arc (0:144:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillB, draw=nmtInk] (0,0) -- (144:2.5) arc (144:198:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillA, draw=nmtInk] (0,0) -- (198:2.5) arc (198:234:2.5) -- cycle;
+\filldraw[thick, fill=nmtFillE, draw=nmtInk] (0,0) -- (234:2.5) arc (234:360:2.5) -- cycle;
+% підписи великих секторів -- всередині
+\node[align=center, inner sep=1pt] at (72:1.4) {Комедія\\40\,\%};
+\node[align=center, inner sep=1pt] at (0.72,-1.4) {Мелодрама\\35\,\%};
+% підписи малих секторів -- ззовні, з виноскою
+\draw[thin, nmtInk] (171:2.5) -- (-2.85,0.65);
+\node[anchor=east, inner sep=1pt] at (-2.9,0.65) {Фантастика};
+\draw[thin, nmtInk] (216:2.5) -- (-2.6,-1.85);
+\node[anchor=east, inner sep=1pt] at (-2.65,-1.85) {Хоррор};
 \end{tikzpicture}\end{nmtfit}
 \end{center}
-
-\nmtnobreak
-\nopagebreak\nbvspace{0.3cm}
+\nopagebreak\nbvspace{0.2cm}
 \nmtAnswerBox
 \par\penalty-20
 \end{samepage}
@@ -2766,7 +2155,7 @@
 \nmtnobreak
 \noindent\begin{center}
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{|>{\centering\arraybackslash}m{2.2cm}|c|c|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|c|}
+\begin{tabular}{|>{\centering\arraybackslash}m{2.2cm}|c|c|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.8cm}|c|}
 \hline
 \textbf{Сорт груш} & Дюшес & Вільямс & Улюблениця Клаппа & Лісова Красуня & Бланка \\
 \hline
@@ -2817,6 +2206,7 @@
 \noindent\textbf{34.}~Б \ {\scriptsize\color{gray}(3.06, №2)}\par
 \noindent\textbf{35.}~В \ {\scriptsize\color{gray}(4.06, №2)}\par
 \noindent\textbf{36.}~Б \ {\scriptsize\color{gray}(5.06, №2)}\par
+\noindent\textbf{39.}~А \ {\scriptsize\color{gray}(10.06, №2)}\par
 \noindent\textbf{42.}~А \ {\scriptsize\color{gray}(15.06, №2)}\par
 \noindent\textbf{43.}~Д \ {\scriptsize\color{gray}(15.06, №11)}\par
 \noindent\textbf{44.}~В \ {\scriptsize\color{gray}(16.06, №2)}\par

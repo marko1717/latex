@@ -1,6 +1,9 @@
 # Ignore everything
 *
 
+# єдина преамбула (створює scripts/build_nmt_2023_2026.py)
+!nmtbase.sty
+
 # Whitelist directories
 !generators/
 !scripts/
@@ -42,13 +45,21 @@ scripts/__pycache__
 # --- База НМТ 2023--2026 (новий формат) ---
 !*.otf
 !*/*.png
+!*/*.jpg
 !*/*/завдання*.tex
 !archive/
 !archive/**
-!scripts/data/
+!# теку не ігноруємо цілком, інакше виняток для файла всередині не спрацює
+scripts/data/*
+!scripts/data/відповіді_*.json
 !scripts/data/*.json
 !/НМТ_2023-2026_всі_теми.tex
 !/Розділ_*.tex
+!/Показникові_*.tex
+!/Логарифмічні_*.tex
+!/Відповідності_*.tex
+!/Призма_*.tex
+!/Піраміда*.tex
 
 # локальні налаштування Claude Code
 .claude/
@@ -58,12 +69,47 @@ scripts/__pycache__
 !шаблон/*
 !scripts/*/
 !scripts/*/*.py
+!scripts/*/*.swift
+!scripts/*/*.sh
+!scripts/*/*.tex
 !scripts/*/*.md
+!scripts/типи_*/*.png
 
 # --- не тримаємо в гілці main: Overleaf має ліміт на сумарний розмір текстових файлів ---
 # Усе це є в гілці «джерела» на GitHub і лишається на диску локально.
 archive/
-scripts/data/
+scripts/data/*
+# ключі відповідей маленькі й потрібні для збірки
+!scripts/data/відповіді_*.json
+# генератор варіантів: каталог завдань, бібліотека аналогів, ключі посібника 2024--2025
+!scripts/data/варіант_*.json
+!scripts/data/рисунки.json
+!scripts/data/вставки_рисунків.json
+!scripts/data/завдання_за_оригіналом.json
+!scripts/data/ключі_pdf_*.json
+!scripts/data/типи_рівнянь_нмт.json
+!scripts/data/типи_алгебри_нмт.json
+!scripts/data/типи_геометрії_нмт.json
+!scripts/data/типи_відп_вирази_нмт.json
+!scripts/data/типи_відп_функції_нмт.json
+!scripts/data/типи_відп_планіметрія_нмт.json
+!scripts/data/типи_кв_стохастика_нмт.json
+!scripts/data/типи_кв_функціональне_нмт.json
+!scripts/data/типи_кв_стерео_нмт.json
+!scripts/data/типи_кв_параметр_нмт.json
+!scripts/data/типи_класифікація.json
+# пробні_база.json не комітимо: її збирає scripts/пробні_нмт/база.py (1 МБ тексту -- ліміт Overleaf)
+# пробні НМТ: .tex у теці пробні/, специфікації й склад -- у підтеках
+!пробні/
+!пробні/*.tex
+!пробні/*/
+!пробні/*/спец.py
+!пробні/*/завдання.json
+!пробні/*/склад.json
+# тренувальні варіанти
+!варіанти/
+!варіанти/*.tex
+!варіанти/журнал.json
 generated/
 tex/
 generators/
@@ -74,3 +120,15 @@ nmt_database.json
 
 # PDF прикладу не тримаємо в git
 шаблон/*.pdf
+
+# сирі зображення з OpenAI (у теки тем іде лише оброблена копія)
+рисунки_вхідні/
+
+# сирі зображення від scripts/рисунок_api.py (у LaTeX іде лише оброблена копія)
+*_raw.png
+
+# локальні бази (osvita тощо): лише для особистого використання, у git не йдуть
+/локальне/
+/локальне
+!scripts/data/дизайн_розміри.json
+!scripts/data/рисунки_за_оригіналом.json
